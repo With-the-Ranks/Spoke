@@ -1,3 +1,6 @@
+import type { Knex } from "knex";
+import type { PoolClient } from "pg";
+
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
 import { stringIsAValidUrl } from "../../../lib/utils";
