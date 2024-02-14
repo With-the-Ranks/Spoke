@@ -1,5 +1,6 @@
 import type { Knex } from "knex";
 import type { PoolClient } from "pg";
+import { getSpokeCharCount } from "src/lib/charset-utils";
 
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
@@ -177,8 +178,24 @@ export const sendMessage = async (
     .reader("campaign_contact")
     .where({ id: campaignContactId })
     .first("zip");
+
+  const { maxSmsSegmentLength } = await r
+    .reader("organization")
+    .where({ id: organizationId })
+    .first("features")
+    .then(({ features }: { features: string }) => JSON.parse(features))
+    .catch(() => ({}));
+
   const { body, mediaUrl } = messageComponents(messageText);
-  const mediaUrls = mediaUrl ? [mediaUrl] : undefined;
+  const { msgCount } = getSpokeCharCount(messageText);
+
+  const mediaUrls = mediaUrl
+    ? [mediaUrl]
+    : // format for switchboard to send empty MMS
+    maxSmsSegmentLength && msgCount > maxSmsSegmentLength
+    ? []
+    : undefined;
+
   const messageInput: NumbersOutboundMessagePayload = {
     profileId,
     to,
@@ -187,6 +204,8 @@ export const sendMessage = async (
     sendBefore,
     contactZipCode: contactZipCode === "" ? null : contactZipCode
   };
+
+  console.log(messageInput);
 
   try {
     const result = await numbers.sms.sendMessage(messageInput);
