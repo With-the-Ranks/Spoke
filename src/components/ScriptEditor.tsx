@@ -2,7 +2,6 @@ import { withApollo } from "@apollo/client/react/hoc";
 import { blue, green, grey, orange, red } from "@material-ui/core/colors";
 import type { CampaignVariable } from "@spoke/spoke-codegen";
 import { IsValidAttachmentDocument } from "@spoke/spoke-codegen";
-import { getCharCount } from "@trt2/gsm-charset-utils";
 import type { ContentBlock } from "draft-js";
 import {
   CompositeDecorator,
@@ -14,7 +13,7 @@ import {
 import escapeRegExp from "lodash/escapeRegExp";
 import React from "react";
 
-import { replaceEasyGsmWins } from "../lib/charset-utils";
+import { getSpokeCharCount, replaceEasyGsmWins } from "../lib/charset-utils";
 import { delimit, getAttachmentLink, getMessageType } from "../lib/scripts";
 import baseTheme from "../styles/theme";
 import Chip from "./Chip";
@@ -369,7 +368,7 @@ class ScriptEditor extends React.Component<Props, State> {
 
   render() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const info = getCharCount(replaceEasyGsmWins(text));
+    const info = getSpokeCharCount(text);
     const messageType = getMessageType(text);
 
     return (
