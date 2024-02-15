@@ -204,8 +204,6 @@ export const sendMessage = async (
     contactZipCode: contactZipCode === "" ? null : contactZipCode
   };
 
-  console.log(messageInput);
-
   try {
     const result = await numbers.sms.sendMessage(messageInput);
     const { data, errors } = result;
