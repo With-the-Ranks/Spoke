@@ -1,9 +1,10 @@
-import type { CampaignVariable } from "@spoke/spoke-codegen";
+import type {
+  CampaignContact,
+  CampaignVariable,
+  User
+} from "@spoke/spoke-codegen";
 import escapeRegExp from "lodash/escapeRegExp";
 import isNil from "lodash/isNil";
-
-import type { CampaignContact } from "../api/campaign-contact";
-import type { User } from "../api/user";
 
 export const delimiters = {
   startDelimiter: "{",
