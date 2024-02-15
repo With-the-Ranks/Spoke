@@ -121,6 +121,7 @@ interface Props {
   scriptFields: string[];
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
+  maxSmsSegmentLength: number | null;
   onChange: (value: string) => Promise<void> | void;
   receiveFocus?: boolean;
 }
@@ -318,7 +319,7 @@ class ScriptEditor extends React.Component<Props, State> {
 
   renderAttachmentWarning() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const messageType = getMessageType(text);
+    const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
     if (messageType === "MMS" && !this.state.validAttachment) {
       return (
         <div style={{ color: baseTheme.colors.red }}>
@@ -369,7 +370,7 @@ class ScriptEditor extends React.Component<Props, State> {
   render() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
     const info = getSpokeCharCount(text);
-    const messageType = getMessageType(text);
+    const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
 
     return (
       <div>

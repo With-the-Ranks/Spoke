@@ -1,9 +1,9 @@
 import type { Knex } from "knex";
 import type { PoolClient } from "pg";
-import { getSpokeCharCount } from "src/lib/charset-utils";
 
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
+import { getMessageType } from "../../../lib/scripts";
 import { stringIsAValidUrl } from "../../../lib/utils";
 import logger from "../../../logger";
 import { makeNumbersClient } from "../../lib/assemble-numbers";
@@ -183,16 +183,15 @@ export const sendMessage = async (
     .reader("organization")
     .where({ id: organizationId })
     .first("features")
-    .then(({ features }: { features: string }) => JSON.parse(features))
+    .then(({ features }) => JSON.parse(features))
     .catch(() => ({}));
 
   const { body, mediaUrl } = messageComponents(messageText);
-  const { msgCount } = getSpokeCharCount(messageText);
 
   const mediaUrls = mediaUrl
     ? [mediaUrl]
-    : // format for switchboard to send empty MMS
-    maxSmsSegmentLength && msgCount > maxSmsSegmentLength
+    : // check if we should convert to switchboard format for empty mms
+    getMessageType(body, maxSmsSegmentLength) === "MMS"
     ? []
     : undefined;
 
