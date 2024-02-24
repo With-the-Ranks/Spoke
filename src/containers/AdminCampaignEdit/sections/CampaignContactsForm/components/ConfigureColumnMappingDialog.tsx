@@ -228,10 +228,10 @@ const ConfigureColumnMappingDialog: React.FC<ConfigureColumnMappingDialogProps> 
                         <Autocomplete
                           value={value}
                           onChange={(_event, newValue) => {
-                            const quotedValue = newValue?.match(
+                            const quotedWord = newValue?.match(
                               /"([^"]+)"/
                             )?.[1];
-                            const valueToSet = quotedValue ?? newValue;
+                            const valueToSet = quotedWord ?? newValue;
                             onChange(valueToSet);
                           }}
                           selectOnFocus
