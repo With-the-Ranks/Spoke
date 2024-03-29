@@ -259,7 +259,7 @@ export const sendMessage = async (
   const timezone = contactTimezone || campaignTimezone;
   const isValidSendTime = isNowBetween(timezone, startHour, endHour);
 
-  if (!isValidSendTime) {
+  if (!config.isTest && !isValidSendTime) {
     throw new OutsideTextingHoursError();
   }
 
