@@ -388,8 +388,14 @@ export const createMessage = async (
     )
     .then(({ rows: [message] }) => message);
 
+const isOrganizationRecord = (
+  organization: OrganizationRecord | CreateOrganizationOptions | undefined
+): organization is OrganizationRecord => {
+  return organization !== undefined && "id" in organization;
+};
+
 export interface CreateCompleteCampaignOptions {
-  organization?: CreateOrganizationOptions;
+  organization?: OrganizationRecord | CreateOrganizationOptions;
   campaign?: Omit<CreateCampaignOptions, "organizationId">;
   texters?: number | CreateTexterOptions[];
   contacts?: number | Omit<CreateCampaignContactOptions, "campaignId">[];
@@ -399,10 +405,11 @@ export const createCompleteCampaign = async (
   client: PoolClient,
   options: CreateCompleteCampaignOptions
 ) => {
-  const organization = await createOrganization(
-    client,
-    options.organization ?? {}
-  );
+  const optOrg = options.organization;
+
+  const organization = isOrganizationRecord(optOrg)
+    ? optOrg
+    : await createOrganization(client, optOrg ?? {});
 
   const campaign = await createCampaign(client, {
     ...(options.campaign ?? {}),
