@@ -11,6 +11,7 @@ import type { Organization } from "../../src/api/organization";
 import { UserRoleType } from "../../src/api/organization-membership";
 import type { User } from "../../src/api/user";
 import { DateTime } from "../../src/lib/datetime";
+import { symmetricEncrypt } from "../../src/server/api/lib/crypto";
 import type {
   AssignmentRecord,
   CampaignContactRecord,
@@ -457,7 +458,7 @@ returning *;
       faker.random.uuid(),
       options.organizationId,
       faker.random.alphaNumeric(15),
-      faker.random.alphaNumeric(15),
+      symmetricEncrypt(faker.random.alphaNumeric(15)),
       "assemble-numbers",
       faker.name.firstName(),
       options.active
