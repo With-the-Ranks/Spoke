@@ -120,7 +120,7 @@ const UserMenu: React.FC<Props> = (props) => {
           </MenuItem>
         )}
         <Divider />
-        <ListSubheader>Teams</ListSubheader>
+        <ListSubheader>Organizations</ListSubheader>
         {currentUser?.organizations?.map((organization) => (
           <OrganizationItem
             key={organization!.id}
