@@ -11,7 +11,7 @@ const Footer: React.FC<FooterProps> = ({ orgName, settingsUrl }) => {
     <MjmlSection fullWidth>
       <MjmlColumn>
         <MjmlText>
-          <p>© 2023 Rewired, LLC. All rights reserved.</p>
+          <p>© 2024 With The Ranks, LLC. All rights reserved.</p>
           <p>
             You are receiving this email because you signed up to text for{" "}
             {orgName}
@@ -23,9 +23,9 @@ const Footer: React.FC<FooterProps> = ({ orgName, settingsUrl }) => {
             <br />
           </p>
           <p>
-            Rewired LLC <br />
-            41 Flatbush Ave Fl 1, PMB 731 <br />
-            Brooklyn, NY 11217 <br />
+            With The Ranks LLC <br />
+            PO Box 49151 <br />
+            Cookeville, TN 38501 <br />
           </p>
         </MjmlText>
       </MjmlColumn>
