@@ -84,6 +84,9 @@ const getScriptFieldValue = (
   return result;
 };
 
+export const customFieldsJsonStringToArray = (customFieldsJson: string) =>
+  Object.keys(JSON.parse(customFieldsJson));
+
 interface ApplyScriptOptions {
   script: string;
   contact: CampaignContact;
