@@ -1,3 +1,4 @@
+import type { CampaignContact, MessageInput, User } from "@spoke/spoke-codegen";
 import type { Task } from "graphile-worker";
 import sample from "lodash/sample";
 import md5 from "md5";
@@ -80,7 +81,7 @@ export const retryInteractionStep: Task = async (
   };
   const texter = recordToCamelCase<User>(user);
   const customFields = Object.keys(JSON.parse(contact.customFields));
-  const campaignVariableIds = campaignVariables.map(({ id }) => id);
+  const campaignVariableIds = campaignVariables.map(({ id }) => id.toString());
 
   const body = applyScript({
     script,
