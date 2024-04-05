@@ -65,9 +65,7 @@ export const retryInteractionStep: Task = async (
   const { campaign_contact, interaction_step, assignment_id, user } = record;
 
   const { rows: campaignVariables } = await helpers.query<
-    Pick<CampaignVariableRecord, "id" | "name"> & {
-      value: NonNullable<CampaignVariableRecord["value"]>;
-    }
+    CampaignVariableRecord
   >(
     "select * from campaign_variable where campaign_id = $1 and deleted_at is null",
     [campaign_contact.campaign_id]
