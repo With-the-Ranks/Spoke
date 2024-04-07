@@ -1535,7 +1535,11 @@ const rootMutations = {
       try {
         await assignmentRequired(user, campaignContact.assignment_id);
       } catch (err) {
-        accessRequired(user, campaignContact.organization_id, "SUPERVOLUNTEER");
+        await accessRequired(
+          user,
+          campaignContact.organization_id,
+          "SUPERVOLUNTEER"
+        );
       }
 
       const { addedTagIds, removedTagIds } = tag;
@@ -1544,14 +1548,15 @@ const rootMutations = {
         tag_id: tagId,
         tagger_id: user.id
       }));
-      await Promise.all([
+
+      if (removedTagIds.length > 0)
         await r
           .knex("campaign_contact_tag")
           .where({ campaign_contact_id: parseInt(campaignContactId, 10) })
           .whereIn("tag_id", removedTagIds)
-          .del(),
-        await r.knex("campaign_contact_tag").insert(tagsToInsert)
-      ]);
+          .del();
+      if (tagsToInsert.length > 0)
+        await r.knex("campaign_contact_tag").insert(tagsToInsert);
 
       // See if any of the newly applied tags are is_assignable = false
       const newlyAssignedTagsThatShouldUnassign = await r
