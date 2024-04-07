@@ -814,7 +814,6 @@ export const resolvers = {
       return result;
     },
     campaignVariables: async (campaign, _, { user }) => {
-      console.log(campaign);
       const organizationId = parseInt(campaign.organization_id, 10);
       await accessRequired(user, organizationId, UserRoleType.TEXTER);
 
