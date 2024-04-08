@@ -287,19 +287,6 @@ const validators = {
     desc: "UUID of organization to automatically insert users into upon signup",
     default: undefined
   }),
-  DD_AGENT_HOST: host({
-    desc: "Datadog agent host",
-    default: undefined
-  }),
-  DD_DOGSTATSD_PORT: port({
-    desc: "Datadog dogstatd port",
-    default: undefined
-  }),
-  DD_TAGS: str({
-    desc: "Comma-separated list of DataDog tags to apply to metrics.",
-    example: "app:spoke,client:rewired",
-    default: "app:spoke"
-  }),
   DELIVERABILITY_ALERT_ENDPOINT: url({
     desc:
       "When present, notification payloads will be sent to this URL when deliverability for a domain becomes poor.",
