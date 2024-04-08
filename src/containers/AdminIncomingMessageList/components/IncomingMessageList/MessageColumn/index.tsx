@@ -38,7 +38,7 @@ const MessageColumn: React.FC<Props> = (props) => {
   const { data: messageData } = useGetMessagesForContactQuery({
     variables: { campaignContactId: contact.id }
   });
-  const messages = messageData?.contact?.messages ?? [];
+  const messages = messageData?.contact?.messages ?? contact.messages;
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
