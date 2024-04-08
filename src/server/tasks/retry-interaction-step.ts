@@ -3,9 +3,6 @@ import type { Task } from "graphile-worker";
 import sample from "lodash/sample";
 import md5 from "md5";
 
-import type { CampaignContact } from "../../api/campaign-contact";
-import type { MessageInput } from "../../api/types";
-import type { User } from "../../api/user";
 import { recordToCamelCase } from "../../lib/attributes";
 import { applyScript } from "../../lib/scripts";
 import { sendMessage } from "../api/lib/send-message";
