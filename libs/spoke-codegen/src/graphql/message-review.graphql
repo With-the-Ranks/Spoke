@@ -77,6 +77,14 @@ query GetConversationsForMessageReview(
   }
 }
 
+query GetMessagesForContact($campaignContactId: String!) {
+  contact (id: $campaignContactId) {
+    messages {
+      ...ConversationMessage
+    }
+  }
+}
+
 mutation CloseConversation($campaignContactId: String!) {
   editCampaignContactMessageStatus(
     campaignContactId: $campaignContactId

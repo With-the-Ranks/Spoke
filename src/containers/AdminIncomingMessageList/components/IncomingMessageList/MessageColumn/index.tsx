@@ -1,11 +1,9 @@
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import type {
-  ConversationInfoFragment,
-  ConversationMessageFragment
-} from "@spoke/spoke-codegen";
+import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
+import { useGetMessagesForContactQuery } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import CannedResponseMenu from "src/components/CannedResponseMenu";
 
 import MessageList from "./MessageList";
@@ -36,12 +34,11 @@ const MessageColumn: React.FC<Props> = (props) => {
   const [isOptedOut, setIsOptedOut] = useState(
     !isNil(conversation.contact.optOut?.cell)
   );
-  // TODO: use apollo client cache rather than state to manage changes to messages list
-  const [messages, setMessages] = useState<ConversationMessageFragment[]>([]);
 
-  useEffect(() => {
-    setMessages(conversation.contact.messages);
-  }, [setMessages]);
+  const { data: messageData } = useGetMessagesForContactQuery({
+    variables: { campaignContactId: contact.id }
+  });
+  const messages = messageData?.contact?.messages ?? [];
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
@@ -71,7 +68,6 @@ const MessageColumn: React.FC<Props> = (props) => {
           <MessageResponse
             value={messageText}
             conversation={conversation}
-            messagesChanged={setMessages}
             onChange={setMessageText}
           />
         )}

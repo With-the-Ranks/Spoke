@@ -33,8 +33,7 @@ const messageSchema = yup.object({
 const MessageResponse: React.FC<MessageResponseProps> = ({
   conversation,
   value,
-  onChange,
-  messagesChanged
+  onChange
 }: MessageResponseProps) => {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [sendError, setSendError] = useState<string>("");
@@ -79,10 +78,7 @@ const MessageResponse: React.FC<MessageResponseProps> = ({
         setSendError(errorMsgs);
       }
 
-      if (messages) {
-        messagesChanged(messages);
-        onChange?.("");
-      }
+      if (messages) onChange?.("");
     } catch (e: any) {
       setSendError(e.message);
     } finally {
