@@ -88,7 +88,7 @@ const getScriptFieldValue = (
 };
 
 export const customFieldsJsonStringToArray = (customFieldsJson: string) =>
-  Object.keys(JSON.parse(customFieldsJson));
+  customFieldsJson ? Object.keys(JSON.parse(customFieldsJson)) : [];
 
 interface ApplyScriptOptions {
   script: string;
