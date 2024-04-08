@@ -1,8 +1,8 @@
 import { format } from "fast-csv";
 import type { JobHelpers } from "graphile-worker";
-import DateTime from "src/lib/datetime";
-import { getDownloadUrl, getUploadStream } from "src/workers/exports/upload";
 
+import DateTime from "../../lib/datetime";
+import { getDownloadUrl, getUploadStream } from "../../workers/exports/upload";
 import sendEmail from "../mail";
 import { r } from "../models";
 import { errToObj } from "../utils";

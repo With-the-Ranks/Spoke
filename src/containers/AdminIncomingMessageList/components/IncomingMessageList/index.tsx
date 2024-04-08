@@ -14,10 +14,10 @@ import type {
 } from "@spoke/spoke-codegen";
 import { useGetConversationsForMessageReviewQuery } from "@spoke/spoke-codegen";
 import React, { useEffect } from "react";
-import { DateTime } from "src/lib/datetime";
 import { NumberParam, useQueryParam, withDefault } from "use-query-params";
 
 import LoadingIndicator from "../../../../components/LoadingIndicator";
+import { DateTime } from "../../../../lib/datetime";
 import { MESSAGE_STATUSES } from "../IncomingMessageFilter";
 import ConversationPreviewModal from "./ConversationPreviewModal";
 

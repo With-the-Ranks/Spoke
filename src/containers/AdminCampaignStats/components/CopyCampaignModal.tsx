@@ -6,8 +6,9 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useCopyCampaignsMutation } from "@spoke/spoke-codegen";
 import React, { useState } from "react";
-import NumberCopiesField from "src/components/NumberCopiesField";
-import OrganizationSelector from "src/components/OrganizationSelector";
+
+import NumberCopiesField from "../../../components/NumberCopiesField";
+import OrganizationSelector from "../../../components/OrganizationSelector";
 
 export interface CopyCampaignModalProps {
   campaignId: string;

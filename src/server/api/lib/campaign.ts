@@ -8,7 +8,6 @@ import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import isNil from "lodash/isNil";
 import type { QueryResult } from "pg";
-import MemoizeHelper, { Buckets, cacheOpts } from "src/server/memoredis";
 
 import type { RelayPaginatedResponse } from "../../../api/pagination";
 import { config } from "../../../config";
@@ -20,6 +19,7 @@ import {
   uploadContacts
 } from "../../../workers/jobs";
 import type { SpokeDbContext } from "../../contexts/types";
+import MemoizeHelper, { Buckets, cacheOpts } from "../../memoredis";
 import { cacheableData, datawarehouse, r } from "../../models";
 import { addAssignTexters } from "../../tasks/assign-texters";
 import { accessRequired } from "../errors";
