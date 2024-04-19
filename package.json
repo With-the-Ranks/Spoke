@@ -134,7 +134,7 @@
     "iconv-lite": "^0.5.1",
     "immer": "^8.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "knex": "^2.3.0",
+    "knex": "^2.5.1",
     "lightship": "^6.6.1",
     "lodash": "^4.17.20",
     "luxon": "^1.28.0",
@@ -314,7 +314,7 @@
     "material-ui": "^0.20.1",
     "pg-connection-string": "~2.4.0",
     "fs-capacitor": "6.2.0",
-    "knex": "^2.3.0"
+    "knex": "^2.5.1"
   },
   "config": {
     "commitizen": {
