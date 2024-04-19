@@ -77,10 +77,13 @@ query GetConversationsForMessageReview(
   }
 }
 
-query GetMessagesForContact($campaignContactId: String!) {
+query GetMessageReviewContactUpdates($campaignContactId: String!) {
   contact (id: $campaignContactId) {
     messages {
       ...ConversationMessage
+    }
+    optOut {
+      cell
     }
   }
 }

@@ -1,7 +1,7 @@
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
-import { useGetMessagesForContactQuery } from "@spoke/spoke-codegen";
+import { useGetMessageReviewContactUpdatesQuery } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useState } from "react";
 import CannedResponseMenu from "src/components/CannedResponseMenu";
@@ -31,14 +31,13 @@ const MessageColumn: React.FC<Props> = (props) => {
 
   const [messageText, setMessageText] = useState("");
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [isOptedOut, setIsOptedOut] = useState(
-    !isNil(conversation.contact.optOut?.cell)
-  );
 
-  const { data: messageData } = useGetMessagesForContactQuery({
+  const { data: updatedContactData } = useGetMessageReviewContactUpdatesQuery({
     variables: { campaignContactId: contact.id }
   });
-  const messages = messageData?.contact?.messages ?? contact.messages;
+  const updatedContact = updatedContactData?.contact;
+  const messages = updatedContact?.messages ?? contact.messages;
+  const isOptedOut = !isNil(updatedContact?.optOut?.cell);
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
@@ -73,11 +72,7 @@ const MessageColumn: React.FC<Props> = (props) => {
         )}
         <Grid container spacing={2} justify="flex-end">
           <Grid item>
-            <MessageOptOut
-              contact={contact}
-              isOptedOut={isOptedOut}
-              optOutChanged={setIsOptedOut}
-            />
+            <MessageOptOut contact={contact} isOptedOut={isOptedOut} />
           </Grid>
           {!isOptedOut && (
             <Grid item>

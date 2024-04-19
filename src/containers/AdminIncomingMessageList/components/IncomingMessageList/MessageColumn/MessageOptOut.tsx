@@ -7,10 +7,9 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import type { CampaignContact, ContactActionInput } from "@spoke/spoke-codegen";
 import React, { Component } from "react";
 
-import type { CampaignContact } from "../../../../../api/campaign-contact";
-import type { ContactActionInput } from "../../../../../api/types";
 import ColorButton from "../../../../../components/ColorButton";
 import type { MutationMap } from "../../../../../network/types";
 import {
@@ -21,7 +20,6 @@ import {
 interface InnerProps {
   contact: CampaignContact;
   isOptedOut: boolean;
-  optOutChanged(value: boolean): void;
 }
 
 interface HocProps {
@@ -93,9 +91,8 @@ class MessageOptOut extends Component<Props, State> {
       if (response.errors) {
         throw response.errors;
       }
-      this.props.optOutChanged(false);
       this.handleCloseAlert();
-    } catch (error) {
+    } catch (error: any) {
       const dialogActions = [
         <Button key="close" color="primary" onClick={this.handleCloseAlert}>
           Close
@@ -127,8 +124,7 @@ class MessageOptOut extends Component<Props, State> {
       if (response.errors) {
         throw response.errors;
       }
-      this.props.optOutChanged(true);
-    } catch (error) {
+    } catch (error: any) {
       const dialogActions = [
         <Button key="close" color="primary" onClick={this.handleCloseAlert}>
           Close
