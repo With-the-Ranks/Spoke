@@ -4,10 +4,18 @@ import type {
   ConversationInfoFragment,
   ConversationMessageFragment
 } from "@spoke/spoke-codegen";
+import {
+  useGetCampaignVariablesLazyQuery,
+  useGetCurrentUserProfileLazyQuery
+} from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useEffect, useState } from "react";
 import CannedResponseMenu from "src/components/CannedResponseMenu";
 
+import {
+  applyScript,
+  customFieldsJsonStringToArray
+} from "../../../../../lib/scripts";
 import MessageList from "./MessageList";
 import MessageOptOut from "./MessageOptOut";
 import MessageResponse from "./MessageResponse";
@@ -29,7 +37,7 @@ interface Props {
 
 const MessageColumn: React.FC<Props> = (props) => {
   const { organizationId, conversation } = props;
-  const { contact } = conversation;
+  const { contact, campaign } = conversation;
 
   const [messageText, setMessageText] = useState("");
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
@@ -38,6 +46,9 @@ const MessageColumn: React.FC<Props> = (props) => {
   );
   // TODO: use apollo client cache rather than state to manage changes to messages list
   const [messages, setMessages] = useState<ConversationMessageFragment[]>([]);
+
+  const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
+  const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
 
   useEffect(() => {
     setMessages(conversation.contact.messages);
@@ -50,10 +61,35 @@ const MessageColumn: React.FC<Props> = (props) => {
     [setAnchorEl]
   );
 
+  const setScriptMessageText = async (script: string) => {
+    const customFields = customFieldsJsonStringToArray(contact.customFields);
+
+    const { data: cvData } = await getCampaignVariables({
+      variables: {
+        campaignId: campaign.id
+      }
+    });
+    const campaignVariables = cvData?.campaign?.campaignVariables ?? [];
+
+    const { data: userData } = await getCurrentUserProfile();
+    const texter = userData?.currentUser;
+
+    if (texter) {
+      const appliedScript = applyScript({
+        script,
+        contact,
+        customFields,
+        campaignVariables,
+        texter
+      });
+      setMessageText(appliedScript);
+    }
+  };
+
   const handleScriptSelected = useCallback(
     (script: string) => {
       setAnchorEl(null);
-      setMessageText(script);
+      setScriptMessageText(script);
     },
     [setAnchorEl]
   );

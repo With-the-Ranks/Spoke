@@ -19,6 +19,7 @@ fragment ConversationInfo on Conversation {
     firstName
     lastName
     cell
+    customFields
     messageStatus
     messages {
       ...ConversationMessage

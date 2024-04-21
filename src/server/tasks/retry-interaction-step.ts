@@ -4,7 +4,7 @@ import sample from "lodash/sample";
 import md5 from "md5";
 
 import { recordToCamelCase } from "../../lib/attributes";
-import { applyScript } from "../../lib/scripts";
+import { applyScript, customFieldsJsonStringToArray } from "../../lib/scripts";
 import { sendMessage } from "../api/lib/send-message";
 import type {
   CampaignContactRecord,
@@ -77,7 +77,7 @@ export const retryInteractionStep: Task = async (
     external_id
   };
   const texter = recordToCamelCase<User>(user);
-  const customFields = Object.keys(JSON.parse(contact.customFields));
+  const customFields = customFieldsJsonStringToArray(contact.customFields);
   const campaignVariableIds = campaignVariables.map(({ id }) => id.toString());
 
   const body = applyScript({
