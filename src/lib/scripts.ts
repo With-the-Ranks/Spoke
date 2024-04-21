@@ -88,7 +88,7 @@ interface ApplyScriptOptions {
   script: string;
   contact: CampaignContact;
   customFields: string[];
-  campaignVariables: { name: string; value: string }[];
+  campaignVariables: Pick<CampaignVariable, "name" | "value">[];
   texter: User;
 }
 
@@ -110,17 +110,11 @@ export const applyScript = ({
     );
   }
 
-  for (const field of campaignVariables) {
-    const re = new RegExp(escapeRegExp(delimit(field.name)), "g");
-    appliedScript = appliedScript.replace(re, field.value);
-  }
-
-  for (const field of campaignVariables) {
-    const re = new RegExp(
-      escapeRegExp(delimit(field.name.replace("cv:", ""))),
-      "g"
-    );
-    appliedScript = appliedScript.replace(re, field.value);
+  for (const campaignVariable of campaignVariables) {
+    if (campaignVariable.value) {
+      const re = new RegExp(escapeRegExp(delimit(campaignVariable.name)), "g");
+      appliedScript = appliedScript.replace(re, campaignVariable.value);
+    }
   }
 
   return appliedScript;
