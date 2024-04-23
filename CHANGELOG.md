@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.1.0](https://github.com/politics-rewired/spoke/compare/v8.0.1...v8.1.0) (2024-04-23)
+
+
+### Features
+
+* hide inactive orgs on select org screen ([#25](https://github.com/politics-rewired/spoke/issues/25)) ([94b2491](https://github.com/politics-rewired/spoke/commit/94b249132702555928bda016a2c0cfc46f142df8))
+
+
+### Backend Changes
+
+* **knex:** upgrade to v2.5.1 ([#24](https://github.com/politics-rewired/spoke/issues/24)) ([1138cdc](https://github.com/politics-rewired/spoke/commit/1138cdc337a8b91a4fda85cbb5d2883ff0aaef79))
+
 ### [8.0.1](https://github.com/politics-rewired/spoke/compare/v8.0.0...v8.0.1) (2024-02-15)
 
 
