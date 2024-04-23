@@ -31,32 +31,23 @@ export type ExternalSyncConfigTarget =
   | ExternalActivistCodeTarget
   | ExternalSurveyQuestionResponseOptionTarget;
 
-export function isActivistCodeTarget(
+export const isActivistCodeTarget = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalActivistCodeTarget {
-  return (
-    (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
-    "activist_code"
-  );
-}
+): obj is ExternalActivistCodeTarget =>
+  (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
+  "activist_code";
 
-export function isResponseOptionTarget(
+export const isResponseOptionTarget = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalSurveyQuestionResponseOptionTarget {
-  return (
-    (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
-    "response_option"
-  );
-}
+): obj is ExternalSurveyQuestionResponseOptionTarget =>
+  (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
+  "response_option";
 
-export function isResultCodeTarget(
+export const isResultCodeTarget = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalResultCodeTarget {
-  return (
-    (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
-    "result_code"
-  );
-}
+): obj is ExternalResultCodeTarget =>
+  (obj as ExternalSyncConfigTarget & ExternalSyncTargetType).target_type ===
+  "result_code";
 
 export interface ExternalSyncQuestionResponseConfig {
   compound_id: string;
@@ -82,7 +73,7 @@ export interface ExternalSyncTagConfig {
 
 export const resolvers = {
   ExternalSyncConfigTarget: {
-    __resolveType(obj: ExternalSyncConfigTarget) {
+    __resolveType: (obj: ExternalSyncConfigTarget) => {
       if (isResultCodeTarget(obj)) {
         return "ExternalResultCodeTarget";
       }

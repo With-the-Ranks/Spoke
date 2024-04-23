@@ -29,7 +29,7 @@ try {
 // See: http://docs.aws.amazon.com/lambda/latest/dg/best-practices.html#function-code
 // "Separate the Lambda handler (entry point) from your core logic"
 
-function cleanHeaders(event) {
+const cleanHeaders = (event) => {
   // X-Twilio-Body can contain unicode and disallowed chars by aws-serverless-express like "'"
   // We don't need it anyway
   if (event.headers) {
@@ -38,7 +38,7 @@ function cleanHeaders(event) {
   if (event.multiValueHeaders) {
     delete event.multiValueHeaders["X-Twilio-Body"];
   }
-}
+};
 
 exports.handler = (event, context, handleCallback) => {
   // Note: When lambda is called with invoke() we MUST call handleCallback with a success
@@ -84,7 +84,7 @@ exports.handler = (event, context, handleCallback) => {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Lambda.html#invoke-property
     job(
       event,
-      function dispatcher(dataToSend, callback) {
+      (dataToSend, callback) => {
         const lambda = new AWS.Lambda();
         return lambda.invoke(
           {

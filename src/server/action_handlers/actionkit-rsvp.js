@@ -15,7 +15,7 @@ export const instructions = () =>
   which will be added as post data where '*' can be any word which will map to an action/event field.
   `;
 
-export async function available(organizationId) {
+export const available = async (organizationId) => {
   if (config.AK_BASEURL && config.AK_SECRET) {
     return true;
   }
@@ -39,7 +39,7 @@ export async function available(organizationId) {
     );
   }
   return !!needed.length;
-}
+};
 
 export const akidGenerate = (ak_secret, cleartext) => {
   const shaHash = crypto.createHash("sha256");
@@ -48,11 +48,11 @@ export const akidGenerate = (ak_secret, cleartext) => {
   return `${cleartext}.${shortHash}`;
 };
 
-export async function processAction(
+export const processAction = async (
   questionResponse,
   interactionStep,
   campaignContactId
-) {
+) => {
   const contactRes = await r
     .knex("campaign_contact")
     .where("campaign_contact.id", campaignContactId)
@@ -143,4 +143,4 @@ export async function processAction(
       );
     }
   }
-}
+};

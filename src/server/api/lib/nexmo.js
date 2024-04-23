@@ -16,7 +16,7 @@ if (config.NEXMO_API_KEY && config.NEXMO_API_SECRET) {
   });
 }
 
-async function convertMessagePartsToMessage(messageParts) {
+const convertMessagePartsToMessage = async (messageParts) => {
   const firstPart = messageParts[0];
   const userNumber = firstPart.user_number;
   const contactNumber = firstPart.contact_number;
@@ -43,10 +43,10 @@ async function convertMessagePartsToMessage(messageParts) {
     service: "nexmo",
     send_status: "DELIVERED"
   };
-}
+};
 
-async function findNewCell() {
-  return new Promise((resolve, reject) => {
+const findNewCell = async () =>
+  new Promise((resolve, reject) => {
     nexmo.number.search(
       "US",
       { features: "VOICE,SMS", size: 1 },
@@ -59,9 +59,8 @@ async function findNewCell() {
       }
     );
   });
-}
 
-async function rentNewCell() {
+const rentNewCell = async () => {
   const newCell = await findNewCell();
 
   if (
@@ -86,9 +85,9 @@ async function rentNewCell() {
     });
   }
   throw new Error("Did not find any cell");
-}
+};
 
-async function sendMessage(message, trx = r.knex) {
+const sendMessage = async (message, trx = r.knex) => {
   if (!nexmo) {
     await trx("message")
       .update({ send_status: "SENT" })
@@ -155,9 +154,9 @@ async function sendMessage(message, trx = r.knex) {
       }
     );
   });
-}
+};
 
-async function handleDeliveryReport(report) {
+const handleDeliveryReport = async (report) => {
   if (Object.prototype.hasOwnProperty.call(report, "client-ref")) {
     const message = await r
       .knex("message")
@@ -179,9 +178,9 @@ async function handleDeliveryReport(report) {
     const { id: messageId, ...messagePayload } = message;
     await r.knex("message").update(messagePayload).where({ id: messageId });
   }
-}
+};
 
-async function handleIncomingMessage(message) {
+const handleIncomingMessage = async (message) => {
   if (
     !Object.prototype.hasOwnProperty.call(message, "to") ||
     !Object.prototype.hasOwnProperty.call(message, "msisdn") ||
@@ -219,7 +218,7 @@ async function handleIncomingMessage(message) {
     .returning("id");
 
   return partId;
-}
+};
 
 export default {
   convertMessagePartsToMessage,

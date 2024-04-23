@@ -6,29 +6,20 @@ import type {
 } from "@spoke/spoke-codegen";
 import type { GraphQLType } from "graphql";
 
-export function isActivistCode(
+export const isActivistCode = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalActivistCodeTarget {
-  return (
-    (obj as ExternalActivistCodeTarget & GraphQLType).__typename ===
-    "ExternalActivistCodeTarget"
-  );
-}
+): obj is ExternalActivistCodeTarget =>
+  (obj as ExternalActivistCodeTarget & GraphQLType).__typename ===
+  "ExternalActivistCodeTarget";
 
-export function isResponseOption(
+export const isResponseOption = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalSurveyQuestionResponseOptionTarget {
-  return (
-    (obj as ExternalSurveyQuestionResponseOptionTarget & GraphQLType)
-      .__typename === "ExternalSurveyQuestionResponseOptionTarget"
-  );
-}
+): obj is ExternalSurveyQuestionResponseOptionTarget =>
+  (obj as ExternalSurveyQuestionResponseOptionTarget & GraphQLType)
+    .__typename === "ExternalSurveyQuestionResponseOptionTarget";
 
-export function isResultCode(
+export const isResultCode = (
   obj: ExternalSyncConfigTarget
-): obj is ExternalResultCodeTarget {
-  return (
-    (obj as ExternalResultCodeTarget & GraphQLType).__typename ===
-    "ExternalResultCodeTarget"
-  );
-}
+): obj is ExternalResultCodeTarget =>
+  (obj as ExternalResultCodeTarget & GraphQLType).__typename ===
+  "ExternalResultCodeTarget";
