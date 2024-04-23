@@ -12,19 +12,19 @@ export const Notifications = Object.freeze({
   ASSIGNMENT_UPDATED: "assignment.updated"
 });
 
-async function createNotification(
+const createNotification = async (
   userId,
   organizationId,
   campaignId,
   notificationType
-) {
+) => {
   await r.knex("notification").insert({
     user_id: userId,
     organization_id: organizationId,
     campaign_id: campaignId,
     notification_type: notificationType
   });
-}
+};
 
 const sendAssignmentUserNotification = async (assignment, notification) => {
   const campaign = await r

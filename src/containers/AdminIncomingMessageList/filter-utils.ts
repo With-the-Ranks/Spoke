@@ -1,7 +1,7 @@
-export function getCampaignsFilterForCampaignArchiveStatus(
+export const getCampaignsFilterForCampaignArchiveStatus = (
   includeActiveCampaigns: boolean,
   includeArchivedCampaigns: boolean
-): Record<string, any> {
+): Record<string, any> => {
   let isArchived;
   if (!includeActiveCampaigns && includeArchivedCampaigns) {
     isArchived = true;
@@ -17,12 +17,12 @@ export function getCampaignsFilterForCampaignArchiveStatus(
   }
 
   return {};
-}
+};
 
-export function getContactsFilterForConversationOptOutStatus(
+export const getContactsFilterForConversationOptOutStatus = (
   includeNotOptedOutConversations: boolean,
   includeOptedOutConversations: boolean
-) {
+) => {
   let isOptedOut;
   if (!includeNotOptedOutConversations && includeOptedOutConversations) {
     isOptedOut = true;
@@ -38,4 +38,4 @@ export function getContactsFilterForConversationOptOutStatus(
   }
 
   return {};
-}
+};

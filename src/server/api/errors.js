@@ -8,11 +8,11 @@ const accessHierarchy = ["TEXTER", "SUPERVOLUNTEER", "ADMIN", "OWNER"];
 
 export const roleIndex = (role) => accessHierarchy.indexOf(role);
 
-export function authRequired(user) {
+export const authRequired = (user) => {
   if (!user) {
     throw new AuthenticationError("You must login to access that resource.");
   }
-}
+};
 
 const getUserRole = async ({ userId, organizationId }) => {
   const user_organization = await r
@@ -23,12 +23,12 @@ const getUserRole = async ({ userId, organizationId }) => {
   return user_organization.role;
 };
 
-export async function accessRequired(
+export const accessRequired = async (
   user,
   orgId,
   role,
   allowSuperadmin = false
-) {
+) => {
   authRequired(user);
   if (!orgId) {
     throw new Error("orgId not passed correctly to accessRequired");
@@ -55,17 +55,17 @@ export async function accessRequired(
   if (!hasRole) {
     throw new ForbiddenError("You are not authorized to access that resource.");
   }
-}
+};
 
-export async function userRoleRequired(user, orgId, role) {
+export const userRoleRequired = async (user, orgId, role) => {
   authRequired(user);
   if (role === UserRoleType.SUPERADMIN && user.is_superadmin !== true) {
     throw new ForbiddenError("You are not authorized to access that resource.");
   }
   await accessRequired(user, orgId, role);
-}
+};
 
-export async function assignmentRequired(user, assignmentId) {
+export const assignmentRequired = async (user, assignmentId) => {
   authRequired(user);
 
   if (user.is_superadmin) {
@@ -83,14 +83,14 @@ export async function assignmentRequired(user, assignmentId) {
   if (typeof assignment === "undefined") {
     throw new ForbiddenError("You are not authorized to access that resource.");
   }
-}
+};
 
-export async function assignmentRequiredOrHasOrgRoleForCampaign(
+export const assignmentRequiredOrHasOrgRoleForCampaign = async (
   user,
   assignmentId,
   campaignId,
   role
-) {
+) => {
   authRequired(user);
 
   if (user.is_superadmin) {
@@ -132,12 +132,12 @@ export async function assignmentRequiredOrHasOrgRoleForCampaign(
       );
     }
   }
-}
+};
 
-export function superAdminRequired(user) {
+export const superAdminRequired = (user) => {
   authRequired(user);
 
   if (!user.is_superadmin) {
     throw new ForbiddenError("You are not authorized to access that resource.");
   }
-}
+};

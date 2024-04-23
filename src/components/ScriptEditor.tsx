@@ -71,11 +71,11 @@ const styles: Record<string, React.CSSProperties> = {
   }
 };
 
-function findWithRegex(
+const findWithRegex = (
   regex: RegExp,
   contentBlock: ContentBlock,
   callback: DecoratorStrategyCallBack
-) {
+) => {
   const text = contentBlock.getText();
   let matchArr = regex.exec(text);
   let start;
@@ -84,7 +84,7 @@ function findWithRegex(
     callback(start, start + matchArr[0].length);
     matchArr = regex.exec(text);
   }
-}
+};
 
 const CustomField: React.FC = (props) => (
   <span {...props} style={{ ...styles.validField, ...styles.validCustomField }}>

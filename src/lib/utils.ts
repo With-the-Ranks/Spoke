@@ -29,10 +29,13 @@ export const sleep = (ms = 0) =>
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
-export function difference(object: Record<any, any>, base: Record<any, any>) {
+export const difference = (
+  object: Record<any, any>,
+  base: Record<any, any>
+) => {
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  function changes(object: Record<any, any>, base: Record<any, any>) {
-    return transform(object, (result: Record<any, any>, value, key) => {
+  const changes = (object: Record<any, any>, base: Record<any, any>) =>
+    transform(object, (result: Record<any, any>, value, key) => {
       if (!isEqual(value, base[key])) {
         result[key] =
           isObject(value) && isObject(base[key])
@@ -40,9 +43,8 @@ export function difference(object: Record<any, any>, base: Record<any, any>) {
             : value;
       }
     });
-  }
   return changes(object, base);
-}
+};
 
 export const downloadFromUrl = async (url: string, filePath: string) => {
   let fileDownloaded = false;

@@ -12,7 +12,7 @@ import { passportCallback } from "./util";
 
 const { BASE_URL, AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = config;
 
-export function setupAuth0Passport() {
+export const setupAuth0Passport = () => {
   const strategy = new Auth0Strategy(
     {
       domain: AUTH0_DOMAIN,
@@ -85,6 +85,6 @@ export function setupAuth0Passport() {
     return passport.authenticate("auth0", callback)(req, res, next);
   });
   return app;
-}
+};
 
 export default setupAuth0Passport;
