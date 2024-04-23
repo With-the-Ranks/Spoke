@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import {
   ListItemIcon,
   ListItemText,
@@ -11,12 +10,10 @@ import ListItem from "@material-ui/core/ListItem";
 import Paper from "@material-ui/core/Paper";
 import MarkunreadMailboxIcon from "@material-ui/icons/MarkunreadMailbox";
 import NotificationsPausedIcon from "@material-ui/icons/NotificationsPaused";
+import { useGetCurrentUserForOrganizationListQuery } from "@spoke/spoke-codegen";
 import sortBy from "lodash/sortBy";
 import React from "react";
 import { Redirect, useHistory } from "react-router-dom";
-
-import type { RelayPaginatedResponse } from "../../../api/pagination";
-import { loadData } from "../../hoc/with-operations";
 
 const useStyles = makeStyles({
   orgText: {
@@ -24,7 +21,7 @@ const useStyles = makeStyles({
   }
 });
 
-interface MembershipType {
+type MembershipType = {
   id: string;
   role: string;
   organization: {
@@ -34,22 +31,17 @@ interface MembershipType {
       maxRequestCount: number;
     }[];
   };
-}
+};
 
-export interface OrganizationListProps {
-  data: {
-    currentUser: {
-      id: string;
-      memberships: RelayPaginatedResponse<MembershipType>;
-    };
-    refetch(): void;
-  };
-}
+const isMembershipType = (obj: any): obj is MembershipType => {
+  return (obj as MembershipType).id !== "undefined";
+};
 
-export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
-  const { currentUser } = props.data;
+export const OrganizationList: React.FC = () => {
   const history = useHistory();
   const classes = useStyles();
+  const { data } = useGetCurrentUserForOrganizationListQuery();
+  const currentUser = data?.currentUser;
 
   const handleSelectOrg = (membership: MembershipType) => () => {
     const {
@@ -62,8 +54,8 @@ export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
     return history.push(`/admin/${orgId}`);
   };
 
-  const { edges: memberships } = currentUser.memberships;
-  if (memberships.length === 0) {
+  const memberships = currentUser?.memberships?.edges;
+  if (memberships?.length === 0) {
     return (
       <div>
         <Typography variant="h4" gutterBottom>
@@ -77,7 +69,7 @@ export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
       </div>
     );
   }
-  if (memberships.length === 1) {
+  if (memberships?.length === 1) {
     const {
       role,
       organization: { id: orgId }
@@ -88,7 +80,7 @@ export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
 
   const showIcons = window.ASSIGNMENT_SHOW_REQUESTS_AVAILABLE;
 
-  const hydratedList = memberships.map(({ node: membership }) => ({
+  const hydratedList = memberships?.map(({ node: membership }) => ({
     membership,
     hasAssignments:
       membership.organization.myCurrentAssignmentTargets.length > 0
@@ -119,19 +111,22 @@ export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
                 <NotificationsPausedIcon style={{ color: grey[500] }} />
               )
             ) : undefined;
-            return (
-              <ListItem
-                key={membership.organization.id}
-                button
-                onClick={handleSelectOrg(membership)}
-              >
-                {showIcons && <ListItemIcon>{leftIcon}</ListItemIcon>}
-                <ListItemText
-                  primary={membership.organization.name}
-                  primaryTypographyProps={{ className: classes.orgText }}
-                />
-              </ListItem>
-            );
+            if (isMembershipType(membership)) {
+              return (
+                <ListItem
+                  key={membership.organization.id}
+                  button
+                  onClick={handleSelectOrg(membership)}
+                >
+                  {showIcons && <ListItemIcon>{leftIcon}</ListItemIcon>}
+                  <ListItemText
+                    primary={membership.organization.name}
+                    primaryTypographyProps={{ className: classes.orgText }}
+                  />
+                </ListItem>
+              );
+            }
+            return null;
           })}
         </List>
       </Paper>
@@ -139,31 +134,4 @@ export const OrganizationList: React.FC<OrganizationListProps> = (props) => {
   );
 };
 
-const queries = {
-  data: {
-    query: gql`
-      query getCurrentUser {
-        currentUser {
-          id
-          memberships {
-            edges {
-              node {
-                id
-                role
-                organization {
-                  id
-                  name
-                  myCurrentAssignmentTargets {
-                    maxRequestCount
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `
-  }
-};
-
-export default loadData({ queries })(OrganizationList);
+export default OrganizationList;

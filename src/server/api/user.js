@@ -191,7 +191,7 @@ export const resolvers = {
         .then((record) => record || null),
     memberships: async (
       user,
-      { organizationId, after, first },
+      { organizationId, after, first, active },
       { user: authUser }
     ) => {
       if (authUser.id !== user.id && !authUser.is_superadmin) {
@@ -205,9 +205,14 @@ export const resolvers = {
       }
 
       const query = r.reader("user_organization").where({ user_id: user.id });
-      if (organizationId) {
-        query.where({ organization_id: organizationId });
+      if (organizationId) query.where({ organization_id: organizationId });
+
+      if (active) {
+        query.whereRaw(
+          "exists (select 1 from organization o where o.id = organization_id and deleted_at is null)"
+        );
       }
+
       return formatPage(query, { after, first });
     },
     organizations: async (user, { role, active = true }) => {
