@@ -333,7 +333,7 @@ export const sendMessage = async (
 
   // Send message after we are sure messageInstance has been persisted
   const service = serviceMap[service_type];
-  service.sendMessage(toInsert, record.organization_id);
+  await service.sendMessage(toInsert, record.organization_id);
 
   // Send message to BernieSMS to be checked for bad words
   const badWordUrl = config.BAD_WORD_URL;
