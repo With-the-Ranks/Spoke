@@ -17,6 +17,7 @@ import { getSpokeCharCount, replaceEasyGsmWins } from "../lib/charset-utils";
 import { delimit, getAttachmentLink, getMessageType } from "../lib/scripts";
 import baseTheme from "../styles/theme";
 import Chip from "./Chip";
+import { IncludeImageDocLink } from "./Links/IncludeImageDocLink";
 
 type DecoratorStrategyCallBack = (start: number, end: number) => void;
 
@@ -325,14 +326,8 @@ class ScriptEditor extends React.Component<Props, State> {
         <div style={{ color: baseTheme.colors.red }}>
           WARNING! The media attachment URL is of an unsupported MMS type.
           Please check the URL of the attachment or see{" "}
-          <a
-            href="https://docs.spokerewired.com/article/86-include-an-image-in-a-message"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Include an Image in a Message
-          </a>{" "}
-          for all supported types.
+          <IncludeImageDocLink text="Include an Image in a Message" /> for all
+          supported types.
         </div>
       );
     }

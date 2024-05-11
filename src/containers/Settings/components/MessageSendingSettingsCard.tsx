@@ -10,6 +10,7 @@ import {
   useUpdateMessageSendingSettingsMutation
 } from "@spoke/spoke-codegen";
 import React from "react";
+import { IncludeImageDocLink } from "src/components/Links/IncludeImageDocLink";
 
 export interface MessageSendingSettingsCardProps {
   organizationId: string;
@@ -84,13 +85,7 @@ export const MessageSendingSettingsCard: React.FC<MessageSendingSettingsCardProp
           Messages longer than 3 segments are usually cheaper to send as MMS.
           You may notice changes in deliverability when switching from SMS to
           MMS messages.{" "}
-          <a
-            href="https://docs.spokerewired.com/article/86-include-an-image-in-a-message"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn more about sending MMS here
-          </a>
+          <IncludeImageDocLink text="Learn more about sending MMS here" />
         </p>
         <FormControlLabel
           label="Convert long SMS messages to MMS?"
