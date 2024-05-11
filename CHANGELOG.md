@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.2](https://github.com/politics-rewired/spoke/compare/v8.1.1...v8.1.2) (2024-05-11)
+
+
+### Bug Fixes
+
+* use wtr mms doc link ([#29](https://github.com/politics-rewired/spoke/issues/29)) ([0703ced](https://github.com/politics-rewired/spoke/commit/0703ced3c1165c11a2fee908fc3eaded89b18e3c))
+
 ### [8.1.1](https://github.com/politics-rewired/spoke/compare/v8.1.0...v8.1.1) (2024-04-27)
 
 ## [8.1.0](https://github.com/politics-rewired/spoke/compare/v8.0.1...v8.1.0) (2024-04-23)
