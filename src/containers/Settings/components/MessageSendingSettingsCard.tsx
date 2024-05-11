@@ -10,7 +10,8 @@ import {
   useUpdateMessageSendingSettingsMutation
 } from "@spoke/spoke-codegen";
 import React from "react";
-import { IncludeImageDocLink } from "src/components/Links/IncludeImageDocLink";
+
+import { IncludeImageDocLink } from "../../../components/Links/IncludeImageDocLink";
 
 export interface MessageSendingSettingsCardProps {
   organizationId: string;
