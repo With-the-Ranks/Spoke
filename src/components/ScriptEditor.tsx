@@ -399,7 +399,7 @@ class ScriptEditor extends React.Component<Props, State> {
           <br />
           Not sure what a segment is? Check out the{" "}
           <a
-            href="https://docs.spokerewired.com/article/89-segments-and-encodings"
+            href="https://withtheranks.com/docs/spoke/for-spoke-admins/segments-and-encodings/"
             target="_blank"
             rel="noopener noreferrer"
           >

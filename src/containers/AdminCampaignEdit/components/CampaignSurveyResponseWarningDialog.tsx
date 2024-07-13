@@ -30,7 +30,7 @@ const CampaignSurveyResponseWarningDialog = ({
         </p>
         Without survey responses, texters can only use{" "}
         <a
-          href="https://docs.spokerewired.com/article/67-tags"
+          href="https://withtheranks.com/docs/spoke/for-spoke-admins/tags/"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -42,7 +42,7 @@ const CampaignSurveyResponseWarningDialog = ({
           single campaign. Canned responses prepopulate scripts but log no data
           at all. (
           <a
-            href="https://docs.spokerewired.com/article/125-survey-responses-vs-canned-responses"
+            href="https://withtheranks.com/docs/spoke/for-spoke-admins/survey-responses-vs-canned-responses/"
             target="_blank"
             rel="noopener noreferrer"
           >
