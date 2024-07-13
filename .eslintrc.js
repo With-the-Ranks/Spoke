@@ -7,7 +7,12 @@ module.exports = {
       jsx: true
     }
   },
-  plugins: ["@typescript-eslint", "simple-import-sort", "import"],
+  plugins: [
+    "@typescript-eslint",
+    "simple-import-sort",
+    "import",
+    "prefer-arrow-functions"
+  ],
   extends: [
     "eslint:recommended",
     "airbnb",
@@ -49,6 +54,7 @@ module.exports = {
     "prettier/prettier": ["error", {}, { usePrettierrc: true }],
     "jsx-a11y/href-no-hash": ["off"],
     "react/jsx-filename-extension": ["warn", { extensions: [".jsx", ".tsx"] }],
+    "prefer-arrow-functions/prefer-arrow-functions": "error",
     "max-len": [
       "warn",
       {
@@ -253,6 +259,13 @@ module.exports = {
             ]
           }
         ]
+      }
+    },
+    {
+      // stick with knex style
+      files: ["migrations/*"],
+      rules: {
+        "prefer-arrow-functions/prefer-arrow-functions": "off"
       }
     }
   ]

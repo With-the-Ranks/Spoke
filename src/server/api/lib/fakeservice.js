@@ -6,8 +6,8 @@ import { getLastMessage } from "./message-sending";
 // that end up just in the db appropriately and then using sendReply() graphql
 // queries for the reception (rather than a real service)
 
-async function sendMessage(message, _organizationId, _trx) {
-  return r
+const sendMessage = async (message, _organizationId, _trx) =>
+  r
     .knex("message")
     .update({
       send_status: "SENT",
@@ -15,12 +15,11 @@ async function sendMessage(message, _organizationId, _trx) {
       sent_at: r.knex.fn.now()
     })
     .where({ id: message.id });
-}
 
 // None of the rest of this is even used for fake-service
 // but *would* be used if it was actually an outside service.
 
-async function convertMessagePartsToMessage(messageParts) {
+const convertMessagePartsToMessage = async (messageParts) => {
   const firstPart = messageParts[0];
   const userNumber = firstPart.user_number;
   const contactNumber = firstPart.contact_number;
@@ -48,9 +47,9 @@ async function convertMessagePartsToMessage(messageParts) {
     service: "fakeservice",
     send_status: "DELIVERED"
   };
-}
+};
 
-async function handleIncomingMessage(message) {
+const handleIncomingMessage = async (message) => {
   const { contact_number, user_number, service_id, text } = message;
   const [{ id: partId }] = await r
     .knex("pending_message_part")
@@ -64,7 +63,7 @@ async function handleIncomingMessage(message) {
     })
     .returning("id");
   return partId;
-}
+};
 
 export default {
   sendMessage,

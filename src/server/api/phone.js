@@ -12,7 +12,7 @@ export const GraphQLPhone = new GraphQLScalarType({
   description: "Phone number",
   parseValue: identity,
   serialize: identity,
-  parseLiteral(ast) {
+  parseLiteral: (ast) => {
     if (ast.kind !== Kind.STRING) {
       throw new GraphQLError(
         `Query error: Can only parse strings got a: ${ast.kind}`,

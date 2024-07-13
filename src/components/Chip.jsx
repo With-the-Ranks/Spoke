@@ -29,25 +29,23 @@ const styles = {
   }
 };
 
-function Chip({
+const Chip = ({
   text,
   iconRightClass,
   onIconRightTouchTap,
   onClick,
   style = {}
-}) {
-  return (
-    <div style={extend({}, styles.chip, style)} onClick={onClick}>
-      {text}
-      {iconRightClass
-        ? React.createElement(iconRightClass, {
-            style: styles.icon,
-            onClick: onIconRightTouchTap
-          })
-        : ""}
-    </div>
-  );
-}
+}) => (
+  <div style={extend({}, styles.chip, style)} onClick={onClick}>
+    {text}
+    {iconRightClass
+      ? React.createElement(iconRightClass, {
+          style: styles.icon,
+          onClick: onIconRightTouchTap
+        })
+      : ""}
+  </div>
+);
 
 Chip.propTypes = {
   text: PropTypes.node,
