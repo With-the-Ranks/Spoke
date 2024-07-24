@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.3](https://github.com/politics-rewired/spoke/compare/v8.1.2...v8.1.3) (2024-07-24)
+
+
+### Backend Changes
+
+* remove rewired notices ([#12](https://github.com/politics-rewired/spoke/issues/12)) ([42c731e](https://github.com/politics-rewired/spoke/commit/42c731ecce18a10124cbb905eeabaf3e93888c70))
+* update links to documentation in codebase ([#30](https://github.com/politics-rewired/spoke/issues/30)) ([67642a5](https://github.com/politics-rewired/spoke/commit/67642a554c2e0b5c100883107088017fcc249a1f))
+
 ### [8.1.2](https://github.com/politics-rewired/spoke/compare/v8.1.1...v8.1.2) (2024-05-11)
 
 
