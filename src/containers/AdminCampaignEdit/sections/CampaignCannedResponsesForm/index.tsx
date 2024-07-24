@@ -411,7 +411,7 @@ class CampaignCannedResponsesForm extends React.Component<InnerProps, State> {
               are not tracked or stored when used. Responses associated with
               data collection should be included in your{" "}
               <a
-                href="https://docs.spokerewired.com/article/43-create-interaction-script"
+                href="https://withtheranks.com/docs/spoke/for-spoke-admins/create-interaction-script/"
                 target="_blank"
                 rel="noreferrer"
               >
