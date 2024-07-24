@@ -12,23 +12,6 @@ query getOrganizationNotifications($organizationId: String!) {
           avatarColor
           markdownContent
         }
-        ... on Register10DlcBrandNotice {
-          id
-          tcrRegistrationUrl
-        }
-        ... on Register10DlcCampaignNotice {
-          id
-          tcrRegistrationUrl
-        }
-        ... on Pending10DlcCampaignNotice {
-          id
-        }
-        ... on Pricing10DlcNotice {
-          id
-        }
-        ... on PricingTollFreeNotice {
-          id
-        }
       }
     }
   }
