@@ -1,3 +1,5 @@
+import "./i18n";
+
 import { StyleSheet } from "aphrodite";
 import React from "react";
 import ReactDOM from "react-dom";
