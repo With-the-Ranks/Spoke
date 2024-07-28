@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import CardActions from "@material-ui/core/CardActions";
 import Divider from "@material-ui/core/Divider";
-import type { Assignment } from "@spoke/spoke-codegen ";
+import type { Assignment } from "@spoke/spoke-codegen";
 import { Card, CardTitle } from "material-ui/Card";
 import React from "react";
 import { useHistory } from "react-router-dom";
@@ -125,7 +125,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
         <CardTitle
           title={title}
           subtitle={subtitle}
-          style={{ backgroundColor: primaryColor }}
+          style={{ backgroundColor: primaryColor ?? "" }}
         >
           {logoImageUrl && <img src={logoImageUrl} className={classes.image} />}
         </CardTitle>
