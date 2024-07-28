@@ -48,12 +48,13 @@ class TexterRequest extends React.Component {
 
   submit = async () => {
     const { count, email, selectedAssignment, submitting } = this.state;
+    const { mutations } = this.props;
     if (submitting) return;
 
     this.setState({ submitting: true, error: undefined });
     try {
       const payload = { count, email, preferredTeamId: selectedAssignment };
-      const response = await this.props.mutations.requestTexts(payload);
+      const response = await mutations.requestTexts(payload);
       if (response.errors) throw response.errors;
 
       const message = response.data.requestTexts;
@@ -109,19 +110,18 @@ class TexterRequest extends React.Component {
   };
 
   render() {
-    if (this.props.data.loading) {
+    const { data } = this.props;
+
+    if (data.loading) {
       return <LoadingIndicator />;
     }
 
-    const {
-      myCurrentAssignmentTargets,
-      settings
-    } = this.props.data.organization;
+    const { myCurrentAssignmentTargets, settings } = data.organization;
 
     const textsAvailable = myCurrentAssignmentTargets.length > 0;
 
-    if (this.props.data.currentUser.currentRequest) {
-      const { amount } = this.props.data.currentUser.currentRequest;
+    if (data.currentUser.currentRequest) {
+      const { amount } = data.currentUser.currentRequest;
 
       return (
         <Paper>
@@ -137,7 +137,7 @@ class TexterRequest extends React.Component {
     }
 
     if (
-      !this.userCanRequest(this.props.data.currentUser.memberships) &&
+      !this.userCanRequest(data.currentUser.memberships) &&
       settings.showDoNotAssignMessage
     ) {
       return (
@@ -199,21 +199,19 @@ class TexterRequest extends React.Component {
         <div style={{ textAlign: "center" }}>
           <h1> Ready to text? </h1>
           <p style={{ marginTop: 5, marginBottom: 5 }}>Pick an assignment: </p>
-          {this.props.data ? (
+          {data ? (
             <SelectField
               value={selectedAssignment}
               onChange={this.setSelectedAssignment}
               fullWidth
             >
-              {this.props.data.organization.myCurrentAssignmentTargets.map(
-                (at) => (
-                  <MenuItem
-                    key={at.teamId}
-                    value={at.teamId}
-                    primaryText={makeOptionText(at)}
-                  />
-                )
-              )}
+              {data.organization.myCurrentAssignmentTargets.map((at) => (
+                <MenuItem
+                  key={at.teamId}
+                  value={at.teamId}
+                  primaryText={makeOptionText(at)}
+                />
+              ))}
             </SelectField>
           ) : (
             <LoadingIndicator />

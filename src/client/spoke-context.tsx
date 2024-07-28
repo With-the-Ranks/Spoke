@@ -2,6 +2,8 @@ import type { OrganizationSettingsInfoFragment } from "@spoke/spoke-codegen";
 import { useGetOrganizationSettingsQuery } from "@spoke/spoke-codegen";
 import React, { useContext, useMemo, useState } from "react";
 
+import type { CustomTheme } from "../styles/types";
+
 export interface InstanceSettings {
   BASE_URL: string;
   AUTH0_DOMAIN?: string;
@@ -12,6 +14,7 @@ export interface InstanceSettings {
 export interface SpokeContextType {
   settings?: InstanceSettings;
   orgSettings?: OrganizationSettingsInfoFragment;
+  theme?: CustomTheme;
   setOrganizationId: (organizationId?: string) => void;
 }
 
