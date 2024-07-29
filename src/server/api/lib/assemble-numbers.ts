@@ -8,7 +8,6 @@ import { stringIsAValidUrl } from "../../../lib/utils";
 import logger from "../../../logger";
 import { makeNumbersClient } from "../../lib/assemble-numbers";
 import { r } from "../../models";
-import statsd from "../../statsd";
 import { errToObj } from "../../utils";
 import { getOrgFeature } from "../organization-settings";
 import type { MessagingServiceRecord, RequestHandlerFactory } from "../types";
@@ -211,8 +210,6 @@ export const sendMessage = async (
 
     if (errors && errors.length > 0) throw new Error(errors[0].message);
 
-    statsd.increment("send_message.assemble_numbers", ["success"]);
-
     const { id: serviceId } = data.sendMessage.outboundMessage;
     await r
       .knex("message")
@@ -225,7 +222,6 @@ export const sendMessage = async (
       .where({ id: spokeMessageId });
   } catch (exc) {
     // TODO - distinguish different failures modes (HTTP failure vs. HTTP 200 with GraphQL errors)
-    statsd.increment("send_message.assemble_numbers", ["failure"]);
 
     logger.error("Error sending message with Assemble Numbers: ", {
       ...errToObj(exc),
