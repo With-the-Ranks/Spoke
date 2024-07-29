@@ -160,14 +160,6 @@ const validators = {
     dec: "Disable use of has unassigned contacts variable",
     default: false
   }),
-  BAD_WORD_TOKEN: str({
-    desc: "Bearer token used for authorization with BAD_WORD_URL.",
-    default: undefined
-  }),
-  BAD_WORD_URL: url({
-    desc: "URL to notify with message text whenever a message is sent.",
-    default: undefined
-  }),
   BASE_URL: url({
     desc:
       "The base URL of the website, without trailing slash, used to construct various URLs.",
