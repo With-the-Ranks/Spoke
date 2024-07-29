@@ -3509,8 +3509,8 @@ const rootMutations = {
                 ].join("\n\n");
 
                 await sendEmail({
-                  to: "support@spokerewired.com",
-                  subject: "Automated organization shutdown request",
+                  to: "support@withtheranks.com",
+                  subject: "Automated Spoke organization shutdown request",
                   text
                 });
               }
