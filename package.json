@@ -105,7 +105,7 @@
     "connect-pg-simple": "^7.0.0",
     "cors": "^2.8.5",
     "cryptr": "^6.0.3",
-    "css-loader": "^5.0.1",
+    "css-loader": "^7.1.2",
     "dataloader": "^1.2.0",
     "dotenv": "^8.0.0",
     "dotenv-cli": "^4.1.1",
