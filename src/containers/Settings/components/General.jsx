@@ -25,8 +25,8 @@ import { loadData } from "../../hoc/with-operations";
 import AutosendingSettingsCard from "./AutosendingSettingsCard";
 import CampaignBuilderSettingsCard from "./CampaignBuilderSettingsCard";
 import EditName from "./EditName";
+import MessageSendingSettingsCard from "./MessageSendingSettingsCard";
 import RejectedTextersMessageCard from "./RejectedTextersMessageCard";
-import Review10DlcInfo from "./Review10DlcInfo";
 import ScriptPreviewSettingsCard from "./ScriptPreviewSettingsCard";
 
 const styles = StyleSheet.create({
@@ -273,10 +273,6 @@ class Settings extends React.Component {
 
     return (
       <div>
-        <Review10DlcInfo
-          organizationId={organization.id}
-          style={{ marginBottom: 20 }}
-        />
         <EditName
           organizationId={organization.id}
           style={{ marginBottom: 20 }}
@@ -469,6 +465,11 @@ class Settings extends React.Component {
         />
 
         <AutosendingSettingsCard
+          organizationId={organization.id}
+          style={{ marginBottom: 20 }}
+        />
+
+        <MessageSendingSettingsCard
           organizationId={organization.id}
           style={{ marginBottom: 20 }}
         />

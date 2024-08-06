@@ -2,7 +2,6 @@ import { withApollo } from "@apollo/client/react/hoc";
 import { blue, green, grey, orange, red } from "@material-ui/core/colors";
 import type { CampaignVariable } from "@spoke/spoke-codegen";
 import { IsValidAttachmentDocument } from "@spoke/spoke-codegen";
-import { getCharCount } from "@trt2/gsm-charset-utils";
 import type { ContentBlock } from "draft-js";
 import {
   CompositeDecorator,
@@ -14,10 +13,11 @@ import {
 import escapeRegExp from "lodash/escapeRegExp";
 import React from "react";
 
-import { replaceEasyGsmWins } from "../lib/charset-utils";
+import { getSpokeCharCount, replaceEasyGsmWins } from "../lib/charset-utils";
 import { delimit, getAttachmentLink, getMessageType } from "../lib/scripts";
 import baseTheme from "../styles/theme";
 import Chip from "./Chip";
+import { IncludeImageDocLink } from "./Links/IncludeImageDocLink";
 
 type DecoratorStrategyCallBack = (start: number, end: number) => void;
 
@@ -122,6 +122,7 @@ interface Props {
   scriptFields: string[];
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
+  maxSmsSegmentLength: number | null;
   onChange: (value: string) => Promise<void> | void;
   receiveFocus?: boolean;
 }
@@ -319,20 +320,14 @@ class ScriptEditor extends React.Component<Props, State> {
 
   renderAttachmentWarning() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const messageType = getMessageType(text);
+    const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
     if (messageType === "MMS" && !this.state.validAttachment) {
       return (
         <div style={{ color: baseTheme.colors.red }}>
           WARNING! The media attachment URL is of an unsupported MMS type.
           Please check the URL of the attachment or see{" "}
-          <a
-            href="https://docs.spokerewired.com/article/86-include-an-image-in-a-message"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Include an Image in a Message
-          </a>{" "}
-          for all supported types.
+          <IncludeImageDocLink text="Include an Image in a Message" /> for all
+          supported types.
         </div>
       );
     }
@@ -369,8 +364,8 @@ class ScriptEditor extends React.Component<Props, State> {
 
   render() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const info = getCharCount(replaceEasyGsmWins(text));
-    const messageType = getMessageType(text);
+    const info = getSpokeCharCount(text);
+    const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
 
     return (
       <div>
@@ -404,7 +399,7 @@ class ScriptEditor extends React.Component<Props, State> {
           <br />
           Not sure what a segment is? Check out the{" "}
           <a
-            href="https://docs.spokerewired.com/article/89-segments-and-encodings"
+            href="https://withtheranks.com/docs/spoke/for-spoke-admins/segments-and-encodings/"
             target="_blank"
             rel="noopener noreferrer"
           >
