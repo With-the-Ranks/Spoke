@@ -251,7 +251,7 @@ type RootMutation {
   bulkUpdateScript(organizationId:String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
   deleteJob(campaignId:String!, id:String!): JobRequest
   copyCampaign(id: String!): Campaign
-  copyCampaigns(sourceCampaignId: String!, quantity: Int!): [Campaign!]!
+  copyCampaigns(sourceCampaignId: String!, quantity: Int!, targetOrgId: String): [Campaign!]!
   exportCampaign(options: CampaignExportInput!): JobRequest
   createCannedResponse(cannedResponse:CannedResponseInput!): CannedResponse
   createOrganization(name: String!, userId: String!, inviteId: String!): Organization
@@ -353,7 +353,7 @@ type User {
   displayName: String!
   email: String
   cell: String
-  memberships(organizationId: String, after: Cursor, first: Int): OrganizationMembershipPage
+  memberships(organizationId: String, after: Cursor, first: Int, active: Boolean): OrganizationMembershipPage
   organizations(active: Boolean, role: String): [Organization]
   todos(organizationId: String): [Assignment]
   roles(organizationId: String!): [UserRole!]!
@@ -482,6 +482,7 @@ input OrganizationSettingsInput {
   showDoNotAssignMessage: Boolean
   doNotAssignMessage: String
   defaultAutosendingControlsMode: AutosendingControlsMode
+  maxSmsSegmentLength: Int
 
   # Superadmin
   startCampaignRequiresApproval: Boolean
@@ -497,6 +498,7 @@ type OrganizationSettings {
   confirmationClickForScriptLinks: Boolean!
   showDoNotAssignMessage: Boolean!
   doNotAssignMessage: String!
+  maxSmsSegmentLength: Int
 
   # Supervolunteer
   startCampaignRequiresApproval: Boolean
@@ -625,6 +627,11 @@ enum ExternalSyncReadinessState {
   INCLUDES_NOT_ACTIVE_TARGETS
 }
 
+type CsvColumnMapping {
+  column: String!
+  remap: String!
+}
+
 type Campaign {
   id: ID!
   organization: Organization!
@@ -675,6 +682,8 @@ type Campaign {
   autosendStatus: String!
   messagingServiceSid: String
   autosendLimit: Int
+  columnMapping: [CsvColumnMapping!]
+  messagingService: MessagingService
 }
 
 type CampaignEdge {
@@ -713,6 +722,11 @@ input TexterInput {
   ignoreAfterDate: Date!
 }
 
+input CsvColumnMappingInput {
+  column: String!
+  remap: String!
+}
+
 input CampaignInput {
   title: String
   description: String
@@ -743,6 +757,7 @@ input CampaignInput {
   repliesStaleAfter: Int
   messagingServiceSid: String
   autosendLimit: Int
+  columnMapping: [CsvColumnMappingInput!]
 }
 
 
@@ -827,7 +842,6 @@ type MessagingService {
   messagingServiceSid: String!
   serviceType: MessagingServiceType!
   updatedAt: String!
-  tcrBrandRegistrationLink: String
   name: String
   active: Boolean!
   isDefault: Boolean
@@ -845,12 +859,15 @@ type MessagingServicePage {
 
 
 
-type Register10DlcBrandNotice {
+type TitleContentNotice {
   id: ID!
-  tcrBrandRegistrationUrl: String
+  title: String!
+  avatarIcon: String!
+  avatarColor: String!
+  markdownContent: String!
 }
 
-union Notice = Register10DlcBrandNotice
+union Notice = TitleContentNotice
 
 type NoticeEdge {
   cursor: Cursor!
@@ -986,6 +1003,7 @@ input CannedResponseInput {
   text: String
   campaignId: String
   userId: String
+  displayOrder: Int
 }
 
 type CannedResponse {
@@ -993,6 +1011,7 @@ type CannedResponse {
   title: String!
   text: String!
   isUserCreated: Boolean
+  displayOrder: Int!
 }
 
 

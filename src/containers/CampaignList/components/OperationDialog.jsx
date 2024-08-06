@@ -119,7 +119,7 @@ export const OperationDialogBody = (props) => {
         <p>
           To read about best practices for second passes, head{" "}
           <a
-            href="https://docs.spokerewired.com/article/101-running-a-second-pass"
+            href="https://withtheranks.com/docs/spoke/for-spoke-admins/running-a-second-pass/"
             rel="noreferrer"
             target="_blank"
           >

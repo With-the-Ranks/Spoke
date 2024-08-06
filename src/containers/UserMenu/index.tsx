@@ -65,7 +65,7 @@ const UserMenu: React.FC<Props> = (props) => {
     } else if (value === "superadmin") {
       history.push(`/superadmin/people`);
     } else if (value === "docs") {
-      window.open("https://docs.spokerewired.com", "_blank");
+      window.open("https://withtheranks.com/docs/spoke/", "_blank");
     }
   };
 
