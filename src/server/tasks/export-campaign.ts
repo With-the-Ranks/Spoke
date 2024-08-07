@@ -203,7 +203,7 @@ export const processContactsChunk = async (
           and id > ?
           ${onlyOptOuts ? "and is_opted_out = true" : ""}
         order by
-          campaign_contact.id asc
+          materialized_contacts.id asc
         limit ?
       )
       select
