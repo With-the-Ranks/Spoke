@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.4-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.3...v8.1.4-rc.0) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** materialize campaign contacts ([#39](https://github.com/politics-rewired/spoke/issues/39)) ([909db41](https://github.com/politics-rewired/spoke/commit/909db41f1e24a16e307db6b773835c6f39fec140))
+
 ### [8.1.3](https://github.com/politics-rewired/spoke/compare/v8.1.2...v8.1.3) (2024-07-24)
 
 
