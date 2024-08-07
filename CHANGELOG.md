@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.4-rc.1](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.0...v8.1.4-rc.1) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** use name of materialized cte ([#40](https://github.com/politics-rewired/spoke/issues/40)) ([6b2cafd](https://github.com/politics-rewired/spoke/commit/6b2cafdcded8535481b00cc3fe4d9555d6771fd1))
+
 ### [8.1.4-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.3...v8.1.4-rc.0) (2024-08-07)
 
 
