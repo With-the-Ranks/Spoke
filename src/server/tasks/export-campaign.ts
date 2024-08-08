@@ -185,25 +185,17 @@ export const processContactsChunk = async (
   lastContactId = 0,
   onlyOptOuts = false
 ): Promise<ContactsChunk | false> => {
-  // HACK - we shouldn't need to materialize the campaign contacts
-  // this gets around a problem with query planning where
-  // the campaign_id index isn't used on some instances
   const { rows }: { rows: ContactExportRow[] } = await r.reader.raw(
     `
-      with materialized_contacts as materialized (
+      with campaign_contacts as (
         select *
         from campaign_contact
         where
           campaign_id = ?
-      ),
-      campaign_contacts as (
-        select *
-        from materialized_contacts
-        where true
           and id > ?
           ${onlyOptOuts ? "and is_opted_out = true" : ""}
         order by
-          materialized_contacts.id asc
+          campaign_contact.id asc
         limit ?
       )
       select
