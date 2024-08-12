@@ -1,3 +1,4 @@
+import Alert from "@material-ui/lab/Alert";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -90,7 +91,7 @@ export const CampaignBuilderSettingsCard: React.FC<CampaignBuilderSettingsCardPr
     <Card style={style}>
       <CardHeader title="Campaign Builder Settings" disableTypography />
       <CardContent>
-        {errorMsg && <p>Error: {errorMsg}</p>}
+        {errorMsg && <Alert severity="error">Error: {errorMsg}</Alert>}
         <FormGroup row>
           <FormControlLabel
             control={

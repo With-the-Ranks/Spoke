@@ -1,3 +1,4 @@
+import Alert from "@material-ui/lab/Alert";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -7,7 +8,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import type { SelectInputProps } from "@material-ui/core/Select/SelectInput";
-import Alert from "@material-ui/lab/Alert";
 import {
   AutosendingControlsMode,
   useGetAutosendingSettingsQuery,
