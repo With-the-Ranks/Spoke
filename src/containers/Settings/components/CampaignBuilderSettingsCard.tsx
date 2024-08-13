@@ -1,4 +1,3 @@
-import Alert from "@material-ui/lab/Alert";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -10,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import type { SelectInputProps } from "@material-ui/core/Select/SelectInput";
 import Switch from "@material-ui/core/Switch";
+import Alert from "@material-ui/lab/Alert";
 import {
   CampaignBuilderMode,
   useGetCampaignBuilderSettingsQuery,
