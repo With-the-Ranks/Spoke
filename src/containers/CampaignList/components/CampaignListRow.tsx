@@ -5,7 +5,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
-import { useTheme } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import WarningIcon from "@material-ui/icons/Warning";
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import React from "react";
@@ -16,7 +16,7 @@ import { DateTime } from "../../../lib/datetime";
 import type { CampaignOperationsProps } from "../utils";
 import CampaignListMenu from "./CampaignListMenu";
 
-const inlineStyles = {
+const useStyles = makeStyles({
   chipWrapper: {
     display: "flex",
     flexWrap: "wrap",
@@ -29,7 +29,7 @@ const inlineStyles = {
   secondaryText: {
     whiteSpace: "pre-wrap"
   }
-};
+});
 
 interface Props extends CampaignOperationsProps {
   organizationId: string;
@@ -40,6 +40,8 @@ interface Props extends CampaignOperationsProps {
 export const CampaignListRow: React.FC<Props> = (props) => {
   const theme = useTheme();
   const history = useHistory();
+  const styles = useStyles();
+
   const { organizationId, isAdmin, campaign } = props;
   const {
     isStarted,
@@ -56,7 +58,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   let listItemStyle = {};
   let leftIcon;
   if (isArchived) {
-    listItemStyle = inlineStyles.past;
+    listItemStyle = styles.past;
   } else if (!isStarted || hasUnassignedContacts) {
     listItemStyle = {
       color: theme.palette.warning.dark
@@ -115,14 +117,14 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   }
 
   const primaryText = (
-    <div style={inlineStyles.chipWrapper}>
+    <div className={styles.chipWrapper}>
       {campaign.title}
       {tags.map((tag) => (
         <Chip
           key={tag.title}
           label={tag.title}
+          className={styles.chip}
           style={{
-            ...inlineStyles.chip,
             color: tag.color,
             backgroundColor: tag.backgroundColor
           }}
@@ -131,7 +133,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     </div>
   );
   const secondaryText = (
-    <span style={inlineStyles.secondaryText}>
+    <span className={styles.secondaryText}>
       <span>
         Campaign ID: {campaign.id}
         <br />
@@ -148,7 +150,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   }`;
   return (
     <ListItem
-      {...dataTest("campaignRow")}
+      {...dataTest("campaignRow", false)}
       style={listItemStyle}
       onClick={() => history.push(campaignUrl)}
     >
