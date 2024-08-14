@@ -13,7 +13,7 @@ import { useHistory } from "react-router-dom";
 
 import { dataTest } from "../../../lib/attributes";
 import { DateTime } from "../../../lib/datetime";
-import type { CampaignOperations } from "./CampaignListMenu";
+import type { CampaignOperationsProps } from "../utils";
 import CampaignListMenu from "./CampaignListMenu";
 
 const inlineStyles = {
@@ -31,7 +31,7 @@ const inlineStyles = {
   }
 };
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   isAdmin: boolean;
   campaign: CampaignListEntryFragment;
