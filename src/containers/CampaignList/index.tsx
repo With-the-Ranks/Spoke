@@ -63,10 +63,7 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
   const [unmarkCampaign] = useUnMarkForSecondPassMutation();
   const [toggleAutoAssign] = useToggleAutoAssignMutation();
 
-  const start = (op: Operation) => () => {
-    setInProgress(op);
-    console.log(op);
-  };
+  const start = (op: Operation) => () => setInProgress(op);
 
   const clearInProgress = () => {
     setInProgress(undefined);
@@ -79,7 +76,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
     result?: Partial<Campaign> | string | null,
     errors?: readonly GraphQLError[]
   ) => {
-    console.log(result);
     if (errors) setError(errors[0]);
     else if (result) {
       const newFinished = typeof result === "string" ? result : "Done";
@@ -89,7 +85,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
   };
 
   const executeOperation = async () => {
-    console.log("exe");
     setExecuting(true);
     if (!inProgress) throw new Error("Operation was not set correctly");
     const { campaign } = inProgress;
@@ -127,7 +122,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         break;
       }
       case isDeleteNeedsMessage(inProgress): {
-        console.log("here");
         const { data, errors } = await deleteNeedsMessage({
           variables: { campaignId: campaign.id }
         });
