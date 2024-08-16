@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  assignmentTargets: (CurrentAssignmentTargetFragment | null | undefined)[];
+  assignmentTargets: CurrentAssignmentTargetFragment[];
 }
 
 const AssignmentHUD: React.FC<Props> = (props) => {
@@ -35,7 +35,7 @@ const AssignmentHUD: React.FC<Props> = (props) => {
       />
       <CardText expandable>
         {assignmentTargets.map((target) => {
-          const campaign = target?.campaign;
+          const { campaign } = target;
           return (
             target && (
               <div key={target.teamTitle} className={css(styles.row)}>
