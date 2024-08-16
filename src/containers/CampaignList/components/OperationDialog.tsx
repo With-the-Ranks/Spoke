@@ -56,30 +56,29 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
 
   if (isReleaseUnrepliedMessages(inProgress)) {
     return (
-      <div>
+      <>
         {operationDefinition?.body(campaign)}
         <br />
         <p>
           <label>
-            {" "}
             How many hours ago should a conversation have been idle for it to be
-            unassigned?{" "}
+            unassigned?
           </label>
-          <TextField
-            type="number"
-            floatingLabelText="Number of Hours"
-            defaultValue={1}
-            value={inProgress.payload.ageInHours}
-            onChange={(_ev, val) => {
-              const newInProgress = setVal<ReleaseUnrepliedMessages>(
-                "ageInHours",
-                parseInt(val, 10)
-              );
-              setInProgress(newInProgress);
-            }}
-          />
         </p>
-      </div>
+        <TextField
+          type="number"
+          floatingLabelText="Number of Hours"
+          defaultValue={1}
+          value={inProgress.payload.ageInHours}
+          onChange={(_ev, val) => {
+            const newInProgress = setVal<ReleaseUnrepliedMessages>(
+              "ageInHours",
+              parseInt(val, 10)
+            );
+            setInProgress(newInProgress);
+          }}
+        />
+      </>
     );
   }
 
