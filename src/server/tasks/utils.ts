@@ -102,10 +102,12 @@ export interface ProgressTaskHelpers extends JobHelpers {
   updateResult(result: Record<string, unknown>): Promise<void>;
 }
 
-export type ProgressTask<P = unknown> = (
+export type KnownReturnProgressTask<P = unknown, R = unknown> = (
   payload: P,
   helpers: ProgressTaskHelpers
-) => void | Promise<void>;
+) => R | Promise<R>;
+
+export type ProgressTask<P = unknown> = KnownReturnProgressTask<P, void>;
 
 export interface ProgressTaskOptions {
   removeOnComplete: boolean;
