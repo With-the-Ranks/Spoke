@@ -15,10 +15,7 @@ import {
   schedules as campaignBuilderSchedules,
   taskList as campaignBuilderTaskList
 } from "./tasks/campaign-builder";
-import {
-  exportCampaign,
-  TASK_IDENTIFIER as exportCampaignIdentifier
-} from "./tasks/export-campaign";
+import { taskList as chunkedTaskList } from "./tasks/chunked-tasks";
 import {
   exportForVan,
   TASK_IDENTIFIER as exportForVanIdentifier
@@ -101,9 +98,6 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     // eslint-disable-next-line max-len
     [QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER]: queueAutoSendOrganizationInitials,
     [PAUSE_AUTOSENDING_CAMPAIGNS_TASK_IDENTIFIER]: pauseAutosendingCampaigns,
-    [exportCampaignIdentifier]: wrapProgressTask(exportCampaign, {
-      removeOnComplete: true
-    }),
     [exportForVanIdentifier]: wrapProgressTask(exportForVan, {
       removeOnComplete: true
     }),
@@ -115,7 +109,8 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     }),
     [exportOptOutsIdentifier]: exportOptOuts,
     ...ngpVanTaskList,
-    ...campaignBuilderTaskList
+    ...campaignBuilderTaskList,
+    ...chunkedTaskList
   };
 
   if (!workerSemaphore) {

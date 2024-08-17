@@ -2,38 +2,38 @@
 import { format } from "fast-csv";
 import _ from "lodash";
 
-import { config } from "../../config";
-import { DateTime } from "../../lib/datetime";
-import { getDownloadUrl, getUploadStream } from "../../workers/exports/upload";
-import getExportCampaignContent from "../api/export-campaign";
+import { DateTime } from "../../../../lib/datetime";
+import {
+  getDownloadUrl,
+  getUploadStream
+} from "../../../../workers/exports/upload";
+import getExportCampaignContent from "../../../api/export-campaign";
+import { sendEmail } from "../../../mail";
+import { r } from "../../../models";
+import { errToObj } from "../../../utils";
+import type { ProgressTask } from "../../utils";
+import type { ChunkTaskTitlePayload, ProcessChunkTitlePayload } from "../utils";
 import type {
-  CampaignContactRecord,
-  FilteredContactRecord,
+  ContactExportRow,
+  ContactsChunk,
+  ExportCampaignTask,
+  FilteredContactsRow,
   InteractionStepRecord,
-  MessageRecord,
-  UserRecord
-} from "../api/types";
-import { sendEmail } from "../mail";
-import { r } from "../models";
-import { errToObj } from "../utils";
-import type { ProgressTask, ProgressTaskHelpers } from "./utils";
-import { addProgressJob } from "./utils";
+  MessageExportRow,
+  MessagesChunk,
+  ProcessMessagesChunkPayload,
+  UploadCampaignContacts,
+  UploadCampaignMessages,
+  UploadContactsPayload
+} from "./utils";
+import {
+  CHUNK_SIZE,
+  getChunkedContactsCte,
+  getNotificationEmail,
+  initUpload
+} from "./utils";
 
-export const TASK_IDENTIFIER = "export-campaign";
-
-const CHUNK_SIZE = config.EXPORT_CAMPAIGN_CHUNK_SIZE;
-
-interface ExportChunk {
-  lastContactId: number;
-}
-
-interface ContactsChunk extends ExportChunk {
-  contacts: { [key: string]: string }[];
-}
-
-interface MessagesChunk extends ExportChunk {
-  messages: { [key: string]: any }[];
-}
+export { TASK_IDENTIFIER } from "./utils";
 
 const stepHasQuestion = (step: InteractionStepRecord) =>
   step.question && step.question.trim() !== "";
@@ -68,11 +68,6 @@ export const getUniqueQuestionsByStepId = (
   );
 };
 
-/**
- * Fetch necessary job data from database.
- * @param {object} job The export job object to fetch data for.
- *                     Must have payload, campaign_id, and requester properties.
- */
 export const fetchExportData = async (
   campaignId: number,
   requesterId: number
@@ -82,10 +77,7 @@ export const fetchExportData = async (
     .first("title")
     .where({ id: campaignId });
 
-  const { email: notificationEmail } = await r
-    .reader("user")
-    .first("email")
-    .where({ id: requesterId });
+  const notificationEmail = await getNotificationEmail(requesterId);
 
   const interactionSteps = await r
     .reader("interaction_step")
@@ -120,16 +112,11 @@ export const fetchExportData = async (
   };
 };
 
-interface FilteredContactsRow extends FilteredContactRecord {
-  city: string;
-  state: string;
-}
-
-const processFilteredContactsChunk = async (
-  campaignId: number,
-  campaignTitle: string,
-  lastContactId = 0
-): Promise<ContactsChunk | false> => {
+const processFilteredContactsChunk = async ({
+  campaignId,
+  campaignTitle,
+  lastContactId
+}: ProcessChunkTitlePayload): Promise<ContactsChunk | false> => {
   const filteredRows: FilteredContactsRow[] = await r
     .reader("filtered_contact")
     .select("filtered_contact.*", "zip_code.city", "zip_code.state")
@@ -170,34 +157,18 @@ const processFilteredContactsChunk = async (
   return { lastContactId: newLastContactId, contacts };
 };
 
-interface ContactExportRow extends CampaignContactRecord {
-  city: string;
-  state: string;
-  interaction_step_id: number;
-  value: string;
-  tag_titles: string;
-}
-
 export const processContactsChunk = async (
-  campaignId: number,
-  campaignTitle: string,
+  { campaignId, campaignTitle, lastContactId }: ProcessChunkTitlePayload,
   questionsById: { [key: string]: string },
-  lastContactId = 0,
   onlyOptOuts = false
 ): Promise<ContactsChunk | false> => {
+  const contactsCte = onlyOptOuts
+    ? getChunkedContactsCte("is_opted_out = true")
+    : getChunkedContactsCte();
+
   const { rows }: { rows: ContactExportRow[] } = await r.reader.raw(
     `
-      with campaign_contacts as (
-        select *
-        from campaign_contact
-        where
-          campaign_id = ?
-          and id > ?
-          ${onlyOptOuts ? "and is_opted_out = true" : ""}
-        order by
-          campaign_contact.id asc
-        limit ?
-      )
+      ${contactsCte}
       select
         campaign_contacts.*,
         zip_code.city,
@@ -274,31 +245,11 @@ export const processContactsChunk = async (
   return { lastContactId, contacts };
 };
 
-interface MessageExportRow
-  extends Pick<
-      MessageRecord,
-      | "campaign_contact_id"
-      | "assignment_id"
-      | "user_number"
-      | "contact_number"
-      | "is_from_contact"
-      | "text"
-      | "send_status"
-      | "created_at"
-      | "num_segments"
-      | "num_media"
-    >,
-    Pick<UserRecord, "first_name" | "last_name" | "email"> {
-  error_codes: string;
-  user_cell: string;
-  campaign_variables: Record<string, string>;
-}
-
-export const processMessagesChunk = async (
-  campaignId: number,
-  campaignVariableNames: string[],
-  lastContactId = 0
-): Promise<MessagesChunk | false> => {
+export const processMessagesChunk = async ({
+  campaignId,
+  lastContactId,
+  campaignVariableNames
+}: ProcessMessagesChunkPayload): Promise<MessagesChunk | false> => {
   const { rows }: { rows: MessageExportRow[] } = await r.reader.raw(
     `
       select
@@ -385,25 +336,19 @@ export const processMessagesChunk = async (
   return { lastContactId, messages };
 };
 
-interface UploadCampaignContacts {
-  campaignTitle: string;
-  interactionSteps: Array<any>;
-  contactsCount: number;
-  campaignId: number;
-  helpers: ProgressTaskHelpers;
-  fileNameKey: string;
-  onlyOptOuts: boolean;
-}
-
-const processAndUploadCampaignContacts = async ({
-  campaignTitle,
-  interactionSteps,
-  contactsCount,
-  campaignId,
-  helpers,
-  fileNameKey,
-  onlyOptOuts
-}: UploadCampaignContacts): Promise<string> => {
+// eslint-disable-next-line max-len
+const processAndUploadCampaignContacts: ExportCampaignTask<UploadCampaignContacts> = async (
+  payload,
+  helpers
+) => {
+  const {
+    interactionSteps,
+    fileNameKey,
+    onlyOptOuts,
+    campaignId,
+    campaignTitle,
+    contactsCount
+  } = payload;
   const uniqueQuestionsByStepId = getUniqueQuestionsByStepId(interactionSteps);
 
   const campaignContactsKey = onlyOptOuts
@@ -439,19 +384,12 @@ const processAndUploadCampaignContacts = async ({
 
   campaignContactsWriteStream.pipe(campaignContactsUploadStream);
 
-  // Contact rows
-  let lastContactId;
-  let processed = 0;
   try {
-    let chunkContactResult: ContactsChunk | false;
-    lastContactId = 0;
-    processed = 0;
+    let { result: chunkContactResult, lastContactId, processed } = initUpload;
     while (
       (chunkContactResult = await processContactsChunk(
-        campaignId,
-        campaignTitle,
+        { campaignId, campaignTitle, lastContactId },
         uniqueQuestionsByStepId,
-        lastContactId,
         onlyOptOuts
       ))
     ) {
@@ -464,7 +402,7 @@ const processAndUploadCampaignContacts = async ({
         Math.round((processed / contactsCount / 4) * 100) +
           (onlyOptOuts ? 75 : 25)
       );
-      for (const c of chunkContactResult.contacts) {
+      for (const c of (chunkContactResult as ContactsChunk).contacts) {
         campaignContactsWriteStream.write(c);
       }
     }
@@ -477,21 +415,11 @@ const processAndUploadCampaignContacts = async ({
   return getDownloadUrl(`${campaignContactsKey}.csv`);
 };
 
-interface UploadCampaignMessages {
-  fileNameKey: string;
-  contactsCount: number;
-  helpers: ProgressTaskHelpers;
-  campaignId: number;
-  campaignVariableNames: string[];
-}
-
-const processAndUploadCampaignMessages = async ({
-  fileNameKey,
-  contactsCount,
-  helpers,
-  campaignId,
-  campaignVariableNames
-}: UploadCampaignMessages): Promise<string> => {
+// eslint-disable-next-line max-len
+const processAndUploadCampaignMessages: ExportCampaignTask<UploadCampaignMessages> = async (
+  { fileNameKey, campaignId, contactsCount, campaignVariableNames },
+  helpers
+) => {
   const messagesKey = `${fileNameKey}-messages`;
   const messagesUploadStream = await getUploadStream(`${messagesKey}.csv`);
   const messagesWriteStream = format({
@@ -512,18 +440,14 @@ const processAndUploadCampaignMessages = async ({
 
   messagesWriteStream.pipe(messagesUploadStream);
 
-  // Message rows
-  let lastContactId;
-  let processed = 0;
   try {
-    let chunkMessageResult: MessagesChunk | false;
-    lastContactId = 0;
+    let { result: chunkMessageResult, lastContactId, processed } = initUpload;
     while (
-      (chunkMessageResult = await processMessagesChunk(
+      (chunkMessageResult = await processMessagesChunk({
         campaignId,
-        campaignVariableNames,
-        lastContactId
-      ))
+        lastContactId,
+        campaignVariableNames
+      }))
     ) {
       lastContactId = chunkMessageResult.lastContactId;
       helpers.logger.debug(
@@ -531,9 +455,9 @@ const processAndUploadCampaignMessages = async ({
       );
       processed += CHUNK_SIZE;
       await helpers.updateStatus(
-        Math.round((processed / contactsCount / 4) * 100)
+        Math.round((processed / (contactsCount ?? -1) / 4) * 100)
       );
-      for (const m of chunkMessageResult.messages) {
+      for (const m of (chunkMessageResult as MessagesChunk).messages) {
         messagesWriteStream.write(m);
       }
     }
@@ -546,19 +470,11 @@ const processAndUploadCampaignMessages = async ({
   return getDownloadUrl(`${messagesKey}.csv`);
 };
 
-interface UploadFilteredContacts {
-  fileNameKey: string;
-  helpers: ProgressTaskHelpers;
-  campaignId: number;
-  campaignTitle: string;
-}
-
-const processAndUploadFilteredContacts = async ({
-  fileNameKey,
-  helpers,
-  campaignId,
-  campaignTitle
-}: UploadFilteredContacts): Promise<string> => {
+// eslint-disable-next-line max-len
+const processAndUploadFilteredContacts: ExportCampaignTask<UploadContactsPayload> = async (
+  { fileNameKey, campaignId, campaignTitle, contactsCount },
+  helpers
+): Promise<string> => {
   const filteredContactsKey = `${fileNameKey}-filteredContacts`;
   const filteredContactsUploadStream = await getUploadStream(
     `${filteredContactsKey}.csv`
@@ -585,26 +501,16 @@ const processAndUploadFilteredContacts = async ({
     filteredContactsUploadStream.on("finish", resolve);
   });
 
-  const countQuery = await r
-    .reader("filtered_contact")
-    .count("*")
-    .where({ campaign_id: campaignId });
-  const contactsCount = countQuery[0].count as number;
-
   filteredContactsWriteStream.pipe(filteredContactsUploadStream);
 
-  let lastContactId;
-  let processed = 0;
   try {
-    let chunkContactResult: ContactsChunk | false;
-    lastContactId = 0;
-    processed = 0;
+    let { result: chunkContactResult, lastContactId, processed } = initUpload;
     while (
-      (chunkContactResult = await processFilteredContactsChunk(
+      (chunkContactResult = await processFilteredContactsChunk({
         campaignId,
         campaignTitle,
         lastContactId
-      ))
+      }))
     ) {
       lastContactId = chunkContactResult.lastContactId;
       helpers.logger.debug(
@@ -612,9 +518,9 @@ const processAndUploadFilteredContacts = async ({
       );
       processed += CHUNK_SIZE;
       await helpers.updateStatus(
-        Math.round((processed / contactsCount / 4) * 100) + 75
+        Math.round((processed / (contactsCount ?? -1) / 4) * 100) + 75
       );
-      for (const c of chunkContactResult.contacts) {
+      for (const c of (chunkContactResult as ContactsChunk).contacts) {
         filteredContactsWriteStream.write(c);
       }
     }
@@ -627,9 +533,7 @@ const processAndUploadFilteredContacts = async ({
   return getDownloadUrl(`${filteredContactsKey}.csv`);
 };
 
-export interface ExportCampaignPayload {
-  campaignId: number;
-  requesterId: number;
+export interface ExportCampaignPayload extends ChunkTaskTitlePayload {
   isAutomatedExport?: boolean;
   spokeOptions: {
     campaign: boolean;
@@ -645,22 +549,18 @@ export const exportCampaign: ProgressTask<ExportCampaignPayload> = async (
 ) => {
   const {
     campaignId,
+    campaignTitle,
+    contactsCount,
     requesterId,
     isAutomatedExport = false,
     spokeOptions
   } = payload;
+
   const {
-    campaignTitle,
     notificationEmail,
     interactionSteps,
     campaignVariableNames
   } = await fetchExportData(campaignId, requesterId);
-
-  const countQueryResult = await r
-    .reader("campaign_contact")
-    .count("*")
-    .where({ campaign_id: campaignId });
-  const contactsCount = countQueryResult[0].count as number;
 
   // Attempt upload to cloud storage
   let fileNameKey = campaignTitle.replace(/ /g, "_").replace(/\//g, "_");
@@ -677,47 +577,51 @@ export const exportCampaign: ProgressTask<ExportCampaignPayload> = async (
     optOuts: shouldExportOptOuts
   } = spokeOptions;
 
+  const campaign = { campaignId, campaignTitle, contactsCount };
+
   const campaignExportUrl = shouldExportCampaign
-    ? await processAndUploadCampaignContacts({
-        fileNameKey,
-        campaignId,
-        campaignTitle,
-        contactsCount,
-        helpers,
-        interactionSteps,
-        onlyOptOuts: false
-      })
+    ? await processAndUploadCampaignContacts(
+        {
+          fileNameKey,
+          ...campaign,
+          interactionSteps,
+          onlyOptOuts: false
+        },
+        helpers
+      )
     : null;
 
   const campaignOptOutsExportUrl = shouldExportOptOuts
-    ? await processAndUploadCampaignContacts({
-        fileNameKey,
-        campaignId,
-        campaignTitle,
-        contactsCount,
-        helpers,
-        interactionSteps,
-        onlyOptOuts: true
-      })
+    ? await processAndUploadCampaignContacts(
+        {
+          fileNameKey,
+          ...campaign,
+          interactionSteps,
+          onlyOptOuts: true
+        },
+        helpers
+      )
     : null;
 
   const campaignMessagesExportUrl = shouldExportMessages
-    ? await processAndUploadCampaignMessages({
-        fileNameKey,
-        campaignId,
-        contactsCount,
-        helpers,
-        campaignVariableNames
-      })
+    ? await processAndUploadCampaignMessages(
+        {
+          fileNameKey,
+          ...campaign,
+          campaignVariableNames
+        },
+        helpers
+      )
     : null;
 
   const campaignFilteredContactsExportUrl = shouldExportFilteredContacts
-    ? await processAndUploadFilteredContacts({
-        fileNameKey,
-        campaignId,
-        campaignTitle,
+    ? await processAndUploadFilteredContacts(
+        {
+          fileNameKey,
+          ...campaign
+        },
         helpers
-      })
+      )
     : null;
 
   helpers.logger.debug("Waiting for streams to finish");
