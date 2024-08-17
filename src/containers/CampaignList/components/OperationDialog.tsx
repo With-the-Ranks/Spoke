@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -60,10 +59,8 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
         {operationDefinition?.body(campaign)}
         <br />
         <p>
-          <label>
-            How many hours ago should a conversation have been idle for it to be
-            unassigned?
-          </label>
+          How many hours ago should a conversation have been idle for it to be
+          unassigned?
         </p>
         <TextField
           type="number"
