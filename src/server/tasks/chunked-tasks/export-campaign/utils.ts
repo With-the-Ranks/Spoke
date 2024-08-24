@@ -19,28 +19,30 @@ export { getChunkedContactsCte, getNotificationEmail } from "../utils";
 
 export type { InteractionStepRecord } from "../../../api/types";
 
-export type { ContactTaskChunk };
-
 export const TASK_IDENTIFIER = "export-campaign";
 
 export const CHUNK_SIZE = config.EXPORT_CAMPAIGN_CHUNK_SIZE;
 
-export interface ExportDataChunk extends ContactTaskChunk {
+export interface ExportChunk extends ContactTaskChunk {
   data: { [key: string]: any }[];
 }
 
-export interface ContactExportRow extends CampaignContactRecord {
+interface ContactCityState {
   city: string;
   state: string;
+}
+
+export interface ContactExportRow
+  extends CampaignContactRecord,
+    ContactCityState {
   interaction_step_id: number;
   value: string;
   tag_titles: string;
 }
 
-export interface FilteredContactsRow extends FilteredContactRecord {
-  city: string;
-  state: string;
-}
+export interface FilteredContactsRow
+  extends FilteredContactRecord,
+    ContactCityState {}
 
 export interface MessageExportRow
   extends Pick<

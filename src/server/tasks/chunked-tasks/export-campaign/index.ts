@@ -19,7 +19,7 @@ import { getCampaignTitle, getContactCount } from "../utils";
 import type {
   ContactExportRow,
   ExportCampaignTask,
-  ExportDataChunk,
+  ExportChunk,
   FilteredContactsRow,
   InteractionStepRecord,
   MessageExportRow,
@@ -155,7 +155,7 @@ const processFilteredContactsChunk = async ({
   campaignId,
   campaignTitle,
   lastContactId
-}: ProcessChunkTitlePayload): Promise<ExportDataChunk | false> => {
+}: ProcessChunkTitlePayload): Promise<ExportChunk | false> => {
   const filteredRows: FilteredContactsRow[] = await r
     .reader("filtered_contact")
     .select("filtered_contact.*", "zip_code.city", "zip_code.state")
@@ -182,7 +182,7 @@ export const processContactsChunk = async (
   { campaignId, campaignTitle, lastContactId }: ProcessChunkTitlePayload,
   questionsById: { [key: string]: string },
   onlyOptOuts = false
-): Promise<ExportDataChunk | false> => {
+): Promise<ExportChunk | false> => {
   const contactsCte = onlyOptOuts
     ? getChunkedContactsCte("is_opted_out = true")
     : getChunkedContactsCte();
@@ -253,7 +253,7 @@ export const processMessagesChunk = async ({
   campaignId,
   lastContactId,
   campaignVariableNames
-}: ProcessMessagesChunkPayload): Promise<ExportDataChunk | false> => {
+}: ProcessMessagesChunkPayload): Promise<ExportChunk | false> => {
   const { rows }: { rows: MessageExportRow[] } = await r.reader.raw(
     `
       select
@@ -377,7 +377,7 @@ interface ProcessExportChunkPayload {
 interface ProcessExportChunksPayload {
   processChunk: (
     payload: ProcessExportChunkPayload
-  ) => Promise<ExportDataChunk | false>;
+  ) => Promise<ExportChunk | false>;
   campaignId: number;
   campaignTitle?: string;
   uniqueQuestionsByStepId?: any;
