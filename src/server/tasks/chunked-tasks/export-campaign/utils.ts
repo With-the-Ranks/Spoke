@@ -25,18 +25,8 @@ export const TASK_IDENTIFIER = "export-campaign";
 
 export const CHUNK_SIZE = config.EXPORT_CAMPAIGN_CHUNK_SIZE;
 
-export const initUpload = {
-  lastContactId: 0,
-  processed: 0,
-  result: false as ContactTaskChunk | false
-};
-
-export interface ContactsChunk extends ContactTaskChunk {
-  contacts: { [key: string]: string }[];
-}
-
-export interface MessagesChunk extends ContactTaskChunk {
-  messages: { [key: string]: any }[];
+export interface ExportDataChunk extends ContactTaskChunk {
+  data: { [key: string]: any }[];
 }
 
 export interface ContactExportRow extends CampaignContactRecord {
@@ -108,3 +98,9 @@ export interface ProcessMessagesChunkPayload
 export interface UploadCampaignMessages
   extends CampaignVariablePayload,
     UploadPayload {}
+
+export const isFilteredContact = (
+  contact: FilteredContactsRow | ContactExportRow
+): contact is FilteredContactsRow => {
+  return "filtered_reason" in contact;
+};
