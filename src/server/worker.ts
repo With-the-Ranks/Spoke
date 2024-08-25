@@ -15,7 +15,7 @@ import {
   schedules as campaignBuilderSchedules,
   taskList as campaignBuilderTaskList
 } from "./tasks/campaign-builder";
-import { taskList as chunkedTaskList } from "./tasks/chunked-tasks";
+import { taskList as chunkTaskList } from "./tasks/chunk-tasks";
 import {
   exportForVan,
   TASK_IDENTIFIER as exportForVanIdentifier
@@ -110,7 +110,7 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     [exportOptOutsIdentifier]: exportOptOuts,
     ...ngpVanTaskList,
     ...campaignBuilderTaskList,
-    ...chunkedTaskList
+    ...chunkTaskList
   };
 
   if (!workerSemaphore) {

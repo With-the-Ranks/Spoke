@@ -30,7 +30,7 @@ import MemoizeHelper, { cacheOpts } from "../memoredis";
 import { cacheableData, r } from "../models";
 import { getUserById } from "../models/cacheable_queries";
 import { Notifications, sendUserNotification } from "../notifications";
-import { addExportCampaign } from "../tasks/chunked-tasks/export-campaign";
+import { addExportCampaign } from "../tasks/chunk-tasks/export-campaign";
 import { addExportForVan } from "../tasks/export-for-van";
 import { TASK_IDENTIFIER as exportOptOutsIdentifier } from "../tasks/export-opt-outs";
 import { addFilterLandlines } from "../tasks/filter-landlines";
