@@ -15,12 +15,17 @@ import type {
   ProcessChunkPayload
 } from "../utils";
 
-export { getChunkedContactsCte, getNotificationEmail } from "../utils";
-
-export type { InteractionStepRecord } from "../../../api/types";
-
+export { errToObj } from "../../../utils";
+export type { ProgressTask, ProgressTaskHelpers } from "../../utils";
+export { addProgressJob } from "../../utils";
+export type { ChunkTaskPayload, ProcessChunkTitlePayload } from "../utils";
+export {
+  getContactCount,
+  getChunkedContactsCte,
+  getNotificationEmail
+} from "../utils";
+export type { InteractionStepRecord };
 export const TASK_IDENTIFIER = "export-campaign";
-
 export const CHUNK_SIZE = config.EXPORT_CAMPAIGN_CHUNK_SIZE;
 
 export interface ExportChunk extends ContactTaskChunk {
