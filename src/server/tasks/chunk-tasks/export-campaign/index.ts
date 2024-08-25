@@ -15,7 +15,7 @@ import { errToObj } from "../../../utils";
 import type { ProgressTask, ProgressTaskHelpers } from "../../utils";
 import { addProgressJob } from "../../utils";
 import type { ChunkTaskPayload, ProcessChunkTitlePayload } from "../utils";
-import { getCampaignTitle, getContactCount } from "../utils";
+import { getContactCount } from "../utils";
 import type {
   ContactExportRow,
   ExportCampaignTask,
@@ -76,7 +76,6 @@ export const fetchExportData = async (
   requesterId: number
 ) => {
   const contactsCount = await getContactCount(campaignId);
-  const campaignTitle = await getCampaignTitle(campaignId);
   const notificationEmail = await getNotificationEmail(requesterId);
 
   const interactionSteps = await r
@@ -105,7 +104,6 @@ export const fetchExportData = async (
 
   return {
     contactsCount,
-    campaignTitle,
     notificationEmail,
     interactionSteps,
     campaignVariableNames,
@@ -558,6 +556,7 @@ export const exportCampaign: ProgressTask<ExportCampaignPayload> = async (
 ) => {
   const {
     campaignId,
+    campaignTitle,
     requesterId,
     isAutomatedExport = false,
     spokeOptions
@@ -565,7 +564,6 @@ export const exportCampaign: ProgressTask<ExportCampaignPayload> = async (
 
   const {
     contactsCount,
-    campaignTitle,
     notificationEmail,
     interactionSteps,
     campaignVariableNames

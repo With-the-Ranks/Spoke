@@ -17,7 +17,9 @@ export interface ProcessChunkTitlePayload
   extends ProcessChunkPayload,
     CampaignTitlePayload {}
 
-export interface ChunkTaskPayload extends ProgressJobPayload {
+export interface ChunkTaskPayload
+  extends ProgressJobPayload,
+    CampaignTitlePayload {
   requesterId: number;
 }
 
@@ -27,14 +29,6 @@ export const getContactCount = async (campaignId: number) => {
     .count()
     .where({ campaign_id: campaignId });
   return count as number;
-};
-
-export const getCampaignTitle = async (campaignId: number) => {
-  const { title } = await r
-    .reader("campaign")
-    .first("title")
-    .where({ id: campaignId });
-  return title;
 };
 
 export const getNotificationEmail = async (requesterId: number) => {
