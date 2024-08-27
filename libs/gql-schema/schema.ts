@@ -335,11 +335,11 @@ const rootSchema = `
     requestTexts(count: Int!, email: String!, organizationId: String!, preferredTeamId: String!): String!
     releaseMessages(campaignId: String!, target: ReleaseActionTarget!, ageInHours: Float): String!
     releaseAllUnhandledReplies(organizationId: String!, ageInHours: Float, releaseOnRestricted: Boolean, limitToCurrentlyTextableContacts: Boolean): ReleaseAllUnhandledRepliesResult!
-    markForSecondPass(campaignId: String!, input: SecondPassInput!): String!
+    markForSecondPass(campaignId: String!, campaignTitle: String!, input: SecondPassInput!): String!
     startAutosending(campaignId: String!): Campaign!
     pauseAutosending(campaignId: String!): Campaign!
     updateCampaignAutosendingLimit(campaignId: String!, limit: Int): Campaign!
-    unMarkForSecondPass(campaignId: String!): String!
+    unMarkForSecondPass(campaignId: String!, campaignTitle: String!): String!
     deleteNeedsMessage(campaignId: String!): String!
     insertLinkDomain(organizationId: String!, domain: String!, maxUsageCount: Int!): LinkDomain!
     updateLinkDomain(organizationId: String!, domainId: String!, payload: UpdateLinkDomain!): LinkDomain!

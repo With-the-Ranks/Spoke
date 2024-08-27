@@ -35,7 +35,6 @@ export interface OperationDialogProps extends OperationDialogBodyProps {
 
 export const OperationDialogBody = (props: OperationDialogBodyProps) => {
   const { inProgress, finished, executing, error, setInProgress } = props;
-
   const { name: operationName, campaign } = inProgress;
   const operationDefinition = dialogOperations[operationName];
 
@@ -89,6 +88,12 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
     return (
       <div>
         <p>{operationDefinition?.body(campaign)}</p>
+        {campaign.hasUnsentInitialMessages && (
+          <p style={{ color: "red" }}>
+            WARNING: This campaign still has contacts with unsent initial
+            messages{" "}
+          </p>
+        )}
         <p>
           To read about best practices for second passes, head{" "}
           <a

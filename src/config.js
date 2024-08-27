@@ -736,6 +736,10 @@ const validators = {
       "A JSON blob passed directly to express-basic-auth for locking campaign previews",
     default: undefined
   }),
+  MARK_SECOND_PASS_CHUNK_SIZE: num({
+    desc: "Chunk size to use when marking a campaign for a second pass",
+    default: 1000
+  }),
   SKIP_TWILIO_VALIDATION: bool({
     desc: "Whether to bypass Twilio header validation altogether.",
     default: false

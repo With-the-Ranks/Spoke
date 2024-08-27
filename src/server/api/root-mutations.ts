@@ -31,6 +31,7 @@ import { cacheableData, r } from "../models";
 import { getUserById } from "../models/cacheable_queries";
 import { Notifications, sendUserNotification } from "../notifications";
 import { addExportCampaign } from "../tasks/chunk-tasks/export-campaign";
+import { addMarkSecondPass } from "../tasks/chunk-tasks/mark-second-pass";
 import { addExportForVan } from "../tasks/export-for-van";
 import { TASK_IDENTIFIER as exportOptOutsIdentifier } from "../tasks/export-opt-outs";
 import { addFilterLandlines } from "../tasks/filter-landlines";
@@ -63,6 +64,7 @@ import {
   markAutosendingPaused,
   unqueueAutosending
 } from "./lib/campaign";
+import { getSecondPassCampaign } from "./lib/mark-second-pass";
 import { saveNewIncomingMessage } from "./lib/message-sending";
 import { processNumbers } from "./lib/opt-out";
 import { sendMessage } from "./lib/send-message";
@@ -1874,18 +1876,12 @@ const rootMutations = {
 
     markForSecondPass: async (
       _ignore,
-      { campaignId, input: { excludeAgeInHours, excludeNewer } },
+      { campaignId, campaignTitle, input: { excludeAgeInHours, excludeNewer } },
       { user }
     ) => {
       // verify permissions
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: parseInt(campaignId, 10) })
-        .first(["organization_id", "is_archived", "autosend_status"]);
-
-      const organizationId = campaign.organization_id;
-
-      await accessRequired(user, organizationId, "ADMIN", true);
+      const numCampaignId = parseInt(campaignId, 10);
+      const campaign = await getSecondPassCampaign(campaignId, user);
 
       if (!["complete", "unstarted"].includes(campaign.autosend_status)) {
         throw new Error(
@@ -1895,61 +1891,21 @@ const rootMutations = {
         );
       }
 
-      await r
-        .knex("campaign")
-        .update({ autosend_status: "unstarted" })
-        .where({ id: parseInt(campaignId, 10) });
+      const [{ count: contactsCount }] = await r
+        .knex("campaign_contact")
+        .where({ campaign_id: numCampaignId, message_status: "messaged" })
+        .count();
 
-      const queryArgs = [parseInt(campaignId, 10)];
-      if (excludeAgeInHours) {
-        queryArgs.push(parseFloat(excludeAgeInHours));
-      }
+      addMarkSecondPass({
+        organizationId: campaign.organization_id,
+        campaignId,
+        campaignTitle,
+        requesterId: user.id,
+        excludeAgeInHours,
+        excludeNewer
+      });
 
-      const excludeNewerSql = `
-          and not exists (
-            select
-              cell
-            from
-              campaign_contact as newer_contact
-            where
-              newer_contact.cell = current_contact.cell
-              and newer_contact.created_at > current_contact.created_at
-          )
-      `;
-
-      /**
-       * "Mark Campaign for Second Pass", will only mark contacts for a second
-       * pass that do not have a more recently created membership in another campaign.
-       * Using SQL injection to avoid passing archived as a binding
-       * Should help with guaranteeing partial index usage
-       */
-      const updateSql = `
-        update
-          campaign_contact as current_contact
-        set
-          message_status = 'needsMessage'
-        where current_contact.campaign_id = ?
-          and current_contact.message_status = 'messaged'
-          and current_contact.archived = ${campaign.is_archived}
-          ${excludeNewer ? excludeNewerSql : ""}
-          and not exists (
-            select 1
-            from message
-            where current_contact.id = message.campaign_contact_id
-              and is_from_contact = true
-          )
-          ${
-            excludeAgeInHours
-              ? "and current_contact.updated_at < now() - interval '?? hour'"
-              : ""
-          }
-        ;
-      `;
-
-      const updateResultRaw = await r.knex.raw(updateSql, queryArgs);
-      const updateResult = updateResultRaw.rowCount;
-
-      return `Marked ${updateResult} campaign contacts for a second pass.`;
+      return `Queuing ${contactsCount} campaign contacts for a second pass. You'll receive an email when the second pass is fully marked!`;
     },
 
     startAutosending: async (_ignore, { campaignId }, { loaders, user }) => {
@@ -2044,53 +2000,30 @@ const rootMutations = {
       return updatedCampaign;
     },
 
-    unMarkForSecondPass: async (_ignore, { campaignId }, { user }) => {
+    unMarkForSecondPass: async (
+      _ignore,
+      { campaignId, campaignTitle },
+      { user }
+    ) => {
       // verify permissions
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: parseInt(campaignId, 10) })
-        .first(["organization_id", "is_archived"]);
+      const numCampaignId = parseInt(campaignId, 10);
+      const campaign = await getSecondPassCampaign(numCampaignId, user);
 
-      const organizationId = campaign.organization_id;
+      // The precise count unmarked may be lower if some contacts never got a first message
+      const [{ count: contactsCount }] = await r
+        .knex("campaign_contact")
+        .where({ campaign_id: numCampaignId, message_status: "needsMessage" })
+        .count();
 
-      await accessRequired(user, organizationId, "ADMIN", true);
+      addMarkSecondPass({
+        unmark: true,
+        organizationId: campaign.organization_id,
+        campaignId,
+        campaignTitle,
+        requesterId: user.id
+      });
 
-      /**
-       * "Un-Mark Campaign for Second Pass", will only mark contacts as messaged
-       * if they are currently needsMessage and have been sent a message and have not replied
-       *
-       * Using SQL injection to avoid passing archived as a binding
-       * Should help with guaranteeing partial index usage
-       */
-      const updateResultRaw = await r.knex.raw(
-        `
-        update
-          campaign_contact
-        set
-          message_status = 'messaged'
-        where campaign_contact.campaign_id = ?
-          and campaign_contact.message_status = 'needsMessage'
-          and campaign_contact.archived = ${campaign.is_archived}
-          and exists (
-            select 1
-            from message
-            where message.campaign_contact_id = campaign_contact.id
-              and is_from_contact = false
-          ) 
-          and not exists (
-            select 1
-            from message
-            where message.campaign_contact_id = campaign_contact.id
-              and is_from_contact = true
-          )
-        ;
-      `,
-        [parseInt(campaignId, 10)]
-      );
-
-      const updateResult = updateResultRaw.rowCount;
-
-      return `Un-Marked ${updateResult} campaign contacts for a second pass.`;
+      return `Queuing ${contactsCount} campaign contacts to remove second pass marking. You'll receive an email when this is complete!`;
     },
 
     deleteNeedsMessage: async (_ignore, { campaignId }, { user }) => {

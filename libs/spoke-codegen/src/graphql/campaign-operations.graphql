@@ -51,12 +51,12 @@ mutation deleteNeedsMessage($campaignId: String!) {
   deleteNeedsMessage(campaignId: $campaignId)
 }
 
-mutation markForSecondPass($campaignId: String!, $input: SecondPassInput!) {
-  markForSecondPass(campaignId: $campaignId, input: $input)
+mutation markForSecondPass($campaignId: String!, $campaignTitle: String!, $input: SecondPassInput!) {
+  markForSecondPass(campaignId: $campaignId, campaignTitle: $campaignTitle, input: $input)
 }
 
-mutation unMarkForSecondPass($campaignId: String!) {
-  unMarkForSecondPass(campaignId: $campaignId)
+mutation unMarkForSecondPass($campaignId: String!, $campaignTitle: String!) {
+  unMarkForSecondPass(campaignId: $campaignId, campaignTitle: $campaignTitle)
 }
 
 mutation toggleAutoAssign($campaignId: String!, $enabled: Boolean!) {

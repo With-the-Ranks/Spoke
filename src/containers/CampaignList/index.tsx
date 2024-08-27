@@ -129,11 +129,25 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         break;
       }
       case isMarkForSecondPass(inProgress): {
-        const { excludeNewer, hours } = inProgress.payload;
+        const {
+          excludeNewer,
+          excludeRecentlyTexted,
+          hours,
+          days
+        } = inProgress.payload;
+        const { id: campaignId, title: campaignTitle } = campaign;
+        const excludeAgeInHours = excludeRecentlyTexted
+          ? (days || 0) * 24 + (hours || 0)
+          : undefined;
+
         const { data, errors } = await markCampaign({
           variables: {
-            campaignId: campaign.id,
-            input: { excludeNewer, excludeAgeInHours: hours }
+            campaignId,
+            campaignTitle,
+            input: {
+              excludeNewer,
+              excludeAgeInHours
+            }
           }
         });
 
@@ -141,8 +155,9 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         break;
       }
       case isUnMarkForSecondPass(inProgress): {
+        const { id: campaignId, title: campaignTitle } = campaign;
         const { data, errors } = await unmarkCampaign({
-          variables: { campaignId: campaign.id }
+          variables: { campaignId, campaignTitle }
         });
         setStateAfterOperation(data?.unMarkForSecondPass, errors);
         break;
