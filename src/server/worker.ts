@@ -62,7 +62,7 @@ import syncContactQuestionResponse from "./tasks/sync-contact-question-response"
 import syncSlackTeamMembers from "./tasks/sync-slack-team-members";
 import { trollPatrol, trollPatrolForOrganization } from "./tasks/troll-patrol";
 import updateOrgMessageUsage from "./tasks/update-org-message-usage";
-import { wrapProgressTask } from "./tasks/utils";
+import { wrapProgressTask, wrapProgressTaskList } from "./tasks/utils";
 
 const logFactory: LogFunctionFactory = (scope) => (level, message, meta) =>
   logger.log({ level, message, ...meta, ...scope });
@@ -110,7 +110,7 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     [exportOptOutsIdentifier]: exportOptOuts,
     ...ngpVanTaskList,
     ...campaignBuilderTaskList,
-    ...chunkTaskList
+    ...wrapProgressTaskList(chunkTaskList)
   };
 
   if (!workerSemaphore) {

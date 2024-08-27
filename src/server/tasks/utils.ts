@@ -113,6 +113,8 @@ export interface ProgressTaskOptions {
   removeOnComplete: boolean;
 }
 
+export type ProgressTaskList<P = unknown> = Record<string, ProgressTask<P>>;
+
 export const wrapProgressTask = <P extends { [key: string]: any }>(
   task: ProgressTask<P>,
   options: ProgressTaskOptions
@@ -154,4 +156,15 @@ export const wrapProgressTask = <P extends { [key: string]: any }>(
     // throw error to trigger graphile retry
     throw err;
   }
+};
+
+export const wrapProgressTaskList = async <P extends ProgressTaskPayload>(
+  list: ProgressTaskList<P>
+) => {
+  return Object.entries(list).reduce((acc, [key, task]) => {
+    acc[key] = wrapProgressTask(task, {
+      removeOnComplete: true
+    });
+    return acc;
+  }, {} as ProgressTaskList<P>);
 };
