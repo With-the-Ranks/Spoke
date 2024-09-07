@@ -1,13 +1,13 @@
 import type { CsvFormatterStream, FormatterRowArray } from "fast-csv";
+
+import { config } from "../../../../config";
 import type {
   CampaignContactRecord,
   FilteredContactRecord,
   InteractionStepRecord,
   MessageRecord,
   UserRecord
-} from "src/server/api/types";
-
-import { config } from "../../../../config";
+} from "../../../api/types";
 import type { KnownReturnProgressTask, ProgressTaskHelpers } from "../../utils";
 import type {
   CampaignTitlePayload,
