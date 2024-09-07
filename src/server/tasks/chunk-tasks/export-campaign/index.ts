@@ -1,5 +1,4 @@
 /* eslint-disable no-cond-assign */
-import type { CsvFormatterStream, FormatterRowArray } from "fast-csv";
 import { format } from "fast-csv";
 import _ from "lodash";
 
@@ -20,6 +19,7 @@ import type {
   InteractionStepRecord,
   MessageExportRow,
   ProcessChunkTitlePayload,
+  ProcessExportChunksPayload,
   ProcessMessagesChunkPayload,
   ProgressTask,
   ProgressTaskHelpers,
@@ -366,27 +366,6 @@ const setupUploadStreams = async (
 
   return { writeStream, uploadPromise };
 };
-
-interface ProcessExportChunkPayload {
-  campaignId: number;
-  campaignTitle: string;
-  lastContactId: number;
-  uniqueQuestionsByStepId?: any;
-}
-
-interface ProcessExportChunksPayload {
-  processChunk: (
-    payload: ProcessExportChunkPayload
-  ) => Promise<ExportChunk | false>;
-  campaignId: number;
-  campaignTitle?: string;
-  uniqueQuestionsByStepId?: any;
-  helpers: ProgressTaskHelpers;
-  contactsCount: number;
-  processedInitial?: number;
-  statusOffset?: number;
-  writeStream: CsvFormatterStream<FormatterRowArray, FormatterRowArray>;
-}
 
 const processChunks = async (payload: ProcessExportChunksPayload) => {
   const {
