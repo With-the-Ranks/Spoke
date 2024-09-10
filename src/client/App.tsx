@@ -1,7 +1,7 @@
 import { ApolloProvider } from "@apollo/client";
 import { LicenseInfo } from "@mui/x-license-pro";
 import { css, StyleSheet } from "aphrodite";
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import { QueryParamProvider } from "use-query-params";
 
@@ -32,7 +32,9 @@ const App: React.FC = () => {
               <div className={css(styles.root)}>
                 <VersionNotifier />
                 <ErrorHandler />
-                <AppRoutes />
+                <Suspense fallback="loading">
+                  <AppRoutes />
+                </Suspense>
               </div>
             </SpokeThemeProvider>
           </SpokeContextProvider>
