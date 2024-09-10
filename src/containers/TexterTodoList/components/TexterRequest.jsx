@@ -5,6 +5,7 @@ import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import TextField from "material-ui/TextField";
 import React from "react";
+import { withTranslation } from "react-i18next";
 import * as yup from "yup";
 
 import { RequestAutoApproveType } from "../../../api/organization-membership";
@@ -48,7 +49,7 @@ class TexterRequest extends React.Component {
 
   submit = async () => {
     const { count, email, selectedAssignment, submitting } = this.state;
-    const { mutations } = this.props;
+    const { mutations, t } = this.props;
     if (submitting) return;
 
     this.setState({ submitting: true, error: undefined });
@@ -63,16 +64,16 @@ class TexterRequest extends React.Component {
         this.setState({ finished: true });
       } else if (message === "Unrecognized email") {
         this.setState({
-          error: `Unrecognized email: please make sure you're logged into Spoke with the same email as Slack.`
+          error: t("unrecognized email error")
         });
       } else if (
         message === "Not created; a shift already requested < 10 mins ago."
       ) {
         this.setState({
-          error: "Sorry - you just requested! Please wait 10 minutes."
+          error: t("recent request error")
         });
       } else if (message === "No texts available at the moment") {
-        this.setState({ error: message });
+        this.setState({ error: t("no texts error") });
       } else {
         this.setState({ finished: true });
       }
@@ -337,7 +338,9 @@ const mutations = {
   })
 };
 
-export default loadData({
-  queries,
-  mutations
-})(TexterRequest);
+export default withTranslation("TexterRequest")(
+  loadData({
+    queries,
+    mutations
+  })(TexterRequest)
+);

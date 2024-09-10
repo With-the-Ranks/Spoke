@@ -4,10 +4,12 @@ import Divider from "@material-ui/core/Divider";
 import type { Assignment } from "@spoke/spoke-codegen";
 import { Card, CardTitle } from "material-ui/Card";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 
 import { useSpokeContext } from "../../../client/spoke-context";
 import { DateTime } from "../../../lib/datetime";
+import { titleCase } from "../../../lib/scripts";
 import type { MessageType } from "./BadgeButton";
 import BadgeButton from "./BadgeButton";
 
@@ -44,6 +46,7 @@ interface Props {
 export const AssignmentSummary: React.FC<Props> = (props) => {
   const history = useHistory();
   const context = useSpokeContext();
+  const { t } = useTranslation("campaign");
 
   const makeGoToTodosHandler = (
     contactsFilter: string | null,
@@ -112,12 +115,16 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     useDynamicAssignment
   } = assignment.campaign;
   const { maxContacts } = assignment;
+
+  const fallbackDueByText = titleCase(`${t("no")} ${t("due date")}`);
   const dueByText = dueBy
     ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
-    : "No Due Date";
+    : fallbackDueByText;
   const subtitle = `${description} - ${dueByText}`;
 
   const classes = useStyles();
+
+  const badgeBtnStartSend = t("send").toUpperCase();
 
   return (
     <div className={classes.container}>
@@ -139,7 +146,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendFirstTexts",
                 assignment,
-                title: "Send first texts",
+                title: `${badgeBtnStartSend} ${t("first texts")}`,
                 type: "initial",
                 count: unmessagedCount,
                 primary: true,
@@ -157,7 +164,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendReplies",
                 assignment,
-                title: "Send replies",
+                title: `${badgeBtnStartSend} ${t("replies")}`,
                 type: "reply",
                 count: unrepliedCount,
                 primary: false,
@@ -167,7 +174,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
               })}
           {renderBadgedButton({
             assignment,
-            title: "Past Messages",
+            title: `${t("past messages")}`,
             type: "past",
             count: pastMessagesCount,
             primary: false,
@@ -177,7 +184,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           })}
           {renderBadgedButton({
             assignment,
-            title: "Skipped Messages",
+            title: `${t("skipped messages")}`,
             type: "past",
             count: skippedMessagesCount,
             primary: false,
@@ -188,7 +195,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           {window.NOT_IN_USA && window.ALLOW_SEND_ALL
             ? renderBadgedButton({
                 assignment,
-                title: "Send messages",
+                title: `${badgeBtnStartSend} ${t("messages")}`,
                 type: "initial",
                 primary: true,
                 disabled: false,
@@ -199,7 +206,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : ""}
           {renderBadgedButton({
             assignment,
-            title: "Send later",
+            title: `${badgeBtnStartSend} ${t("later")}`,
             type: "initial",
             count: badTimezoneCount,
             primary: false,
