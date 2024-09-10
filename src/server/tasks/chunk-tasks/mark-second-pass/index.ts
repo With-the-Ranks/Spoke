@@ -1,10 +1,13 @@
 import { getContent } from "../../../lib/templates/mark-second-pass";
 import { sendEmail } from "../../../mail";
 import { r } from "../../../models";
+import type { ContactTaskChunk } from "../utils";
+import { processChunks } from "../utils";
 import type {
   MarkSecondPassPayload,
   ProcessSecondPassChunkPayload,
-  ProgressTask
+  ProgressTask,
+  SecondPassOptions
 } from "./utils";
 import {
   addProgressJob,
@@ -17,16 +20,12 @@ import {
 
 export { TASK_IDENTIFIER };
 
-export const processChunk = async (
-  payload: ProcessSecondPassChunkPayload
-): Promise<number> => {
-  const {
-    campaignId,
-    lastContactId = 0,
-    unmark,
-    excludeNewer,
-    excludeAgeInHours
-  } = payload;
+const processChunk = async (
+  chunkPayload: ProcessSecondPassChunkPayload,
+  secondPassOptions: SecondPassOptions
+): Promise<ContactTaskChunk | false> => {
+  const { campaignId, lastContactId } = chunkPayload;
+  const { unmark, excludeNewer, excludeAgeInHours } = secondPassOptions;
 
   // don't unmark contacts where a first msg was never sent
   const msgExists = `
@@ -90,7 +89,9 @@ export const processChunk = async (
     `,
     queryArgs
   );
-  return maxContactId;
+
+  if (maxContactId === null) return false;
+  return { lastContactId: maxContactId };
 };
 
 type ProcessContactsPayload = Omit<
@@ -103,30 +104,17 @@ const processContacts: ProgressTask<ProcessContactsPayload> = async (
 ) => {
   const { campaignId, unmark, excludeNewer, excludeAgeInHours } = payload;
   const contactsCount = await getContactCount(campaignId);
+  const operationName = `${unmark ? "un" : ""}mark second pass`;
 
-  let lastContactId = 0;
-  let processed = 0;
-  let chunkContactResult: number;
-
-  while (
-    // eslint-disable-next-line no-cond-assign
-    (chunkContactResult = await processChunk({
-      campaignId,
-      lastContactId,
-      unmark,
-      excludeNewer,
-      excludeAgeInHours
-    }))
-  ) {
-    lastContactId = chunkContactResult;
-    helpers.logger.debug(
-      `Processing ${
-        unmark ? "un" : ""
-      }mark second pass for ${campaignId} chunk part ${lastContactId}`
-    );
-    processed += CHUNK_SIZE;
-    await helpers.updateStatus(Math.round(processed / contactsCount));
-  }
+  await processChunks({
+    processChunk: (chunkPayload) =>
+      processChunk(chunkPayload, { unmark, excludeNewer, excludeAgeInHours }),
+    operationName,
+    campaignId,
+    chunkSize: CHUNK_SIZE,
+    contactsCount,
+    helpers
+  });
 };
 
 export const markSecondPass: ProgressTask<MarkSecondPassPayload> = async (
@@ -143,7 +131,7 @@ export const markSecondPass: ProgressTask<MarkSecondPassPayload> = async (
     excludeAgeInHours
   } = payload;
 
-  const unPrefix = unmark ? "un" : "";
+  const prefix = unmark ? "un" : "";
   await processContacts(
     { campaignId, unmark, excludeNewer, excludeAgeInHours },
     helpers
@@ -166,12 +154,12 @@ export const markSecondPass: ProgressTask<MarkSecondPassPayload> = async (
 
   await sendEmail({
     to: notificationEmail,
-    subject: `Second pass ${unPrefix}marking complete for ${campaignTitle}`,
+    subject: `Second pass ${prefix}marking complete for ${campaignTitle}`,
     html: emailContent
   });
 
   helpers.logger.info(
-    `Successfully ${unPrefix}marked ${campaignId} for second pass`
+    `Successfully ${prefix}marked ${campaignId} for second pass`
   );
 };
 
