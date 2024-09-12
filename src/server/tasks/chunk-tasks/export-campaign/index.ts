@@ -413,7 +413,7 @@ const processAndUploadCampaignContacts: ExportCampaignTask<UploadCampaignContact
           uniqueQuestionsByStepId,
           onlyOptOuts
         ),
-      operationName: "Export campaign contacts",
+      operationName: "campaign contact export",
       chunkSize: CHUNK_SIZE,
       campaignId,
       helpers,
