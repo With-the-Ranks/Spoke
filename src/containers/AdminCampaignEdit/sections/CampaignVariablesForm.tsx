@@ -15,9 +15,9 @@ import {
   useEditCampaignVariablesMutation,
   useGetCampaignVariablesQuery
 } from "@spoke/spoke-codegen";
-import sortBy from "lodash/sortBy";
 import React, { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { sortCampaignVariables } from "src/api/campaign-variable";
 
 import { allScriptFields, VARIABLE_NAME_REGEXP } from "../../../lib/scripts";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
@@ -73,17 +73,19 @@ const CampaignVariablesForm: React.FC<FullComponentProps> = (props) => {
   } = useGetCampaignVariablesQuery({
     variables: { campaignId },
     onCompleted: (data) => {
-      const nodes =
-        data?.campaign?.campaignVariables.edges.map(({ node }) => node) ?? [];
-      const campaignVariables = sortBy(
-        nodes.map((campaignVariable) => ({
-          displayOrder: campaignVariable.displayOrder,
-          name: campaignVariable.name.replace("cv:", ""),
-          value: campaignVariable.value ?? ""
-        })),
-        ["displayOrder"]
-      );
+      const unsortedCampaignVariables = data?.campaign?.campaignVariables;
 
+      const noPrefixCampaignVariables =
+        unsortedCampaignVariables?.map((campaignVariable) => {
+          return {
+            ...campaignVariable,
+            name: campaignVariable.name.replace("cv:", "")
+          };
+        }) ?? [];
+
+      const campaignVariables = sortCampaignVariables(
+        noPrefixCampaignVariables
+      );
       // Wait for useForm's subscription to be ready before reset() sends a signal to flush form state update
       setTimeout(() => {
         reset({ campaignVariables });

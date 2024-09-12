@@ -1,10 +1,8 @@
+import type { CampaignContact, MessageInput, User } from "@spoke/spoke-codegen";
 import type { Task } from "graphile-worker";
 import sample from "lodash/sample";
 import md5 from "md5";
 
-import type { CampaignContact } from "../../api/campaign-contact";
-import type { MessageInput } from "../../api/types";
-import type { User } from "../../api/user";
 import { recordToCamelCase } from "../../lib/attributes";
 import { applyScript } from "../../lib/scripts";
 import { sendMessage } from "../api/lib/send-message";
@@ -65,9 +63,7 @@ export const retryInteractionStep: Task = async (
   const { campaign_contact, interaction_step, assignment_id, user } = record;
 
   const { rows: campaignVariables } = await helpers.query<
-    Pick<CampaignVariableRecord, "id" | "name"> & {
-      value: NonNullable<CampaignVariableRecord["value"]>;
-    }
+    CampaignVariableRecord
   >(
     "select * from campaign_variable where campaign_id = $1 and deleted_at is null",
     [campaign_contact.campaign_id]
@@ -82,7 +78,7 @@ export const retryInteractionStep: Task = async (
   };
   const texter = recordToCamelCase<User>(user);
   const customFields = Object.keys(JSON.parse(contact.customFields));
-  const campaignVariableIds = campaignVariables.map(({ id }) => id);
+  const campaignVariableIds = campaignVariables.map(({ id }) => id.toString());
 
   const body = applyScript({
     script,
