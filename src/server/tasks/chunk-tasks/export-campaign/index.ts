@@ -495,9 +495,7 @@ const processAndUploadFilteredContacts: ExportCampaignTask<UploadContactsPayload
       chunkSize: CHUNK_SIZE,
       helpers,
       contactsCount,
-      writeResult: writeExportResult(writeStream),
-      statusDivider: 4,
-      statusOffset: 75
+      writeResult: writeExportResult(writeStream)
     });
   } finally {
     writeStream.end();
