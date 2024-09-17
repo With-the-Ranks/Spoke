@@ -1,3 +1,4 @@
+import { config } from "../../../config";
 import { r } from "../../models";
 import type { ProgressJobPayload, ProgressTaskHelpers } from "../utils";
 
@@ -110,8 +111,8 @@ export const processChunks = async (payload: ProcessChunksPayload) => {
     const newStatus =
       Math.round((processed / contactsCount / statusDivider) * 100) +
       statusOffset;
-    await helpers.updateStatus(newStatus);
 
+    if (!config.isTest) await helpers.updateStatus(newStatus);
     if (writeResult) writeResult(chunkResult);
   }
 };
