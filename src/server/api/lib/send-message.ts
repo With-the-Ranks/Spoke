@@ -307,10 +307,10 @@ export const sendMessage = async (
       await trx("campaign_contact")
         .update({
           message_status:
-            cc_message_status === "needsResponse" ||
-            cc_message_status === "convo"
-              ? "convo"
-              : "messaged"
+            cc_message_status === "needsMessage" ||
+            cc_message_status === "messaged"
+              ? "messaged"
+              : "convo"
         })
         .where({ id: record.cc_id });
     }
