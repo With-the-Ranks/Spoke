@@ -91,7 +91,7 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
         {campaign.hasUnsentInitialMessages && (
           <p style={{ color: "red" }}>
             WARNING: This campaign still has contacts with unsent initial
-            messages{" "}
+            messages
           </p>
         )}
         <p>
