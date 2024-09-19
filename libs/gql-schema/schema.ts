@@ -210,6 +210,8 @@ const rootSchema = `
 
   input CampaignExportInput {
     campaignId: String!
+    # For Spoke Exports
+    campaignTitle: String
     exportType: CampaignExportType!
     spokeOptions: ExportForSpokeInput
     vanOptions: ExportForVanInput

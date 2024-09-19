@@ -102,14 +102,18 @@ export interface ProgressTaskHelpers extends JobHelpers {
   updateResult(result: Record<string, unknown>): Promise<void>;
 }
 
-export type ProgressTask<P = unknown> = (
+export type KnownReturnProgressTask<P = unknown, R = unknown> = (
   payload: P,
   helpers: ProgressTaskHelpers
-) => void | Promise<void>;
+) => R | Promise<R>;
+
+export type ProgressTask<P = unknown> = KnownReturnProgressTask<P, void>;
 
 export interface ProgressTaskOptions {
   removeOnComplete: boolean;
 }
+
+export type ProgressTaskList<P = unknown> = Record<string, ProgressTask<P>>;
 
 export const wrapProgressTask = <P extends { [key: string]: any }>(
   task: ProgressTask<P>,
@@ -152,4 +156,15 @@ export const wrapProgressTask = <P extends { [key: string]: any }>(
     // throw error to trigger graphile retry
     throw err;
   }
+};
+
+export const wrapProgressTaskList = async <P extends ProgressTaskPayload>(
+  list: ProgressTaskList<P>
+) => {
+  return Object.entries(list).reduce((acc, [key, task]) => {
+    acc[key] = wrapProgressTask(task, {
+      removeOnComplete: true
+    });
+    return acc;
+  }, {} as ProgressTaskList<P>);
 };

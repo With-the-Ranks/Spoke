@@ -15,10 +15,7 @@ import {
   schedules as campaignBuilderSchedules,
   taskList as campaignBuilderTaskList
 } from "./tasks/campaign-builder";
-import {
-  exportCampaign,
-  TASK_IDENTIFIER as exportCampaignIdentifier
-} from "./tasks/export-campaign";
+import { taskList as chunkTaskList } from "./tasks/chunk-tasks";
 import {
   exportForVan,
   TASK_IDENTIFIER as exportForVanIdentifier
@@ -65,7 +62,7 @@ import syncContactQuestionResponse from "./tasks/sync-contact-question-response"
 import syncSlackTeamMembers from "./tasks/sync-slack-team-members";
 import { trollPatrol, trollPatrolForOrganization } from "./tasks/troll-patrol";
 import updateOrgMessageUsage from "./tasks/update-org-message-usage";
-import { wrapProgressTask } from "./tasks/utils";
+import { wrapProgressTask, wrapProgressTaskList } from "./tasks/utils";
 
 const logFactory: LogFunctionFactory = (scope) => (level, message, meta) =>
   logger.log({ level, message, ...meta, ...scope });
@@ -101,9 +98,6 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     // eslint-disable-next-line max-len
     [QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER]: queueAutoSendOrganizationInitials,
     [PAUSE_AUTOSENDING_CAMPAIGNS_TASK_IDENTIFIER]: pauseAutosendingCampaigns,
-    [exportCampaignIdentifier]: wrapProgressTask(exportCampaign, {
-      removeOnComplete: true
-    }),
     [exportForVanIdentifier]: wrapProgressTask(exportForVan, {
       removeOnComplete: true
     }),
@@ -115,7 +109,8 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     }),
     [exportOptOutsIdentifier]: exportOptOuts,
     ...ngpVanTaskList,
-    ...campaignBuilderTaskList
+    ...campaignBuilderTaskList,
+    ...wrapProgressTaskList(chunkTaskList)
   };
 
   if (!workerSemaphore) {
