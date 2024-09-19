@@ -1,4 +1,4 @@
-/* eslint-disable no-cond-assign */
+import type { CsvFormatterStream, FormatterRowArray } from "fast-csv";
 import { format } from "fast-csv";
 import _ from "lodash";
 
@@ -10,6 +10,8 @@ import {
 import getExportCampaignContent from "../../../api/export-campaign";
 import { sendEmail } from "../../../mail";
 import { r } from "../../../models";
+import type { ContactTaskChunk } from "../utils";
+import { processChunks } from "../utils";
 import type {
   ChunkTaskPayload,
   ContactExportRow,
@@ -19,7 +21,6 @@ import type {
   InteractionStepRecord,
   MessageExportRow,
   ProcessChunkTitlePayload,
-  ProcessExportChunksPayload,
   ProcessMessagesChunkPayload,
   ProgressTask,
   ProgressTaskHelpers,
@@ -34,6 +35,7 @@ import {
   getChunkedContactsCte,
   getContactCount,
   getNotificationEmail,
+  isExportChunk,
   isFilteredContact,
   TASK_IDENTIFIER
 } from "./utils";
@@ -179,7 +181,12 @@ const processFilteredContactsChunk = async ({
 };
 
 export const processContactsChunk = async (
-  { campaignId, campaignTitle, lastContactId }: ProcessChunkTitlePayload,
+  {
+    campaignId,
+    campaignTitle = "",
+    lastContactId
+  }: Pick<ProcessChunkTitlePayload, "campaignId" | "lastContactId"> &
+    Partial<Pick<ProcessChunkTitlePayload, "campaignTitle">>,
   questionsById: { [key: string]: string },
   onlyOptOuts = false
 ): Promise<ExportChunk | false> => {
@@ -367,42 +374,12 @@ const setupUploadStreams = async (
   return { writeStream, uploadPromise };
 };
 
-const processChunks = async (payload: ProcessExportChunksPayload) => {
-  const {
-    processChunk,
-    campaignId,
-    campaignTitle = "",
-    uniqueQuestionsByStepId,
-    helpers,
-    contactsCount,
-    statusOffset = 0,
-    writeStream
-  } = payload;
-
-  let lastContactId = 0;
-  let processed = 0;
-  let chunkResult;
-
-  while (
-    (chunkResult = await processChunk({
-      campaignId,
-      campaignTitle,
-      lastContactId,
-      uniqueQuestionsByStepId
-    }))
-  ) {
-    lastContactId = chunkResult.lastContactId;
-    helpers.logger.debug(
-      `Processing export for ${campaignId} chunk part ${lastContactId}`
-    );
-
-    processed += CHUNK_SIZE;
-    await helpers.updateStatus(
-      Math.round((processed / contactsCount / 4) * 100) + statusOffset
-    );
-
-    for (const c of chunkResult.data) writeStream.write(c);
-  }
+const writeExportResult = (
+  writeStream: CsvFormatterStream<FormatterRowArray, FormatterRowArray>
+) => (result: ContactTaskChunk) => {
+  if (!isExportChunk(result))
+    throw new Error("Wrong task chunk type passed to writeExportResult");
+  for (const c of result.data) writeStream.write(c);
 };
 
 // eslint-disable-next-line max-len
@@ -415,8 +392,7 @@ const processAndUploadCampaignContacts: ExportCampaignTask<UploadCampaignContact
     fileNameKey,
     onlyOptOuts,
     campaignId,
-    contactsCount,
-    campaignTitle
+    contactsCount
   } = payload;
   const uniqueQuestionsByStepId = getUniqueQuestionsByStepId(interactionSteps);
 
@@ -431,14 +407,19 @@ const processAndUploadCampaignContacts: ExportCampaignTask<UploadCampaignContact
 
   try {
     await processChunks({
-      processChunk: (params) =>
-        processContactsChunk(params, uniqueQuestionsByStepId, onlyOptOuts),
+      processChunk: (chunkPayload) =>
+        processContactsChunk(
+          chunkPayload,
+          uniqueQuestionsByStepId,
+          onlyOptOuts
+        ),
+      operationName: "campaign contact export",
+      chunkSize: CHUNK_SIZE,
       campaignId,
-      campaignTitle,
-      uniqueQuestionsByStepId,
       helpers,
       contactsCount,
-      writeStream,
+      writeResult: writeExportResult(writeStream),
+      statusDivider: 4,
       statusOffset: onlyOptOuts ? 75 : 25
     });
   } finally {
@@ -462,16 +443,19 @@ const processAndUploadCampaignMessages: ExportCampaignTask<UploadCampaignMessage
 
   try {
     await processChunks({
-      processChunk: (params) =>
+      processChunk: (chunkPayload) =>
         processMessagesChunk({
           campaignId,
-          lastContactId: params.lastContactId,
+          lastContactId: chunkPayload.lastContactId,
           campaignVariableNames
         }),
+      operationName: "message export",
+      chunkSize: CHUNK_SIZE,
       campaignId,
       helpers,
       contactsCount,
-      writeStream
+      writeResult: writeExportResult(writeStream),
+      statusDivider: 4
     });
   } finally {
     writeStream.end();
@@ -500,18 +484,18 @@ const processAndUploadFilteredContacts: ExportCampaignTask<UploadContactsPayload
 
   try {
     await processChunks({
-      processChunk: (params) =>
+      processChunk: (chunkPayload) =>
         processFilteredContactsChunk({
           campaignId,
           campaignTitle,
-          lastContactId: params.lastContactId
+          lastContactId: chunkPayload.lastContactId
         }),
+      operationName: "filtered contacts export",
       campaignId,
-      campaignTitle,
+      chunkSize: CHUNK_SIZE,
       helpers,
       contactsCount,
-      writeStream,
-      statusOffset: 75
+      writeResult: writeExportResult(writeStream)
     });
   } finally {
     writeStream.end();

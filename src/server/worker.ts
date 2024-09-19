@@ -75,6 +75,8 @@ let workerSemaphore = false;
 export const getWorker = async (attempt = 0): Promise<Runner> => {
   if (worker) return worker;
 
+  const chunkTasks = await wrapProgressTaskList(chunkTaskList);
+
   const taskList: TaskList = {
     "handle-autoassignment-request": handleAutoassignmentRequest,
     "release-stale-replies": releaseStaleReplies,
@@ -110,7 +112,7 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     [exportOptOutsIdentifier]: exportOptOuts,
     ...ngpVanTaskList,
     ...campaignBuilderTaskList,
-    ...wrapProgressTaskList(chunkTaskList)
+    ...chunkTasks
   };
 
   if (!workerSemaphore) {

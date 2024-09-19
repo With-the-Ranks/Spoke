@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -36,7 +35,6 @@ export interface OperationDialogProps extends OperationDialogBodyProps {
 
 export const OperationDialogBody = (props: OperationDialogBodyProps) => {
   const { inProgress, finished, executing, error, setInProgress } = props;
-
   const { name: operationName, campaign } = inProgress;
   const operationDefinition = dialogOperations[operationName];
 
@@ -60,10 +58,8 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
         {operationDefinition?.body(campaign)}
         <br />
         <p>
-          <label>
-            How many hours ago should a conversation have been idle for it to be
-            unassigned?
-          </label>
+          How many hours ago should a conversation have been idle for it to be
+          unassigned?
         </p>
         <TextField
           type="number"
@@ -92,6 +88,12 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
     return (
       <div>
         <p>{operationDefinition?.body(campaign)}</p>
+        {campaign.hasUnsentInitialMessages && (
+          <p style={{ color: "red" }}>
+            WARNING: This campaign still has contacts with unsent initial
+            messages
+          </p>
+        )}
         <p>
           To read about best practices for second passes, head{" "}
           <a

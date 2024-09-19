@@ -1,5 +1,3 @@
-import type { CsvFormatterStream, FormatterRowArray } from "fast-csv";
-
 import { config } from "../../../../config";
 import type {
   CampaignContactRecord,
@@ -8,7 +6,7 @@ import type {
   MessageRecord,
   UserRecord
 } from "../../../api/types";
-import type { KnownReturnProgressTask, ProgressTaskHelpers } from "../../utils";
+import type { KnownReturnProgressTask } from "../../utils";
 import type {
   CampaignTitlePayload,
   ChunkTaskPayload,
@@ -107,29 +105,9 @@ export interface UploadCampaignMessages
   extends CampaignVariablePayload,
     UploadPayload {}
 
-interface ProcessExportChunkPayload {
-  campaignId: number;
-  campaignTitle: string;
-  lastContactId: number;
-  uniqueQuestionsByStepId?: any;
-}
-
-export interface ProcessExportChunksPayload {
-  processChunk: (
-    payload: ProcessExportChunkPayload
-  ) => Promise<ExportChunk | false>;
-  campaignId: number;
-  campaignTitle?: string;
-  uniqueQuestionsByStepId?: any;
-  helpers: ProgressTaskHelpers;
-  contactsCount: number;
-  processedInitial?: number;
-  statusOffset?: number;
-  writeStream: CsvFormatterStream<FormatterRowArray, FormatterRowArray>;
-}
-
 export const isFilteredContact = (
   contact: FilteredContactsRow | ContactExportRow
-): contact is FilteredContactsRow => {
-  return "filtered_reason" in contact;
-};
+): contact is FilteredContactsRow => "filtered_reason" in contact;
+
+export const isExportChunk = (chunk: ContactTaskChunk): chunk is ExportChunk =>
+  "data" in chunk;

@@ -1,5 +1,6 @@
+import { config } from "../../../config";
 import { r } from "../../models";
-import type { ProgressJobPayload } from "../utils";
+import type { ProgressJobPayload, ProgressTaskHelpers } from "../utils";
 
 export interface ContactTaskChunk {
   lastContactId: number;
@@ -49,16 +50,69 @@ export const andSqlFilter = (filter?: string) =>
 
 /**
  * Fetch a chunk of contacts for the campaign
- * @param filter a SQL condition to filter the contacts (ex. is_opted_out = true)
- * @returns CTE for the selected contacts which requires query params [campaignId, lastContactId, limit]
+ * @param filter a SQL condition to filter the contacts for the campaign_contact alias cc
+ * (ex. cc.is_opted_out = true)
+ * @returns campaign_contacts:
+ * the CTE for the selected contacts which requires query params [campaignId, lastContactId, limit]
  */
 export const getChunkedContactsCte = (filter?: string) => {
   return `
     with campaign_contacts as (
-      select * from campaign_contact
+      select * from campaign_contact cc
       where campaign_id = ? and id > ?
       ${andSqlFilter(filter)}
-      order by campaign_contact.id asc
+      order by cc.id asc
       limit ?
     )`;
+};
+
+export interface ProcessChunksPayload {
+  processChunk: (
+    payload: ProcessChunkPayload
+  ) => Promise<ContactTaskChunk | false>;
+  operationName: string;
+  chunkSize: number;
+  campaignId: number;
+  helpers: ProgressTaskHelpers;
+  contactsCount: number;
+  processedInitial?: number;
+  statusDivider?: number;
+  statusOffset?: number;
+  writeResult?: (result: ContactTaskChunk) => void;
+}
+
+export const processChunks = async (payload: ProcessChunksPayload) => {
+  const {
+    processChunk,
+    operationName,
+    chunkSize,
+    campaignId,
+    helpers,
+    contactsCount,
+    statusDivider = 1,
+    statusOffset = 0,
+    writeResult
+  } = payload;
+
+  let lastContactId = 0;
+  let processed = 0;
+  let chunkResult;
+
+  while (
+    // eslint-disable-next-line no-cond-assign
+    (chunkResult = await processChunk({ ...payload, lastContactId }))
+  ) {
+    lastContactId = chunkResult.lastContactId;
+    helpers.logger.debug(
+      `Processing ${operationName} for campaign ID ${campaignId} chunk part ${lastContactId}`
+    );
+
+    processed += chunkSize;
+    const newStatus =
+      Math.round((processed / contactsCount / statusDivider) * 100) +
+      statusOffset;
+
+    if (!config.isTest) await helpers.updateStatus(newStatus);
+    if (writeResult) writeResult(chunkResult);
+  }
 };
