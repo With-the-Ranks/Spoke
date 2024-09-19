@@ -7,7 +7,6 @@ import {
   ContactOptedOutError,
   OutsideTextingHoursError
 } from "src/server/send-message-errors";
-import request from "superagent";
 
 import { UserRoleType } from "../../../api/organization-membership";
 import { config } from "../../../config";
@@ -16,7 +15,6 @@ import { DateTime } from "../../../lib/datetime";
 import { hasRole } from "../../../lib/permissions";
 import { isNowBetween } from "../../../lib/timezones";
 import { getSendBeforeUtc } from "../../../lib/tz-helpers";
-import logger from "../../../logger";
 import { eventBus, EventType } from "../../event-bus";
 import { r } from "../../models";
 import type { UserRecord } from "../types";
@@ -334,21 +332,6 @@ export const sendMessage = async (
   // Send message after we are sure messageInstance has been persisted
   const service = serviceMap[service_type];
   await service.sendMessage(toInsert, record.organization_id);
-
-  // Send message to BernieSMS to be checked for bad words
-  const badWordUrl = config.BAD_WORD_URL;
-  if (badWordUrl) {
-    request
-      .post(badWordUrl)
-      .timeout(5000)
-      .set("Authorization", `Token ${config.BAD_WORD_TOKEN}`)
-      .send({ user_id: user.auth0_id, message: toInsert.text })
-      .end((err, _res) => {
-        if (err) {
-          logger.error("Error submitting message to bad word service: ", err);
-        }
-      });
-  }
 
   return contactUpdateResult;
 };
