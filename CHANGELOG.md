@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.6-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.5...v8.1.6-rc.0) (2024-09-23)
+
 ### [8.1.5](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.1...v8.1.5) (2024-09-19)
 
 
