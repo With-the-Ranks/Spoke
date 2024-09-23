@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import queryString from "query-string";
 import React from "react";
 import Form from "react-formal";
+import { Trans, withTranslation } from "react-i18next";
 import * as yup from "yup";
 
 import { NotificationFrequencyType } from "../../api/user";
@@ -64,6 +65,7 @@ class UserEdit extends React.Component {
   };
 
   handleSave = async (formData) => {
+    const { t } = this.props;
     switch (this.props.authType) {
       case UserEditMode.Edit: {
         const result = await this.props.mutations.editUser(formData);
@@ -101,7 +103,7 @@ class UserEdit extends React.Component {
 
           this.setState({
             successDialog: true,
-            successMessage: "Check your email for a password reset link"
+            successMessage: t("password reset success")
           });
         }
         break;
@@ -237,7 +239,7 @@ class UserEdit extends React.Component {
 
   render() {
     // Data may be `undefined` here due to refetch in child UserEdit component in change password dialog
-    const { authType, style, userId, data, saveLabel } = this.props;
+    const { authType, style, userId, data, saveLabel, t } = this.props;
     const { user } = this.state;
 
     const formSchema = this.buildFormSchema(authType);
@@ -271,22 +273,22 @@ class UserEdit extends React.Component {
             authType === UserEditMode.Edit) && (
             <span>
               <SpokeFormField
-                label="First name"
+                label={t("first name")}
                 name="firstName"
                 {...dataTest("firstName")}
               />
               <SpokeFormField
-                label="Last name"
+                label={t("last name")}
                 name="lastName"
                 {...dataTest("lastName")}
               />
               <SpokeFormField
-                label="Cell Number"
+                label={t("cell number")}
                 name="cell"
                 {...dataTest("cell")}
               />
               <SpokeFormField
-                label="Notification Frequency"
+                label={t("notification frequency")}
                 name="notificationFrequency"
                 {...dataTest("notificationFrequency")}
                 type="select"
@@ -327,7 +329,7 @@ class UserEdit extends React.Component {
             {canChangePassword && (
               <div className={css(styles.container)}>
                 <Button variant="outlined" onClick={this.handleClick}>
-                  Change password
+                  <Trans>Change password</Trans>
                 </Button>
               </div>
             )}
@@ -344,7 +346,9 @@ class UserEdit extends React.Component {
             open={this.state.changePasswordDialog}
             onClose={this.handleClose}
           >
-            <DialogTitle>Change your password</DialogTitle>
+            <DialogTitle>
+              <Trans>Change your password</Trans>
+            </DialogTitle>
             <DialogContent>
               <UserEdit
                 authType={UserEditMode.Change}
@@ -362,7 +366,9 @@ class UserEdit extends React.Component {
             onClose={this.handleClose}
           >
             <DialogTitle>
-              {this.state.successMessage || "Password changed successfully!"}
+              {this.state.successMessage || (
+                <Trans>Password changed successfully!</Trans>
+              )}
             </DialogTitle>
             <DialogActions>
               <Button
@@ -370,7 +376,7 @@ class UserEdit extends React.Component {
                 color="primary"
                 onClick={this.handleClose}
               >
-                OK
+                <Trans>OK</Trans>
               </Button>
             </DialogActions>
           </Dialog>
@@ -381,7 +387,7 @@ class UserEdit extends React.Component {
             style={{ marginTop: 25, cursor: "pointer" }}
             onClick={this.props.startRequestReset}
           >
-            Forgot your password?
+            <Trans>Forgot your password?</Trans>
           </div>
         )}
         <SaveNotificationSettingsAlert
@@ -474,7 +480,9 @@ const mutations = {
   })
 };
 
-export default loadData({
-  queries,
-  mutations
-})(UserEdit);
+export default withTranslation("UserEdit")(
+  loadData({
+    queries,
+    mutations
+  })(UserEdit)
+);

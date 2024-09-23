@@ -1,0 +1,17 @@
+{
+    "password reset success": "Check your email for a password reset link",
+    "passwords must match": "Passwords must match",
+    "first name": "First name",
+    "last name": "Last name",
+    "cell number": "Cell Number",
+    "notification frequency": "Notification Frequency",
+    "new password": "New Password",
+    "confirm password": "Confirm Password",
+    "Change password": "Change your password",
+    "Change your password": "Change your password",
+    "save": "Save",
+    "save new password": "Save new password",
+    "Password changed successfully!": "Password changed successfully!",
+    "Forgot your password?": "Forgot your password?",
+    "OK": "OK"
+}
