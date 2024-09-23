@@ -310,7 +310,7 @@ class UserEdit extends React.Component {
           )}
           {authType === UserEditMode.Change && (
             <SpokeFormField
-              label="New Password"
+              label={t("new password")}
               name="newPassword"
               type="password"
             />
@@ -320,7 +320,7 @@ class UserEdit extends React.Component {
             authType === UserEditMode.EmailReset ||
             authType === UserEditMode.Change) && (
             <SpokeFormField
-              label="Confirm Password"
+              label={t("confirm password")}
               name="passwordConfirm"
               type="password"
             />
@@ -335,7 +335,7 @@ class UserEdit extends React.Component {
             )}
             <Form.Submit
               type="submit"
-              label={saveLabel || "Save"}
+              label={saveLabel || t("save")}
               component={GSSubmitButton}
             />
           </div>
@@ -352,11 +352,12 @@ class UserEdit extends React.Component {
             <DialogContent>
               <UserEdit
                 authType={UserEditMode.Change}
-                saveLabel="Save new password"
+                saveLabel={t("save new password")}
                 handleClose={this.handleClose}
                 openSuccessDialog={this.openSuccessDialog}
                 userId={this.props.userId}
                 mutations={this.props.mutations}
+                t={this.props.t}
               />
             </DialogContent>
           </Dialog>
