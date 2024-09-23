@@ -1,0 +1,14 @@
+{
+  "can'tSendEmptyMessage": "You can't send an empty message.",
+  "sending": "Sending...",
+  "assignmentChanged": "This assignment has changed.",
+  "backToTodos": "Back to todos",
+  "skippingOptOut": "Skipping contact who opted out.",
+  "refreshing": "Refreshing campaign data...",
+  "closed": "Closed",
+  "reopen": "Reopen",
+  "manageTags": "Manage Tags",
+  "optOut": "Opt Out",
+  "cannedResponses": "Canned Responses",
+  "firstMessage": "This is your first message to {{firstName}}."
+}
