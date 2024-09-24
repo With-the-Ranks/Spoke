@@ -7,11 +7,10 @@
     "notification frequency": "Notification Frequency",
     "new password": "New Password",
     "confirm password": "Confirm Password",
-    "Change password": "Change your password",
-    "Change your password": "Change your password",
+    "change password": "Change your password",
     "save": "Save",
     "save new password": "Save new password",
-    "Password changed successfully!": "Password changed successfully!",
-    "Forgot your password?": "Forgot your password?",
+    "password changed successfully": "Password changed successfully!",
+    "forgot your password": "Forgot your password?",
     "OK": "OK"
 }

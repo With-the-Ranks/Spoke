@@ -329,7 +329,7 @@ class UserEdit extends React.Component {
             {canChangePassword && (
               <div className={css(styles.container)}>
                 <Button variant="outlined" onClick={this.handleClick}>
-                  <Trans>Change password</Trans>
+                  {t("change password")}
                 </Button>
               </div>
             )}
@@ -346,9 +346,7 @@ class UserEdit extends React.Component {
             open={this.state.changePasswordDialog}
             onClose={this.handleClose}
           >
-            <DialogTitle>
-              <Trans>Change your password</Trans>
-            </DialogTitle>
+            <DialogTitle>{t("change password")}</DialogTitle>
             <DialogContent>
               <UserEdit
                 authType={UserEditMode.Change}
@@ -367,9 +365,7 @@ class UserEdit extends React.Component {
             onClose={this.handleClose}
           >
             <DialogTitle>
-              {this.state.successMessage || (
-                <Trans>Password changed successfully!</Trans>
-              )}
+              {this.state.successMessage || t("password changed successfully")}
             </DialogTitle>
             <DialogActions>
               <Button
@@ -388,7 +384,7 @@ class UserEdit extends React.Component {
             style={{ marginTop: 25, cursor: "pointer" }}
             onClick={this.props.startRequestReset}
           >
-            <Trans>Forgot your password?</Trans>
+            {t("forgot your password")}
           </div>
         )}
         <SaveNotificationSettingsAlert
