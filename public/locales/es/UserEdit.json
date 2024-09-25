@@ -1,0 +1,16 @@
+{
+  "password reset success": "Revise su correo electrónico para obtener un enlace de restablecimiento de contraseña",
+  "passwords must match": "Las contraseñas deben coincidir",
+  "first name": "Nombre de pila",
+  "last name": "Apellido",
+  "cell number": "Número de celular",
+  "notification frequency": "Frecuencia de notificación",
+  "new password": "Nueva contraseña",
+  "confirm password": "Confirmar Contraseña",
+  "change password": "Cambiar tu contraseña",
+  "save": "Ahorrar",
+  "save new password": "Guardar nueva contraseña",
+  "password changed successfully": "¡Contraseña cambiada exitosamente!",
+  "forgot your password": "¿Olvidaste tu contraseña?",
+  "OK": "OK"
+}
