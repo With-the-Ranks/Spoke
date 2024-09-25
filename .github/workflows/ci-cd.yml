@@ -21,7 +21,6 @@ jobs:
       matrix:
         node-version:
           - 20.16.0-bullseye
-
     container:
       image: node:${{ matrix.node-version }}
 

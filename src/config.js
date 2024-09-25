@@ -160,14 +160,6 @@ const validators = {
     dec: "Disable use of has unassigned contacts variable",
     default: false
   }),
-  BAD_WORD_TOKEN: str({
-    desc: "Bearer token used for authorization with BAD_WORD_URL.",
-    default: undefined
-  }),
-  BAD_WORD_URL: url({
-    desc: "URL to notify with message text whenever a message is sent.",
-    default: undefined
-  }),
   BASE_URL: url({
     desc:
       "The base URL of the website, without trailing slash, used to construct various URLs.",
@@ -735,6 +727,10 @@ const validators = {
     desc:
       "A JSON blob passed directly to express-basic-auth for locking campaign previews",
     default: undefined
+  }),
+  MARK_SECOND_PASS_CHUNK_SIZE: num({
+    desc: "Chunk size to use when marking a campaign for a second pass",
+    default: 1000
   }),
   SKIP_TWILIO_VALIDATION: bool({
     desc: "Whether to bypass Twilio header validation altogether.",

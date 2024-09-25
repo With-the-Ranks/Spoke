@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.6-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.5...v8.1.6-rc.0) (2024-09-23)
+
+### [8.1.5](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.1...v8.1.5) (2024-09-19)
+
+
+### Bug Fixes
+
+* **column mapping:** remove create as from custom field value ([#5](https://github.com/politics-rewired/spoke/issues/5)) ([13730d5](https://github.com/politics-rewired/spoke/commit/13730d576b8e262e7947a851844b99c3739606e8))
+* **send-message:** await service method ([#7](https://github.com/politics-rewired/spoke/issues/7)) ([dc4421d](https://github.com/politics-rewired/spoke/commit/dc4421d997b76bb86b02d3526b9e1ceed317262d))
+* only mark contact as messaged after initial ([#42](https://github.com/politics-rewired/spoke/issues/42)) ([c16398e](https://github.com/politics-rewired/spoke/commit/c16398ed45a580101265b93fd3017f83a50d3851))
+
+
+### Backend Changes
+
+* **campaign-operations:** use codegen, typescript, react fcs ([#43](https://github.com/politics-rewired/spoke/issues/43)) ([9c760df](https://github.com/politics-rewired/spoke/commit/9c760df845ab836f17beb298a1f9a24ed22a0389))
+* **email:** use with the ranks info ([#13](https://github.com/politics-rewired/spoke/issues/13)) ([b1ea23d](https://github.com/politics-rewired/spoke/commit/b1ea23de40453cf72c46ffe9955039050e2cd646))
+* **export-campaign:** extract payload types ([#44](https://github.com/politics-rewired/spoke/issues/44)) ([5df2d21](https://github.com/politics-rewired/spoke/commit/5df2d217e56f91670542839f5ed481c6558866ea))
+* **second-pass:** implement as task ([#46](https://github.com/politics-rewired/spoke/issues/46)) ([d575a0b](https://github.com/politics-rewired/spoke/commit/d575a0beee71a82e1b8ccc7407c70f291b9c07db))
+* **user menu:** rename teams to organizations ([#11](https://github.com/politics-rewired/spoke/issues/11)) ([66cd60c](https://github.com/politics-rewired/spoke/commit/66cd60cbcca24a39816a51a2ce47f2d9094aa398))
+* remove bernie sms references ([#8](https://github.com/politics-rewired/spoke/issues/8)) ([241960c](https://github.com/politics-rewired/spoke/commit/241960c7505bbcf4687f73211aa31a609a385205))
+
+### [8.1.4-rc.1](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.0...v8.1.4-rc.1) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** use name of materialized cte ([#40](https://github.com/politics-rewired/spoke/issues/40)) ([6b2cafd](https://github.com/politics-rewired/spoke/commit/6b2cafdcded8535481b00cc3fe4d9555d6771fd1))
+
+### [8.1.4-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.3...v8.1.4-rc.0) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** materialize campaign contacts ([#39](https://github.com/politics-rewired/spoke/issues/39)) ([909db41](https://github.com/politics-rewired/spoke/commit/909db41f1e24a16e307db6b773835c6f39fec140))
+
 ### [8.1.3](https://github.com/politics-rewired/spoke/compare/v8.1.2...v8.1.3) (2024-07-24)
 
 
