@@ -1,8 +1,7 @@
 {
-    "due date": "due date",
-    "initial texts": "initial texts",
-    "no texts error": "No texts available at the moment",
-    "recent request error" : "Sorry - you just requested! Please wait 10 minutes.",
-    "unrecognized email error": "Unrecognized email: please make sure you're logged into Spoke with the same email as Slack."
-
+  "due date": "due date",
+  "initial texts": "initial texts",
+  "no texts error": "No texts available at the moment",
+  "recent request error": "Sorry - you just requested! Please wait 10 minutes.",
+  "unrecognized email error": "Unrecognized email: please make sure you're logged into Spoke with the same email as Slack."
 }
