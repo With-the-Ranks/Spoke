@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/politics-rewired/spoke/compare/v8.1.6-rc.0...v9.0.0) (2024-10-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to v20 LTS (#38)
+* **node:** update 16.14 -> 18.16 (#37)
+
+### Bug Fixes
+
+* **autoassign:** narrow custom escalation teams to requested org ([#55](https://github.com/politics-rewired/spoke/issues/55)) ([6da1195](https://github.com/politics-rewired/spoke/commit/6da1195f5e0884008439ac9a6cef348fc0a987d9))
+
+
+### build
+
+* upgrade to v20 LTS ([#38](https://github.com/politics-rewired/spoke/issues/38)) ([b1d2ff1](https://github.com/politics-rewired/spoke/commit/b1d2ff157ff2e95f523689047053c26bf99d9a9e))
+
+
+### Backend Changes
+
+* lint json files ([#53](https://github.com/politics-rewired/spoke/issues/53)) ([ca74b00](https://github.com/politics-rewired/spoke/commit/ca74b008e956a43f761153db8b9461c5522c17ad))
+* **node:** update 16.14 -> 18.16 ([#37](https://github.com/politics-rewired/spoke/issues/37)) ([28a793f](https://github.com/politics-rewired/spoke/commit/28a793f4448197f3e90de4b68759ea24e0fb8b9f))
+
 ### [8.1.6-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.5...v8.1.6-rc.0) (2024-09-23)
 
 ### [8.1.5](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.1...v8.1.5) (2024-09-19)
