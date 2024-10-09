@@ -126,15 +126,13 @@ export class AssignmentTexterContact extends React.Component {
     messageText: yup
       .string()
       .trim()
-      .required(this.props.t("can'tSendEmptyMessage"))
+      .required(this.props.t("cant send empty message"))
       .max(window.MAX_MESSAGE_LENGTH)
   });
 
   constructor(props) {
     super(props);
-    const { t } = this.props;
-
-    const { assignment, campaign, contact } = this.props;
+    const { t, assignment, campaign, contact } = this.props;
     const questionResponses = this.getInitialQuestionResponses(
       contact.questionResponseValues
     );
@@ -149,11 +147,11 @@ export class AssignmentTexterContact extends React.Component {
     if (assignment.id !== contact.assignmentId || campaign.isArchived) {
       disabledText = "";
       disabled = true;
-      snackbarError = t("assignmentChanged");
+      snackbarError = t("assignment changed");
       snackbarOnTouchTap = this.goBackToTodos;
-      snackbarActionTitle = t("backToTodos");
+      snackbarActionTitle = t("back to todos");
     } else if (contact.optOut) {
-      disabledText = t("skippingOptOut");
+      disabledText = t("skipping opt out");
       disabled = true;
     } else if (!isContactNowWithinCampaignHours(contact, campaign)) {
       disabledText = t("refreshing");
@@ -410,7 +408,7 @@ export class AssignmentTexterContact extends React.Component {
 
   handleClickCloseContactButton = async () => {
     const { contact } = this.props;
-    await this.handleEditMessageStatus(this.props.t("closed"));
+    await this.handleEditMessageStatus("closed");
     const payload = this.gatherSurveyChanges();
     await this.props.sendMessage(contact.id, payload);
   };
@@ -601,7 +599,7 @@ export class AssignmentTexterContact extends React.Component {
             variant="contained"
             onClick={this.handleClickCloseContactButton}
           >
-            {this.props.t("closed")}
+            {this.props.t("close")}
           </Button>
         </Box>
       );
@@ -628,7 +626,7 @@ export class AssignmentTexterContact extends React.Component {
           <ListItemIcon>
             <MailIcon />
           </ListItemIcon>
-          {this.props.t("reopen")}
+          {this.props.t("close")}
         </MenuItem>
       );
     }
@@ -724,7 +722,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <NotInterestedIcon />
             </ListItemIcon>
-            {this.props.t("optOut")}
+            {this.props.t("opt out")}
           </MenuItem>
         );
       }
@@ -738,7 +736,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <ReplyIcon />
             </ListItemIcon>
-            {this.props.t("cannedResponses")}
+            {this.props.t("canned responses")}
           </MenuItem>
         );
       }
@@ -764,7 +762,7 @@ export class AssignmentTexterContact extends React.Component {
                   backgroundColor={deepOrange[500]}
                   onClick={this.handleOpenOptOutDialog}
                 >
-                  {this.props.t("optOut")}
+                  {this.props.t("opt out")}
                 </ColorButton>
               </Box>
             </Tooltip>
@@ -777,7 +775,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("canResponses")}
+                {this.props.t("canned responses")}
               </Button>
             </Box>
           )}
@@ -801,7 +799,7 @@ export class AssignmentTexterContact extends React.Component {
           <ListItemIcon>
             <LocalOfferIcon />
           </ListItemIcon>
-          {this.props.t("manageTags")}
+          {this.props.t("manage tags")}
         </MenuItem>
       );
 
@@ -814,7 +812,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <ReplyIcon />
             </ListItemIcon>
-            {this.props.t("cannedResponses")}
+            {this.props.t("canned responses")}
           </MenuItem>
         );
       }
@@ -845,7 +843,7 @@ export class AssignmentTexterContact extends React.Component {
                 backgroundColor={deepOrange[500]}
                 onClick={this.handleOpenOptOutDialog}
               >
-                {this.props.t("optOut")}
+                {this.props.t("opt out")}
               </ColorButton>
             </Box>
           </Tooltip>
@@ -857,7 +855,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("cannedResponses")}
+                {this.props.t("canned responses")}
               </Button>
             </Box>
           )}
@@ -889,7 +887,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("canResponses")}
+                {this.props.t("canned responses")}
               </Button>
             </Box>
             <Box m={2}>
@@ -899,7 +897,7 @@ export class AssignmentTexterContact extends React.Component {
                 backgroundColor={deepOrange[500]}
                 onClick={this.handleOpenOptOutDialog}
               >
-                {this.props.t("optOut")}
+                {this.props.t("opt out")}
               </ColorButton>
             </Box>
             <Box m={2}>
@@ -1055,7 +1053,7 @@ export class AssignmentTexterContact extends React.Component {
               </div>
             ) : (
               <Empty
-                title={t("firstMessage", {
+                title={t("first message", {
                   firstName: this.props.contact.firstName
                 })}
                 icon={<NoMessagesIcon />}

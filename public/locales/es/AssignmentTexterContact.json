@@ -1,14 +1,14 @@
 {
-  "can'tSendEmptyMessage": "No puedes enviar un mensaje vacío.",
+  "cant send empty message": "No puedes enviar un mensaje vacío.",
   "sending": "Enviando...",
-  "assignmentChanged": "Esta asignación ha cambiado.",
-  "backToTodos": "Volver a pendientes",
-  "skippingOptOut": "Saltando contacto que optó por no recibir mensajes.",
+  "assignment changed": "Esta asignación ha cambiado.",
+  "back to todos": "Volver a tareas",
+  "skipping opt out": "Saltando contacto que optó por no recibir mensajes.",
   "refreshing": "Actualizando datos de la campaña...",
   "closed": "Cerrado",
   "reopen": "Reabrir",
-  "manageTags": "Administrar etiquetas",
-  "optOut": "Darse de baja",
-  "cannedResponses": "Respuestas predefinidas",
-  "firstMessage": "Este es tu primer mensaje para {{firstName}}."
+  "manage tags": "Administrar etiquetas",
+  "opt out": "Darse de baja",
+  "canned responses": "Respuestas predefinidas",
+  "first message": "Este es tu primer mensaje para {{firstName}}."
 }
