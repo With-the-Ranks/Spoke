@@ -1,0 +1,14 @@
+{
+  "cant send empty message": "No puedes enviar un mensaje vacío.",
+  "sending": "Enviando...",
+  "assignment changed": "Esta asignación ha cambiado.",
+  "back to todos": "Volver a tareas",
+  "skipping opt out": "Saltando contacto que optó por no recibir mensajes.",
+  "refreshing": "Actualizando datos de la campaña...",
+  "closed": "Cerrado",
+  "reopen": "Reabrir",
+  "manage tags": "Administrar etiquetas",
+  "opt out": "Darse de baja",
+  "canned responses": "Respuestas predefinidas",
+  "first message": "Este es tu primer mensaje para {{firstName}}."
+}
