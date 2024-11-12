@@ -10,6 +10,11 @@ enum CampaignBuilderMode {
   TEMPLATE
 }
 
+enum Language {
+  en
+  es
+}
+
 input BulkUpdateScriptInput {
   searchString: String!
   replaceString: String!
@@ -64,6 +69,7 @@ input UserInput {
   email: String!
   cell: String!
   notificationFrequency: String!
+  language: Language!
   oldPassword: String
   newPassword: String
 }
@@ -366,6 +372,7 @@ type User {
   terms: Boolean
   isSuperadmin: Boolean!
   notificationFrequency: String!
+  language: Language!
   isSuspended: Boolean!
 }
 
