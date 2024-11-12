@@ -10,6 +10,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import { useGetCurrentUserForMenuQuery } from "@spoke/spoke-codegen";
 import React, { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 
 import { dataTest } from "../../lib/attributes";
@@ -22,6 +23,7 @@ interface Props {
 
 const UserMenu: React.FC<Props> = (props) => {
   const { organizationId } = props;
+  const { t } = useTranslation("UserMenu");
 
   const [open, setOpen] = useState(false);
   const { isSuperadmin } = useAuthzContext();
@@ -112,15 +114,15 @@ const UserMenu: React.FC<Props> = (props) => {
           disabled={!organizationId}
           onClick={onNavigateFactory("home")}
         >
-          Home
+          {t("home")}
         </MenuItem>
         {isSuperadmin && (
           <MenuItem onClick={onNavigateFactory("superadmin")}>
-            Superadmin
+            {t("superadmin")}
           </MenuItem>
         )}
         <Divider />
-        <ListSubheader>Organizations</ListSubheader>
+        <ListSubheader>{t("organizations")}</ListSubheader>
         {currentUser?.organizations?.map((organization) => (
           <OrganizationItem
             key={organization!.id}
@@ -130,7 +132,7 @@ const UserMenu: React.FC<Props> = (props) => {
           />
         ))}
         <Divider />
-        <ListSubheader>Help</ListSubheader>
+        <ListSubheader>{t("help")}</ListSubheader>
         <MenuItem {...dataTest("docs")} onClick={onNavigateFactory("docs")}>
           <ListItemText primary="Documentation" />
           <ListItemSecondaryAction>
@@ -142,7 +144,7 @@ const UserMenu: React.FC<Props> = (props) => {
           {...dataTest("userMenuLogOut")}
           onClick={onNavigateFactory("logout")}
         >
-          Log out
+          {t("log out")}
         </MenuItem>
       </Menu>
     </>
