@@ -3,6 +3,7 @@ import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import PropTypes from "prop-types";
 import React from "react";
+import { withTranslation } from "react-i18next";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
@@ -81,6 +82,7 @@ class TexterTodoList extends React.Component {
   render() {
     this.termsAgreed();
     const { todos } = this.props.data.currentUser;
+    const { t } = this.props;
     const renderedTodos = this.renderTodoList(todos);
 
     const empty = (
@@ -125,19 +127,16 @@ class TexterTodoList extends React.Component {
             }}
           >
             {this.state.releasedReplies ? (
-              <h1> All gone! </h1>
+              <h1> {t("all gone")} </h1>
             ) : this.state.releasedRepliesError ? (
               <p>
                 {" "}
-                Error releasing replies: {this.state.releasedRepliesError}{" "}
+                {t("error releasing")} {this.state.releasedRepliesError}{" "}
               </p>
             ) : (
               [
-                <h1 key={1}> Done for the day? </h1>,
-                <p key={2}>
-                  We can reassign conversations you haven't answered to other
-                  available texters
-                </p>
+                <h1 key={1}> {t("done for the day")} </h1>,
+                <p key={2}>{t("we can reassign")}</p>
               ]
             )}
             <Button
@@ -149,7 +148,7 @@ class TexterTodoList extends React.Component {
               }
               onClick={this.releaseMyReplies}
             >
-              Reassign My Replies
+              {t("reassign my replies")}
             </Button>
           </div>
         </div>
@@ -265,6 +264,7 @@ const mutations = {
 
 export default compose(
   withRouter,
+  withTranslation("TexterTodoList"),
   loadData({
     queries,
     mutations
