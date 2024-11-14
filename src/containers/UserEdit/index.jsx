@@ -12,7 +12,11 @@ import Form from "react-formal";
 import { Trans, withTranslation } from "react-i18next";
 import * as yup from "yup";
 
-import { NotificationFrequencyType } from "../../api/user";
+import {
+  Language,
+  languageEnumToLabel,
+  NotificationFrequencyType
+} from "../../api/user";
 import GSForm from "../../components/forms/GSForm";
 import GSSubmitButton from "../../components/forms/GSSubmitButton";
 import SpokeFormField from "../../components/forms/SpokeFormField";
@@ -44,7 +48,8 @@ const styles = StyleSheet.create({
 class UserEdit extends React.Component {
   state = {
     user: {
-      notificationFrequency: NotificationFrequencyType.All
+      notificationFrequency: NotificationFrequencyType.All,
+      language: Language.English
     },
     changePasswordDialog: false,
     successDialog: false,
@@ -177,7 +182,8 @@ class UserEdit extends React.Component {
       firstName: yup.string().required(),
       lastName: yup.string().required(),
       cell: yup.string().required(),
-      notificationFrequency: yup.string().required()
+      notificationFrequency: yup.string().required(),
+      language: yup.string().required()
     };
     const password = yup.string().required();
     const passwordConfirm = (refField = "password") =>
@@ -298,6 +304,16 @@ class UserEdit extends React.Component {
                     label: titleCase(option)
                   })
                 )}
+              />
+              <SpokeFormField
+                label="Language"
+                name="language"
+                {...dataTest("language")}
+                type="select"
+                choices={Object.values(Language).map((option) => ({
+                  value: option,
+                  label: languageEnumToLabel(option)
+                }))}
               />
             </span>
           )}
@@ -450,6 +466,7 @@ const mutations = {
           cell
           email
           notificationFrequency
+          language
         }
       }
     `,

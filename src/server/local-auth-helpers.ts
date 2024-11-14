@@ -162,7 +162,8 @@ const signup: AuthHelper = async (options) => {
           last_name: capitalizeWord(reqBody.lastName),
           cell: reqBody.cell,
           is_superadmin: false,
-          notification_frequency: reqBody.notificationFrequency
+          notification_frequency: reqBody.notificationFrequency,
+          language: reqBody.language
         })
         .returning("*");
       resolve(user);

@@ -44,6 +44,11 @@ const rootSchema = `
     TEMPLATE
   }
 
+  enum Language {
+    en
+    es
+  }
+
   input BulkUpdateScriptInput {
     searchString: String!
     replaceString: String!
@@ -98,6 +103,7 @@ const rootSchema = `
     email: String!
     cell: String!
     notificationFrequency: String!
+    language: Language!
     oldPassword: String
     newPassword: String
   }
