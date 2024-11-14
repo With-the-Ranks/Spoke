@@ -477,7 +477,8 @@ const rootMutations = {
             last_name: userData.lastName,
             email: userData.email,
             cell: userData.cell,
-            notification_frequency: userData.notificationFrequency
+            notification_frequency: userData.notificationFrequency,
+            language: userData.language
           },
           ["id", "auth0_id"]
         );
@@ -494,7 +495,8 @@ const rootMutations = {
           last_name: userData.lastName,
           email: userData.email,
           cell: userData.cell,
-          notification_frequency: userData.notificationFrequency
+          notification_frequency: userData.notificationFrequency,
+          language: userData.language
         };
       } else {
         userData = member;
