@@ -37,13 +37,9 @@ export const GET_CAMPAIGN_INTERACTIONS = gql`
       customFields
       invalidScriptFields
       campaignVariables {
-        edges {
-          node {
-            id
-            name
-            value
-          }
-        }
+        id
+        name
+        value
       }
       externalSystem {
         id

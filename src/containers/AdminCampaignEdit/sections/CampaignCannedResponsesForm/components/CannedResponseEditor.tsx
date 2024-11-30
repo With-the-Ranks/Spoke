@@ -1,11 +1,10 @@
 import Button from "@material-ui/core/Button";
+import type { CampaignVariable, CannedResponse } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import React from "react";
 import Form from "react-formal";
 import * as yup from "yup";
 
-import type { CampaignVariable } from "../../../../../api/campaign-variable";
-import type { CannedResponse } from "../../../../../api/canned-response";
 import GSForm from "../../../../../components/forms/GSForm";
 import SpokeFormField from "../../../../../components/forms/SpokeFormField";
 import { dataTest } from "../../../../../lib/attributes";
@@ -49,7 +48,7 @@ const CannedResponseEditor: React.SFC<CannedResponseEditorProps> = (props) => {
   return (
     <GSForm schema={modelSchema} onSubmit={handleSave}>
       <SpokeFormField
-        {...dataTest("title")}
+        {...dataTest("title", false)}
         name="title"
         context="responseEditor"
         fullWidth
@@ -57,7 +56,7 @@ const CannedResponseEditor: React.SFC<CannedResponseEditorProps> = (props) => {
         value={editingResponse?.title}
       />
       <SpokeFormField
-        {...dataTest("editorResponse")}
+        {...dataTest("editorResponse", false)}
         customFields={customFields}
         campaignVariables={campaignVariables}
         integrationSourced={integrationSourced}
@@ -71,7 +70,7 @@ const CannedResponseEditor: React.SFC<CannedResponseEditorProps> = (props) => {
       />
       <div className={css(styles.buttonRow)}>
         <Form.Submit
-          {...dataTest("addResponse")}
+          {...dataTest("addResponse", false)}
           type="submit"
           label={submitLabel}
           style={{
