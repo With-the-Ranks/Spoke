@@ -1,7 +1,15 @@
 {
   "due date": "due date",
   "initial texts": "initial texts",
-  "no texts error": "No texts available at the moment",
+  "no texts message": "No texts available at the moment",
   "recent request error": "Sorry - you just requested! Please wait 10 minutes.",
-  "unrecognized email error": "Unrecognized email: please make sure you're logged into Spoke with the same email as Slack."
+  "unrecognized email error": "Unrecognized email: please make sure you're logged into Spoke with the same email as Slack.",
+  "request pending message": "You currently have a pending request",
+  "approval pending message": "You requested {{amount}} texts. Hold on, someone will approve them soon!",
+  "assignment request disabled": "Assignment Request Disabled",
+  "watch for announcement": "Watch out for an announcement when new texts are available!",
+  "request success": "Submitted Successfully – Thank you!",
+  "expect texts": "Give us a few minutes to assign your texts. You'll receive an email notification when we've done so. If you requested your texts after hours, you’ll get them when texting opens (usually at 9 AM in your time zone).",
+  "ready to text q": "Ready to text?",
+  "request more texts": "Request More Texts"
 }
