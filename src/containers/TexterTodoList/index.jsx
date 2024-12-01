@@ -135,7 +135,7 @@ class TexterTodoList extends React.Component {
               </p>
             ) : (
               [
-                <h1 key={1}> {t("done for the day")} </h1>,
+                <h1 key={1}>{t("done for the day")}</h1>,
                 <p key={2}>{t("we can reassign")}</p>
               ]
             )}
