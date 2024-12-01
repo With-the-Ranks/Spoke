@@ -11,6 +11,7 @@ import * as yup from "yup";
 import { RequestAutoApproveType } from "../../../api/organization-membership";
 import GSForm from "../../../components/forms/GSForm";
 import LoadingIndicator from "../../../components/LoadingIndicator";
+import { titleCase } from "../../../lib/scripts";
 import { loadData } from "../../hoc/with-operations";
 
 class TexterRequest extends React.Component {
@@ -73,7 +74,7 @@ class TexterRequest extends React.Component {
           error: t("recent request error")
         });
       } else if (message === "No texts available at the moment") {
-        this.setState({ error: t("no texts error") });
+        this.setState({ error: t("no texts message") });
       } else {
         this.setState({ finished: true });
       }
@@ -111,7 +112,7 @@ class TexterRequest extends React.Component {
   };
 
   render() {
-    const { data } = this.props;
+    const { data, t } = this.props;
 
     if (data.loading) {
       return <LoadingIndicator />;
@@ -127,11 +128,8 @@ class TexterRequest extends React.Component {
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3> You currently have a pending request</h3>
-            <p>
-              You requested {amount} texts. Hold on, someone will approve them
-              soon!
-            </p>
+            <h3>{t("request pending message")}</h3>
+            <p>{t("approval pending message", { amount })}</p>
           </div>
         </Paper>
       );
@@ -144,7 +142,7 @@ class TexterRequest extends React.Component {
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3>Assignment Request Disabled</h3>
+            <h3>{t("assignment request disabled")}</h3>
             <p>{settings.doNotAssignMessage}</p>
           </div>
         </Paper>
@@ -155,8 +153,8 @@ class TexterRequest extends React.Component {
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3> No texts available right now </h3>
-            <p> Watch out for an announcement when new texts are available! </p>
+            <h3>{t("no texts message")}</h3>
+            <p>{t("watch for announcement")}</p>
           </div>
         </Paper>
       );
@@ -179,26 +177,21 @@ class TexterRequest extends React.Component {
     if (finished) {
       return (
         <div>
-          <h3> Submitted Successfully – Thank you! </h3>
-          <p>
-            {" "}
-            Give us a few minutes to assign your texts. You'll receive an email
-            notification when we've done so. If you requested your texts after
-            hours, you’ll get them when texting opens at 9am ET :).{" "}
-          </p>
+          <h3>{t("request success")}</h3>
+          <p>{t("expect texts")}</p>
         </div>
       );
     }
 
     const makeOptionText = (at) =>
       `${at.teamTitle}: ${at.maxRequestCount ?? ""} ${
-        at.type === "UNSENT" ? "Initials" : "Replies"
+        at.type === "UNSENT" ? t("initials") : t("replies")
       }`;
 
     return (
       <div>
         <div style={{ textAlign: "center" }}>
-          <h1> Ready to text? </h1>
+          <h1>{t("ready to text q")}</h1>
           <p style={{ marginTop: 5, marginBottom: 5 }}>Pick an assignment: </p>
           {data ? (
             <SelectField
@@ -225,8 +218,7 @@ class TexterRequest extends React.Component {
           onSubmit={this.submit}
         >
           <label htmlFor="count">
-            {" "}
-            Count:
+            {titleCase(t("count"))}:
             <TextField
               name="count"
               label="Count"
@@ -251,7 +243,7 @@ class TexterRequest extends React.Component {
             fullWidth
             onClick={this.submit}
           >
-            Request More Texts
+            {t("request more texts")}
           </Button>
         </GSForm>
         {error && (
