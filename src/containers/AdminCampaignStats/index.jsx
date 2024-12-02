@@ -314,7 +314,7 @@ class AdminCampaignStats extends React.Component {
             <div className={css(styles.rightAlign)}>
               <div className={css(styles.inline)}>
                 <div className={css(styles.inline)}>
-                  {!campaign.isArchived ? (
+                  {
                     // edit
                     <Button
                       {...dataTest("editCampaign")}
@@ -323,7 +323,7 @@ class AdminCampaignStats extends React.Component {
                     >
                       Edit
                     </Button>
-                  ) : null}
+                  }
                   <ScriptPreviewButton campaignId={campaignId} />
 
                   {isAdmin
