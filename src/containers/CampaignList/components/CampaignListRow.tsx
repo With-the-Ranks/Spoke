@@ -23,9 +23,6 @@ const useStyles = makeStyles({
     alignItems: "center"
   },
   chip: { margin: "4px" },
-  past: {
-    opacity: 0.6
-  },
   secondaryText: {
     whiteSpace: "pre-wrap"
   }
@@ -55,10 +52,12 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     externalSystem
   } = campaign;
 
-  let listItemStyle = {};
+  let listItemStyle: React.CSSProperties = {};
   let leftIcon;
   if (isArchived) {
-    listItemStyle = styles.past;
+    listItemStyle = {
+      opacity: 0.6
+    };
   } else if (!isStarted || hasUnassignedContacts) {
     listItemStyle = {
       color: theme.palette.warning.dark
@@ -148,6 +147,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   const campaignUrl = `/admin/${organizationId}/campaigns/${campaign.id}${
     isStarted ? "" : "/edit"
   }`;
+
   return (
     <ListItem
       {...dataTest("campaignRow", false)}
