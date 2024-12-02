@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.1](https://github.com/politics-rewired/spoke/compare/v9.0.0...v9.0.1) (2024-12-02)
+
+
+### Bug Fixes
+
+* fix loading of archived campaigns ([#61](https://github.com/politics-rewired/spoke/issues/61)) ([da7df71](https://github.com/politics-rewired/spoke/commit/da7df71f84225c52d1f81858e3c4d22ce9bc6d60))
+* remove new query parameter when create new campaign ([#59](https://github.com/politics-rewired/spoke/issues/59)) ([07abb4b](https://github.com/politics-rewired/spoke/commit/07abb4b0f2d24ac7a684b63c7cf54166c0c8e7c6))
+
 ## [9.0.0](https://github.com/politics-rewired/spoke/compare/v8.1.6-rc.0...v9.0.0) (2024-10-03)
 
 
