@@ -3,5 +3,6 @@
   "error releasing": "Error al liberar respuestas:",
   "done for the day": "¿Terminaste por hoy?",
   "we can reassign": "Podemos reasignar conversaciones que no has respondido a otros mensajeros de texto disponibles.",
-  "reassign my replies": "Reasignar mis respuestas"
+  "reassign my replies": "Reasignar mis respuestas",
+  "waiting for replies": "¡Esperando respuestas!"
 }

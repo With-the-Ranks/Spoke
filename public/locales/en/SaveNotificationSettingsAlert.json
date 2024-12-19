@@ -1,0 +1,7 @@
+{
+    "changes saved": "Changes Saved!",
+    "email all": "Emails will be sent for all notifications, including assignment changes and replies.",
+    "email daily":"Email notifications are sent at 9AM in the time zone of your Spoke workspace.",
+    "email periodic": "Email notifications are sent at 9AM, 1PM, 4PM, and 8PM in the timezone of your Spoke workspace.",
+    "email none": "You will not receive notifications about changes to your assignments, or replies."
+}
