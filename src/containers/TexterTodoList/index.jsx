@@ -87,7 +87,7 @@ class TexterTodoList extends React.Component {
 
     const empty = (
       <div>
-        <Empty title="Waiting for replies!" icon={<CheckIcon />} />
+        <Empty title={t("waiting for replies")} icon={<CheckIcon />} />
       </div>
     );
 

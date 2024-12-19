@@ -3,6 +3,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import CloseIcon from "@material-ui/icons/Close";
 import MuiAlert from "@material-ui/lab/Alert";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { NotificationFrequencyType } from "../../../api/user";
 import { titleCase } from "../../../lib/attributes";
@@ -13,39 +14,22 @@ export interface SaveNotificationSettingsAlertProps {
   handleCloseSnackbar: () => void;
 }
 
+// eslint-disable-next-line max-len
 export const SaveNotificationSettingsAlert: React.FC<SaveNotificationSettingsAlertProps> = (
   props
 ) => {
+  const { t } = useTranslation("UserMenu");
+
   const getSnackbarText = () => {
     switch (props.notificationFrequency) {
       case NotificationFrequencyType.All:
-        return (
-          <p>
-            Emails will be sent for all notifications, including assignment
-            changes and replies.
-          </p>
-        );
+        return <p>{t("emails all")}</p>;
       case NotificationFrequencyType.Daily:
-        return (
-          <p>
-            Email notifications are sent at 9AM in the time zone of your Spoke
-            workspace.
-          </p>
-        );
+        return <p>{t("email daily")}</p>;
       case NotificationFrequencyType.Periodic:
-        return (
-          <p>
-            Email notifications are sent at 9AM, 1PM, 4PM, and 8PM in the time
-            zone of your Spoke workspace.
-          </p>
-        );
+        return <p>{t("email periodic")}</p>;
       case NotificationFrequencyType.None:
-        return (
-          <p>
-            You will not receive notifications about changes to your
-            assignments, or replies.
-          </p>
-        );
+        return <p>{t("email none")}</p>;
       default:
         return <p />;
     }
@@ -71,7 +55,7 @@ export const SaveNotificationSettingsAlert: React.FC<SaveNotificationSettingsAle
       }
     >
       <MuiAlert variant="filled" elevation={6} severity="success">
-        Changes Saved!
+        {t("changes saved")}
         <h3>{titleCase(props.notificationFrequency)}</h3>
         {getSnackbarText()}
       </MuiAlert>

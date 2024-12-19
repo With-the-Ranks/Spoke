@@ -361,10 +361,9 @@ class AssignmentTexter extends React.Component {
         error.snackbarError = "Error: Please wait a few seconds and try again.";
       }
 
-      error.snackbarError = `Error for contact ${contact_id}: ${error.snackbarError.replace(
-        "GraphQL error:",
-        ""
-      )}`;
+      error.snackbarError = `${this.props.t(
+        "error for contact"
+      )} ${contact_id}: ${error.snackbarError.replace("GraphQL error:", "")}`;
 
       this.setState({ errors: this.state.errors.concat([error]) });
 
@@ -421,7 +420,7 @@ class AssignmentTexter extends React.Component {
     return (
       <div>
         <Empty
-          title="You've already messaged or replied to all your assigned contacts for now."
+          title={this.props.t("already messaged or replied")}
           icon={<CheckCircleIcon />}
           content={
             <Button variant="contained" onClick={this.handleExitTexter}>
