@@ -9,6 +9,7 @@ import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import type { CampaignContact } from "@spoke/spoke-codegen";
 import clsx from "clsx";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { DateTime } from "../../../lib/datetime";
 
@@ -63,6 +64,7 @@ const MessageList: React.FC<MessageListProps> = (props) => {
   } = props;
 
   const classes = useStyles();
+  const { t } = useTranslation("AssignmentTexterContact");
 
   const optOutItem = optOut ? (
     <>
@@ -72,7 +74,7 @@ const MessageList: React.FC<MessageListProps> = (props) => {
           <NotInterestedIcon style={{ color: red[300] }} />
         </ListItemIcon>
         <ListItemText
-          primary={`${firstName} opted out of texts`}
+          primary={`${firstName} ${t("opted out of texts")}`}
           secondary={DateTime.fromISO(optOut.createdAt).toRelative()}
           primaryTypographyProps={{ className: classes.messageText }}
           secondaryTypographyProps={{ className: classes.messageTimeText }}

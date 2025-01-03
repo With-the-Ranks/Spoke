@@ -1,9 +1,15 @@
 {
+  "cancel": "Cancelar",
+  "contact": "contacto",
   "count": "cuenta",
   "later": "después",
   "messages": "mensajes",
   "no": "no",
   "replies": "respuestas",
   "send": "enviar",
-  "texts": "textos"
+  "this": "esto",
+  "text": "texto",
+  "texts": "textos",
+  "user": "usuario",
+  "without": "sin"
 }

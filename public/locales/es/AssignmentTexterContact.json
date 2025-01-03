@@ -10,5 +10,10 @@
   "manage tags": "Administrar etiquetas",
   "opt out": "Darse de baja",
   "canned responses": "Respuestas predefinidas",
-  "first message": "Este es tu primer mensaje para {{firstName}}."
+  "first message": "Este es tu primer mensaje para {{firstName}}.",
+  "all questions": "Todas las preguntas",
+  "current question": "Pregunta actual",
+  "opted out of texts": "Se dio de baja de los mensajes",
+  "your message": "Tu mensaje",
+  "return home": "Volver a inicio"
 }

@@ -2,11 +2,13 @@ import { Tooltip } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import ContactToolbar from "../../../components/ContactToolbar";
 
 const TopFixedSection = (props) => {
   const { contactSettings, contact, campaign, onExitTexter } = props;
+  const { t } = useTranslation();
 
   return (
     <ContactToolbar
@@ -14,7 +16,7 @@ const TopFixedSection = (props) => {
       campaignContact={contact}
       contactSettings={contactSettings}
       rightToolbarIcon={
-        <Tooltip title="Return Home" placement="bottom">
+        <Tooltip title={t("return home")} placement="bottom">
           <IconButton onClick={onExitTexter}>
             <HomeIcon />
           </IconButton>

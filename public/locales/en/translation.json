@@ -1,4 +1,6 @@
 {
+  "cancel": "Cancel",
+  "contact": "contact",
   "count": "count",
   "initials": "initials",
   "later": "later",
@@ -6,5 +8,9 @@
   "no": "no",
   "replies": "replies",
   "send": "send",
-  "texts": "texts"
+  "this": "this",
+  "text": "text",
+  "texts": "texts",
+  "user": "user",
+  "without": "without"
 }
