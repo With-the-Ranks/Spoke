@@ -1,7 +1,7 @@
 {
-    "save and move on": "Save and Move On Without a Message",
-    "save and type message": "Save and Type Message",
-    "more actions": "More Actions",
-    "escalate convo": "Escalate Conversation",
-    "non-assignable tag applied": "You've selected a tag that will unassign this conversation from you and reassign it to the appropriate team. You will not be able to apply additional tags or send a follow up message. Apply this tag as your last step!"
+  "save and move on": "Save and Move On Without a Message",
+  "save and type message": "Save and Type Message",
+  "more actions": "More Actions",
+  "escalate convo": "Escalate Conversation",
+  "non-assignable tag applied": "You've selected a tag that will unassign this conversation from you and reassign it to the appropriate team. You will not be able to apply additional tags or send a follow up message. Apply this tag as your last step!"
 }
