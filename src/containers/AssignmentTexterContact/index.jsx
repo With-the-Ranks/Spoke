@@ -658,16 +658,21 @@ export class AssignmentTexterContact extends React.Component {
       assignment,
       navigationToolbarChildren,
       onFinishContact,
-      theme
+      theme,
+      t
     } = this.props;
+
     const { userCannedResponses, campaignCannedResponses } = assignment;
+
     const isCannedResponseEnabled =
       userCannedResponses.length + campaignCannedResponses.length > 0;
+
     const { justSentNew, alreadySent } = this.state;
     const { messageStatus } = contact;
-    const size = document.documentElement.clientWidth;
 
+    const size = document.documentElement.clientWidth;
     const menuItems = [];
+    const txtOptOut = t("opt out");
 
     if (messageStatus === "needsMessage" || justSentNew) {
       return (
@@ -711,7 +716,7 @@ export class AssignmentTexterContact extends React.Component {
           <ListItemIcon>
             <LocalOfferIcon />
           </ListItemIcon>
-          {this.props.t("mangageTags")}
+          {t("mangageTags")}
         </MenuItem>
       );
 
@@ -722,7 +727,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <NotInterestedIcon />
             </ListItemIcon>
-            {this.props.t("opt out")}
+            {t("opt out")}
           </MenuItem>
         );
       }
@@ -736,7 +741,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <ReplyIcon />
             </ListItemIcon>
-            {this.props.t("canned responses")}
+            {t("canned responses")}
           </MenuItem>
         );
       }
@@ -762,7 +767,7 @@ export class AssignmentTexterContact extends React.Component {
                   backgroundColor={deepOrange[500]}
                   onClick={this.handleOpenOptOutDialog}
                 >
-                  {this.props.t("opt out")}
+                  {t("opt out")}
                 </ColorButton>
               </Box>
             </Tooltip>
@@ -775,7 +780,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("canned responses")}
+                {t("canned responses")}
               </Button>
             </Box>
           )}
@@ -799,7 +804,7 @@ export class AssignmentTexterContact extends React.Component {
           <ListItemIcon>
             <LocalOfferIcon />
           </ListItemIcon>
-          {this.props.t("manage tags")}
+          {t("manage tags")}
         </MenuItem>
       );
 
@@ -812,7 +817,7 @@ export class AssignmentTexterContact extends React.Component {
             <ListItemIcon>
               <ReplyIcon />
             </ListItemIcon>
-            {this.props.t("canned responses")}
+            {t("canned responses")}
           </MenuItem>
         );
       }
@@ -835,7 +840,7 @@ export class AssignmentTexterContact extends React.Component {
               disabled={this.state.disabled}
             />
           </Box>
-          <Tooltip title="Opt out this contact">
+          <Tooltip title={`${txtOptOut} ${t("this")} ${t("contact")}`}>
             <Box m={2}>
               <ColorButton
                 {...dataTest("optOut")}
@@ -843,7 +848,7 @@ export class AssignmentTexterContact extends React.Component {
                 backgroundColor={deepOrange[500]}
                 onClick={this.handleOpenOptOutDialog}
               >
-                {this.props.t("opt out")}
+                {t("opt out")}
               </ColorButton>
             </Box>
           </Tooltip>
@@ -855,7 +860,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("canned responses")}
+                {t("canned responses")}
               </Button>
             </Box>
           )}
@@ -887,7 +892,7 @@ export class AssignmentTexterContact extends React.Component {
                 style={{ backgroundColor: theme.palette.info.light }}
                 disabled={!isCannedResponseEnabled}
               >
-                {this.props.t("canned responses")}
+                {t("canned responses")}
               </Button>
             </Box>
             <Box m={2}>
@@ -897,7 +902,7 @@ export class AssignmentTexterContact extends React.Component {
                 backgroundColor={deepOrange[500]}
                 onClick={this.handleOpenOptOutDialog}
               >
-                {this.props.t("opt out")}
+                {txtOptOut}
               </ColorButton>
             </Box>
             <Box m={2}>
@@ -908,7 +913,7 @@ export class AssignmentTexterContact extends React.Component {
                 disabled={tags.length === 0}
                 onClick={() => this.setState({ isTagEditorOpen: true })}
               >
-                {this.props.t("manageTags")}
+                {t("manageTags")}
               </Button>
             </Box>
             {this.renderNeedsResponseToggleButton(contact)}
@@ -958,7 +963,7 @@ export class AssignmentTexterContact extends React.Component {
   }
 
   renderBottomFixedSection() {
-    const { contact, tags } = this.props;
+    const { contact, tags, t } = this.props;
     const {
       dialogType,
       messageText,
@@ -1002,10 +1007,12 @@ export class AssignmentTexterContact extends React.Component {
         )}
         {dialogType === TexterDialogType.OptOut && (
           <ContactActionDialog
-            title="Opt out user"
+            title={`${t("opt out")} ${t("user")}`}
             messageText={this.state.optOutMessageText}
             submitTitle={
-              this.state.optOutMessageText ? "Send" : "Opt Out without Text"
+              this.state.optOutMessageText
+                ? t("send")
+                : `${t("opt out")} ${t("without")} ${t("text")}`
             }
             onChange={({ messageText: optOutMessageText }) =>
               this.setState({ optOutMessageText })

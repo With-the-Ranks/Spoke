@@ -10,5 +10,10 @@
   "manage tags": "Manage Tags",
   "opt out": "Opt Out",
   "canned responses": "Canned Responses",
-  "first message": "This is your first message to {{firstName}}."
+  "first message": "This is your first message to {{firstName}}.",
+  "all questions": "All questions",
+  "current question": "Current question",
+  "opted out of texts": "opted out of texts",
+  "your message": "Your message",
+  "return home": "Return Home"
 }

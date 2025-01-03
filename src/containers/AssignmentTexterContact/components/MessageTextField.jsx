@@ -1,6 +1,7 @@
 import TextField from "@material-ui/core/TextField";
 import { css, StyleSheet } from "aphrodite";
 import React, { Component } from "react";
+import { withTranslation } from "react-i18next";
 
 import SpokeFormField from "../../../components/forms/SpokeFormField";
 
@@ -53,7 +54,7 @@ class MessageTextField extends Component {
         <SpokeFormField
           className={css(styles.textField)}
           name={FIELD_NAME}
-          label="Your message"
+          label={this.props.t("your message")}
           as={TextField}
           multiline
           fullWidth
@@ -65,4 +66,4 @@ class MessageTextField extends Component {
   }
 }
 
-export default MessageTextField;
+export default withTranslation()(MessageTextField);
