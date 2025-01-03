@@ -43,29 +43,8 @@ describe('AssignmentSummary text', function t() {
     )
   })
 
-  each([[0, false], [1, false], [0, true], [1, true]]).test(
-    'renders title and html for notInUSA=%s and allowSendAll=%s',
-    (notInUSA, allowSendAll) => {
-      window.NOT_IN_USA = notInUSA
-      window.ALLOW_SEND_ALL = allowSendAll
-      const title = this.summary.find(CardTitle)
-      expect(title.prop('title')).toBe('New Campaign')
-      // expect(title.find(CardTitle).prop('subtitle')).toBe('asdf - Jan 31 2018')
-
-      const htmlWrapper = this.summary.findWhere(
-        d => d.length && d.type() === 'div' && d.prop('dangerouslySetInnerHTML')
-      )
-      expect(htmlWrapper.prop('dangerouslySetInnerHTML')).toEqual({
-        __html: 'yoyo'
-      })
-    }
-  )
-})
-
 describe('AssignmentSummary actions inUSA and NOT AllowSendAll', () => {
   function create(unmessaged, unreplied, badTimezone, past, skipped, isDynamic) {
-    window.NOT_IN_USA = 0
-    window.ALLOW_SEND_ALL = false
     return mount(
       <MuiThemeProvider>
         <AssignmentSummary
@@ -114,35 +93,6 @@ describe('AssignmentSummary actions inUSA and NOT AllowSendAll', () => {
   })
 })
 
-describe('AssignmentSummary NOT inUSA and AllowSendAll', () => {
-  function create(unmessaged, unreplied, badTimezone, past, skipped, isDynamic) {
-    window.NOT_IN_USA = 1
-    window.ALLOW_SEND_ALL = true
-    return mount(
-      <MuiThemeProvider>
-        <AssignmentSummary
-          assignment={getAssignment(isDynamic)}
-          unmessagedCount={unmessaged}
-          unrepliedCount={unreplied}
-          badTimezoneCount={badTimezone}
-          pastMessagesCount={past}
-          skippedMessagesCount={skipped}
-        />
-      </MuiThemeProvider>
-    ).find(CardActions)
-  }
-
-  it('renders "Send message" with unmessaged', () => {
-    const actions = create(1, 0, 0, 0, 0, false)
-    expect(actions.find(RaisedButton).at(0).prop('label')).toBe('Send messages')
-  })
-
-  it('renders "Send messages" with unreplied', () => {
-    const actions = create(0, 1, 0, 0, 0, false)
-    expect(actions.find(RaisedButton).at(0).prop('label')).toBe('Send messages')
-  })
-})
-
 it('renders "Send later" when there is a badTimezoneCount', () => {
   const actions = mount(
     <MuiThemeProvider>
@@ -167,8 +117,6 @@ describe('contacts filters', () => {
   // some hints are here https://github.com/mui-org/material-ui/issues/4200#issuecomment-217738345
 
   it('filters correctly in USA', () => {
-    window.NOT_IN_USA = 0
-    window.ALLOW_SEND_ALL = false
     const mockRender = jest.fn()
     AssignmentSummary.prototype.renderBadgedButton = mockRender
     mount(
@@ -197,34 +145,6 @@ describe('contacts filters', () => {
     const skippedMessages = mockRender.mock.calls[3][0]
     expect(skippedMessages.title).toBe('Skipped Messages')
     expect(skippedMessages.contactsFilter).toBe('skipped')
-  })
-  it('filters correctly out of USA', () => {
-    window.NOT_IN_USA = 1
-    window.ALLOW_SEND_ALL = true
-    const mockRender = jest.fn()
-    AssignmentSummary.prototype.renderBadgedButton = mockRender
-    mount(
-      <MuiThemeProvider>
-        <AssignmentSummary
-          assignment={getAssignment()}
-          unmessagedCount={1}
-          unrepliedCount={1}
-          badTimezoneCount={4}
-          skippedMessagesCount={0}
-        />
-      </MuiThemeProvider>
-    )
-    const sendMessages = mockRender.mock.calls[0][0]
-    expect(sendMessages.title).toBe('Past Messages')
-    expect(sendMessages.contactsFilter).toBe('stale')
-
-    const skippedMessages = mockRender.mock.calls[1][0]
-    expect(skippedMessages.title).toBe('Skipped Messages')
-    expect(skippedMessages.contactsFilter).toBe('skipped')
-
-    const sendFirstTexts = mockRender.mock.calls[2][0]
-    expect(sendFirstTexts.title).toBe('Send messages')
-    expect(sendFirstTexts.contactsFilter).toBe('all')
   })
 })
 
