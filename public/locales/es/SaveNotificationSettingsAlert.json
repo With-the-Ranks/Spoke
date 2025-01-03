@@ -1,7 +1,7 @@
 {
-    "changes saved": "¡Cambios guardados!",
-    "email all": "Se enviarán correos electrónicos para todas las notificaciones, incluidas las asignaciones y las respuestas.",
-    "email daily": "Las notificaciones por correo electrónico se envían a las 9 AM en la zona horaria de tu espacio de trabajo en Spoke.",
-    "email periodic": "Las notificaciones por correo electrónico se envían a las 9 AM, 1 PM, 4 PM y 8 PM en la zona horaria de tu espacio de trabajo en Spoke.",
-    "email none": "No recibirás notificaciones sobre cambios en tus asignaciones ni respuestas."
+  "changes saved": "¡Cambios guardados!",
+  "email all": "Se enviarán correos electrónicos para todas las notificaciones, incluidas las asignaciones y las respuestas.",
+  "email daily": "Las notificaciones por correo electrónico se envían a las 9 AM en la zona horaria de tu espacio de trabajo en Spoke.",
+  "email periodic": "Las notificaciones por correo electrónico se envían a las 9 AM, 1 PM, 4 PM y 8 PM en la zona horaria de tu espacio de trabajo en Spoke.",
+  "email none": "No recibirás notificaciones sobre cambios en tus asignaciones ni respuestas."
 }
