@@ -1,11 +1,12 @@
-import PropTypes from "prop-types";
 import React from "react";
 
 import { getSpokeCharCount } from "../lib/charset-utils";
 
-const MessageLengthInfo: React.SFC<{ messageText: string }> = ({
-  messageText
-}) => {
+interface MessageLengthProps {
+  messageText: string;
+}
+
+const MessageLengthInfo: React.FC<MessageLengthProps> = ({ messageText }) => {
   const { charCount, msgCount, charsPerSegment } = getSpokeCharCount(
     messageText
   );
@@ -16,10 +17,6 @@ const MessageLengthInfo: React.SFC<{ messageText: string }> = ({
       {`${charCount}/${msgCount * charsPerSegment} ${segmentInfo}`}
     </div>
   );
-};
-
-MessageLengthInfo.propTypes = {
-  messageText: PropTypes.string.isRequired
 };
 
 export default MessageLengthInfo;
