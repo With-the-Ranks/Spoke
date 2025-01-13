@@ -1,6 +1,4 @@
 {
-  "due date": "fecha de vencimiento",
-  "initial texts": "textos iniciales",
   "no texts message": "No hay textos disponibles en este momento",
   "recent request error": "¡Lo siento, acabas de hacer una solicitud! Por favor, espera 10 minutos.",
   "unrecognized email error": "Correo electrónico no reconocido: asegúrate de haber iniciado sesión en Spoke con el mismo correo electrónico que usas en Slack.",
@@ -11,5 +9,5 @@
   "request success": "¡Enviado con éxito, Gracias!",
   "expect texts": "Danos unos minutos para asignar tus textos. Recibirás una notificación por correo electrónico cuando lo hayamos hecho. Si solicitaste tus textos fuera del horario laboral, los recibirás cuando se abra el horario de envío (generalmente a las 9 AM en tu zona horaria).",
   "ready to text q": "¿Listo para enviar mensajes?",
-  "request more texts": "Solicitar más textos"
+  "request more texts": "Solicitar Más Textos"
 }
