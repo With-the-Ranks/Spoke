@@ -46,7 +46,7 @@ interface Props {
 export const AssignmentSummary: React.FC<Props> = (props) => {
   const history = useHistory();
   const context = useSpokeContext();
-  const { t } = useTranslation("AssignmentSummary");
+  const { t } = useTranslation();
 
   const makeGoToTodosHandler = (
     contactsFilter: string | null,
@@ -104,6 +104,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     pastMessagesCount,
     skippedMessagesCount
   } = props;
+
   const {
     title,
     description,
@@ -114,17 +115,17 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     introHtml,
     useDynamicAssignment
   } = assignment.campaign;
-  const { maxContacts } = assignment;
 
+  const { maxContacts } = assignment;
+  const classes = useStyles();
+
+  const txtSend = t("send");
   const fallbackDueByText = titleCase(`${t("no")} ${t("due date")}`);
+
   const dueByText = dueBy
     ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
     : fallbackDueByText;
   const subtitle = `${description} - ${dueByText}`;
-
-  const classes = useStyles();
-
-  const badgeBtnStartSend = t("send").toUpperCase();
 
   return (
     <div className={classes.container}>
@@ -146,7 +147,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendFirstTexts",
                 assignment,
-                title: `${badgeBtnStartSend} ${t("first texts")}`,
+                title: `${txtSend} ${t("initial texts")}`,
                 type: "initial",
                 count: unmessagedCount,
                 primary: true,
@@ -164,7 +165,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendReplies",
                 assignment,
-                title: `${badgeBtnStartSend} ${t("replies")}`,
+                title: `${txtSend} ${t("replies")}`,
                 type: "reply",
                 count: unrepliedCount,
                 primary: false,
@@ -195,7 +196,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           {window.NOT_IN_USA && window.ALLOW_SEND_ALL
             ? renderBadgedButton({
                 assignment,
-                title: `${badgeBtnStartSend} ${t("messages")}`,
+                title: `${txtSend} ${t("messages")}`,
                 type: "initial",
                 primary: true,
                 disabled: false,
@@ -206,7 +207,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : ""}
           {renderBadgedButton({
             assignment,
-            title: `${badgeBtnStartSend} ${t("later")}`,
+            title: `${txtSend} ${t("later")}`,
             type: "initial",
             count: badTimezoneCount,
             primary: false,
