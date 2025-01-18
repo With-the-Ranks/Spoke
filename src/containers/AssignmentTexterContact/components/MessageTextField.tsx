@@ -1,5 +1,4 @@
 import { makeStyles } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +37,6 @@ const MessageTextField: React.FC = () => {
         className={classes.textField}
         name={FIELD_NAME}
         label={t("your message")}
-        as={TextField}
         multiline
         fullWidth
         rowsMax={6}
