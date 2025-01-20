@@ -1,4 +1,5 @@
 {
+  "apply tags": "Apply tags:",
   "back to todos": "Back to Todos",
   "cancel": "Cancel",
   "contact": "contact",
@@ -7,13 +8,18 @@
   "initials": "initials",
   "initial texts": "initial texts",
   "later": "later",
-  "messages": "messages",
+  "message_one": "message",
+  "message_other": "messages",
   "no": "no",
+  "of": "of",
+  "ok": "ok",
+  "recipient": "recipient",
   "replies": "replies",
   "send": "Send",
+  "segment_one": "segment",
+  "segment_other": "segments",
   "this": "this",
   "text": "text",
-  "texts": "texts",
   "user": "user",
   "without": "without"
 }

@@ -913,7 +913,7 @@ export class AssignmentTexterContact extends React.Component {
                 disabled={tags.length === 0}
                 onClick={() => this.setState({ isTagEditorOpen: true })}
               >
-                {t("manageTags")}
+                {t("manage tags")}
               </Button>
             </Box>
             {this.renderNeedsResponseToggleButton(contact)}

@@ -196,7 +196,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           {window.NOT_IN_USA && window.ALLOW_SEND_ALL
             ? renderBadgedButton({
                 assignment,
-                title: `${txtSend} ${t("messages")}`,
+                title: `${txtSend} ${t("message_other")}`,
                 type: "initial",
                 primary: true,
                 disabled: false,

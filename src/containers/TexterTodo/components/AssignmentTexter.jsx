@@ -257,12 +257,14 @@ class AssignmentTexter extends React.Component {
     ) {
       ofHowMany = "?";
     }
-    const title = `${currentIndex} of ${ofHowMany}`;
+
+    const textOfHowMany = `${currentIndex} ${t("of")} ${ofHowMany}`;
+
     return [
       <ToolbarTitle
         key="title"
         className={css(styles.navigationToolbarTitle)}
-        text={title}
+        text={textOfHowMany}
       />,
       <ButtonGroup
         variant="outlined"

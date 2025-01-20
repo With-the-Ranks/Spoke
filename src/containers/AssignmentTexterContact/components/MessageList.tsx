@@ -64,7 +64,7 @@ const MessageList: React.FC<MessageListProps> = (props) => {
   } = props;
 
   const classes = useStyles();
-  const { t } = useTranslation("AssignmentTexterContact");
+  const { i18n, t } = useTranslation("AssignmentTexterContact");
 
   const optOutItem = optOut ? (
     <>
@@ -97,7 +97,9 @@ const MessageList: React.FC<MessageListProps> = (props) => {
             primary={
               <span style={{ whiteSpace: "pre-wrap" }}>{message.text}</span>
             }
-            secondary={`${DateTime.fromISO(message.createdAt).toRelative()}`}
+            secondary={`${DateTime.fromISO(message.createdAt).toRelative({
+              locale: i18n.language
+            })}`}
             primaryTypographyProps={{ className: classes.messageText }}
             secondaryTypographyProps={{ className: classes.messageTimeText }}
           />
