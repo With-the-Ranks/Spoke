@@ -1,5 +1,6 @@
 import type { TagInfoFragment } from "@spoke/spoke-codegen";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import type { StylesConfig } from "react-select";
 import Select from "react-select";
 
@@ -34,11 +35,12 @@ const TagSelector: React.FC<TagSelectorProps> = (props) => {
   const handleSelectChange = (tagsArray: TagInfoFragment[]) =>
     props.onChange(tagsArray);
 
+  const { t } = useTranslation();
   const { dataSource, value } = props;
 
   return (
     <>
-      <p>Apply tags:</p>
+      <p>{t("apply tags")}</p>
       <Select<TagInfoFragment>
         isMulti
         isSearchable

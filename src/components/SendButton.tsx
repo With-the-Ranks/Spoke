@@ -1,8 +1,9 @@
 import { useTheme } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { dataTest } from "../lib/attributes";
+import { dataTest, titleCase } from "../lib/attributes";
 import { useSpokeTheme } from "../styles/spoke-theme-context";
 
 interface Props {
@@ -15,11 +16,18 @@ interface Props {
 const SendButton: React.FC<Props> = (props) => {
   const theme = useTheme();
   const spokeTheme = useSpokeTheme();
+  const { t } = useTranslation();
   const [clickStepIndex, setClickStepIndex] = useState(0);
 
+  const lblOk = t("ok");
+  const lblRecipientOk = `${titleCase(t("recipient")) + lblOk}?`;
+  const lblMessageOk = `${titleCase(t("message_one")) + lblOk}?`;
+  const lblSend = t("send");
+  const lblSendMessage = `${lblSend + lblOk}?`;
+
   const clickStepLabels = props.threeClickEnabled
-    ? ["Recipient ok?", "Message ok?", "Send message"]
-    : ["Send"];
+    ? [lblRecipientOk, lblMessageOk, lblSendMessage]
+    : [lblSend];
 
   const handleTouchTap = () => {
     const { onFinalTouchTap } = props;

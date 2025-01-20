@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { getSpokeCharCount } from "../lib/charset-utils";
 
@@ -7,10 +8,13 @@ interface MessageLengthProps {
 }
 
 const MessageLengthInfo: React.FC<MessageLengthProps> = ({ messageText }) => {
+  const { t } = useTranslation();
+
   const { charCount, msgCount, charsPerSegment } = getSpokeCharCount(
     messageText
   );
-  const segmentInfo = msgCount === 1 ? "(1 segment)" : `(${msgCount} segments)`;
+
+  const segmentInfo = `(${msgCount} ${t("segment", { count: msgCount })})`;
 
   return (
     <div style={{ display: "inline" }}>
