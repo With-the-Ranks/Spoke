@@ -4,23 +4,23 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import type {
+  ConversationInfoFragment,
+  MessageInput
+} from "@spoke/spoke-codegen";
 import { useSendMessageMutation } from "@spoke/spoke-codegen";
 import React, { useState } from "react";
 import * as yup from "yup";
 
-import type { Conversation } from "../../../../../api/conversations";
-import type { Message } from "../../../../../api/message";
-import type { MessageInput } from "../../../../../api/types";
 import GSForm from "../../../../../components/forms/GSForm";
 import SpokeFormField from "../../../../../components/forms/SpokeFormField";
 import MessageLengthInfo from "../../../../../components/MessageLengthInfo";
 import SendButton from "../../../../../components/SendButton";
 
 interface MessageResponseProps {
-  conversation: Conversation;
+  conversation: ConversationInfoFragment;
   value?: string;
   onChange?: (value: string) => Promise<void> | void;
-  messagesChanged(messages: Message[]): Promise<void> | void;
 }
 
 const messageSchema = yup.object({
@@ -33,8 +33,7 @@ const messageSchema = yup.object({
 const MessageResponse: React.FC<MessageResponseProps> = ({
   conversation,
   value,
-  onChange,
-  messagesChanged
+  onChange
 }: MessageResponseProps) => {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [sendError, setSendError] = useState<string>("");
@@ -53,10 +52,14 @@ const MessageResponse: React.FC<MessageResponseProps> = ({
     };
   };
 
-  const handleMessageFormChange = ({ messageText }: MessageFormValue) =>
+  const handleMessageFormChange = ({ messageText }: { messageText: string }) =>
     onChange?.(messageText);
 
-  const handleMessageFormSubmit = async ({ messageText }: MessageFormValue) => {
+  const handleMessageFormSubmit = async ({
+    messageText
+  }: {
+    messageText: string;
+  }) => {
     const { contact } = conversation;
     const message: MessageInput = createMessageToContact(messageText);
     if (isSending) {
@@ -75,10 +78,7 @@ const MessageResponse: React.FC<MessageResponseProps> = ({
         setSendError(errorMsgs);
       }
 
-      if (messages) {
-        messagesChanged(messages);
-        onChange?.("");
-      }
+      if (messages) onChange?.("");
     } catch (e: any) {
       setSendError(e.message);
     } finally {
