@@ -6,18 +6,16 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Grid from "@material-ui/core/Grid";
-import type { CampaignVariablePage } from "@spoke/spoke-codegen";
+import type { Action, Campaign, CampaignVariable } from "@spoke/spoke-codegen";
 import produce from "immer";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useState } from "react";
 import { compose } from "recompose";
 
-import type { Campaign } from "../../../../api/campaign";
 import type {
   InteractionStep,
   InteractionStepWithChildren
 } from "../../../../api/interaction-step";
-import type { Action } from "../../../../api/types";
 import { readClipboardText, writeClipboardText } from "../../../../client/lib";
 import ScriptPreviewButton from "../../../../components/ScriptPreviewButton";
 import { dataTest } from "../../../../lib/attributes";
@@ -72,7 +70,7 @@ interface HocProps {
       "id" | "isStarted" | "customFields" | "externalSystem"
     > & {
       interactionSteps: InteractionStepWithLocalState[];
-      campaignVariables: CampaignVariablePage;
+      campaignVariables: CampaignVariable[];
     };
   };
   availableActions: {
@@ -279,18 +277,16 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
       campaign: {
         customFields,
         invalidScriptFields,
-        campaignVariables: { edges: campaignVariableEdges },
+        campaignVariables,
         externalSystem
       } = {
         customFields: [],
-        campaignVariables: { edges: [] },
+        campaignVariables: [],
         externalSystem: null
       }
     },
     availableActions: { availableActions }
   } = props;
-
-  const campaignVariables = campaignVariableEdges.map(({ node }) => node);
 
   const {
     interactionSteps,
