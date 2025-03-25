@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import { gql } from "@apollo/client";
+import i18n from "i18next";
 import React from "react";
 import { Redirect, Route, Switch, withRouter } from "react-router-dom";
 
@@ -54,11 +55,16 @@ class ProtectedInner extends React.Component {
         query currentUser {
           currentUser {
             id
+            language
           }
         }
       `
     })
-      .then((result) => result.data.currentUser.id)
+      .then((result) => {
+        const { id: userId, language: userLanguage } = result.data.currentUser;
+        i18n.changeLanguage(userLanguage);
+        return userId;
+      })
       .then(() => this.setState({ isAuthed: true }))
       .catch((_err) => history.push(loginUrl));
   }

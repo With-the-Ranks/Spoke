@@ -12,6 +12,7 @@ import type {
 } from "@spoke/spoke-codegen";
 import { useGetContactTagsQuery } from "@spoke/spoke-codegen";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import TagSelector from "../../../components/TagSelector";
 import { DateTime } from "../../../lib/datetime";
@@ -43,6 +44,8 @@ const ApplyTagDialog: React.FC<ApplyTagDialogProps> = ({
   texter,
   contact
 }: ApplyTagDialogProps) => {
+  const { t: i18t } = useTranslation("ApplyTagDialog");
+
   const { data } = useGetContactTagsQuery({
     variables: { contactId: contact.id }
   });
@@ -132,43 +135,36 @@ const ApplyTagDialog: React.FC<ApplyTagDialogProps> = ({
 
   const hasNonAssignableTag = isNonAssignableTagApplied(selectedContactTags);
 
+  const btnSaveWithoutMessage = (
+    <Button
+      key="save-without-message"
+      color="primary"
+      onClick={handleApplyTagsAndMoveOn}
+    >
+      {i18t("save and move on")}
+    </Button>
+  );
+
+  const btnSaveWithMessage = (
+    <Button key="save-with-message" color="primary" onClick={handleApplyTags}>
+      {i18t("save and type message")}
+    </Button>
+  );
+
   const saveActions = hasNonAssignableTag
-    ? [
-        <Button
-          key="save-without-message"
-          color="primary"
-          onClick={handleApplyTagsAndMoveOn}
-        >
-          Save and Move On Without a Message
-        </Button>
-      ]
-    : [
-        <Button
-          key="save-with-message"
-          color="primary"
-          onClick={handleApplyTags}
-        >
-          Save and Type Message
-        </Button>,
-        <Button
-          key="save-without-message"
-          color="primary"
-          onClick={handleApplyTagsAndMoveOn}
-        >
-          Save and Move On Without a Message
-        </Button>
-      ];
+    ? [btnSaveWithoutMessage]
+    : [btnSaveWithMessage, btnSaveWithoutMessage];
 
   const selectTagActions = saveActions.concat([
     <Button key="save" color="primary" onClick={onRequestClose}>
-      Cancel
+      {i18t("cancel")}
     </Button>
   ]);
 
   return (
     <div id="applyTagDialog">
       <Dialog open={open} maxWidth="xl" fullWidth onClose={onRequestClose}>
-        <DialogTitle>More Actions</DialogTitle>
+        <DialogTitle>{i18t("more actions")}</DialogTitle>
         <DialogContent>
           {!!escalateTag && (
             <Button
@@ -177,15 +173,12 @@ const ApplyTagDialog: React.FC<ApplyTagDialogProps> = ({
               style={{ paddingLeft: 20, paddingRight: 20 }}
               onClick={handleAddEscalatedTag}
             >
-              Escalate Conversation
+              {i18t("escalate convo")}
             </Button>
           )}
           {hasNonAssignableTag ? (
             <p style={{ color: theme.colors.red }}>
-              You've selected a tag that will unassign this conversation from
-              you and reassign it to the appropriate team. You will not be able
-              to apply additional tags or send a follow up message. Apply this
-              tag as your last step!
+              {i18t("non-assignable tag applied")}
             </p>
           ) : null}
           <TagSelector

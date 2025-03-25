@@ -14,6 +14,7 @@ import { css, StyleSheet } from "aphrodite";
 import { ToolbarTitle } from "material-ui/Toolbar";
 import PropTypes from "prop-types";
 import React from "react";
+import { withTranslation } from "react-i18next";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
@@ -244,7 +245,7 @@ class AssignmentTexter extends React.Component {
   };
 
   renderNavigationToolbarChildren = () => {
-    const { allContactsCount } = this.props;
+    const { allContactsCount, t } = this.props;
     const remainingContacts = this.contactCount();
     const messagedContacts = allContactsCount - remainingContacts;
 
@@ -256,12 +257,14 @@ class AssignmentTexter extends React.Component {
     ) {
       ofHowMany = "?";
     }
-    const title = `${currentIndex} of ${ofHowMany}`;
+
+    const textOfHowMany = `${currentIndex} ${t("of")} ${ofHowMany}`;
+
     return [
       <ToolbarTitle
         key="title"
         className={css(styles.navigationToolbarTitle)}
-        text={title}
+        text={textOfHowMany}
       />,
       <ButtonGroup
         variant="outlined"
@@ -275,7 +278,7 @@ class AssignmentTexter extends React.Component {
           disabled={!this.hasPrevious()}
           startIcon={<NavigateBeforeIcon />}
         >
-          PREV
+          {t("prev")}
         </Button>
         ,
         <Button
@@ -285,7 +288,7 @@ class AssignmentTexter extends React.Component {
           disabled={!this.hasNext()}
           endIcon={<NavigateNextIcon />}
         >
-          NEXT
+          {t("next")}
         </Button>
       </ButtonGroup>
     ];
@@ -347,7 +350,7 @@ class AssignmentTexter extends React.Component {
       error.snackbarError = e.message;
 
       if (e.message.includes("Your assignment has changed")) {
-        error.snackbarActionTitle = "Back to todos";
+        error.snackbarActionTitle = this.props.t("back to todos");
         error.snackbarOnTouchTap = this.goBackToTodos;
       } else if (
         e.message.includes(
@@ -355,15 +358,14 @@ class AssignmentTexter extends React.Component {
         )
       ) {
         // opt out or send message Error
-        error.snackbarActionTitle = "A previous contact had been opted out";
+        error.snackbarActionTitle = this.props.t("a previous contact");
       } else if (e.message === undefined) {
         error.snackbarError = "Error: Please wait a few seconds and try again.";
       }
 
-      error.snackbarError = `Error for contact ${contact_id}: ${error.snackbarError.replace(
-        "GraphQL error:",
-        ""
-      )}`;
+      error.snackbarError = `${this.props.t(
+        "error for contact"
+      )} ${contact_id}: ${error.snackbarError.replace("GraphQL error:", "")}`;
 
       this.setState({ errors: this.state.errors.concat([error]) });
 
@@ -420,11 +422,11 @@ class AssignmentTexter extends React.Component {
     return (
       <div>
         <Empty
-          title="You've already messaged or replied to all your assigned contacts for now."
+          title={this.props.t("already messaged or replied")}
           icon={<CheckCircleIcon />}
           content={
             <Button variant="contained" onClick={this.handleExitTexter}>
-              Back To Todos
+              {this.props.t("back to todos")}
             </Button>
           }
         />
@@ -672,6 +674,7 @@ const mutations = {
 
 export default compose(
   withRouter,
+  withTranslation("AssignmentTexter"),
   loadData({
     queries,
     mutations

@@ -3292,6 +3292,8 @@ CREATE TABLE public."user" (
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     notification_frequency text DEFAULT 'DAILY'::text NOT NULL,
     is_suspended boolean DEFAULT false NOT NULL,
+    language text DEFAULT 'en'::text NOT NULL,
+    CONSTRAINT user_language_check CHECK ((language = ANY (ARRAY['en'::text, 'es'::text]))),
     CONSTRAINT user_notification_frequency_check CHECK ((notification_frequency = ANY (ARRAY['ALL'::text, 'PERIODIC'::text, 'DAILY'::text, 'NONE'::text])))
 );
 

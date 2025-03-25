@@ -5,11 +5,13 @@ import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import TextField from "material-ui/TextField";
 import React from "react";
+import { withTranslation } from "react-i18next";
 import * as yup from "yup";
 
 import { RequestAutoApproveType } from "../../../api/organization-membership";
 import GSForm from "../../../components/forms/GSForm";
 import LoadingIndicator from "../../../components/LoadingIndicator";
+import { titleCase } from "../../../lib/scripts";
 import { loadData } from "../../hoc/with-operations";
 
 class TexterRequest extends React.Component {
@@ -48,12 +50,13 @@ class TexterRequest extends React.Component {
 
   submit = async () => {
     const { count, email, selectedAssignment, submitting } = this.state;
+    const { mutations, t } = this.props;
     if (submitting) return;
 
     this.setState({ submitting: true, error: undefined });
     try {
       const payload = { count, email, preferredTeamId: selectedAssignment };
-      const response = await this.props.mutations.requestTexts(payload);
+      const response = await mutations.requestTexts(payload);
       if (response.errors) throw response.errors;
 
       const message = response.data.requestTexts;
@@ -62,16 +65,16 @@ class TexterRequest extends React.Component {
         this.setState({ finished: true });
       } else if (message === "Unrecognized email") {
         this.setState({
-          error: `Unrecognized email: please make sure you're logged into Spoke with the same email as Slack.`
+          error: t("unrecognized email error")
         });
       } else if (
         message === "Not created; a shift already requested < 10 mins ago."
       ) {
         this.setState({
-          error: "Sorry - you just requested! Please wait 10 minutes."
+          error: t("recent request error")
         });
       } else if (message === "No texts available at the moment") {
-        this.setState({ error: message });
+        this.setState({ error: t("no texts message") });
       } else {
         this.setState({ finished: true });
       }
@@ -109,41 +112,37 @@ class TexterRequest extends React.Component {
   };
 
   render() {
-    if (this.props.data.loading) {
+    const { data, t } = this.props;
+
+    if (data.loading) {
       return <LoadingIndicator />;
     }
 
-    const {
-      myCurrentAssignmentTargets,
-      settings
-    } = this.props.data.organization;
+    const { myCurrentAssignmentTargets, settings } = data.organization;
 
     const textsAvailable = myCurrentAssignmentTargets.length > 0;
 
-    if (this.props.data.currentUser.currentRequest) {
-      const { amount } = this.props.data.currentUser.currentRequest;
+    if (data.currentUser.currentRequest) {
+      const { amount } = data.currentUser.currentRequest;
 
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3> You currently have a pending request</h3>
-            <p>
-              You requested {amount} texts. Hold on, someone will approve them
-              soon!
-            </p>
+            <h3>{t("request pending message")}</h3>
+            <p>{t("approval pending message", { amount })}</p>
           </div>
         </Paper>
       );
     }
 
     if (
-      !this.userCanRequest(this.props.data.currentUser.memberships) &&
+      !this.userCanRequest(data.currentUser.memberships) &&
       settings.showDoNotAssignMessage
     ) {
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3>Assignment Request Disabled</h3>
+            <h3>{t("assignment request disabled")}</h3>
             <p>{settings.doNotAssignMessage}</p>
           </div>
         </Paper>
@@ -154,8 +153,8 @@ class TexterRequest extends React.Component {
       return (
         <Paper>
           <div style={{ padding: "20px" }}>
-            <h3> No texts available right now </h3>
-            <p> Watch out for an announcement when new texts are available! </p>
+            <h3>{t("no texts message")}</h3>
+            <p>{t("watch for announcement")}</p>
           </div>
         </Paper>
       );
@@ -178,42 +177,35 @@ class TexterRequest extends React.Component {
     if (finished) {
       return (
         <div>
-          <h3> Submitted Successfully – Thank you! </h3>
-          <p>
-            {" "}
-            Give us a few minutes to assign your texts. You'll receive an email
-            notification when we've done so. If you requested your texts after
-            hours, you’ll get them when texting opens at 9am ET :).{" "}
-          </p>
+          <h3>{t("request success")}</h3>
+          <p>{t("expect texts")}</p>
         </div>
       );
     }
 
     const makeOptionText = (at) =>
       `${at.teamTitle}: ${at.maxRequestCount ?? ""} ${
-        at.type === "UNSENT" ? "Initials" : "Replies"
+        at.type === "UNSENT" ? t("initials") : t("replies")
       }`;
 
     return (
       <div>
         <div style={{ textAlign: "center" }}>
-          <h1> Ready to text? </h1>
+          <h1>{t("ready to text q")}</h1>
           <p style={{ marginTop: 5, marginBottom: 5 }}>Pick an assignment: </p>
-          {this.props.data ? (
+          {data ? (
             <SelectField
               value={selectedAssignment}
               onChange={this.setSelectedAssignment}
               fullWidth
             >
-              {this.props.data.organization.myCurrentAssignmentTargets.map(
-                (at) => (
-                  <MenuItem
-                    key={at.teamId}
-                    value={at.teamId}
-                    primaryText={makeOptionText(at)}
-                  />
-                )
-              )}
+              {data.organization.myCurrentAssignmentTargets.map((at) => (
+                <MenuItem
+                  key={at.teamId}
+                  value={at.teamId}
+                  primaryText={makeOptionText(at)}
+                />
+              ))}
             </SelectField>
           ) : (
             <LoadingIndicator />
@@ -226,8 +218,7 @@ class TexterRequest extends React.Component {
           onSubmit={this.submit}
         >
           <label htmlFor="count">
-            {" "}
-            Count:
+            {titleCase(t("count"))}:
             <TextField
               name="count"
               label="Count"
@@ -252,7 +243,7 @@ class TexterRequest extends React.Component {
             fullWidth
             onClick={this.submit}
           >
-            Request More Texts
+            {t("request more texts")}
           </Button>
         </GSForm>
         {error && (
@@ -339,7 +330,9 @@ const mutations = {
   })
 };
 
-export default loadData({
-  queries,
-  mutations
-})(TexterRequest);
+export default withTranslation("TexterRequest")(
+  loadData({
+    queries,
+    mutations
+  })(TexterRequest)
+);

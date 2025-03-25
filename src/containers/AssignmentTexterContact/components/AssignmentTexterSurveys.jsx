@@ -17,6 +17,7 @@ import isEmpty from "lodash/isEmpty";
 import sample from "lodash/sample";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
+import { withTranslation } from "react-i18next";
 
 const styles = {
   root: {},
@@ -140,7 +141,7 @@ class AssignmentTexterSurveys extends Component {
   }
 
   render() {
-    const { interactionSteps, currentInteractionStep } = this.props;
+    const { interactionSteps, currentInteractionStep, t } = this.props;
     const questions = interactionSteps.filter(
       ({ question }) => !isEmpty(question.text)
     );
@@ -159,7 +160,7 @@ class AssignmentTexterSurveys extends Component {
         <CardHeader
           title={
             <Typography variant="body1" component="span">
-              {showAllQuestions ? "All questions" : "Current question"}
+              {showAllQuestions ? t("all questions") : t("current question")}
             </Typography>
           }
           style={styles.cardHeader}
@@ -192,4 +193,6 @@ AssignmentTexterSurveys.propTypes = {
   onQuestionResponseChange: PropTypes.func
 };
 
-export default AssignmentTexterSurveys;
+export default withTranslation("AssignmentTexterContact")(
+  AssignmentTexterSurveys
+);

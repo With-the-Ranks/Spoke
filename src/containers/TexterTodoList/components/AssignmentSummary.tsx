@@ -1,13 +1,15 @@
 import { makeStyles } from "@material-ui/core";
 import CardActions from "@material-ui/core/CardActions";
 import Divider from "@material-ui/core/Divider";
-import type { Assignment } from "@spoke/spoke-codegen ";
+import type { Assignment } from "@spoke/spoke-codegen";
 import { Card, CardTitle } from "material-ui/Card";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 
 import { useSpokeContext } from "../../../client/spoke-context";
 import { DateTime } from "../../../lib/datetime";
+import { titleCase } from "../../../lib/scripts";
 import type { MessageType } from "./BadgeButton";
 import BadgeButton from "./BadgeButton";
 
@@ -44,6 +46,7 @@ interface Props {
 export const AssignmentSummary: React.FC<Props> = (props) => {
   const history = useHistory();
   const context = useSpokeContext();
+  const { t } = useTranslation();
 
   const makeGoToTodosHandler = (
     contactsFilter: string | null,
@@ -101,6 +104,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     pastMessagesCount,
     skippedMessagesCount
   } = props;
+
   const {
     title,
     description,
@@ -111,13 +115,17 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     introHtml,
     useDynamicAssignment
   } = assignment.campaign;
+
   const { maxContacts } = assignment;
+  const classes = useStyles();
+
+  const txtSend = t("send");
+  const fallbackDueByText = titleCase(`${t("no")} ${t("due date")}`);
+
   const dueByText = dueBy
     ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
-    : "No Due Date";
+    : fallbackDueByText;
   const subtitle = `${description} - ${dueByText}`;
-
-  const classes = useStyles();
 
   return (
     <div className={classes.container}>
@@ -125,7 +133,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
         <CardTitle
           title={title}
           subtitle={subtitle}
-          style={{ backgroundColor: primaryColor }}
+          style={{ backgroundColor: primaryColor ?? "" }}
         >
           {logoImageUrl && <img src={logoImageUrl} className={classes.image} />}
         </CardTitle>
@@ -139,7 +147,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendFirstTexts",
                 assignment,
-                title: "Send first texts",
+                title: `${txtSend} ${t("initial texts")}`,
                 type: "initial",
                 count: unmessagedCount,
                 primary: true,
@@ -157,7 +165,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : renderBadgedButton({
                 dataTestText: "sendReplies",
                 assignment,
-                title: "Send replies",
+                title: `${txtSend} ${t("replies")}`,
                 type: "reply",
                 count: unrepliedCount,
                 primary: false,
@@ -167,7 +175,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
               })}
           {renderBadgedButton({
             assignment,
-            title: "Past Messages",
+            title: `${t("past messages")}`,
             type: "past",
             count: pastMessagesCount,
             primary: false,
@@ -177,7 +185,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           })}
           {renderBadgedButton({
             assignment,
-            title: "Skipped Messages",
+            title: `${t("skipped messages")}`,
             type: "past",
             count: skippedMessagesCount,
             primary: false,
@@ -188,7 +196,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           {window.NOT_IN_USA && window.ALLOW_SEND_ALL
             ? renderBadgedButton({
                 assignment,
-                title: "Send messages",
+                title: `${txtSend} ${t("message_other")}`,
                 type: "initial",
                 primary: true,
                 disabled: false,
@@ -199,7 +207,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             : ""}
           {renderBadgedButton({
             assignment,
-            title: "Send later",
+            title: `${txtSend} ${t("later")}`,
             type: "initial",
             count: badTimezoneCount,
             primary: false,
