@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.2-rc.0](https://github.com/politics-rewired/spoke/compare/v9.0.1...v9.0.2-rc.0) (2025-03-25)
+
+
+### Bug Fixes
+
+* **mms:** skip file validation ([#66](https://github.com/politics-rewired/spoke/issues/66)) ([35ee5a2](https://github.com/politics-rewired/spoke/commit/35ee5a2e32f75d972fb4ed47268e584937cc2f16))
+
+
+### Backend Changes
+
+* **gh:** update ci workflow ([#67](https://github.com/politics-rewired/spoke/issues/67)) ([6ad9771](https://github.com/politics-rewired/spoke/commit/6ad97711bc0e644272586b22b3e769281a36db0d))
+
 ### [9.0.1](https://github.com/politics-rewired/spoke/compare/v9.0.0...v9.0.1) (2024-12-02)
 
 
