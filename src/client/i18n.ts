@@ -6,6 +6,10 @@ i18n
   .use(Backend)
   .use(initReactI18next)
   .init({
+    backend: {
+      loadPath:
+        "https://storage.googleapis.com/sendable-audio-clips/locales/{{lng}}/{{ns}}.json"
+    },
     fallbackLng: "en",
     fallbackNS: "translation",
     interpolation: {
