@@ -5,6 +5,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { css, StyleSheet } from "aphrodite";
+import i18n from "i18next";
 import PropTypes from "prop-types";
 import queryString from "query-string";
 import React from "react";
@@ -314,6 +315,7 @@ class UserEdit extends React.Component {
                   value: option,
                   label: languageEnumToLabel(option)
                 }))}
+                onChange={(value) => i18n.changeLanguage(value)}
               />
             </span>
           )}
@@ -322,7 +324,11 @@ class UserEdit extends React.Component {
             authType === UserEditMode.Reset ||
             authType === UserEditMode.EmailReset ||
             authType === UserEditMode.Change) && (
-            <SpokeFormField label="Password" name="password" type="password" />
+            <SpokeFormField
+              label={titleCase(t("password"))}
+              name="password"
+              type="password"
+            />
           )}
           {authType === UserEditMode.Change && (
             <SpokeFormField

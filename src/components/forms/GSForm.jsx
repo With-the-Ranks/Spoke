@@ -3,6 +3,7 @@ import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
 import Form from "react-formal";
+import { withTranslation } from "react-i18next";
 
 import theme from "../../styles/theme";
 import GSSubmitButton from "./GSSubmitButton";
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
     textAlign: "center"
   }
 });
-export default class GSForm extends React.Component {
+export class GSForm extends React.Component {
   // eslint-disable-next-line react/static-property-placement
   static propTypes = {
     value: PropTypes.object,
@@ -117,6 +118,7 @@ export default class GSForm extends React.Component {
 
   renderChildren = (children) => {
     const formErrors = this.getFormErrors();
+    const { t } = this.props;
 
     return React.Children.map(children, (child) => {
       if (!React.isValidElement(child)) {
@@ -130,10 +132,20 @@ export default class GSForm extends React.Component {
         const error = formErrors[name];
         let clonedElement = child;
         if (error) {
+          const REQUIRED_FIELD_TEXT = "is a required field";
+
           const errorText = error[0]
             ? error[0].message.replace(name, label)
             : null;
-          clonedElement = React.cloneElement(child, { errorText });
+
+          const translatedText = errorText.replace(
+            REQUIRED_FIELD_TEXT,
+            t(REQUIRED_FIELD_TEXT)
+          );
+
+          clonedElement = React.cloneElement(child, {
+            errorText: translatedText
+          });
         }
         return React.cloneElement(clonedElement, {
           events: ["onBlur"]
@@ -188,3 +200,5 @@ export default class GSForm extends React.Component {
 GSForm.propTypes = {
   onSubmit: PropTypes.func
 };
+
+export default withTranslation()(GSForm);
