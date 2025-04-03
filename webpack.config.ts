@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 import path from "path";
@@ -71,6 +72,17 @@ if (config.isProduction) {
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
     })
   );
+
+  plugins.push(
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: "../public",
+          to: config.PUBLIC_DIR
+        }
+      ]
+    })
+  );
 }
 
 const webpackConfig: WebpackConfiguration = {
@@ -129,9 +141,14 @@ const webpackConfig: WebpackConfiguration = {
       publicPath: "/assets/",
       stats: "minimal"
     },
-    static: {
-      directory: "/assets/"
-    },
+    static: [
+      {
+        directory: "/assets/"
+      },
+      {
+        directory: "/public/"
+      }
+    ],
     hot: true,
     allowedHosts: "all",
     headers: { "Access-Control-Allow-Origin": "*" },
