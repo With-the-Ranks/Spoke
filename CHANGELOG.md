@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0-rc.3](https://github.com/politics-rewired/spoke/compare/v9.1.0-rc.2...v9.1.0-rc.3) (2025-04-03)
+
+
+### Bug Fixes
+
+* resolve public  paths ([36c66ee](https://github.com/politics-rewired/spoke/commit/36c66eeefc26c526afbec0eac3454a8af0e023b1))
+
 ## [9.1.0-rc.2](https://github.com/politics-rewired/spoke/compare/v9.1.0-rc.1...v9.1.0-rc.2) (2025-04-03)
 
 
