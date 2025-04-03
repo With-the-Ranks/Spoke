@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0-rc.2](https://github.com/politics-rewired/spoke/compare/v9.1.0-rc.1...v9.1.0-rc.2) (2025-04-03)
+
+
+### Bug Fixes
+
+* serve from webpack ([e143be3](https://github.com/politics-rewired/spoke/commit/e143be307118ab6022f3e3a1f0fafd145f5363a2))
+
 ## [9.1.0-rc.1](https://github.com/politics-rewired/spoke/compare/v9.1.0-rc.0...v9.1.0-rc.1) (2025-04-02)
 
 
