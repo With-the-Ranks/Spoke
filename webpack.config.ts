@@ -77,8 +77,8 @@ if (config.isProduction) {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: "../public",
-          to: config.PUBLIC_DIR
+          from: path.resolve(__dirname, "public"),
+          to: path.resolve(__dirname, config.PUBLIC_DIR)
         }
       ]
     })
