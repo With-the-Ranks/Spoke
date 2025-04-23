@@ -67,7 +67,7 @@ const AdminAssignmentControl: React.FC<InnerProps> = (props) => {
       title: "General",
       textColor: "",
       backgroundColor: "",
-      isAssignmentEnabled: textRequestFormEnabled,
+      isAssignmentEnabled: textRequestFormEnabled ?? false,
       assignmentType: textRequestType,
       maxRequestCount: textRequestMaxCount,
       escalationTags: []
@@ -111,7 +111,6 @@ const AdminAssignmentControl: React.FC<InnerProps> = (props) => {
       const response = await props.mutations.saveTeams(payloads);
       if (response.errors) throw response.errors;
       setChanges({});
-      console.log("assignmentPoolsWithChanges", assignmentPoolsWithChanges());
     } catch (err: any) {
       setError(err.message);
     } finally {
