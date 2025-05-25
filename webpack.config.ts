@@ -146,7 +146,8 @@ const webpackConfig: WebpackConfiguration = {
         directory: "/assets/"
       },
       {
-        directory: "/public/"
+        directory: "/public/",
+        watch: true
       }
     ],
     hot: true,
