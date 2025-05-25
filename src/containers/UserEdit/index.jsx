@@ -11,6 +11,7 @@ import queryString from "query-string";
 import React from "react";
 import Form from "react-formal";
 import { Trans, withTranslation } from "react-i18next";
+import { compose } from "recompose";
 import * as yup from "yup";
 
 import {
@@ -270,7 +271,7 @@ class UserEdit extends React.Component {
             authType === UserEditMode.RequestReset ||
             authType === UserEditMode.Edit) && (
             <SpokeFormField
-              label="Email"
+              label={t("email")}
               name="email"
               disabled={!isLocalAuth}
               {...dataTest("email")}
@@ -500,9 +501,10 @@ const mutations = {
   })
 };
 
-export default withTranslation("UserEdit")(
+export default compose(
+  withTranslation("UserEdit"),
   loadData({
     queries,
     mutations
-  })(UserEdit)
-);
+  })
+)(UserEdit);

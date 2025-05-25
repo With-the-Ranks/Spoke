@@ -4,6 +4,7 @@ import { css, StyleSheet } from "aphrodite/no-important";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import queryString from "query-string";
 import React from "react";
+import { withTranslation } from "react-i18next";
 import type { RouteChildrenProps } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
@@ -59,7 +60,11 @@ const saveLabels: Record<string, string> = {
   [UserEditMode.RequestReset]: "Request Reset"
 };
 
-type LogalLoginProps = RouteChildrenProps & MuiThemeProviderProps;
+type LogalLoginProps = RouteChildrenProps &
+  MuiThemeProviderProps & {
+    // comes from withTranslation
+    t: (key: string) => string;
+  };
 
 interface LogalLoginState {
   active: string;
@@ -88,7 +93,8 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
     nextUrl.includes("invite");
 
   render() {
-    const { location, history, muiTheme } = this.props;
+    const { location, history, muiTheme, t } = this.props;
+
     const rawNextUrl = queryString.parse(location.search).nextUrl;
     const nextUrl =
       (Array.isArray(rawNextUrl) ? rawNextUrl[0] : rawNextUrl) || "/";
@@ -114,7 +120,7 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               onClick={this.handleClick}
               disabled={active === UserEditMode.Login}
             >
-              Log In
+              {t("log in")}
             </button>
             <button
               className={css(styles.button)}
@@ -123,17 +129,17 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               onClick={this.handleClick}
               disabled={active === UserEditMode.SignUp}
             >
-              Sign Up
+              {t("sign up")}
             </button>
           </section>
         )}
         <div className={css(styles.fieldContainer)}>
           <h2 className={css(styles.header)} style={{ color: headerColor }}>
             {active === UserEditMode.EmailReset
-              ? "Reset Your Password"
+              ? t("reset password")
               : active === UserEditMode.RequestReset
-              ? "Request a Password Reset Email"
-              : "Welcome to Spoke"}
+              ? t("request reset email")
+              : t("welcome")}
           </h2>
           {active === UserEditMode.Reset ? (
             <UserPasswordReset history={history} nextUrl={nextUrl} />
@@ -155,6 +161,7 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
 }
 
 const LocalLoginWrapper = compose<LogalLoginProps, unknown>(
+  withTranslation("Login"),
   muiThemeable(),
   withRouter
 )(LocalLogin);

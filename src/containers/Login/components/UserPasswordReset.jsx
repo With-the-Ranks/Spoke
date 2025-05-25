@@ -2,6 +2,7 @@ import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
 import Form from "react-formal";
+import { withTranslation } from "react-i18next";
 import * as yup from "yup";
 
 import GSForm from "../../../components/forms/GSForm";
@@ -59,7 +60,7 @@ class UserPasswordReset extends React.Component {
   };
 
   render() {
-    const { style, isEmailReset } = this.props;
+    const { style, isEmailReset, t } = this.props;
     const { working, error } = this.state;
     const isLocalAuth = window.PASSPORT_STRATEGY === "local";
 
@@ -71,7 +72,7 @@ class UserPasswordReset extends React.Component {
       >
         {!isEmailReset && (
           <SpokeFormField
-            label="Email"
+            label={t("email")}
             name="email"
             disabled={!isLocalAuth}
             {...dataTest("email")}
@@ -79,14 +80,14 @@ class UserPasswordReset extends React.Component {
         )}
         <SpokeFormField label="Password" name="password" type="password" />
         <SpokeFormField
-          label="Confirm Password"
+          label={t("confirm password")}
           name="passwordConfirm"
           type="password"
         />
         <div className={css(styles.buttons)}>
           <Form.Submit
             type="submit"
-            label="Save New Password"
+            label={t("save new password")}
             disabled={working}
           />
         </div>
@@ -102,4 +103,4 @@ UserPasswordReset.propTypes = {
   style: PropTypes.string
 };
 
-export default UserPasswordReset;
+export default withTranslation("UserEdit")(UserPasswordReset);

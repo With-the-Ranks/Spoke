@@ -3,6 +3,7 @@
   "passwords must match": "Las contraseñas deben coincidir",
   "first name": "Nombre",
   "last name": "Apellido",
+  "email": "Correo Electrónico",
   "cell number": "Número de celular",
   "notification frequency": "Frecuencia de notificación",
   "new password": "Nueva contraseña",
