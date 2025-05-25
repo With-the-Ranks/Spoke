@@ -1,3 +1,5 @@
+// 2025-05-25 this is NOT fully a functional component currently
+// https://github.com/With-the-Ranks/Spoke/issues/70
 import { css, StyleSheet } from "aphrodite/no-important";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import queryString from "query-string";
