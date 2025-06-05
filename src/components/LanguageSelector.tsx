@@ -1,3 +1,4 @@
+import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { Language } from "@spoke/spoke-codegen";
@@ -22,10 +23,18 @@ export const LanguageSelector: React.FC = () => {
   ) => setSelectedLanguage(event.target.value as Language);
 
   return (
-    <Select value={selectedLanguage} onChange={handleLangSelected}>
-      <MenuItem value={Language.En}>English</MenuItem>
-      <MenuItem value={Language.Es}>Español</MenuItem>
-    </Select>
+    <>
+      <InputLabel id="select-lang">Language</InputLabel>
+      <Select
+        value={selectedLanguage}
+        onChange={handleLangSelected}
+        labelId="select-lang"
+        style={{ marginTop: 10 }}
+      >
+        <MenuItem value={Language.En}>English</MenuItem>
+        <MenuItem value={Language.Es}>Español</MenuItem>
+      </Select>
+    </>
   );
 };
 
