@@ -4,6 +4,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { Language } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import i18n from "i18next";
 import PropTypes from "prop-types";
@@ -14,11 +15,7 @@ import { Trans, withTranslation } from "react-i18next";
 import { compose } from "recompose";
 import * as yup from "yup";
 
-import {
-  Language,
-  languageEnumToLabel,
-  NotificationFrequencyType
-} from "../../api/user";
+import { languageEnumToLabel, NotificationFrequencyType } from "../../api/user";
 import GSForm from "../../components/forms/GSForm";
 import GSSubmitButton from "../../components/forms/GSSubmitButton";
 import SpokeFormField from "../../components/forms/SpokeFormField";
@@ -36,6 +33,11 @@ export const UserEditMode = Object.freeze({
   Edit: "edit"
 });
 
+const lngChoices = Object.values(Language).map((option) => ({
+  value: option,
+  label: languageEnumToLabel(option)
+}));
+
 const styles = StyleSheet.create({
   buttons: {
     display: "flex"
@@ -51,7 +53,7 @@ class UserEdit extends React.Component {
   state = {
     user: {
       notificationFrequency: NotificationFrequencyType.All,
-      language: Language.English
+      language: Language.En
     },
     changePasswordDialog: false,
     successDialog: false,
@@ -312,10 +314,7 @@ class UserEdit extends React.Component {
                 name="language"
                 {...dataTest("language")}
                 type="select"
-                choices={Object.values(Language).map((option) => ({
-                  value: option,
-                  label: languageEnumToLabel(option)
-                }))}
+                choices={lngChoices}
                 onChange={(value) => i18n.changeLanguage(value)}
               />
             </span>

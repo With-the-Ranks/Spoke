@@ -1,3 +1,5 @@
+import { Language } from "@spoke/spoke-codegen";
+
 /* eslint-disable import/prefer-default-export */
 export enum NotificationFrequencyType {
   All = "ALL",
@@ -6,14 +8,9 @@ export enum NotificationFrequencyType {
   None = "NONE"
 }
 
-export enum Language {
-  English = "en",
-  Spanish = "es"
-}
-
 export const languageEnumToLabel = (value: Language) => {
   switch (value) {
-    case Language.Spanish:
+    case Language.Es:
       return "Español";
     default:
       return "English";

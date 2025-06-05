@@ -1,5 +1,6 @@
 // 2025-05-25 this is NOT fully a functional component currently
 // https://github.com/With-the-Ranks/Spoke/issues/70
+import { Box } from "@material-ui/core";
 import { css, StyleSheet } from "aphrodite/no-important";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import queryString from "query-string";
@@ -8,6 +9,7 @@ import { withTranslation } from "react-i18next";
 import type { RouteChildrenProps } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
+import LanguageSelector from "src/components/LanguageSelector";
 
 import theme from "../../styles/theme";
 import type { MuiThemeProviderProps } from "../../styles/types";
@@ -64,6 +66,7 @@ type LogalLoginProps = RouteChildrenProps &
   MuiThemeProviderProps & {
     // comes from withTranslation
     t: (key: string) => string;
+    i18n: any;
   };
 
 interface LogalLoginState {
@@ -141,6 +144,9 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               ? t("request reset email")
               : t("welcome")}
           </h2>
+          <Box mt={4}>
+            <LanguageSelector />
+          </Box>
           {active === UserEditMode.Reset ? (
             <UserPasswordReset history={history} nextUrl={nextUrl} />
           ) : (
