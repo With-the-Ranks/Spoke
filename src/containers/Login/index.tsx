@@ -1,6 +1,7 @@
 // 2025-05-25 this is NOT fully a functional component currently
 // https://github.com/With-the-Ranks/Spoke/issues/70
 import { Box } from "@material-ui/core";
+import { Language } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite/no-important";
 import muiThemeable from "material-ui/styles/muiThemeable";
 import queryString from "query-string";
@@ -55,13 +56,6 @@ const styles = StyleSheet.create({
   }
 });
 
-const saveLabels: Record<string, string> = {
-  [UserEditMode.SignUp]: "Sign Up",
-  [UserEditMode.Login]: "Log In",
-  [UserEditMode.Reset]: "Save New Password",
-  [UserEditMode.RequestReset]: "Request Reset"
-};
-
 type LogalLoginProps = RouteChildrenProps &
   MuiThemeProviderProps & {
     // comes from withTranslation
@@ -87,8 +81,12 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
     };
   }
 
-  handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  handleClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    i18n: any
+  ) => {
     this.setState({ active: e.currentTarget.name });
+    i18n.changeLanguage(Language.En); // Reset language to English on login/signup
   };
 
   naiveVerifyInviteValid = (nextUrl: string) =>
@@ -96,7 +94,7 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
     nextUrl.includes("invite");
 
   render() {
-    const { location, history, muiTheme, t } = this.props;
+    const { location, history, muiTheme, i18n, t } = this.props;
 
     const rawNextUrl = queryString.parse(location.search).nextUrl;
     const nextUrl =
@@ -111,6 +109,13 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
 
     const headerColor = muiTheme?.palette?.primary1Color ?? theme.colors.green;
 
+    const saveLabels: Record<string, string> = {
+      [UserEditMode.SignUp]: t("sign up"),
+      [UserEditMode.Login]: t("log in"),
+      [UserEditMode.Reset]: t("save new password"),
+      [UserEditMode.RequestReset]: t("request reset")
+    };
+
     return (
       <div className={css(styles.loginPage)}>
         {/* Only display sign up option if there is a nextUrl */}
@@ -120,7 +125,7 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               className={css(styles.button)}
               type="button"
               name={UserEditMode.Login}
-              onClick={this.handleClick}
+              onClick={(e) => this.handleClick(e, i18n)}
               disabled={active === UserEditMode.Login}
             >
               {t("log in")}
@@ -129,7 +134,7 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               className={css(styles.button)}
               type="button"
               name={UserEditMode.SignUp}
-              onClick={this.handleClick}
+              onClick={(e) => this.handleClick(e, i18n)}
               disabled={active === UserEditMode.SignUp}
             >
               {t("sign up")}
@@ -144,9 +149,11 @@ class LocalLogin extends React.Component<LogalLoginProps, LogalLoginState> {
               ? t("request reset email")
               : t("welcome")}
           </h2>
-          <Box mt={4}>
-            <LanguageSelector />
-          </Box>
+          {active !== UserEditMode.SignUp && (
+            <Box mt={4}>
+              <LanguageSelector />
+            </Box>
+          )}
           {active === UserEditMode.Reset ? (
             <UserPasswordReset history={history} nextUrl={nextUrl} />
           ) : (
