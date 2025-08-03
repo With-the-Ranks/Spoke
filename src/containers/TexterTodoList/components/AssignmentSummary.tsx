@@ -46,7 +46,7 @@ interface Props {
 export const AssignmentSummary: React.FC<Props> = (props) => {
   const history = useHistory();
   const context = useSpokeContext();
-  const { t } = useTranslation();
+  const { t } = useTranslation("AssignmentSummary");
 
   const makeGoToTodosHandler = (
     contactsFilter: string | null,
