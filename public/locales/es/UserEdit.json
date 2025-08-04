@@ -1,5 +1,5 @@
 {
-  "password reset success": "Revise su correo electrónico para obtener un enlace de restablecimiento de contraseña",
+  "password reset success": "Revise su correo electrónico, para obtener un enlace de restablecimiento de contraseña",
   "passwords must match": "Las contraseñas deben coincidir",
   "first name": "Nombre",
   "last name": "Apellido",
@@ -9,9 +9,9 @@
   "new password": "Nueva contraseña",
   "confirm password": "Confirmar Contraseña",
   "change password": "Cambiar tu contraseña",
-  "save": "Ahorrar",
+  "save": "Guardar",
   "save new password": "Guardar nueva contraseña",
-  "password changed successfully": "¡Contraseña cambiada exitosamente!",
+  "password changed successfully": "Contraseña cambiada correctamente.",
   "forgot your password": "¿Olvidaste tu contraseña?",
   "OK": "OK"
 }

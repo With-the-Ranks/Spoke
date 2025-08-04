@@ -1,8 +1,8 @@
 {
-  "all gone": "¡Todo se ha ido!",
-  "error releasing": "Error al liberar respuestas:",
-  "done for the day": "¿Terminaste por hoy?",
-  "we can reassign": "Podemos reasignar conversaciones que no has respondido a otros mensajeros de texto disponibles.",
-  "reassign my replies": "Reasignar Respuestas",
-  "waiting for replies": "¡Esperando respuestas!"
+  "all gone": "Todo se ha acabado.",
+  "error releasing": "Error con liberar las respuestas:",
+  "done for the day": "¿Ya terminaste por hoy?",
+  "we can reassign": "Podemos reasignar conversaciones que no has respondido a otros mensajeros disponibles.",
+  "reassign my replies": "Reasignar Mis Respuestas",
+  "waiting for replies": "Esperando respuestas"
 }

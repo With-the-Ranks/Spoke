@@ -1,7 +1,7 @@
 {
-  "save and move on": "Guardar y Continuar sin un Mensaje",
-  "save and type message": "Guardar y Escribir Mensaje",
+  "save and move on": "Guardar y Continuar sin una Respuesta",
+  "save and type message": "Guardar y Escribir con Respuesta",
   "more actions": "Más Acciones",
-  "escalate convo": "Escalar Conversación",
-  "non-assignable tag applied": "Has seleccionado una etiqueta que te desasignará esta conversación y la reasignará al equipo correspondiente. No podrás aplicar etiquetas adicionales ni enviar un mensaje de seguimiento. ¡Aplica esta etiqueta como tu último paso!"
+  "escalate convo": "Escalar esta Conversación",
+  "non-assignable tag applied": "Has seleccionado una etiqueta que te desasignará esta conversación y la reasignará al equipo correspondiente. No podrás aplicar etiquetas adicionales, o enviar mensajes despues de aplicar esta etiqueta."
 }
