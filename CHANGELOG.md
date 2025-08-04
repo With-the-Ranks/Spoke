@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0-rc.0](https://github.com/politics-rewired/spoke/compare/v9.0.2-rc.0...v9.1.0-rc.0) (2025-04-02)
+
+
+### Features
+
+* **apply-tag-dialog:** add translations ([a9dcf91](https://github.com/politics-rewired/spoke/commit/a9dcf918dd7884ed6109d0ca640fceebbd8d1ebc))
+* **assignment-texter-contact:** add more translations ([6881d4e](https://github.com/politics-rewired/spoke/commit/6881d4ee8ddf4d13de4716ea8e14eb6a1c7adb53))
+* **user-edit:** change languages when user chooses a new one ([83f3e56](https://github.com/politics-rewired/spoke/commit/83f3e56562ad722795b16eb492d63c3e12fc50d9))
+* add translations for AssignmentTexterContact component ([#50](https://github.com/politics-rewired/spoke/issues/50)) ([a7cd947](https://github.com/politics-rewired/spoke/commit/a7cd947a381330648609359c52b7fc7e69eb5264))
+* add translations for TexterTodo ([#58](https://github.com/politics-rewired/spoke/issues/58)) ([8b01b8e](https://github.com/politics-rewired/spoke/commit/8b01b8e9e39b5a6987d6aa1a6d6ee575c0a0e342))
+* Add translations for UserEdit component ([#52](https://github.com/politics-rewired/spoke/issues/52)) ([1e15214](https://github.com/politics-rewired/spoke/commit/1e15214911d978e83426404cb0d5ac33eb05c9b4))
+* add translations for UserMenu ([#57](https://github.com/politics-rewired/spoke/issues/57)) ([c2c2ba2](https://github.com/politics-rewired/spoke/commit/c2c2ba2e31690fb8930d71322b549be6353ef9e3))
+* finish texter todo list translations ([35947f4](https://github.com/politics-rewired/spoke/commit/35947f4158e3329d3ae4d9475be3e8a4daf03793))
+* save user preferences for language ([#60](https://github.com/politics-rewired/spoke/issues/60)) ([41a3134](https://github.com/politics-rewired/spoke/commit/41a313444728d058c041b4c1841d8ff8717174b9))
+* **texter-todo-list:** wip translations ([d04abc2](https://github.com/politics-rewired/spoke/commit/d04abc28bfde72352d0a33c3c67ddafb84832c0f))
+* set up react-i18next ([50e7d24](https://github.com/politics-rewired/spoke/commit/50e7d24664518da247c5bfe7ef260e3d96df2e6d))
+
+
+### Bug Fixes
+
+* translation fixes ([7cea0be](https://github.com/politics-rewired/spoke/commit/7cea0beb035b8df2f051405407c82d56161edde7))
+* **message-length-info:** use react fc ([8974e50](https://github.com/politics-rewired/spoke/commit/8974e50724768a66fa0434f803176d0b139eeb78))
+* **message-text-field:** skip passing textfield type ([9a290a0](https://github.com/politics-rewired/spoke/commit/9a290a04e64691865990ed0ac3637f27006003b2))
+* clean up translations ([d9e8c47](https://github.com/politics-rewired/spoke/commit/d9e8c47f2f4bb7a489e44bce4d8c05c18f62fb8a))
+* rename texter todo json ([3481ff6](https://github.com/politics-rewired/spoke/commit/3481ff6cbf9987bfc345eafcf835df33a99a4bcb))
+* run prettier ([9814d28](https://github.com/politics-rewired/spoke/commit/9814d28b040120f10b27da3545614f56f974c431))
+
+
+### Backend Changes
+
+* **message-text-field:** refactor as react fc with ts ([d069260](https://github.com/politics-rewired/spoke/commit/d069260a518b7ab3e22583d3df6699947490f949))
+* clean up translated files ([9098d9c](https://github.com/politics-rewired/spoke/commit/9098d9c5c2aeb03b778725ff2300da3d65c8d86e))
+* code clean up ([d722693](https://github.com/politics-rewired/spoke/commit/d7226931f0aa9989d7948ebb4440090198815a4d))
+* run prettier ([c6cbfec](https://github.com/politics-rewired/spoke/commit/c6cbfec4259d318604350a77e7b639793ffa9797))
+
 ### [9.0.2-rc.0](https://github.com/politics-rewired/spoke/compare/v9.0.1...v9.0.2-rc.0) (2025-03-25)
 
 

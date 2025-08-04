@@ -4,14 +4,18 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { Language } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
+import i18n from "i18next";
 import PropTypes from "prop-types";
 import queryString from "query-string";
 import React from "react";
 import Form from "react-formal";
+import { Trans, withTranslation } from "react-i18next";
+import { compose } from "recompose";
 import * as yup from "yup";
 
-import { NotificationFrequencyType } from "../../api/user";
+import { languageEnumToLabel, NotificationFrequencyType } from "../../api/user";
 import GSForm from "../../components/forms/GSForm";
 import GSSubmitButton from "../../components/forms/GSSubmitButton";
 import SpokeFormField from "../../components/forms/SpokeFormField";
@@ -29,6 +33,11 @@ export const UserEditMode = Object.freeze({
   Edit: "edit"
 });
 
+const lngChoices = Object.values(Language).map((option) => ({
+  value: option,
+  label: languageEnumToLabel(option)
+}));
+
 const styles = StyleSheet.create({
   buttons: {
     display: "flex"
@@ -43,7 +52,8 @@ const styles = StyleSheet.create({
 class UserEdit extends React.Component {
   state = {
     user: {
-      notificationFrequency: NotificationFrequencyType.All
+      notificationFrequency: NotificationFrequencyType.All,
+      language: Language.En
     },
     changePasswordDialog: false,
     successDialog: false,
@@ -64,6 +74,7 @@ class UserEdit extends React.Component {
   };
 
   handleSave = async (formData) => {
+    const { t } = this.props;
     switch (this.props.authType) {
       case UserEditMode.Edit: {
         const result = await this.props.mutations.editUser(formData);
@@ -101,7 +112,7 @@ class UserEdit extends React.Component {
 
           this.setState({
             successDialog: true,
-            successMessage: "Check your email for a password reset link"
+            successMessage: t("password reset success")
           });
         }
         break;
@@ -175,7 +186,8 @@ class UserEdit extends React.Component {
       firstName: yup.string().required(),
       lastName: yup.string().required(),
       cell: yup.string().required(),
-      notificationFrequency: yup.string().required()
+      notificationFrequency: yup.string().required(),
+      language: yup.string().required()
     };
     const password = yup.string().required();
     const passwordConfirm = (refField = "password") =>
@@ -237,7 +249,7 @@ class UserEdit extends React.Component {
 
   render() {
     // Data may be `undefined` here due to refetch in child UserEdit component in change password dialog
-    const { authType, style, userId, data, saveLabel } = this.props;
+    const { authType, style, userId, data, saveLabel, t } = this.props;
     const { user } = this.state;
 
     const formSchema = this.buildFormSchema(authType);
@@ -261,7 +273,7 @@ class UserEdit extends React.Component {
             authType === UserEditMode.RequestReset ||
             authType === UserEditMode.Edit) && (
             <SpokeFormField
-              label="Email"
+              label={t("email")}
               name="email"
               disabled={!isLocalAuth}
               {...dataTest("email")}
@@ -271,22 +283,22 @@ class UserEdit extends React.Component {
             authType === UserEditMode.Edit) && (
             <span>
               <SpokeFormField
-                label="First name"
+                label={t("first name")}
                 name="firstName"
                 {...dataTest("firstName")}
               />
               <SpokeFormField
-                label="Last name"
+                label={t("last name")}
                 name="lastName"
                 {...dataTest("lastName")}
               />
               <SpokeFormField
-                label="Cell Number"
+                label={t("cell number")}
                 name="cell"
                 {...dataTest("cell")}
               />
               <SpokeFormField
-                label="Notification Frequency"
+                label={t("notification frequency")}
                 name="notificationFrequency"
                 {...dataTest("notificationFrequency")}
                 type="select"
@@ -297,6 +309,14 @@ class UserEdit extends React.Component {
                   })
                 )}
               />
+              <SpokeFormField
+                label="Language"
+                name="language"
+                {...dataTest("language")}
+                type="select"
+                choices={lngChoices}
+                onChange={(value) => i18n.changeLanguage(value)}
+              />
             </span>
           )}
           {(authType === UserEditMode.Login ||
@@ -304,11 +324,15 @@ class UserEdit extends React.Component {
             authType === UserEditMode.Reset ||
             authType === UserEditMode.EmailReset ||
             authType === UserEditMode.Change) && (
-            <SpokeFormField label="Password" name="password" type="password" />
+            <SpokeFormField
+              label={titleCase(t("password"))}
+              name="password"
+              type="password"
+            />
           )}
           {authType === UserEditMode.Change && (
             <SpokeFormField
-              label="New Password"
+              label={t("new password")}
               name="newPassword"
               type="password"
             />
@@ -318,7 +342,7 @@ class UserEdit extends React.Component {
             authType === UserEditMode.EmailReset ||
             authType === UserEditMode.Change) && (
             <SpokeFormField
-              label="Confirm Password"
+              label={t("confirm password")}
               name="passwordConfirm"
               type="password"
             />
@@ -327,13 +351,13 @@ class UserEdit extends React.Component {
             {canChangePassword && (
               <div className={css(styles.container)}>
                 <Button variant="outlined" onClick={this.handleClick}>
-                  Change password
+                  {t("change password")}
                 </Button>
               </div>
             )}
             <Form.Submit
               type="submit"
-              label={saveLabel || "Save"}
+              label={saveLabel || t("save")}
               component={GSSubmitButton}
             />
           </div>
@@ -344,15 +368,16 @@ class UserEdit extends React.Component {
             open={this.state.changePasswordDialog}
             onClose={this.handleClose}
           >
-            <DialogTitle>Change your password</DialogTitle>
+            <DialogTitle>{t("change password")}</DialogTitle>
             <DialogContent>
               <UserEdit
                 authType={UserEditMode.Change}
-                saveLabel="Save new password"
+                saveLabel={t("save new password")}
                 handleClose={this.handleClose}
                 openSuccessDialog={this.openSuccessDialog}
                 userId={this.props.userId}
                 mutations={this.props.mutations}
+                t={this.props.t}
               />
             </DialogContent>
           </Dialog>
@@ -362,7 +387,7 @@ class UserEdit extends React.Component {
             onClose={this.handleClose}
           >
             <DialogTitle>
-              {this.state.successMessage || "Password changed successfully!"}
+              {this.state.successMessage || t("password changed successfully")}
             </DialogTitle>
             <DialogActions>
               <Button
@@ -370,7 +395,7 @@ class UserEdit extends React.Component {
                 color="primary"
                 onClick={this.handleClose}
               >
-                OK
+                <Trans>OK</Trans>
               </Button>
             </DialogActions>
           </Dialog>
@@ -381,7 +406,7 @@ class UserEdit extends React.Component {
             style={{ marginTop: 25, cursor: "pointer" }}
             onClick={this.props.startRequestReset}
           >
-            Forgot your password?
+            {t("forgot your password")}
           </div>
         )}
         <SaveNotificationSettingsAlert
@@ -447,6 +472,7 @@ const mutations = {
           cell
           email
           notificationFrequency
+          language
         }
       }
     `,
@@ -474,7 +500,10 @@ const mutations = {
   })
 };
 
-export default loadData({
-  queries,
-  mutations
-})(UserEdit);
+export default compose(
+  withTranslation("UserEdit"),
+  loadData({
+    queries,
+    mutations
+  })
+)(UserEdit);

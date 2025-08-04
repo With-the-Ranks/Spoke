@@ -5,6 +5,7 @@ import { Card, CardActions, CardTitle } from "material-ui/Card";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 import Form from "react-formal";
+import { withTranslation } from "react-i18next";
 import * as yup from "yup";
 
 import GSForm from "../../../components/forms/GSForm";
@@ -94,7 +95,7 @@ class ContactActionDialog extends Component {
                 style={inlineStyles.dialogButton}
                 onClick={handleCloseDialog}
               >
-                Cancel
+                {this.props.t("cancel")}
               </Button>
               <Form.Submit
                 type="submit"
@@ -118,4 +119,4 @@ ContactActionDialog.propTypes = {
   handleCloseDialog: PropTypes.func.isRequired
 };
 
-export default ContactActionDialog;
+export default withTranslation()(ContactActionDialog);

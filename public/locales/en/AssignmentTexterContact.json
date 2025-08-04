@@ -1,0 +1,18 @@
+{
+  "cant send empty message": "You can't send an empty message.",
+  "sending": "Sending...",
+  "assignment changed": "This assignment has changed.",
+  "skipping opt out": "Skipping contact who opted out.",
+  "refreshing": "Refreshing campaign data...",
+  "close": "Close",
+  "reopen": "Reopen",
+  "manage tags": "Manage Tags",
+  "opt out": "Opt Out",
+  "canned responses": "Canned Responses",
+  "first message": "This is your first message to {{firstName}}.",
+  "all questions": "All questions",
+  "current question": "Current question",
+  "opted out of texts": "opted out of texts",
+  "your message": "Your message",
+  "return home": "Return Home"
+}

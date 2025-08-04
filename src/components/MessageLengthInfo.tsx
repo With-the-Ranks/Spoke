@@ -1,25 +1,26 @@
-import PropTypes from "prop-types";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { getSpokeCharCount } from "../lib/charset-utils";
 
-const MessageLengthInfo: React.SFC<{ messageText: string }> = ({
-  messageText
-}) => {
+interface MessageLengthProps {
+  messageText: string;
+}
+
+const MessageLengthInfo: React.FC<MessageLengthProps> = ({ messageText }) => {
+  const { t } = useTranslation();
+
   const { charCount, msgCount, charsPerSegment } = getSpokeCharCount(
     messageText
   );
-  const segmentInfo = msgCount === 1 ? "(1 segment)" : `(${msgCount} segments)`;
+
+  const segmentInfo = `(${msgCount} ${t("segment", { count: msgCount })})`;
 
   return (
     <div style={{ display: "inline" }}>
       {`${charCount}/${msgCount * charsPerSegment} ${segmentInfo}`}
     </div>
   );
-};
-
-MessageLengthInfo.propTypes = {
-  messageText: PropTypes.string.isRequired
 };
 
 export default MessageLengthInfo;

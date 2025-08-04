@@ -116,6 +116,8 @@ export const createApp = async () => {
     app.use(express.static(PUBLIC_DIR, { maxAge: "180 days" }));
   }
 
+  if (config.isDevelopment) app.use("/", express.static("./public"));
+
   const graphqlRouter = await createGraphqlRouter();
 
   app.use(authRouter);

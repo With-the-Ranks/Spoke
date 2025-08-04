@@ -163,6 +163,7 @@ export const resolvers = {
       "assignedCell",
       "terms",
       "notificationFrequency",
+      "language",
       "isSuspended"
     ]),
     isSuperadmin: (userRecord, _, { user: authUser }) => {

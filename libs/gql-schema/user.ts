@@ -17,6 +17,7 @@ export const schema = `
     terms: Boolean
     isSuperadmin: Boolean!
     notificationFrequency: String!
+    language: Language!
     isSuspended: Boolean!
   }
 
