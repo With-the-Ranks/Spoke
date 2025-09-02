@@ -531,7 +531,11 @@ export class AssignmentTexterContact extends React.Component {
   };
 
   handleClickSendMessageButton = () => {
-    this.formRef.submit();
+    if (!this.state.alreadySent)
+      // this.handleMessageFormSubmit... should just be this.formRef.submit();
+      // But GSForm ref isn't passed correctly with internationalization
+      // and underlying issue is difficult to debug
+      this.handleMessageFormSubmit({ messageText: this.state.messageText });
     if (this.props.contact.messageStatus === "needsMessage") {
       this.setState({ justSentNew: true });
     }
@@ -978,9 +982,6 @@ export class AssignmentTexterContact extends React.Component {
           <div>
             <div className={css(styles.messageField)}>
               <GSForm
-                ref={(el) => {
-                  this.formRef = el;
-                }}
                 schema={this.messageSchema}
                 value={{ messageText }}
                 onSubmit={
