@@ -2,10 +2,7 @@ import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import CreateIcon from "@material-ui/icons/Create";
-import type {
-  CampaignVariablePage,
-  CannedResponse
-} from "@spoke/spoke-codegen";
+import type { CampaignVariable, CannedResponse } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
 import unionBy from "lodash/unionBy";
 import uniqBy from "lodash/uniqBy";
@@ -40,7 +37,7 @@ interface HocProps {
     campaign: {
       id: string;
       cannedResponses: CannedResponse[];
-      campaignVariables: CampaignVariablePage;
+      campaignVariables: CampaignVariable[];
       isStarted: boolean;
       customFields: string[];
       externalSystem: { id: string } | null;
@@ -344,14 +341,9 @@ class CampaignCannedResponsesForm extends React.Component<InnerProps, State> {
   scriptVariables = () => {
     const {
       data: {
-        campaign: {
-          customFields,
-          campaignVariables: { edges: campaignVariableEdges }
-        }
+        campaign: { customFields, campaignVariables }
       }
     } = this.props;
-
-    const campaignVariables = campaignVariableEdges.map(({ node }) => node);
 
     return { customFields, campaignVariables };
   };
@@ -510,13 +502,9 @@ const queries: QueryMap<InnerProps> = {
           isApproved
           customFields
           campaignVariables {
-            edges {
-              node {
-                id
-                name
-                value
-              }
-            }
+            id
+            name
+            value
           }
           externalSystem {
             id

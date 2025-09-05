@@ -12,7 +12,7 @@ import { scriptToTokens } from "../../../../../lib/scripts";
 interface Props {
   cannedResponse: CannedResponse;
   customFields: string[];
-  campaignVariables: Omit<CampaignVariable, "createdAt" | "updatedAt">[];
+  campaignVariables: CampaignVariable[];
   onDelete(): void;
   onToggleResponseEditor(): void;
 }
@@ -46,7 +46,7 @@ export const CannedResponseRow: React.FC<Props> = ({
 
   return (
     <LargeListItem
-      {...dataTest("cannedResponse")}
+      {...dataTest("cannedResponse", false)}
       draggable
       key={cannedResponse.id}
       primaryText={cannedResponse.title}

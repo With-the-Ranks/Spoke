@@ -667,7 +667,7 @@ type Campaign {
   editors: String
   teams: [Team!]!
   campaignGroups: CampaignGroupPage
-  campaignVariables: CampaignVariablePage!
+  campaignVariables: [CampaignVariable!]!
   textingHoursStart: Int
   textingHoursEnd: Int
   isAutoassignEnabled: Boolean!
@@ -738,7 +738,7 @@ input CampaignInput {
   introHtml: String
   externalSystemId: String
   useDynamicAssignment: Boolean
-  contacts: [CampaignContactInput]
+  contacts: [CampaignContactInput!]
   contactsFile: Upload
   externalListId: String
   filterOutLandlines: Boolean
@@ -751,7 +751,7 @@ input CampaignInput {
   campaignVariables: [CampaignVariableInput!]
   texters: TexterInput
   interactionSteps: InteractionStepInput
-  cannedResponses: [CannedResponseInput]
+  cannedResponses: [CannedResponseInput!]
   textingHoursStart: Int
   textingHoursEnd: Int
   isAutoassignEnabled: Boolean
@@ -938,8 +938,6 @@ type CampaignContactTag {
   id: String!
   tag: Tag!
   tagger: User!
-  createdAt: String!
-  updatedAt: String!
 }
 
 
@@ -983,18 +981,6 @@ type CampaignVariable {
   displayOrder: Int!
   name: String!
   value: String
-  createdAt: String!
-  updatedAt: String!
-}
-
-type CampaignVariableEdge {
-  cursor: Cursor!
-  node: CampaignVariable!
-}
-
-type CampaignVariablePage {
-  edges: [CampaignVariableEdge!]!
-  pageInfo: RelayPageInfo!
 }
 
 
