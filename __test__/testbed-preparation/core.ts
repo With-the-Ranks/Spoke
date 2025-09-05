@@ -11,6 +11,7 @@ import type { Organization } from "../../src/api/organization";
 import { UserRoleType } from "../../src/api/organization-membership";
 import type { User } from "../../src/api/user";
 import { DateTime } from "../../src/lib/datetime";
+import { symmetricEncrypt } from "../../src/server/api/lib/crypto";
 import type {
   AssignmentRecord,
   CampaignContactRecord,
@@ -387,8 +388,14 @@ export const createMessage = async (
     )
     .then(({ rows: [message] }) => message);
 
+const isOrganizationRecord = (
+  organization: OrganizationRecord | CreateOrganizationOptions | undefined
+): organization is OrganizationRecord => {
+  return organization !== undefined && "id" in organization;
+};
+
 export interface CreateCompleteCampaignOptions {
-  organization?: CreateOrganizationOptions;
+  organization?: OrganizationRecord | CreateOrganizationOptions;
   campaign?: Omit<CreateCampaignOptions, "organizationId">;
   texters?: number | CreateTexterOptions[];
   contacts?: number | Omit<CreateCampaignContactOptions, "campaignId">[];
@@ -398,10 +405,11 @@ export const createCompleteCampaign = async (
   client: PoolClient,
   options: CreateCompleteCampaignOptions
 ) => {
-  const organization = await createOrganization(
-    client,
-    options.organization ?? {}
-  );
+  const optOrg = options.organization;
+
+  const organization = isOrganizationRecord(optOrg)
+    ? optOrg
+    : await createOrganization(client, optOrg ?? {});
 
   const campaign = await createCampaign(client, {
     ...(options.campaign ?? {}),
@@ -457,7 +465,7 @@ returning *;
       faker.random.uuid(),
       options.organizationId,
       faker.random.alphaNumeric(15),
-      faker.random.alphaNumeric(15),
+      symmetricEncrypt(faker.random.alphaNumeric(15)),
       "assemble-numbers",
       faker.name.firstName(),
       options.active
@@ -524,3 +532,24 @@ export const createQuestionResponse = async (
       [options.value, options.campaignContactId, options.interactionStepId]
     )
     .then(({ rows: [questionResponse] }) => questionResponse);
+
+export const assignContacts = async (
+  client: PoolClient,
+  assignmentId: number,
+  campaignId: number,
+  count: number
+) => {
+  await client.query(
+    `
+          update campaign_contact
+          set assignment_id = $1
+          where id in (
+            select id from campaign_contact
+            where campaign_id = $2
+              and assignment_id is null
+            limit $3
+          )
+        `,
+    [assignmentId, campaignId, count]
+  );
+};

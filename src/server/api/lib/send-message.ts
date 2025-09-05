@@ -257,7 +257,7 @@ export const sendMessage = async (
   const timezone = contactTimezone || campaignTimezone;
   const isValidSendTime = isNowBetween(timezone, startHour, endHour);
 
-  if (!isValidSendTime) {
+  if (!config.isTest && !isValidSendTime) {
     throw new OutsideTextingHoursError();
   }
 
@@ -331,7 +331,7 @@ export const sendMessage = async (
 
   // Send message after we are sure messageInstance has been persisted
   const service = serviceMap[service_type];
-  service.sendMessage(toInsert, record.organization_id);
+  await service.sendMessage(toInsert, record.organization_id);
 
   return contactUpdateResult;
 };
