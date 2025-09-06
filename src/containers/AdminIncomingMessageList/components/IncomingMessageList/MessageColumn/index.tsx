@@ -43,17 +43,13 @@ const MessageColumn: React.FC<Props> = (props) => {
   const { data: updatedContactData } = useGetMessageReviewContactUpdatesQuery({
     variables: { campaignContactId: contact.id }
   });
-  
+
   const updatedContact = updatedContactData?.contact;
   const messages = updatedContact?.messages ?? contact.messages;
   const isOptedOut = !isNil(updatedContact?.optOut?.cell);
-  
+
   const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
   const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
-
-  useEffect(() => {
-    setMessages(conversation.contact.messages);
-  }, [setMessages]);
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
