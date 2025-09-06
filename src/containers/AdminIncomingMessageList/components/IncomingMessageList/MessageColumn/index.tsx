@@ -1,10 +1,10 @@
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
-import { useGetMessageReviewContactUpdatesQuery } from "@spoke/spoke-codegen";
 import {
   useGetCampaignVariablesLazyQuery,
-  useGetCurrentUserProfileLazyQuery
+  useGetCurrentUserProfileLazyQuery,
+  useGetMessageReviewContactUpdatesQuery
 } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useState } from "react";
