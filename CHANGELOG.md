@@ -2,6 +2,113 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.2-rc.0](https://github.com/politics-rewired/spoke/compare/v9.0.1...v9.0.2-rc.0) (2025-03-25)
+
+
+### Bug Fixes
+
+* **mms:** skip file validation ([#66](https://github.com/politics-rewired/spoke/issues/66)) ([35ee5a2](https://github.com/politics-rewired/spoke/commit/35ee5a2e32f75d972fb4ed47268e584937cc2f16))
+
+
+### Backend Changes
+
+* **gh:** update ci workflow ([#67](https://github.com/politics-rewired/spoke/issues/67)) ([6ad9771](https://github.com/politics-rewired/spoke/commit/6ad97711bc0e644272586b22b3e769281a36db0d))
+
+### [9.0.1](https://github.com/politics-rewired/spoke/compare/v9.0.0...v9.0.1) (2024-12-02)
+
+
+### Bug Fixes
+
+* fix loading of archived campaigns ([#61](https://github.com/politics-rewired/spoke/issues/61)) ([da7df71](https://github.com/politics-rewired/spoke/commit/da7df71f84225c52d1f81858e3c4d22ce9bc6d60))
+* remove new query parameter when create new campaign ([#59](https://github.com/politics-rewired/spoke/issues/59)) ([07abb4b](https://github.com/politics-rewired/spoke/commit/07abb4b0f2d24ac7a684b63c7cf54166c0c8e7c6))
+
+## [9.0.0](https://github.com/politics-rewired/spoke/compare/v8.1.6-rc.0...v9.0.0) (2024-10-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to v20 LTS (#38)
+* **node:** update 16.14 -> 18.16 (#37)
+
+### Bug Fixes
+
+* **autoassign:** narrow custom escalation teams to requested org ([#55](https://github.com/politics-rewired/spoke/issues/55)) ([6da1195](https://github.com/politics-rewired/spoke/commit/6da1195f5e0884008439ac9a6cef348fc0a987d9))
+
+
+### build
+
+* upgrade to v20 LTS ([#38](https://github.com/politics-rewired/spoke/issues/38)) ([b1d2ff1](https://github.com/politics-rewired/spoke/commit/b1d2ff157ff2e95f523689047053c26bf99d9a9e))
+
+
+### Backend Changes
+
+* lint json files ([#53](https://github.com/politics-rewired/spoke/issues/53)) ([ca74b00](https://github.com/politics-rewired/spoke/commit/ca74b008e956a43f761153db8b9461c5522c17ad))
+* **node:** update 16.14 -> 18.16 ([#37](https://github.com/politics-rewired/spoke/issues/37)) ([28a793f](https://github.com/politics-rewired/spoke/commit/28a793f4448197f3e90de4b68759ea24e0fb8b9f))
+
+### [8.1.6-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.5...v8.1.6-rc.0) (2024-09-23)
+
+### [8.1.5](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.1...v8.1.5) (2024-09-19)
+
+
+### Bug Fixes
+
+* **column mapping:** remove create as from custom field value ([#5](https://github.com/politics-rewired/spoke/issues/5)) ([13730d5](https://github.com/politics-rewired/spoke/commit/13730d576b8e262e7947a851844b99c3739606e8))
+* **send-message:** await service method ([#7](https://github.com/politics-rewired/spoke/issues/7)) ([dc4421d](https://github.com/politics-rewired/spoke/commit/dc4421d997b76bb86b02d3526b9e1ceed317262d))
+* only mark contact as messaged after initial ([#42](https://github.com/politics-rewired/spoke/issues/42)) ([c16398e](https://github.com/politics-rewired/spoke/commit/c16398ed45a580101265b93fd3017f83a50d3851))
+
+
+### Backend Changes
+
+* **campaign-operations:** use codegen, typescript, react fcs ([#43](https://github.com/politics-rewired/spoke/issues/43)) ([9c760df](https://github.com/politics-rewired/spoke/commit/9c760df845ab836f17beb298a1f9a24ed22a0389))
+* **email:** use with the ranks info ([#13](https://github.com/politics-rewired/spoke/issues/13)) ([b1ea23d](https://github.com/politics-rewired/spoke/commit/b1ea23de40453cf72c46ffe9955039050e2cd646))
+* **export-campaign:** extract payload types ([#44](https://github.com/politics-rewired/spoke/issues/44)) ([5df2d21](https://github.com/politics-rewired/spoke/commit/5df2d217e56f91670542839f5ed481c6558866ea))
+* **second-pass:** implement as task ([#46](https://github.com/politics-rewired/spoke/issues/46)) ([d575a0b](https://github.com/politics-rewired/spoke/commit/d575a0beee71a82e1b8ccc7407c70f291b9c07db))
+* **user menu:** rename teams to organizations ([#11](https://github.com/politics-rewired/spoke/issues/11)) ([66cd60c](https://github.com/politics-rewired/spoke/commit/66cd60cbcca24a39816a51a2ce47f2d9094aa398))
+* remove bernie sms references ([#8](https://github.com/politics-rewired/spoke/issues/8)) ([241960c](https://github.com/politics-rewired/spoke/commit/241960c7505bbcf4687f73211aa31a609a385205))
+
+### [8.1.4-rc.1](https://github.com/politics-rewired/spoke/compare/v8.1.4-rc.0...v8.1.4-rc.1) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** use name of materialized cte ([#40](https://github.com/politics-rewired/spoke/issues/40)) ([6b2cafd](https://github.com/politics-rewired/spoke/commit/6b2cafdcded8535481b00cc3fe4d9555d6771fd1))
+
+### [8.1.4-rc.0](https://github.com/politics-rewired/spoke/compare/v8.1.3...v8.1.4-rc.0) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** materialize campaign contacts ([#39](https://github.com/politics-rewired/spoke/issues/39)) ([909db41](https://github.com/politics-rewired/spoke/commit/909db41f1e24a16e307db6b773835c6f39fec140))
+
+### [8.1.3](https://github.com/politics-rewired/spoke/compare/v8.1.2...v8.1.3) (2024-07-24)
+
+
+### Backend Changes
+
+* remove rewired notices ([#12](https://github.com/politics-rewired/spoke/issues/12)) ([42c731e](https://github.com/politics-rewired/spoke/commit/42c731ecce18a10124cbb905eeabaf3e93888c70))
+* update links to documentation in codebase ([#30](https://github.com/politics-rewired/spoke/issues/30)) ([67642a5](https://github.com/politics-rewired/spoke/commit/67642a554c2e0b5c100883107088017fcc249a1f))
+
+### [8.1.2](https://github.com/politics-rewired/spoke/compare/v8.1.1...v8.1.2) (2024-05-11)
+
+
+### Bug Fixes
+
+* use wtr mms doc link ([#29](https://github.com/politics-rewired/spoke/issues/29)) ([0703ced](https://github.com/politics-rewired/spoke/commit/0703ced3c1165c11a2fee908fc3eaded89b18e3c))
+
+### [8.1.1](https://github.com/politics-rewired/spoke/compare/v8.1.0...v8.1.1) (2024-04-27)
+
+## [8.1.0](https://github.com/politics-rewired/spoke/compare/v8.0.1...v8.1.0) (2024-04-23)
+
+
+### Features
+
+* hide inactive orgs on select org screen ([#25](https://github.com/politics-rewired/spoke/issues/25)) ([94b2491](https://github.com/politics-rewired/spoke/commit/94b249132702555928bda016a2c0cfc46f142df8))
+
+
+### Backend Changes
+
+* **knex:** upgrade to v2.5.1 ([#24](https://github.com/politics-rewired/spoke/issues/24)) ([1138cdc](https://github.com/politics-rewired/spoke/commit/1138cdc337a8b91a4fda85cbb5d2883ff0aaef79))
+
 ### [8.0.1](https://github.com/politics-rewired/spoke/compare/v8.0.0...v8.0.1) (2024-02-15)
 
 

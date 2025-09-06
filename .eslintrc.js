@@ -7,7 +7,7 @@ module.exports = {
       jsx: true
     }
   },
-  plugins: ["@typescript-eslint", "simple-import-sort", "import"],
+  plugins: ["@typescript-eslint", "simple-import-sort", "import", "json"],
   extends: [
     "eslint:recommended",
     "airbnb",
@@ -198,6 +198,7 @@ module.exports = {
         ]
       }
     ],
+    "json/*": ["error"],
 
     // Rules to get linting to pass
     camelcase: ["off", { properties: "never" }],
