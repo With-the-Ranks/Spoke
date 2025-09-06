@@ -227,6 +227,7 @@ export async function getConversations(
     "campaign_contact.first_name as cc_first_name",
     "campaign_contact.last_name as cc_last_name",
     "campaign_contact.cell",
+    "campaign_contact.custom_fields",
     "campaign_contact.message_status",
     "campaign_contact.is_opted_out",
     "campaign_contact.updated_at",
