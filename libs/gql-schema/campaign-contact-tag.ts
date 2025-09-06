@@ -3,8 +3,6 @@ export const schema = `
     id: String!
     tag: Tag!
     tagger: User!
-    createdAt: String!
-    updatedAt: String!
   }
 `;
 

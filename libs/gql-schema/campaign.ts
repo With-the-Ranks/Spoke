@@ -106,7 +106,7 @@ export const schema = `
     editors: String
     teams: [Team!]!
     campaignGroups: CampaignGroupPage
-    campaignVariables: CampaignVariablePage!
+    campaignVariables: [CampaignVariable!]!
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean!
@@ -177,7 +177,7 @@ export const schema = `
     introHtml: String
     externalSystemId: String
     useDynamicAssignment: Boolean
-    contacts: [CampaignContactInput]
+    contacts: [CampaignContactInput!]
     contactsFile: Upload
     externalListId: String
     filterOutLandlines: Boolean
@@ -190,7 +190,7 @@ export const schema = `
     campaignVariables: [CampaignVariableInput!]
     texters: TexterInput
     interactionSteps: InteractionStepInput
-    cannedResponses: [CannedResponseInput]
+    cannedResponses: [CannedResponseInput!]
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean

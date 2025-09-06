@@ -2,10 +2,18 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
 import { useGetMessageReviewContactUpdatesQuery } from "@spoke/spoke-codegen";
+import {
+  useGetCampaignVariablesLazyQuery,
+  useGetCurrentUserProfileLazyQuery
+} from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useState } from "react";
 import CannedResponseMenu from "src/components/CannedResponseMenu";
 
+import {
+  applyScript,
+  customFieldsJsonStringToArray
+} from "../../../../../lib/scripts";
 import MessageList from "./MessageList";
 import MessageOptOut from "./MessageOptOut";
 import MessageResponse from "./MessageResponse";
@@ -27,7 +35,7 @@ interface Props {
 
 const MessageColumn: React.FC<Props> = (props) => {
   const { organizationId, conversation } = props;
-  const { contact } = conversation;
+  const { contact, campaign } = conversation;
 
   const [messageText, setMessageText] = useState("");
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
@@ -35,9 +43,17 @@ const MessageColumn: React.FC<Props> = (props) => {
   const { data: updatedContactData } = useGetMessageReviewContactUpdatesQuery({
     variables: { campaignContactId: contact.id }
   });
+  
   const updatedContact = updatedContactData?.contact;
   const messages = updatedContact?.messages ?? contact.messages;
   const isOptedOut = !isNil(updatedContact?.optOut?.cell);
+  
+  const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
+  const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
+
+  useEffect(() => {
+    setMessages(conversation.contact.messages);
+  }, [setMessages]);
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
@@ -46,10 +62,35 @@ const MessageColumn: React.FC<Props> = (props) => {
     [setAnchorEl]
   );
 
+  const setScriptMessageText = async (script: string) => {
+    const customFields = customFieldsJsonStringToArray(contact.customFields);
+
+    const { data: cvData } = await getCampaignVariables({
+      variables: {
+        campaignId: campaign.id
+      }
+    });
+    const campaignVariables = cvData?.campaign?.campaignVariables ?? [];
+
+    const { data: userData } = await getCurrentUserProfile();
+    const texter = userData?.currentUser;
+
+    if (texter) {
+      const appliedScript = applyScript({
+        script,
+        contact,
+        customFields,
+        campaignVariables,
+        texter
+      });
+      setMessageText(appliedScript);
+    }
+  };
+
   const handleScriptSelected = useCallback(
     (script: string) => {
       setAnchorEl(null);
-      setMessageText(script);
+      setScriptMessageText(script);
     },
     [setAnchorEl]
   );

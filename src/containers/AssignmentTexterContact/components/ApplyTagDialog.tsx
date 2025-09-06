@@ -31,7 +31,7 @@ export interface ApplyTagDialogProps {
     removedTags: ContactTagInfoFragment[]
   ) => Promise<void> | void;
   texter: User;
-  contact: Omit<CampaignContact, "tags">;
+  contact: CampaignContact;
 }
 
 const ApplyTagDialog: React.FC<ApplyTagDialogProps> = ({

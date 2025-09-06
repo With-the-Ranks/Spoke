@@ -6,7 +6,7 @@ export const schema = `
     displayName: String!
     email: String
     cell: String
-    memberships(organizationId: String, after: Cursor, first: Int): OrganizationMembershipPage
+    memberships(organizationId: String, after: Cursor, first: Int, active: Boolean): OrganizationMembershipPage
     organizations(active: Boolean, role: String): [Organization]
     todos(organizationId: String): [Assignment]
     roles(organizationId: String!): [UserRole!]!

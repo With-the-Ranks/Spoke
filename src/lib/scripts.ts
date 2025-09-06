@@ -8,6 +8,9 @@ import isNil from "lodash/isNil";
 
 import { getSpokeCharCount } from "./charset-utils";
 
+type ScriptCampaignContact = Partial<Omit<CampaignContact, "tags">>;
+type ScriptUser = Pick<User, "firstName" | "lastName">;
+
 export const delimiters = {
   startDelimiter: "{",
   endDelimiter: "}"
@@ -57,8 +60,8 @@ export const titleCase = (str: string) =>
     .join(" ");
 
 const getScriptFieldValue = (
-  contact: CampaignContact,
-  texter: User,
+  contact: ScriptCampaignContact,
+  texter: ScriptUser,
   fieldName: string
 ) => {
   let result;
@@ -67,7 +70,7 @@ const getScriptFieldValue = (
   } else if (fieldName === "texterLastName") {
     result = texter.lastName;
   } else if (TOP_LEVEL_UPLOAD_FIELDS.indexOf(fieldName) !== -1) {
-    result = contact[fieldName as keyof CampaignContact];
+    result = contact[fieldName as keyof ScriptCampaignContact];
   } else {
     const customFieldNames = JSON.parse(contact.customFields);
     result = customFieldNames[fieldName];
@@ -84,12 +87,15 @@ const getScriptFieldValue = (
   return result;
 };
 
+export const customFieldsJsonStringToArray = (customFieldsJson: string) =>
+  customFieldsJson ? Object.keys(JSON.parse(customFieldsJson)) : [];
+
 interface ApplyScriptOptions {
   script: string;
-  contact: CampaignContact;
+  contact: ScriptCampaignContact;
   customFields: string[];
-  campaignVariables: { name: string; value: string }[];
-  texter: User;
+  campaignVariables: Pick<CampaignVariable, "name" | "value">[];
+  texter: ScriptUser;
 }
 
 export const applyScript = ({
@@ -110,17 +116,11 @@ export const applyScript = ({
     );
   }
 
-  for (const field of campaignVariables) {
-    const re = new RegExp(escapeRegExp(delimit(field.name)), "g");
-    appliedScript = appliedScript.replace(re, field.value);
-  }
-
-  for (const field of campaignVariables) {
-    const re = new RegExp(
-      escapeRegExp(delimit(field.name.replace("cv:", ""))),
-      "g"
-    );
-    appliedScript = appliedScript.replace(re, field.value);
+  for (const campaignVariable of campaignVariables) {
+    if (campaignVariable.value) {
+      const re = new RegExp(escapeRegExp(delimit(campaignVariable.name)), "g");
+      appliedScript = appliedScript.replace(re, campaignVariable.value);
+    }
   }
 
   return appliedScript;
