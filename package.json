@@ -1,12 +1,12 @@
 {
   "name": "spoke",
-  "version": "8.0.1",
+  "version": "9.0.2-rc.0",
   "description": "Spoke",
   "main": "src/server",
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">= 1.19.1",
-    "node": "^16.14.0"
+    "node": "^20.16.0"
   },
   "scripts": {
     "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('spoke must be installed with Yarn: https://yarnpkg.com/')\"",
@@ -103,11 +103,10 @@
     "camelcase-keys": "^4.1.0",
     "chart.js": "^2.9.4",
     "clsx": "^1.2.1",
-    "connect-datadog-graphql": "^1.0.0",
     "connect-pg-simple": "^7.0.0",
     "cors": "^2.8.5",
     "cryptr": "^6.0.3",
-    "css-loader": "^5.0.1",
+    "css-loader": "^7.1.2",
     "dataloader": "^1.2.0",
     "dotenv": "^8.0.0",
     "dotenv-cli": "^4.1.1",
@@ -129,12 +128,11 @@
     "graphql-type-json": "^0.3.2",
     "graphql-upload": "^13.0.0",
     "history": "^5.0.0",
-    "hot-shots": "^8.3.0",
     "humps": "^1.1.0",
     "iconv-lite": "^0.5.1",
     "immer": "^8.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "knex": "^2.3.0",
+    "knex": "^2.5.1",
     "lightship": "^6.6.1",
     "lodash": "^4.17.20",
     "luxon": "^1.28.0",
@@ -271,6 +269,7 @@
     "eslint-config-prettier": "^6.9.0",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-json": "^4.0.1",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.28.0",
@@ -314,7 +313,7 @@
     "material-ui": "^0.20.1",
     "pg-connection-string": "~2.4.0",
     "fs-capacitor": "6.2.0",
-    "knex": "^2.3.0"
+    "knex": "^2.5.1"
   },
   "config": {
     "commitizen": {
@@ -328,7 +327,7 @@
     }
   },
   "lint-staged": {
-    "./**/*.{js,jsx,ts,tsx}": [
+    "./**/*.{js,jsx,ts,tsx,json}": [
       "eslint --fix"
     ]
   }

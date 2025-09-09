@@ -40,7 +40,6 @@ export const GET_MESSAGING_SERVICES = gql`
           node {
             id
             serviceType
-            tcrBrandRegistrationLink
           }
         }
       }

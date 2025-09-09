@@ -115,10 +115,6 @@ const validators = {
     default: false,
     isClient: true
   }),
-  ENABLE_REWIRED_SHUTDOWN_NOTICE: bool({
-    desc: "Show the Rewired shutdown notice",
-    default: true
-  }),
   DISABLE_ASSIGNMENT_CASCADE: bool({
     desc:
       "Whether to just assign from 1 campaign rather than gathering from multiple to fulfill a request",
@@ -164,14 +160,6 @@ const validators = {
     dec: "Disable use of has unassigned contacts variable",
     default: false
   }),
-  BAD_WORD_TOKEN: str({
-    desc: "Bearer token used for authorization with BAD_WORD_URL.",
-    default: undefined
-  }),
-  BAD_WORD_URL: url({
-    desc: "URL to notify with message text whenever a message is sent.",
-    default: undefined
-  }),
   BASE_URL: url({
     desc:
       "The base URL of the website, without trailing slash, used to construct various URLs.",
@@ -208,10 +196,6 @@ const validators = {
     desc:
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
     default: -1
-  }),
-  CLIENT_NAME: str({
-    desc: "Name of client to pass to Datadog",
-    default: undefined
   }),
   CONTACT_REMOVAL_SECRET: str({
     desc:
@@ -298,19 +282,6 @@ const validators = {
   AUTOJOIN_ORG_UUID: str({
     desc: "UUID of organization to automatically insert users into upon signup",
     default: undefined
-  }),
-  DD_AGENT_HOST: host({
-    desc: "Datadog agent host",
-    default: undefined
-  }),
-  DD_DOGSTATSD_PORT: port({
-    desc: "Datadog dogstatd port",
-    default: undefined
-  }),
-  DD_TAGS: str({
-    desc: "Comma-separated list of DataDog tags to apply to metrics.",
-    example: "app:spoke,client:rewired",
-    default: "app:spoke"
   }),
   DELIVERABILITY_ALERT_ENDPOINT: url({
     desc:
@@ -448,12 +419,6 @@ const validators = {
     desc:
       "A comma separated list of contact fields to not ship to the client. Can include 'external_id, cell, and lastName'",
     default: ""
-  }),
-  SHOW_10DLC_REGISTRATION_NOTICES: bool({
-    desc:
-      "Whether the 10DLC Registration Notices are displayed to Admins and Owners",
-    default: true,
-    isClient: true
   }),
   JOBS_SAME_PROCESS: bool({
     desc:
@@ -745,6 +710,10 @@ const validators = {
     desc:
       "A JSON blob passed directly to express-basic-auth for locking campaign previews",
     default: undefined
+  }),
+  MARK_SECOND_PASS_CHUNK_SIZE: num({
+    desc: "Chunk size to use when marking a campaign for a second pass",
+    default: 1000
   }),
   SKIP_TWILIO_VALIDATION: bool({
     desc: "Whether to bypass Twilio header validation altogether.",

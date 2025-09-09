@@ -594,26 +594,16 @@ export async function myCurrentAssignmentTargets(
      */
     `
       with team_assignment_options as (
-        select *
-        from team
+        select t.* from team t
+        join user_team ut on t.id = ut.team_id
         where organization_id = ?
-          and is_assignment_enabled = true
-          and exists (
-            select 1
-            from user_team
-            where team_id = team.id
-              and user_id = ?
-          )         
+          and is_assignment_enabled
+          and user_id = ?         
       ),
       my_escalation_tags as (
-        select array_agg(tag_id) as my_escalation_tags
-        from team_escalation_tags
-        where exists (
-          select 1
-          from user_team
-          where user_team.team_id = team_escalation_tags.team_id
-            and user_id = ?
-        )
+        select array_agg(esc.tag_id) as my_escalation_tags
+        from team_escalation_tags esc
+        join team_assignment_options opts on esc.team_id = opts.id
       ),
       needs_message_teams as (
         select * from team_assignment_options
@@ -727,7 +717,7 @@ export async function myCurrentAssignmentTargets(
       select * from all_possible_team_assignments
       where enabled = true
       order by priority, id asc`,
-    [organizationId, userId, userId, organizationId]
+    [organizationId, userId, organizationId]
   );
 
   const results = teamToCampaigns.map((ttc) =>

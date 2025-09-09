@@ -10,18 +10,6 @@ export const schema = `
     displayOrder: Int!
     name: String!
     value: String
-    createdAt: String!
-    updatedAt: String!
-  }
-
-  type CampaignVariableEdge {
-    cursor: Cursor!
-    node: CampaignVariable!
-  }
-
-  type CampaignVariablePage {
-    edges: [CampaignVariableEdge!]!
-    pageInfo: RelayPageInfo!
   }
 `;
 

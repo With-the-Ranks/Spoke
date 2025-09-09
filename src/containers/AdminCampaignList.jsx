@@ -108,9 +108,7 @@ class AdminCampaignList extends React.Component {
     }
 
     const { id: campaignId } = newCampaign.data.createCampaign;
-    history.push(
-      `/admin/${organizationId}/campaigns/${campaignId}/edit?new=true`
-    );
+    history.push(`/admin/${organizationId}/campaigns/${campaignId}/edit`);
   };
 
   handleFilterChange = (event, index, value) => {

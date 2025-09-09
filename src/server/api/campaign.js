@@ -813,17 +813,15 @@ export const resolvers = {
       const result = await formatPage(query, { after, first });
       return result;
     },
-    campaignVariables: async (campaign, { after, first }, { user }) => {
+    campaignVariables: async (campaign, _, { user }) => {
       const organizationId = parseInt(campaign.organization_id, 10);
       await accessRequired(user, organizationId, UserRoleType.TEXTER);
 
-      const query = r
+      return r
         .reader("campaign_variable")
         .where({ campaign_id: campaign.id })
         .whereNull("deleted_at")
         .select("*");
-      const result = await formatPage(query, { after, first });
-      return result;
     },
     autosendStatus: async (campaign) => {
       const {

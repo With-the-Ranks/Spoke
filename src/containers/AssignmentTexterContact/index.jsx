@@ -275,17 +275,14 @@ export class AssignmentTexterContact extends React.Component {
 
   getMessageTextFromScript = (script) => {
     const { campaign, contact, texter } = this.props;
-
-    const campaignVariables = campaign.campaignVariables.edges.map(
-      ({ node }) => node
-    );
+    const { customFields, campaignVariables } = campaign;
 
     return script
       ? applyScript({
           contact,
           texter,
           script,
-          customFields: campaign.customFields,
+          customFields,
           campaignVariables
         })
       : "";
@@ -333,8 +330,8 @@ export class AssignmentTexterContact extends React.Component {
   createMessageToContact = (text) => {
     const { texter, campaign, assignment } = this.props;
     const { contact } = this.props;
-    const campaignVariableIds = campaign.campaignVariables.edges.map(
-      ({ node: { id } }) => id
+    const campaignVariableIds = campaign.campaignVariables.map(
+      (campaignVariable) => campaignVariable.id
     );
 
     return {

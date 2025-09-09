@@ -4,17 +4,7 @@ import Divider from "@material-ui/core/Divider";
 import { useGetOrganizationNotificationsQuery } from "@spoke/spoke-codegen";
 import React from "react";
 
-import {
-  isPending10DlcCampaignNotice,
-  isPricing10DlcNotice,
-  isPricingTollFreeNotice,
-  isRegister10DlcBrandNotice,
-  isRegister10DlcCampaignNotice,
-  isTitleContentNotice
-} from "../../../api/notice";
-import Pending10DlcCampaignNoticeCard from "./Pending10DlcCampaignNoticeCard";
-import PricingNoticeCard from "./PricingNoticeCard";
-import Register10DlcNoticeCard from "./Register10DlcNoticeCard";
+import { isTitleContentNotice } from "../../../api/notice";
 import TitleContentNoticeCard from "./TitleContentNoticeCard";
 
 interface NotificationCardProps {
@@ -51,20 +41,6 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
               markdownContent={node.markdownContent}
             />
           );
-        }
-        if (window.SHOW_10DLC_REGISTRATION_NOTICES) {
-          if (
-            isRegister10DlcBrandNotice(node) ||
-            isRegister10DlcCampaignNotice(node)
-          ) {
-            return <Register10DlcNoticeCard key={node.id} {...node} />;
-          }
-          if (isPending10DlcCampaignNotice(node)) {
-            return <Pending10DlcCampaignNoticeCard key={node.id} {...node} />;
-          }
-          if (isPricing10DlcNotice(node) || isPricingTollFreeNotice(node)) {
-            return <PricingNoticeCard key={node.id} {...node} />;
-          }
         }
         return null;
       })}
