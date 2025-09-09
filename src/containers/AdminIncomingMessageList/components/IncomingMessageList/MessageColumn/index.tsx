@@ -1,15 +1,13 @@
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import type {
-  ConversationInfoFragment,
-  ConversationMessageFragment
-} from "@spoke/spoke-codegen";
+import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
 import {
   useGetCampaignVariablesLazyQuery,
-  useGetCurrentUserProfileLazyQuery
+  useGetCurrentUserProfileLazyQuery,
+  useGetMessageReviewContactUpdatesQuery
 } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import CannedResponseMenu from "src/components/CannedResponseMenu";
 
 import {
@@ -41,18 +39,17 @@ const MessageColumn: React.FC<Props> = (props) => {
 
   const [messageText, setMessageText] = useState("");
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [isOptedOut, setIsOptedOut] = useState(
-    !isNil(conversation.contact.optOut?.cell)
-  );
-  // TODO: use apollo client cache rather than state to manage changes to messages list
-  const [messages, setMessages] = useState<ConversationMessageFragment[]>([]);
+
+  const { data: updatedContactData } = useGetMessageReviewContactUpdatesQuery({
+    variables: { campaignContactId: contact.id }
+  });
+
+  const updatedContact = updatedContactData?.contact;
+  const messages = updatedContact?.messages ?? contact.messages;
+  const isOptedOut = !isNil(updatedContact?.optOut?.cell);
 
   const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
   const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
-
-  useEffect(() => {
-    setMessages(conversation.contact.messages);
-  }, [setMessages]);
 
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
@@ -107,17 +104,12 @@ const MessageColumn: React.FC<Props> = (props) => {
           <MessageResponse
             value={messageText}
             conversation={conversation}
-            messagesChanged={setMessages}
             onChange={setMessageText}
           />
         )}
         <Grid container spacing={2} justify="flex-end">
           <Grid item>
-            <MessageOptOut
-              contact={contact}
-              isOptedOut={isOptedOut}
-              optOutChanged={setIsOptedOut}
-            />
+            <MessageOptOut contact={contact} isOptedOut={isOptedOut} />
           </Grid>
           {!isOptedOut && (
             <Grid item>
