@@ -197,10 +197,6 @@ const validators = {
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
     default: -1
   }),
-  CLIENT_NAME: str({
-    desc: "Name of client to pass to Datadog",
-    default: undefined
-  }),
   CONTACT_REMOVAL_SECRET: str({
     desc:
       "Secret to authorize incoming requests to /remove-number-from-campaign",
