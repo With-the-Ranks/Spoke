@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import passport from "@passport-next/passport";
 import bodyParser from "body-parser";
-import connectDatadog from "connect-datadog-graphql";
 import pgSession from "connect-pg-simple";
 import cors from "cors";
+import type { RequestHandler } from "express";
 import express from "express";
 import basicAuth from "express-basic-auth";
 import expressSession from "express-session";
@@ -25,7 +25,6 @@ import {
   twilioRouter,
   utilsRouter
 } from "./routes";
-import statsd from "./statsd";
 import { errToObj } from "./utils";
 
 const {
@@ -37,23 +36,6 @@ const {
 
 export const createApp = async () => {
   const app = express();
-
-  if (config.DD_AGENT_HOST && config.DD_DOGSTATSD_PORT) {
-    const datadogOptions = {
-      dogstatsd: statsd,
-      path: true,
-      method: false,
-      response_code: true,
-      graphql_paths: ["/graphql"],
-      tags: config.DD_TAGS.split(",")
-    };
-
-    if (config.CLIENT_NAME) {
-      datadogOptions.tags.push(`client:${config.CLIENT_NAME}`);
-    }
-
-    app.use(connectDatadog(datadogOptions));
-  }
 
   if (config.LOG_LEVEL === "verbose" || config.LOG_LEVEL === "debug") {
     app.use(requestLogging);
@@ -78,8 +60,8 @@ export const createApp = async () => {
     })
   );
   app.options("*", cors());
-  app.use(bodyParser.json({ limit: "50mb" }));
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json({ limit: "50mb" }) as RequestHandler);
+  app.use(bodyParser.urlencoded({ extended: true }) as RequestHandler);
   app.use(
     expressSession({
       secret: SESSION_SECRET,

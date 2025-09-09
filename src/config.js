@@ -197,10 +197,6 @@ const validators = {
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
     default: -1
   }),
-  CLIENT_NAME: str({
-    desc: "Name of client to pass to Datadog",
-    default: undefined
-  }),
   CONTACT_REMOVAL_SECRET: str({
     desc:
       "Secret to authorize incoming requests to /remove-number-from-campaign",
@@ -286,19 +282,6 @@ const validators = {
   AUTOJOIN_ORG_UUID: str({
     desc: "UUID of organization to automatically insert users into upon signup",
     default: undefined
-  }),
-  DD_AGENT_HOST: host({
-    desc: "Datadog agent host",
-    default: undefined
-  }),
-  DD_DOGSTATSD_PORT: port({
-    desc: "Datadog dogstatd port",
-    default: undefined
-  }),
-  DD_TAGS: str({
-    desc: "Comma-separated list of DataDog tags to apply to metrics.",
-    example: "app:spoke,client:rewired",
-    default: "app:spoke"
   }),
   DELIVERABILITY_ALERT_ENDPOINT: url({
     desc:
