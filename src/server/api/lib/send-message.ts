@@ -3,12 +3,6 @@ import type { MessageInput } from "@spoke/spoke-codegen";
 import { GraphQLError } from "graphql/error";
 import type { Knex } from "knex";
 import escapeRegExp from "lodash/escapeRegExp";
-import request from "superagent";
-
-import {
-  ContactOptedOutError,
-  OutsideTextingHoursError
-} from "../../send-message-errors";
 
 import { UserRoleType } from "../../../api/organization-membership";
 import { config } from "../../../config";
