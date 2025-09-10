@@ -7,14 +7,13 @@ import {
   useGetMessageReviewContactUpdatesQuery
 } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import CannedResponseMenu from "../../../../../components/CannedResponseMenu";
 import {
   applyScript,
   customFieldsJsonStringToArray
 } from "../../../../../lib/scripts";
-
 import MessageList from "./MessageList";
 import MessageOptOut from "./MessageOptOut";
 import MessageResponse from "./MessageResponse";
