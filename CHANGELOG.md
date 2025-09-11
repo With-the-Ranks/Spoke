@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.2](https://github.com/politics-rewired/spoke/compare/v9.0.2-rc.0...v9.0.2) (2025-09-11)
+
+
+### Bug Fixes
+
+* **jest:** remove datadog ([#19](https://github.com/politics-rewired/spoke/issues/19)) ([23315fe](https://github.com/politics-rewired/spoke/commit/23315fedd4978d34a88b4dc20a0555fd253f4d4d))
+* **message review:** apply script for canned responses ([#17](https://github.com/politics-rewired/spoke/issues/17)) ([af9a61f](https://github.com/politics-rewired/spoke/commit/af9a61fcbb56c5bf11d464f09e086ed275f43ba4))
+* skip commiting empty changes to tags ([#16](https://github.com/politics-rewired/spoke/issues/16)) ([83c12ce](https://github.com/politics-rewired/spoke/commit/83c12cec597ce87fc3b0f3bc14dac88bf5e34119))
+
+
+### Backend Changes
+
+* replace spoke chip with mui chip ([#27](https://github.com/politics-rewired/spoke/issues/27)) ([9717599](https://github.com/politics-rewired/spoke/commit/9717599b3bf8878943646ee8001e924d0335248d))
+* **types:** sort declarations alphabetically ([#23](https://github.com/politics-rewired/spoke/issues/23)) ([c605655](https://github.com/politics-rewired/spoke/commit/c605655a97169123a8b3130902a5c0711f04cb06))
+* remove console logs ([#21](https://github.com/politics-rewired/spoke/issues/21)) ([2a6a1cb](https://github.com/politics-rewired/spoke/commit/2a6a1cb6af6eb2c07e3345d9092fadb98d2f4566))
+* remove deprecated bulk sending implementation ([#62](https://github.com/politics-rewired/spoke/issues/62)) ([c3bd65d](https://github.com/politics-rewired/spoke/commit/c3bd65d6607db0a914c8cfbeafec117f6a3614b9))
+* **campaign:** simplify subtypes ([#15](https://github.com/politics-rewired/spoke/issues/15)) ([a695f67](https://github.com/politics-rewired/spoke/commit/a695f67f74015e4fc113d8036a1537f921e86920))
+* **message review:** fetch updated contact instead of using state ([#18](https://github.com/politics-rewired/spoke/issues/18)) ([62fb313](https://github.com/politics-rewired/spoke/commit/62fb3135515877cd30c67d01c769f5f5874cd47d))
+
 ### [9.0.2-rc.0](https://github.com/politics-rewired/spoke/compare/v9.0.1...v9.0.2-rc.0) (2025-03-25)
 
 
