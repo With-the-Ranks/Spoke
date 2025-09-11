@@ -1,4 +1,5 @@
 import { withApollo } from "@apollo/client/react/hoc";
+import Chip from "@material-ui/core/Chip";
 import { blue, green, grey, orange, red } from "@material-ui/core/colors";
 import type { CampaignVariable } from "@spoke/spoke-codegen";
 import { IsValidAttachmentDocument } from "@spoke/spoke-codegen";
@@ -16,7 +17,6 @@ import React from "react";
 import { getSpokeCharCount, replaceEasyGsmWins } from "../lib/charset-utils";
 import { delimit, getAttachmentLink, getMessageType } from "../lib/scripts";
 import baseTheme from "../styles/theme";
-import Chip from "./Chip";
 import { IncludeImageDocLink } from "./Links/IncludeImageDocLink";
 
 type DecoratorStrategyCallBack = (start: number, end: number) => void;
@@ -55,10 +55,10 @@ const styles: Record<string, React.CSSProperties> = {
     color: red[400]
   },
   scriptFieldButton: {
-    fontSize: "11px",
     textTransform: "none",
     backgroundColor: grey[100],
-    cursor: "pointer"
+    cursor: "pointer",
+    margin: 5
   },
   customField: {
     color: green[800]
@@ -341,7 +341,7 @@ class ScriptEditor extends React.Component<Props, State> {
           <Chip
             key={field}
             style={{ ...styles.scriptFieldButton, ...styles.customField }}
-            text={delimit(field)}
+            label={delimit(field)}
             onClick={() => this.addCustomField(field)}
           />
         ))}
@@ -354,7 +354,7 @@ class ScriptEditor extends React.Component<Props, State> {
                 ? styles.invalidCampaignVariableField
                 : styles.validCampaignVariableField)
             }}
-            text={delimit(field.name)}
+            label={delimit(field.name)}
             onClick={() => this.addCustomField(field.name)}
           />
         ))}
