@@ -14,17 +14,15 @@ export const instructions = () =>
 // either in environment variables or organization.features json data
 // Besides this returning true, "test-action" will also need to be added to
 // process.env.ACTION_HANDLERS
-export async function available(_organizationId) {
-  return true;
-}
+export const available = async (_organizationId) => true;
 
 // What happens when a texter saves the answer that triggers the action
 // This is presumably the meat of the action
-export async function processAction(
+export const processAction = async (
   questionResponse,
   interactionStep,
   campaignContactId
-) {
+) => {
   // This is a meta action that updates a variable in the contact record itself.
   // Generally, you want to send action data to the outside world, so you
   // might want the request library loaded above
@@ -40,4 +38,4 @@ export async function processAction(
     .knex("campaign_contact")
     .where("campaign_contact.id", campaignContactId)
     .update("custom_fields", JSON.stringify(customFields));
-}
+};

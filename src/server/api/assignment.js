@@ -19,10 +19,10 @@ class AutoassignError extends Error {
   }
 }
 
-export function addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue(
+export const addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue = (
   queryParameter,
   messageStatusFilter
-) {
+) => {
   if (!messageStatusFilter) {
     return queryParameter;
   }
@@ -34,7 +34,7 @@ export function addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDu
     query = query.whereIn("message_status", messageStatusFilter.split(","));
   }
   return query;
-}
+};
 
 /**
  * Given query parameters, an assignment record, and its associated records, build a Knex query
@@ -46,13 +46,13 @@ export function addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDu
  * @param {boolean} forCount When `true`, return a count(*) query
  * @returns {Knex} The Knex query
  */
-export function getContacts(
+export const getContacts = (
   assignment,
   contactsFilter,
   organization,
   campaign,
   forCount = false
-) {
+) => {
   // 24-hours past due - why is this 24 hours offset?
   const includePastDue = contactsFilter && contactsFilter.includePastDue;
 
@@ -133,10 +133,10 @@ export function getContacts(
   }
 
   return query;
-}
+};
 
 // Returns either "replies", "initials", or null
-export async function getCurrentAssignmentType(organizationId) {
+export const getCurrentAssignmentType = async (organizationId) => {
   const organization = await r
     .reader("organization")
     .select("features")
@@ -156,9 +156,9 @@ export async function getCurrentAssignmentType(organizationId) {
     generalEnabled: features.textRequestFormEnabled || false,
     orgMaxRequestCount: features.textRequestMaxCount || 0
   };
-}
+};
 
-export async function allCurrentAssignmentTargets(organizationId) {
+export const allCurrentAssignmentTargets = async (organizationId) => {
   const { assignmentType, generalEnabled } = await getCurrentAssignmentType(
     organizationId
   );
@@ -358,7 +358,7 @@ export async function allCurrentAssignmentTargets(organizationId) {
   );
 
   return teamToCampaigns;
-}
+};
 
 const memoizedMyCurrentAssignmentTargets = async ({
   myTeamIds,
@@ -506,7 +506,10 @@ const memoizedMyCurrentAssignmentTargets = async ({
   return results;
 };
 
-export async function cachedMyCurrentAssignmentTargets(userId, organizationId) {
+export const cachedMyCurrentAssignmentTargets = async (
+  userId,
+  organizationId
+) => {
   const {
     assignmentType,
     generalEnabled,
@@ -554,13 +557,13 @@ export async function cachedMyCurrentAssignmentTargets(userId, organizationId) {
     assignmentType,
     organizationId
   });
-}
+};
 
-export async function myCurrentAssignmentTargets(
+export const myCurrentAssignmentTargets = async (
   userId,
   organizationId,
   trx = r.knex
-) {
+) => {
   const {
     assignmentType,
     generalEnabled,
@@ -729,18 +732,18 @@ export async function myCurrentAssignmentTargets(
   );
 
   return results;
-}
+};
 
-export async function myCurrentAssignmentTarget(
+export const myCurrentAssignmentTarget = async (
   userId,
   organizationId,
   trx = r.knex
-) {
+) => {
   const options = await myCurrentAssignmentTargets(userId, organizationId, trx);
   return options.length > 0 ? options[0] : null;
-}
+};
 
-async function notifyIfAllAssigned(organizationId, teamsAssignedTo) {
+const notifyIfAllAssigned = async (organizationId, teamsAssignedTo) => {
   const doNotification = async ({ team }) =>
     request
       .post(config.ASSIGNMENT_COMPLETE_NOTIFICATION_URL)
@@ -769,15 +772,15 @@ async function notifyIfAllAssigned(organizationId, teamsAssignedTo) {
       "Not checking if assignments are available – ASSIGNMENT_COMPLETE_NOTIFICATION_URL is unset"
     );
   }
-}
+};
 
-export async function assignLoop(
+export const assignLoop = async (
   user,
   organizationId,
   countLeft,
   preferredTeamId,
   trx
-) {
+) => {
   const assignmentOptions = await myCurrentAssignmentTargets(
     user.id,
     organizationId,
@@ -907,15 +910,15 @@ export async function assignLoop(
   };
 
   return { count: ccUpdateCount, team };
-}
+};
 
-export async function giveUserMoreTexts(
+export const giveUserMoreTexts = async (
   userId,
   count,
   organizationId,
   preferredTeamId,
   parentTrx = r.knex
-) {
+) => {
   logger.verbose(`Starting to give ${userId} ${count} texts`);
 
   const matchingUsers = await r.knex("user").where({ id: userId });
@@ -994,9 +997,9 @@ export async function giveUserMoreTexts(
   }
 
   return updated_result;
-}
+};
 
-export async function fulfillPendingRequestFor(auth0Id) {
+export const fulfillPendingRequestFor = async (auth0Id) => {
   const user = await r.knex("user").first("id").where({ auth0_id: auth0Id });
 
   if (!user) {
@@ -1057,9 +1060,9 @@ export async function fulfillPendingRequestFor(auth0Id) {
   return doAssignment({
     pendingAssignmentRequestId: pendingAssignmentRequest.id
   });
-}
+};
 
-export async function autoHandleRequest(pendingAssignmentRequest) {
+export const autoHandleRequest = async (pendingAssignmentRequest) => {
   // check texter status of pendingAssignmentRequest
   const user_organization = await r
     .knex("user_organization")
@@ -1097,7 +1100,7 @@ export async function autoHandleRequest(pendingAssignmentRequest) {
         .where({ id: pendingAssignmentRequest.id });
     }
   }
-}
+};
 
 const getContactsCountFromShadowCounts = (shadowCounts, contactsFilter) => {
   const countsPassingContactsFilter = shadowCounts.filter(

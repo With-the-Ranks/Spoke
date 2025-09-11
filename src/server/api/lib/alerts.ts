@@ -79,7 +79,7 @@ type DeliverabilityRow = {
   count: number;
 };
 
-export async function checkForBadDeliverability() {
+export const checkForBadDeliverability = async () => {
   if (config.DELIVERABILITY_ALERT_ENDPOINT === undefined) return null;
   logger.info("Running deliverability check");
   /*
@@ -133,13 +133,13 @@ export async function checkForBadDeliverability() {
         .send({ domain, errorPercent });
     }
   }
-}
+};
 
-export async function notifyOnTagConversation(
+export const notifyOnTagConversation = async (
   campaignContactId: string,
   userId: string,
   webhookUrls: string[]
-) {
+) => {
   const promises = {
     mostRecentlyReceivedMessage: (async () => {
       const message = await r
@@ -202,14 +202,14 @@ export async function notifyOnTagConversation(
         )
     )
   );
-}
+};
 
-export async function notifyLargeCampaignEvent(
+export const notifyLargeCampaignEvent = async (
   campaignId: number,
   event: "upload" | "start",
   threshold = config.LARGE_CAMPAIGN_THRESHOLD,
   url = config.LARGE_CAMPAIGN_WEBHOOK
-) {
+) => {
   if (!url) return;
 
   const campaignInfo = await r
@@ -242,4 +242,4 @@ export async function notifyLargeCampaignEvent(
   };
 
   await request.post(url).send(payload);
-}
+};

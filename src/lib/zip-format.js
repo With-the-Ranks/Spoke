@@ -69,9 +69,7 @@ const commonZipRanges = [
 
 commonZipRanges.sort((a, b) => a[0] - b[0]);
 
-function getCommonZipRanges() {
-  return commonZipRanges;
-}
+const getCommonZipRanges = () => commonZipRanges;
 
 const zipToTimeZone = (zip) => {
   // will search common zip ranges -- won't necessarily find something

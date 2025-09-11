@@ -75,12 +75,12 @@ import { ActionType, DeactivateMode } from "./types";
 
 const uuidv4 = require("uuid").v4;
 
-async function updateQuestionResponses(
+const updateQuestionResponses = async (
   trx,
   campaignContactId,
   questionResponses,
   loaders
-) {
+) => {
   // TODO: wrap in transaction
   // TODO - batch insert / delete
   const count = questionResponses.length;
@@ -109,15 +109,15 @@ async function updateQuestionResponses(
 
   const contact = loaders.campaignContact.load(campaignContactId);
   return contact;
-}
+};
 
-async function deleteQuestionResponses(
+const deleteQuestionResponses = async (
   trx,
   campaignContactId,
   interactionStepIds,
   loaders,
   user
-) {
+) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
   try {
     await assignmentRequired(user, contact.assignment_id);
@@ -146,9 +146,9 @@ async function deleteQuestionResponses(
   );
 
   return contact;
-}
+};
 
-async function createOptOut(trx, campaignContactId, optOut, loaders, user) {
+const createOptOut = async (trx, campaignContactId, optOut, loaders, user) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
   let organizationId = contact.organization_id;
   if (!organizationId) {
@@ -210,15 +210,15 @@ async function createOptOut(trx, campaignContactId, optOut, loaders, user) {
     campaignContact,
     optOutId
   };
-}
+};
 
-async function editCampaignContactMessageStatus(
+const editCampaignContactMessageStatus = async (
   trx,
   campaignContactId,
   messageStatus,
   loaders,
   user
-) {
+) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
 
   await assignmentRequiredOrHasOrgRoleForCampaign(
@@ -234,7 +234,7 @@ async function editCampaignContactMessageStatus(
     .returning("*");
 
   return campaign;
-}
+};
 
 const rootMutations = {
   RootMutation: {
