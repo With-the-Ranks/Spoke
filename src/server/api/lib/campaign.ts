@@ -8,7 +8,6 @@ import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import isNil from "lodash/isNil";
 import type { QueryResult } from "pg";
-import MemoizeHelper, { Buckets, cacheOpts } from "src/server/memoredis";
 
 import type { RelayPaginatedResponse } from "../../../api/pagination";
 import { config } from "../../../config";
@@ -20,6 +19,7 @@ import {
   uploadContacts
 } from "../../../workers/jobs";
 import type { SpokeDbContext } from "../../contexts/types";
+import MemoizeHelper, { Buckets, cacheOpts } from "../../memoredis";
 import { cacheableData, datawarehouse, r } from "../../models";
 import { addAssignTexters } from "../../tasks/assign-texters";
 import { accessRequired } from "../errors";
@@ -547,7 +547,9 @@ export const editCampaign = async (
       filterOutLandlines: campaign.filterOutLandlines,
       validationStats
     };
-    const compressedString = await gzip(JSON.stringify(jobPayload));
+    const compressedString: Buffer = (await gzip(
+      JSON.stringify(jobPayload)
+    )) as Buffer;
     const [job] = await r
       .knex("job_request")
       .insert({
@@ -607,7 +609,7 @@ export const editCampaign = async (
       // Remove all existing team memberships and then add everything again
       await trx("campaign_team").where({ campaign_id: id }).del();
       await trx("campaign_team").insert(
-        campaign.teamIds.map((team_id) => ({
+        campaign.teamIds?.map((team_id) => ({
           team_id,
           campaign_id: id
         }))
@@ -756,7 +758,7 @@ export const editCampaign = async (
     await unstartIfNecessary();
 
     // Ignore the mocked `id` automatically created on the input by GraphQL
-    const convertedResponses = campaign.cannedResponses.map(
+    const convertedResponses = campaign.cannedResponses?.map(
       ({
         id: _cannedResponseId,
         displayOrder,

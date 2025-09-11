@@ -82,42 +82,8 @@ const zipToTimeZone = (zip) => {
   }
 };
 
-// lperson 2018.02.10 this is dead code
-const findZipRanges = async (r) => {
-  const zipchanges = [];
-  await r
-    .knex("zip_code")
-    .select("zip", "timezone_offset", "has_dst")
-    .orderBy("zip")
-    .then((zips) => {
-      let front = -1;
-      let curTz = -4;
-      let curHasDst = -1;
-      zips.forEach((zipRec) => {
-        if (zipRec.timezone_offset !== curTz || zipRec.has_dst !== curHasDst) {
-          zipchanges.push([
-            front,
-            parseInt(zipRec.zip, 10),
-            curTz,
-            curHasDst,
-            parseInt(zipRec.zip, 10) - front
-          ]);
-          curTz = zipRec.timezone_offset;
-          curHasDst = zipRec.has_dst;
-          front = parseInt(zipRec.zip, 10);
-        }
-      });
-      zipchanges.sort((a, b) => {
-        return b[4] - a[4];
-      });
-      console.info(zipchanges);
-    });
-  return zipchanges;
-};
-
 module.exports = {
   getFormattedZip,
   getCommonZipRanges,
-  zipToTimeZone,
-  findZipRanges
+  zipToTimeZone
 };

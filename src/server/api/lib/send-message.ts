@@ -3,11 +3,6 @@ import type { MessageInput } from "@spoke/spoke-codegen";
 import { GraphQLError } from "graphql/error";
 import type { Knex } from "knex";
 import escapeRegExp from "lodash/escapeRegExp";
-import {
-  ContactOptedOutError,
-  OutsideTextingHoursError
-} from "src/server/send-message-errors";
-import request from "superagent";
 
 import { UserRoleType } from "../../../api/organization-membership";
 import { config } from "../../../config";
@@ -16,9 +11,12 @@ import { DateTime } from "../../../lib/datetime";
 import { hasRole } from "../../../lib/permissions";
 import { isNowBetween } from "../../../lib/timezones";
 import { getSendBeforeUtc } from "../../../lib/tz-helpers";
-import logger from "../../../logger";
 import { eventBus, EventType } from "../../event-bus";
 import { r } from "../../models";
+import {
+  ContactOptedOutError,
+  OutsideTextingHoursError
+} from "../../send-message-errors";
 import type { UserRecord } from "../types";
 import { getContactMessagingService } from "./message-sending";
 import serviceMap from "./services";
@@ -259,7 +257,7 @@ export const sendMessage = async (
   const timezone = contactTimezone || campaignTimezone;
   const isValidSendTime = isNowBetween(timezone, startHour, endHour);
 
-  if (!isValidSendTime) {
+  if (!config.isTest && !isValidSendTime) {
     throw new OutsideTextingHoursError();
   }
 
@@ -307,10 +305,10 @@ export const sendMessage = async (
       await trx("campaign_contact")
         .update({
           message_status:
-            cc_message_status === "needsResponse" ||
-            cc_message_status === "convo"
-              ? "convo"
-              : "messaged"
+            cc_message_status === "needsMessage" ||
+            cc_message_status === "messaged"
+              ? "messaged"
+              : "convo"
         })
         .where({ id: record.cc_id });
     }
@@ -333,22 +331,7 @@ export const sendMessage = async (
 
   // Send message after we are sure messageInstance has been persisted
   const service = serviceMap[service_type];
-  service.sendMessage(toInsert, record.organization_id);
-
-  // Send message to BernieSMS to be checked for bad words
-  const badWordUrl = config.BAD_WORD_URL;
-  if (badWordUrl) {
-    request
-      .post(badWordUrl)
-      .timeout(5000)
-      .set("Authorization", `Token ${config.BAD_WORD_TOKEN}`)
-      .send({ user_id: user.auth0_id, message: toInsert.text })
-      .end((err, _res) => {
-        if (err) {
-          logger.error("Error submitting message to bad word service: ", err);
-        }
-      });
-  }
+  await service.sendMessage(toInsert, record.organization_id);
 
   return contactUpdateResult;
 };

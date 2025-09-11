@@ -2,11 +2,11 @@ import { gql } from "@apollo/client";
 import type { Message, User } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import React, { Component } from "react";
-import errorCodeDescriptions from "src/lib/telco-error-codes";
-import { MessageSendStatus } from "src/server/api/types";
 
 import { DateTime } from "../../../../../lib/datetime";
+import errorCodeDescriptions from "../../../../../lib/telco-error-codes";
 import type { QueryMap } from "../../../../../network/types";
+import { MessageSendStatus } from "../../../../../server/api/types";
 import { loadData } from "../../../../hoc/with-operations";
 
 const styles: Record<string, React.CSSProperties> = StyleSheet.create({

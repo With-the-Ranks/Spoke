@@ -1,0 +1,67 @@
+fragment CurrentAssignmentTarget on AssignmentTarget {
+  type
+  campaign {
+    id
+    title
+  }
+  teamTitle
+  countLeft
+  enabled
+}
+
+fragment CampaignInfo on Campaign {
+  id
+  title
+  isStarted
+  isApproved
+  isArchived
+  hasUnassignedContacts
+  hasUnsentInitialMessages
+  hasUnhandledMessages
+  description
+  dueBy
+}
+
+query GetAdminAssignmentTargets($organizationId: String!) {
+  organization(id: $organizationId) {
+    id
+    currentAssignmentTargets {
+      ...CurrentAssignmentTarget
+    }
+  }
+}
+
+mutation archiveCampaign($campaignId: String!) {
+  archiveCampaign(id: $campaignId) {
+    ...CampaignInfo
+  }
+}
+
+mutation unarchiveCampaign($campaignId: String!) {
+  unarchiveCampaign(id: $campaignId) {
+    ...CampaignInfo
+  }
+}
+
+mutation releaseMessages($campaignId: String!, $target: ReleaseActionTarget!, $ageInHours: Float) {
+  releaseMessages(campaignId: $campaignId, target: $target, ageInHours: $ageInHours)
+}
+
+mutation deleteNeedsMessage($campaignId: String!) {
+  deleteNeedsMessage(campaignId: $campaignId)
+}
+
+mutation markForSecondPass($campaignId: String!, $campaignTitle: String!, $input: SecondPassInput!) {
+  markForSecondPass(campaignId: $campaignId, campaignTitle: $campaignTitle, input: $input)
+}
+
+mutation unMarkForSecondPass($campaignId: String!, $campaignTitle: String!) {
+  unMarkForSecondPass(campaignId: $campaignId, campaignTitle: $campaignTitle)
+}
+
+mutation toggleAutoAssign($campaignId: String!, $enabled: Boolean!) {
+  editCampaign(id: $campaignId, campaign: { isAutoassignEnabled: $enabled }) {
+    id
+    isAutoassignEnabled
+  }
+}

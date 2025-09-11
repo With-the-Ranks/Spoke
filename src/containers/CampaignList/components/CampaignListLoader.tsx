@@ -9,17 +9,15 @@ import React from "react";
 
 import LoadingIndicator from "../../../components/LoadingIndicator";
 import { useAuthzContext } from "../../AuthzProvider";
+import type { CampaignOperationsProps } from "../utils";
 import { isCampaignGroupsPermissionError } from "../utils";
 import CampaignList from "./CampaignList";
 
-interface Props {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   pageSize: number;
   campaignsFilter: CampaignsFilter;
   isAdmin: boolean;
-  startOperation: (...args: any[]) => any;
-  archiveCampaign: (...args: any[]) => any;
-  unarchiveCampaign: (...args: any[]) => any;
 }
 
 const CampaignListLoader: React.FC<Props> = (props) => {

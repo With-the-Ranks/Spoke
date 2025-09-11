@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOMServer from "react-dom/server";
-import assemblePalette from "src/styles/assemble-palette";
 
+import assemblePalette from "../../../styles/assemble-palette";
 import type { CampaignRecord, OrganizationRecord } from "../../api/types";
 import { NotificationTypes } from "../../api/types";
 import TemplateWrapper from "./template-wrapper";

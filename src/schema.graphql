@@ -176,6 +176,8 @@ input ExportForSpokeInput {
 
 input CampaignExportInput {
   campaignId: String!
+  # For Spoke Exports
+  campaignTitle: String
   exportType: CampaignExportType!
   spokeOptions: ExportForSpokeInput
   vanOptions: ExportForVanInput
@@ -299,11 +301,11 @@ type RootMutation {
   requestTexts(count: Int!, email: String!, organizationId: String!, preferredTeamId: String!): String!
   releaseMessages(campaignId: String!, target: ReleaseActionTarget!, ageInHours: Float): String!
   releaseAllUnhandledReplies(organizationId: String!, ageInHours: Float, releaseOnRestricted: Boolean, limitToCurrentlyTextableContacts: Boolean): ReleaseAllUnhandledRepliesResult!
-  markForSecondPass(campaignId: String!, input: SecondPassInput!): String!
+  markForSecondPass(campaignId: String!, campaignTitle: String!, input: SecondPassInput!): String!
   startAutosending(campaignId: String!): Campaign!
   pauseAutosending(campaignId: String!): Campaign!
   updateCampaignAutosendingLimit(campaignId: String!, limit: Int): Campaign!
-  unMarkForSecondPass(campaignId: String!): String!
+  unMarkForSecondPass(campaignId: String!, campaignTitle: String!): String!
   deleteNeedsMessage(campaignId: String!): String!
   insertLinkDomain(organizationId: String!, domain: String!, maxUsageCount: Int!): LinkDomain!
   updateLinkDomain(organizationId: String!, domainId: String!, payload: UpdateLinkDomain!): LinkDomain!
@@ -422,7 +424,7 @@ type Organization {
   textRequestMaxCount: Int
   textsAvailable: Boolean
   pendingAssignmentRequestCount: Int!
-  currentAssignmentTargets: [AssignmentTarget]!
+  currentAssignmentTargets: [AssignmentTarget!]!
   myCurrentAssignmentTarget: AssignmentTarget
   myCurrentAssignmentTargets: [AssignmentTarget]!
   escalatedConversationCount: Int!
@@ -665,7 +667,7 @@ type Campaign {
   editors: String
   teams: [Team!]!
   campaignGroups: CampaignGroupPage
-  campaignVariables: CampaignVariablePage!
+  campaignVariables: [CampaignVariable!]!
   textingHoursStart: Int
   textingHoursEnd: Int
   isAutoassignEnabled: Boolean!
@@ -736,7 +738,7 @@ input CampaignInput {
   introHtml: String
   externalSystemId: String
   useDynamicAssignment: Boolean
-  contacts: [CampaignContactInput]
+  contacts: [CampaignContactInput!]
   contactsFile: Upload
   externalListId: String
   filterOutLandlines: Boolean
@@ -749,7 +751,7 @@ input CampaignInput {
   campaignVariables: [CampaignVariableInput!]
   texters: TexterInput
   interactionSteps: InteractionStepInput
-  cannedResponses: [CannedResponseInput]
+  cannedResponses: [CannedResponseInput!]
   textingHoursStart: Int
   textingHoursEnd: Int
   isAutoassignEnabled: Boolean
@@ -842,7 +844,6 @@ type MessagingService {
   messagingServiceSid: String!
   serviceType: MessagingServiceType!
   updatedAt: String!
-  tcrBrandRegistrationLink: String
   name: String
   active: Boolean!
   isDefault: Boolean
@@ -860,37 +861,6 @@ type MessagingServicePage {
 
 
 
-interface Register10DlcNotice {
-  id: ID!
-  tcrRegistrationUrl: String
-}
-
-type Register10DlcBrandNotice implements Register10DlcNotice {
-  id: ID!
-  tcrRegistrationUrl: String
-}
-
-type Register10DlcCampaignNotice implements Register10DlcNotice {
-  id: ID!
-  tcrRegistrationUrl: String
-}
-
-type Pending10DlcCampaignNotice {
-  id: ID!
-}
-
-interface PricingNotice {
-  id: ID!
-}
-
-type Pricing10DlcNotice implements PricingNotice {
-  id: ID!
-}
-
-type PricingTollFreeNotice implements PricingNotice {
-  id: ID!
-}
-
 type TitleContentNotice {
   id: ID!
   title: String!
@@ -899,7 +869,7 @@ type TitleContentNotice {
   markdownContent: String!
 }
 
-union Notice = Register10DlcBrandNotice | Register10DlcCampaignNotice | Pending10DlcCampaignNotice | Pricing10DlcNotice | PricingTollFreeNotice | TitleContentNotice
+union Notice = TitleContentNotice
 
 type NoticeEdge {
   cursor: Cursor!
@@ -968,8 +938,6 @@ type CampaignContactTag {
   id: String!
   tag: Tag!
   tagger: User!
-  createdAt: String!
-  updatedAt: String!
 }
 
 
@@ -1013,18 +981,6 @@ type CampaignVariable {
   displayOrder: Int!
   name: String!
   value: String
-  createdAt: String!
-  updatedAt: String!
-}
-
-type CampaignVariableEdge {
-  cursor: Cursor!
-  node: CampaignVariable!
-}
-
-type CampaignVariablePage {
-  edges: [CampaignVariableEdge!]!
-  pageInfo: RelayPageInfo!
 }
 
 

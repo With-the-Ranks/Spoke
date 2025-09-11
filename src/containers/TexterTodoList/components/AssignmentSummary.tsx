@@ -95,8 +95,6 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
 
   const {
     assignment,
-    unmessagedCount,
-    unrepliedCount,
     badTimezoneCount,
     pastMessagesCount,
     skippedMessagesCount
@@ -104,14 +102,11 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   const {
     title,
     description,
-    hasUnassignedContacts,
     dueBy,
     primaryColor = context.theme?.defaultCampaignColor,
     logoImageUrl = context.theme?.defaultCampaignLogo,
-    introHtml,
-    useDynamicAssignment
+    introHtml
   } = assignment.campaign;
-  const { maxContacts } = assignment;
   const dueByText = dueBy
     ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
     : "No Due Date";
@@ -134,37 +129,6 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           <div dangerouslySetInnerHTML={{ __html: introHtml || "" }} />
         </div>
         <CardActions className={classes.cardActions}>
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? ""
-            : renderBadgedButton({
-                dataTestText: "sendFirstTexts",
-                assignment,
-                title: "Send first texts",
-                type: "initial",
-                count: unmessagedCount,
-                primary: true,
-                disabled:
-                  (useDynamicAssignment &&
-                    !hasUnassignedContacts &&
-                    unmessagedCount === 0) ||
-                  (useDynamicAssignment && maxContacts === 0) ||
-                  undefined,
-                contactsFilter: "text",
-                hideIfZero: !useDynamicAssignment
-              })}
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? ""
-            : renderBadgedButton({
-                dataTestText: "sendReplies",
-                assignment,
-                title: "Send replies",
-                type: "reply",
-                count: unrepliedCount,
-                primary: false,
-                disabled: false,
-                contactsFilter: "reply",
-                hideIfZero: true
-              })}
           {renderBadgedButton({
             assignment,
             title: "Past Messages",
@@ -185,18 +149,6 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             contactsFilter: "skipped",
             hideIfZero: true
           })}
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? renderBadgedButton({
-                assignment,
-                title: "Send messages",
-                type: "initial",
-                primary: true,
-                disabled: false,
-                contactsFilter: "all",
-                count: 0,
-                hideIfZero: false
-              })
-            : ""}
           {renderBadgedButton({
             assignment,
             title: "Send later",
