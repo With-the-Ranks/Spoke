@@ -44,6 +44,7 @@ const networkOnlyHandlerWithGatewayErrorFallback: RouteHandler = async (
     }
     return response;
   } catch (workboxErr) {
+    // eslint-disable-next-line no-console
     console.error("workbox err", workboxErr);
     throw workboxErr;
   }

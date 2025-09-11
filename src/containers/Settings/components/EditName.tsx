@@ -50,8 +50,7 @@ const EditName: React.FC<InnerProps> = (props) => {
     try {
       const result = await props.mutations.editName(orgName);
       if (result.errors) throw new Error(result.errors[0].message);
-    } catch (err) {
-      console.log("setting error message", err.message);
+    } catch (err: any) {
       setErrorMsg(err.message);
     } finally {
       setWorking(false);

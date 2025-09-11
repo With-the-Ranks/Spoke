@@ -103,10 +103,6 @@ class AdminAssignmentRequest extends Component {
       await sleep(2000);
       this.deleteRequest(requestId);
     } catch (exc) {
-      console.error(
-        `Resolve request as "${approved ? "approved" : "denied"}" failed: `,
-        exc
-      );
       this.setRequestStatus(requestId, RowWorkStatus.Error);
     }
   };
