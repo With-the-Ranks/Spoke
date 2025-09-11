@@ -1,3 +1,4 @@
+import type { RequestHandler } from "express";
 import type { Knex } from "knex";
 import type { PoolClient } from "pg";
 
@@ -10,7 +11,7 @@ import { makeNumbersClient } from "../../lib/assemble-numbers";
 import { r } from "../../models";
 import { errToObj } from "../../utils";
 import { getOrgFeature } from "../organization-settings";
-import type { MessagingServiceRecord, RequestHandlerFactory } from "../types";
+import type { MessagingServiceRecord } from "../types";
 import { MessagingServiceType } from "../types";
 import { symmetricDecrypt } from "./crypto";
 import {
@@ -68,6 +69,8 @@ export interface NumbersDeliveryReportPayload {
     num_media?: number;
   };
 }
+
+type RequestHandlerFactory = () => RequestHandler;
 
 /**
  * Create an Assemble Numbers client
