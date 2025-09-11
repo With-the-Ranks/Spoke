@@ -9,9 +9,10 @@ module.exports = {
   },
   plugins: [
     "@typescript-eslint",
-    "simple-import-sort",
     "import",
-    "prefer-arrow-functions"
+    "json",
+    "prefer-arrow-functions",
+    "simple-import-sort"
   ],
   extends: [
     "eslint:recommended",
