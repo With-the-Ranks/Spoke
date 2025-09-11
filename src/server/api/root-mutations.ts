@@ -1,5 +1,4 @@
 import { ForbiddenError, UserInputError } from "apollo-server-errors";
-import camelCaseKeys from "camelcase-keys";
 import { GraphQLError } from "graphql/error";
 import _ from "lodash";
 import groupBy from "lodash/groupBy";
@@ -13,7 +12,6 @@ import { CampaignExportType, TextRequestType } from "../../api/types";
 import { config } from "../../config";
 import { parseIanaZone } from "../../lib/datetime";
 import { hasRole } from "../../lib/permissions";
-import { applyScript } from "../../lib/scripts";
 import { replaceAll } from "../../lib/utils";
 import logger from "../../logger";
 import type { SpokeRequestContext } from "../contexts/types";
@@ -38,7 +36,6 @@ import { addFilterLandlines } from "../tasks/filter-landlines";
 import { QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER } from "../tasks/queue-autosend-initials";
 import { getWorker } from "../worker";
 import { giveUserMoreTexts, myCurrentAssignmentTarget } from "./assignment";
-import { resolvers as campaignContactResolvers } from "./campaign-contact";
 import { queryCampaignOverlapCount } from "./campaign-overlap";
 import {
   getCampaignIdMessageIdsAndCampaignIdContactIdsMapsChunked,
@@ -1695,81 +1692,6 @@ const rootMutations = {
         id: contactId,
         is_opted_out: false
       }));
-    },
-
-    bulkSendMessages: async (_root, args, loaders) => {
-      if (!config.ALLOW_SEND_ALL || !config.NOT_IN_USA) {
-        logger.error("Not allowed to send all messages at once");
-        throw new GraphQLError("Not allowed to send all messages at once");
-      }
-
-      const assignmentId = parseInt(args.assignmentId, 10);
-
-      const assignment = await r
-        .knex("assignment")
-        .where({ id: assignmentId })
-        .first();
-      // Assign some contacts
-      await rootMutations.RootMutation.findNewCampaignContact(
-        _,
-        {
-          assignmentId,
-          numberContacts: Number(config.BULK_SEND_CHUNK_SIZE) - 1
-        },
-        loaders
-      );
-
-      const contacts = await r
-        .knex("campaign_contact")
-        .where({
-          message_status: "needsMessage",
-          assignment_id: assignmentId
-        })
-        .whereRaw("archived = false") // partial index friendly
-        .orderByRaw("updated_at")
-        .limit(config.BULK_SEND_CHUNK_SIZE);
-
-      const texter = camelCaseKeys(
-        await r.knex("user").where({ id: assignment.user_id }).first()
-      );
-      const customFields = Object.keys(JSON.parse(contacts[0].custom_fields));
-
-      const campaignVariables = await r
-        .knex("campaign_variable")
-        .where({ campaign_id: assignment.campaign_id });
-
-      await Promise.all(
-        contacts.map(async (contactRecord) => {
-          const script = await campaignContactResolvers.CampaignContact.currentInteractionStepScript(
-            contactRecord
-          );
-          const { external_id, ...restOfContact } = contactRecord;
-          const contact = {
-            ...camelCaseKeys(restOfContact),
-            external_id
-          };
-          const text = applyScript({
-            contact,
-            texter,
-            script,
-            customFields,
-            campaignVariables
-          });
-          const contactMessage = {
-            contactNumber: contactRecord.cell,
-            userId: assignment.user_id,
-            text,
-            assignmentId
-          };
-          await rootMutations.RootMutation.sendMessage(
-            _,
-            { message: contactMessage, campaignContactId: contactRecord.id },
-            loaders
-          );
-        })
-      );
-
-      return [];
     },
 
     sendMessage: async (_root, { message, campaignContactId }, { user }) => {

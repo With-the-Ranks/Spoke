@@ -167,12 +167,6 @@ const validators = {
     devDefault: "http://localhost:3000",
     isClient: true
   }),
-  BULK_SEND_CHUNK_SIZE: num({
-    desc:
-      "Chunk size to use when sending all texts at once with ALLOW_SEND_ALL",
-    default: 100,
-    isClient: true
-  }),
   CACHE_PREFIX: str({
     desc:
       "If REDISURL is set, then this will prefix keys CACHE_PREFIX, which might be useful if multiple applications use the same redis server.",
@@ -496,12 +490,6 @@ const validators = {
     desc: "Node environment",
     choices: ["production", "development", "test"],
     default: "development",
-    isClient: true
-  }),
-  NOT_IN_USA: bool({
-    desc:
-      "A flag to affirmatively indicate the ability to use features that are discouraged or not legally usable in the United States. Consult with an attorney about the implications for doing so. Default assumes a USA legal context.",
-    default: false,
     isClient: true
   }),
   OPT_OUT_MESSAGE: str({

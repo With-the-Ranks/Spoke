@@ -43,7 +43,6 @@ import { applyScript } from "../../lib/scripts";
 import { isContactNowWithinCampaignHours } from "../../lib/timezones";
 import ApplyTagDialog from "./components/ApplyTagDialog";
 import AssignmentTexterSurveys from "./components/AssignmentTexterSurveys";
-import BulkSendButton from "./components/BulkSendButton";
 import ContactActionDialog from "./components/ContactActionDialog";
 import MessageList from "./components/MessageList";
 import MessageTextField from "./components/MessageTextField";
@@ -228,10 +227,6 @@ export class AssignmentTexterContact extends React.Component {
         this.handleClickSendMessageButton();
       }
     }
-  };
-
-  setDisabled = (disabled = true) => {
-    this.setState({ disabled });
   };
 
   getAvailableInteractionSteps = (questionResponses) => {
@@ -543,11 +538,6 @@ export class AssignmentTexterContact extends React.Component {
     this.props.onFinishContact();
   };
 
-  bulkSendMessages = async (assignmentId) => {
-    await this.props.mutations.bulkSendMessages(assignmentId);
-    this.props.refreshData();
-  };
-
   handleMessageFormChange = ({ messageText }) => {
     const { messageStatus } = this.props.contact;
     // Do not allow deviating from the script for the first message of a campaign
@@ -654,7 +644,6 @@ export class AssignmentTexterContact extends React.Component {
       tags,
       assignment,
       navigationToolbarChildren,
-      onFinishContact,
       theme
     } = this.props;
     const { userCannedResponses, campaignCannedResponses } = assignment;
@@ -678,18 +667,6 @@ export class AssignmentTexterContact extends React.Component {
                 }
                 disabled={this.state.disabled}
               />
-              {window.NOT_IN_USA &&
-              window.ALLOW_SEND_ALL &&
-              window.BULK_SEND_CHUNK_SIZE ? (
-                <BulkSendButton
-                  assignment={assignment}
-                  onFinishContact={onFinishContact}
-                  bulkSendMessages={this.bulkSendMessages}
-                  setDisabled={this.setDisabled}
-                />
-              ) : (
-                ""
-              )}
               <div style={{ float: "right", marginLeft: 20 }}>
                 {navigationToolbarChildren}
               </div>
