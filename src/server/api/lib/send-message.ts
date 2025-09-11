@@ -3,10 +3,6 @@ import type { MessageInput } from "@spoke/spoke-codegen";
 import { GraphQLError } from "graphql/error";
 import type { Knex } from "knex";
 import escapeRegExp from "lodash/escapeRegExp";
-import {
-  ContactOptedOutError,
-  OutsideTextingHoursError
-} from "src/server/send-message-errors";
 
 import { UserRoleType } from "../../../api/organization-membership";
 import { config } from "../../../config";
@@ -17,6 +13,10 @@ import { isNowBetween } from "../../../lib/timezones";
 import { getSendBeforeUtc } from "../../../lib/tz-helpers";
 import { eventBus, EventType } from "../../event-bus";
 import { r } from "../../models";
+import {
+  ContactOptedOutError,
+  OutsideTextingHoursError
+} from "../../send-message-errors";
 import type { UserRecord } from "../types";
 import { getContactMessagingService } from "./message-sending";
 import serviceMap from "./services";

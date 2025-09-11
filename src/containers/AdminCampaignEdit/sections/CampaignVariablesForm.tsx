@@ -17,8 +17,8 @@ import {
 } from "@spoke/spoke-codegen";
 import React, { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { sortCampaignVariables } from "src/api/campaign-variable";
 
+import { sortCampaignVariables } from "../../../api/campaign-variable";
 import { allScriptFields, VARIABLE_NAME_REGEXP } from "../../../lib/scripts";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
 import type { FullComponentProps } from "../components/SectionWrapper";

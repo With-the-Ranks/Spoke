@@ -8,8 +8,8 @@ import {
 } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useState } from "react";
-import CannedResponseMenu from "src/components/CannedResponseMenu";
 
+import CannedResponseMenu from "../../../../../components/CannedResponseMenu";
 import {
   applyScript,
   customFieldsJsonStringToArray
