@@ -17,6 +17,7 @@ import React from "react";
 import { getSpokeCharCount, replaceEasyGsmWins } from "../lib/charset-utils";
 import { delimit, getAttachmentLink, getMessageType } from "../lib/scripts";
 import baseTheme from "../styles/theme";
+import { IncludeImageDocLink } from "./Links/IncludeImageDocLink";
 
 type DecoratorStrategyCallBack = (start: number, end: number) => void;
 
