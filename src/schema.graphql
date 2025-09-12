@@ -660,7 +660,6 @@ type Campaign {
   stats: CampaignStats,
   pendingJobs(jobTypes: [String]): [JobRequest]!
   datawarehouseAvailable: Boolean
-  useDynamicAssignment: Boolean
   introHtml: String
   primaryColor: String
   logoImageUrl: String
@@ -737,7 +736,6 @@ input CampaignInput {
   primaryColor: String
   introHtml: String
   externalSystemId: String
-  useDynamicAssignment: Boolean
   contacts: [CampaignContactInput!]
   contactsFile: Upload
   externalListId: String

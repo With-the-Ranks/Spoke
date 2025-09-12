@@ -108,7 +108,6 @@ export interface CampaignRecord {
   due_by: string | null;
   created_at: string;
   is_archived: boolean | null;
-  use_dynamic_assignment: boolean | null;
   logo_image_url: string | null;
   intro_html: string | null;
   primary_color: string | null;

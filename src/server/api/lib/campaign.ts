@@ -425,7 +425,6 @@ export const editCampaign = async (
     title,
     description,
     dueBy,
-    useDynamicAssignment: _useDynamicAssignment,
     logoImageUrl,
     introHtml,
     primaryColor,
@@ -446,8 +445,6 @@ export const editCampaign = async (
     description: description ?? undefined,
     due_by: dueBy,
     organization_id: organizationId,
-    // TODO: re-enable once dynamic assignment is fixed (#548)
-    // use_dynamic_assignment: useDynamicAssignment,
     logo_image_url: logoImageUrl,
     primary_color: primaryColor,
     intro_html: introHtml,

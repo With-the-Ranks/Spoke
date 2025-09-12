@@ -13,12 +13,9 @@ jest.mock('../../src/lib/timezones')
 jest.unmock('../../src/lib/tz-helpers')
 jest.useFakeTimers()
 
-var timezones = require('../../src/lib/timezones')
-
 const campaign = {
   id: 9,
   isArchived: false,
-  useDynamicAssignment: null,
   organization: {
     id: 2,
     textingHoursEnforced: true,

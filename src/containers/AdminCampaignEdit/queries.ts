@@ -81,7 +81,6 @@ export const EditCampaignFragment = gql`
     contactsCount
     datawarehouseAvailable
     customFields
-    useDynamicAssignment
     logoImageUrl
     introHtml
     primaryColor

@@ -479,8 +479,6 @@ export const resolvers = {
       "description",
       "isStarted",
       "isArchived",
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      // "useDynamicAssignment",
       "introHtml",
       "primaryColor",
       "logoImageUrl",
@@ -500,7 +498,6 @@ export const resolvers = {
     timezone: (campaign) => parseIanaZone(campaign.timezone),
     readiness: (campaign) => campaign,
     repliesStaleAfter: (campaign) => campaign.replies_stale_after_minutes,
-    useDynamicAssignment: (_) => false,
     isAssignmentLimitedToTeams: (campaign) =>
       campaign.limit_assignment_to_teams,
     dueBy: (campaign) =>

@@ -454,7 +454,7 @@ const validators = {
   }),
   MAX_CONTACTS_PER_TEXTER: num({
     desc:
-      "Maximum contacts that a texter can receive. This is particularly useful for dynamic assignment. Set to 0 for no maximum.",
+      "Maximum contacts that a texter can receive. Set to 0 for no maximum.",
     default: 500
   }),
   MAX_MESSAGE_LENGTH: num({

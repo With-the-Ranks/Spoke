@@ -61,18 +61,8 @@ class TexterTodo extends React.Component {
   }
 
   assignContactsIfNeeded = async (checkServer = false) => {
-    const { assignment } = this.props.data;
     const { contacts } = this.props.contacts.assignment;
     if (contacts.length === 0 || checkServer) {
-      if (assignment.campaign.useDynamicAssignment) {
-        const didAddContacts = (
-          await this.props.mutations.findNewCampaignContact(assignment.id, 1)
-        ).data.findNewCampaignContact.found;
-        if (didAddContacts) {
-          this.props.contacts.refetch();
-          return;
-        }
-      }
       const { organizationId } = this.props.match.params;
       this.props.history.push(`/app/${organizationId}/todos`);
     }
@@ -141,7 +131,6 @@ const queries = {
             id
             title
             isArchived
-            useDynamicAssignment
             timezone
             textingHoursStart
             textingHoursEnd

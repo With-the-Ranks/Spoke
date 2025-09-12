@@ -99,7 +99,6 @@ export const schema = `
     stats: CampaignStats,
     pendingJobs(jobTypes: [String]): [JobRequest]!
     datawarehouseAvailable: Boolean
-    useDynamicAssignment: Boolean
     introHtml: String
     primaryColor: String
     logoImageUrl: String
@@ -176,7 +175,6 @@ export const schema = `
     primaryColor: String
     introHtml: String
     externalSystemId: String
-    useDynamicAssignment: Boolean
     contacts: [CampaignContactInput!]
     contactsFile: Upload
     externalListId: String
