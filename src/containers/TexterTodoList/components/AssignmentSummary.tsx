@@ -138,7 +138,8 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             type: "initial",
             count: unmessagedCount,
             primary: true,
-            contactsFilter: "text"
+            contactsFilter: "text",
+            hideIfZero: true
           })}
           {renderBadgedButton({
             dataTestText: "sendReplies",
