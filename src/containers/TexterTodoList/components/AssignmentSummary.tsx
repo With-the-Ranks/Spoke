@@ -95,6 +95,8 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
 
   const {
     assignment,
+    unmessagedCount,
+    unrepliedCount,
     badTimezoneCount,
     pastMessagesCount,
     skippedMessagesCount
@@ -129,6 +131,26 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           <div dangerouslySetInnerHTML={{ __html: introHtml || "" }} />
         </div>
         <CardActions className={classes.cardActions}>
+          {renderBadgedButton({
+            dataTestText: "sendFirstTexts",
+            assignment,
+            title: "Send first texts",
+            type: "initial",
+            count: unmessagedCount,
+            primary: true,
+            contactsFilter: "text"
+          })}
+          {renderBadgedButton({
+            dataTestText: "sendReplies",
+            assignment,
+            title: "Send replies",
+            type: "reply",
+            count: unrepliedCount,
+            primary: false,
+            disabled: false,
+            contactsFilter: "reply",
+            hideIfZero: true
+          })}
           {renderBadgedButton({
             assignment,
             title: "Past Messages",
