@@ -74,7 +74,7 @@ Spoke is a full-stack SMS texting platform for political campaigns and advocacy 
 ### Database Schema
 
 - Uses Knex migrations in `migrations/` directory
-- Migrations should always include named functions - exports.up = function up(knex) and exports.down = function down(knex). Knex will leave them unnamed by default.  
+- Migrations should always include named functions - exports.up = function up(knex) and exports.down = function down(knex). Knex will leave them unnamed by default.
 - Core entities: organizations, campaigns, users, messages, contacts
 - Background job tables managed by Graphile Worker
 - Supports read replicas via `DATABASE_READER_URL`
