@@ -43,10 +43,10 @@ const prepareDataTableData = (conversationsData: Array<any>) =>
     updatedAt: contact.updatedAt
   }));
 
-function prepareSelectedRowsData(
+const prepareSelectedRowsData = (
   conversations: Array<any>,
   rowsSelected: Array<any>
-) {
+) => {
   const selectedData = rowsSelected.map((selectedIndex: number) => {
     const conversation = conversations[selectedIndex];
     return {
@@ -59,7 +59,7 @@ function prepareSelectedRowsData(
   });
 
   return [rowsSelected, selectedData];
-}
+};
 
 interface IncomingMessageListProps {
   organizationId: string;

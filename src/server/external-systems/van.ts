@@ -212,10 +212,10 @@ const formatCanvassResponse = (
 };
 
 const VAN: ExternalSystem = {
-  async queueOptOut(
+  queueOptOut: async (
     payload: Record<string, any>,
     helpers: JobHelpers
-  ): Promise<void> {
+  ): Promise<void> => {
     const { campaignContactId, syncId, externalSystemId } = payload;
 
     const externalSyncOptOutConfig = await r
@@ -310,10 +310,10 @@ const VAN: ExternalSystem = {
       .where({ id: syncId });
   },
 
-  async syncQuestionResponse(
+  syncQuestionResponse: async (
     payload: Record<string, any>,
     helpers: JobHelpers
-  ): Promise<void> {
+  ): Promise<void> => {
     const { campaignContactId, externalSystemId } = payload;
 
     const campaignContact = await r
@@ -399,10 +399,10 @@ const VAN: ExternalSystem = {
     }
   },
 
-  async syncOptOut(
+  syncOptOut: async (
     payload: Record<string, any>,
     helpers: JobHelpers
-  ): Promise<void> {
+  ): Promise<void> => {
     const { syncId, campaignContactId, externalSystemId } = payload;
 
     const campaignContact = await r

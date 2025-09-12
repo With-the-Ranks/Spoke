@@ -29,7 +29,7 @@ const jobMap = {
   upload_contacts_sql: loadContactsFromDataWarehouse
 };
 
-export async function processJobs() {
+export const processJobs = async () => {
   setupUserNotificationObservers();
   logger.info("Running processJobs");
   // eslint-disable-next-line no-constant-condition
@@ -48,9 +48,9 @@ export async function processJobs() {
       logger.error("Error processing jobs: ", ex);
     }
   }
-}
+};
 
-export async function checkMessageQueue() {
+export const checkMessageQueue = async () => {
   if (!config.TWILIO_SQS_QUEUE_URL) {
     return;
   }
@@ -65,7 +65,7 @@ export async function checkMessageQueue() {
       logger.error("Error checking message queue: ", ex);
     }
   }
-}
+};
 
 const messageSenderCreator = (subQuery, defaultStatus) => {
   return async (event) => {
@@ -137,7 +137,7 @@ export const failedDayMessageSender = messageSenderCreator((mQuery) => {
   return mQuery.where("created_at", ">", oneDayAgo);
 }, "SENDING");
 
-export async function handleIncomingMessages() {
+export const handleIncomingMessages = async () => {
   setupUserNotificationObservers();
   if (config.DEBUG_INCOMING_MESSAGES) {
     logger.debug("Running handleIncomingMessages");
@@ -168,20 +168,24 @@ export async function handleIncomingMessages() {
       logger.error("Error at handleIncomingMessages: ", ex);
     }
   }
-}
+};
 
-export async function runDatabaseMigrations(event, dispatcher, eventCallback) {
+export const runDatabaseMigrations = async (
+  event,
+  dispatcher,
+  eventCallback
+) => {
   r.knex.migrate.latest();
   if (eventCallback) {
     eventCallback(null, "completed migrations");
   }
-}
+};
 
-export async function loadContactsFromDataWarehouseFragmentJob(
+export const loadContactsFromDataWarehouseFragmentJob = async (
   event,
   dispatcher,
   eventCallback
-) {
+) => {
   const eventAsJob = event;
   logger.info("LAMBDA INVOCATION job-processes", event);
   try {
@@ -194,7 +198,7 @@ export async function loadContactsFromDataWarehouseFragmentJob(
       eventCallback(err, null);
     }
   }
-}
+};
 
 const processMap = {
   processJobs,
@@ -216,7 +220,7 @@ const syncProcessMap = {
   clearOldJobs
 };
 
-export async function dispatchProcesses(event, _dispatcher, _eventCallback) {
+export const dispatchProcesses = async (event, _dispatcher, _eventCallback) => {
   const toDispatch =
     event.processes || (config.JOBS_SAME_PROCESS ? syncProcessMap : processMap);
   for (const p in toDispatch) {
@@ -228,4 +232,4 @@ export async function dispatchProcesses(event, _dispatcher, _eventCallback) {
       toDispatch[p]().then();
     }
   }
-}
+};

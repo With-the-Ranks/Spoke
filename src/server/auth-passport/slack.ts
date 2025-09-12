@@ -43,7 +43,7 @@ const namePartsFromSlack = (slackUser: any) => {
   return { firstName, lastName };
 };
 
-export function setupSlackPassport() {
+export const setupSlackPassport = () => {
   const options = {
     clientID: SLACK_CLIENT_ID,
     clientSecret: SLACK_CLIENT_SECRET,
@@ -156,6 +156,6 @@ export function setupSlackPassport() {
     return passport.authenticate("slack", callback)(req, res, next);
   });
   return app;
-}
+};
 
 export default setupSlackPassport;

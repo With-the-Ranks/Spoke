@@ -7,7 +7,13 @@ module.exports = {
       jsx: true
     }
   },
-  plugins: ["@typescript-eslint", "simple-import-sort", "import", "json"],
+  plugins: [
+    "@typescript-eslint",
+    "import",
+    "json",
+    "prefer-arrow-functions",
+    "simple-import-sort"
+  ],
   extends: [
     "eslint:recommended",
     "airbnb",
@@ -50,6 +56,7 @@ module.exports = {
     "jsx-a11y/href-no-hash": ["off"],
     "react/jsx-filename-extension": ["warn", { extensions: [".jsx", ".tsx"] }],
     "no-console": ["error", { allow: ["error", "warn"] }],
+    "prefer-arrow-functions/prefer-arrow-functions": "error",
     "max-len": [
       "warn",
       {
@@ -259,6 +266,13 @@ module.exports = {
             ]
           }
         ]
+      }
+    },
+    {
+      // stick with knex style
+      files: ["migrations/*"],
+      rules: {
+        "prefer-arrow-functions/prefer-arrow-functions": "off"
       }
     }
   ]

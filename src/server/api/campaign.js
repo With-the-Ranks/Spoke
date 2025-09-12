@@ -17,7 +17,7 @@ import { sqlResolvers } from "./lib/utils";
 import { getOrgFeature } from "./organization-settings";
 import { getUsers } from "./user";
 
-export function addCampaignsFilterToQuery(queryParam, campaignsFilter) {
+export const addCampaignsFilterToQuery = (queryParam, campaignsFilter) => {
   let query = queryParam;
 
   if (campaignsFilter) {
@@ -53,14 +53,14 @@ export function addCampaignsFilterToQuery(queryParam, campaignsFilter) {
     }
   }
   return query;
-}
+};
 
-export function buildCampaignQuery(
+export const buildCampaignQuery = (
   queryParam,
   organizationId,
   campaignsFilter,
   addFromClause = true
-) {
+) => {
   let query = queryParam;
 
   if (addFromClause) {
@@ -71,7 +71,7 @@ export function buildCampaignQuery(
   query = addCampaignsFilterToQuery(query, campaignsFilter);
 
   return query;
-}
+};
 
 const doGetCampaigns = async ({ organizationId, cursor, campaignsFilter }) => {
   let campaignsQuery = buildCampaignQuery(
@@ -109,13 +109,13 @@ const doGetCampaigns = async ({ organizationId, cursor, campaignsFilter }) => {
   return campaignsQuery;
 };
 
-export async function getCampaigns(organizationId, cursor, campaignsFilter) {
+export const getCampaigns = async (organizationId, cursor, campaignsFilter) => {
   const memoizer = await MemoizeHelper.getMemoizer();
   const memoizedCampaigns = MemoizeHelper.hasBucketConfigured(Buckets.Advanced)
     ? memoizer.memoize(doGetCampaigns, cacheOpts.CampaignsList)
     : doGetCampaigns;
   return memoizedCampaigns({ organizationId, cursor, campaignsFilter });
-}
+};
 
 const getCampaignOrganization = async ({ campaignId }) => {
   const campaign = await r
@@ -446,7 +446,7 @@ export const resolvers = {
         .then(([{ count }]) => parseInt(count, 10) === 0)
   },
   CampaignsReturn: {
-    __resolveType(obj, _context, _) {
+    __resolveType: (obj, _context, _) => {
       if (Array.isArray(obj)) {
         return "CampaignsList";
       }

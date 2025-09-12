@@ -3,12 +3,13 @@ export interface DataSourceItemType<T = string> {
   rawValue: T;
 }
 
-export function dataSourceItem<T = string>(
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
+export const dataSourceItem = <T extends unknown = string>(
   name: string,
   key: T
-): DataSourceItemType<T> {
+): DataSourceItemType<T> => {
   return {
     text: name,
     rawValue: key
   };
-}
+};

@@ -16,7 +16,7 @@ import type { SpokeRequest } from "../types";
 import type { PassportCallback, UserWithStatus } from "./util";
 import { passportCallback } from "./util";
 
-export function setupLocalAuthPassport() {
+export const setupLocalAuthPassport = () => {
   const strategy = new LocalStrategy(
     {
       usernameField: "email",
@@ -178,6 +178,6 @@ export function setupLocalAuthPassport() {
   });
 
   return app;
-}
+};
 
 export default setupLocalAuthPassport;

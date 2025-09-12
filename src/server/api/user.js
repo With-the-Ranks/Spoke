@@ -8,13 +8,13 @@ import { accessRequired } from "./errors";
 import { formatPage } from "./lib/pagination";
 import { sqlResolvers } from "./lib/utils";
 
-export function buildUserOrganizationQuery(
+export const buildUserOrganizationQuery = (
   queryParam,
   organizationId,
   role,
   campaignId,
   offset
-) {
+) => {
   if (role) {
     queryParam.where({ role });
   } else {
@@ -36,7 +36,7 @@ export function buildUserOrganizationQuery(
     queryParam.offset(offset);
   }
   return queryParam;
-}
+};
 
 async function doGetUsers({
   organizationId,
@@ -121,17 +121,17 @@ export const getUsers = async (
   });
 };
 
-export async function getUsersById(userIds) {
+export const getUsersById = async (userIds) => {
   const usersQuery = r
     .reader("user")
     .select("id", "first_name", "last_name")
     .whereIn("id", userIds);
   return usersQuery;
-}
+};
 
 export const resolvers = {
   UsersReturn: {
-    __resolveType(obj) {
+    __resolveType: (obj) => {
       if (Array.isArray(obj)) {
         return "UsersList";
       }

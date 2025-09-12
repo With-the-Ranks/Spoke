@@ -1,6 +1,6 @@
 import { r } from "../server/models";
 
-export async function updateJob(job, percentComplete) {
+export const updateJob = async (job, percentComplete) => {
   if (job.id) {
     await r
       .knex("job_request")
@@ -10,9 +10,9 @@ export async function updateJob(job, percentComplete) {
       })
       .where({ id: job.id });
   }
-}
+};
 
-export async function getNextJob() {
+export const getNextJob = async () => {
   let nextJob = await r
     .knex("job_request")
     .where({ assigned: false })
@@ -28,4 +28,4 @@ export async function getNextJob() {
     }
   }
   return nextJob;
-}
+};
