@@ -166,7 +166,6 @@ export const createCampaign = async (
         is_approved,
         is_started,
         is_archived,
-        use_dynamic_assignment,
         logo_image_url,
         intro_html,
         primary_color,
@@ -181,7 +180,7 @@ export const createCampaign = async (
         external_system_id,
         autosend_status,
         autosend_user_id
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       returning *
     `,
       [
@@ -191,7 +190,6 @@ export const createCampaign = async (
         options.isApproved ?? false,
         options.isStarted ?? true,
         options.isArchived ?? false,
-        false,
         null,
         null,
         null,
@@ -225,7 +223,6 @@ export const createTemplate = async (
         is_approved,
         is_started,
         is_archived,
-        use_dynamic_assignment,
         logo_image_url,
         intro_html,
         primary_color,
@@ -241,14 +238,13 @@ export const createTemplate = async (
         autosend_status,
         autosend_user_id,
         is_template
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       returning *
     `,
       [
         options.organizationId,
         options.title ?? faker.company.companyName(),
         options.description ?? faker.lorem.sentence(),
-        false,
         false,
         false,
         false,

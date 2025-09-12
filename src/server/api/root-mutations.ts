@@ -657,48 +657,6 @@ const rootMutations = {
       return organization;
     },
 
-    assignUserToCampaign: async (
-      _root,
-      { organizationUuid, campaignId },
-      { user }
-    ) => {
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      throw new Error("Invalid join request");
-      // eslint-disable-next-line no-unreachable
-      const campaign = await r
-        .knex("campaign")
-        .join("organization", "campaign.organization_id", "organization.id")
-        .where({
-          "campaign.id": parseInt(campaignId, 10),
-          "campaign.use_dynamic_assignment": true,
-          "organization.uuid": organizationUuid
-        })
-        .select("campaign.*")
-        .first();
-      if (!campaign) {
-        throw new Error("Invalid join request");
-      }
-      const assignment = await r
-        .knex("assignment")
-        .where({
-          user_id: user.id,
-          campaign_id: campaign.id
-        })
-        .first();
-      if (!assignment) {
-        const [newAssignment] = await r
-          .knex("assignment")
-          .insert({
-            user_id: user.id,
-            campaign_id: campaign.id,
-            max_contacts: config.MAX_CONTACTS_PER_TEXTER
-          })
-          .returning("*");
-        eventBus.emit(EventType.AssignmentCreated, newAssignment);
-      }
-      return campaign;
-    },
-
     updateDefaultTextingTimezone: async (
       _root,
       { organizationId, defaultTextingTz },
@@ -1455,83 +1413,6 @@ const rootMutations = {
       return contactIds.map((cid) => contactsById[cid]);
     },
 
-    findNewCampaignContact: async (
-      _root,
-      { assignmentId, numberContacts },
-      { user }
-    ) => {
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      throw new GraphQLError("Invalid assignment");
-      /* This attempts to find a new contact for the assignment, in the case that useDynamicAssigment == true */
-      // eslint-disable-next-line no-unreachable
-      const assignment = await r
-        .knex("assignment")
-        .where({ id: assignmentId })
-        .first();
-      if (assignment.user_id !== user.id) {
-        throw new GraphQLError("Invalid assignment");
-      }
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: assignment.campaign_id })
-        .first();
-      if (!campaign.use_dynamic_assignment || assignment.max_contacts === 0) {
-        return { found: false };
-      }
-
-      const contactsCount = await r.getCount(
-        r
-          .knex("campaign_contact")
-          .where({ assignment_id: assignmentId })
-          .whereRaw("archived = false") // partial index friendly
-      );
-
-      numberContacts = numberContacts || 1;
-      if (
-        assignment.max_contacts &&
-        contactsCount + numberContacts > assignment.max_contacts
-      ) {
-        numberContacts = assignment.max_contacts - contactsCount;
-      }
-      // Don't add more if they already have that many
-      const result = await r.getCount(
-        r
-          .knex("campaign_contact")
-          .where({
-            assignment_id: assignmentId,
-            message_status: "needsMessage",
-            is_opted_out: false
-          })
-          .whereRaw("archived = false") // partial index friendly
-      );
-
-      if (result >= numberContacts) {
-        return { found: false };
-      }
-
-      const updateResult = await r
-        .knex("campaign_contact")
-        .where(
-          "id",
-          "in",
-          r
-            .knex("campaign_contact")
-            .where({
-              assignment_id: null,
-              campaign_id: campaign.id
-            })
-            .whereRaw("archived = false") // partial index friendly
-            .limit(numberContacts)
-            .select("id")
-        )
-        .update({ assignment_id: assignmentId })
-        .catch(logger.error);
-
-      if (updateResult > 0) {
-        return { found: true };
-      }
-      return { found: false };
-    },
     tagConversation: async (_root, { campaignContactId, tag }, { user }) => {
       const campaignContact = await r
         .knex("campaign_contact")

@@ -1,24 +1,21 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react'
 import { mount } from 'enzyme'
 import { StyleSheetTestUtils } from 'aphrodite'
-import each from 'jest-each'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import { CardActions, CardTitle } from 'material-ui/Card'
+import { CardActions } from 'material-ui/Card'
 import { AssignmentSummary } from '../src/components/AssignmentSummary'
 import Badge from 'material-ui/Badge/Badge'
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton'
 
-function getAssignment(isDynamic = false) {
+function getAssignment() {
   return {
     id: '1',
     campaign: {
       id: '1',
       title: 'New Campaign',
       description: 'asdf',
-      useDynamicAssignment: isDynamic,
       hasUnassignedContacts: false,
       introHtml: 'yoyo',
       primaryColor: '#2052d8',
@@ -44,11 +41,11 @@ describe('AssignmentSummary text', function t() {
   })
 
 describe('AssignmentSummary actions inUSA and NOT AllowSendAll', () => {
-  function create(unmessaged, unreplied, badTimezone, past, skipped, isDynamic) {
+  function create(unmessaged, unreplied, badTimezone, past, skipped) {
     return mount(
       <MuiThemeProvider>
         <AssignmentSummary
-          assignment={getAssignment(isDynamic)}
+          assignment={getAssignment()}
           unmessagedCount={unmessaged}
           unrepliedCount={unreplied}
           badTimezoneCount={badTimezone}
@@ -59,20 +56,9 @@ describe('AssignmentSummary actions inUSA and NOT AllowSendAll', () => {
     ).find(CardActions)
   }
 
-  it('renders "send first texts (1)" with unmessaged (dynamic assignment)', () => {
-    const actions = create(5, 0, 0, 0, 0, true)
-    expect(actions.find(Badge).at(0).prop('badgeContent')).toBe(5)
-    expect(actions.find(RaisedButton).at(0).prop('label')).toBe('Send first texts')
-  })
-
-  it('renders "send first texts (1)" with unmessaged (non-dynamic)', () => {
+  it('renders "send first texts (1)" with unmessaged', () => {
     const actions = create(1, 0, 0, 0, 0, false)
     expect(actions.find(Badge).at(0).prop('badgeContent')).toBe(1)
-    expect(actions.find(RaisedButton).at(0).prop('label')).toBe('Send first texts')
-  })
-
-  it('renders "send first texts" with no unmessaged (dynamic assignment)', () => {
-    const actions = create(0, 0, 0, 0, 0, true)
     expect(actions.find(RaisedButton).at(0).prop('label')).toBe('Send first texts')
   })
 

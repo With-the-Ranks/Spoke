@@ -498,15 +498,14 @@ class AdminCampaignEdit extends React.Component {
         content: CampaignTextersForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
-        keys: ["texters", "contactsCount", "useDynamicAssignment"],
+        keys: ["texters", "contactsCount"],
         checkCompleted: () =>
-          (this.state.campaignFormValues.texters.length > 0 &&
-            this.state.campaignFormValues.contactsCount ===
-              this.state.campaignFormValues.texters.reduce(
-                (left, right) => left + right.assignment.contactsCount,
-                0
-              )) ||
-          this.state.campaignFormValues.useDynamicAssignment === true,
+          this.state.campaignFormValues.texters.length > 0 &&
+          this.state.campaignFormValues.contactsCount ===
+            this.state.campaignFormValues.texters.reduce(
+              (left, right) => left + right.assignment.contactsCount,
+              0
+            ),
         blocksStarting: false,
         expandAfterCampaignStarts: true,
         expandableBySuperVolunteers: true
