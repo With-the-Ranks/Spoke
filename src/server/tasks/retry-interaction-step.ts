@@ -51,6 +51,7 @@ export const retryInteractionStep: Task = async (
       where
         cc.id = $1
         and istep.parent_interaction_id is null
+        and not istep.is_deleted
     `,
     [campaignContactId]
   );
