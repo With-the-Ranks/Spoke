@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.3](https://github.com/politics-rewired/spoke/compare/v9.0.2...v9.0.3) (2025-09-12)
+
+
+### Bug Fixes
+
+* **texter:** hide send first texts when none left ([#80](https://github.com/politics-rewired/spoke/issues/80)) ([f2c333e](https://github.com/politics-rewired/spoke/commit/f2c333e1f07e23cba8a689da6804516783e4b789))
+* **texter:** render badge buttons ([#78](https://github.com/politics-rewired/spoke/issues/78)) ([f8137f5](https://github.com/politics-rewired/spoke/commit/f8137f572d3037adc9272d0348f1239bb7a3af94))
+
 ### [9.0.2](https://github.com/politics-rewired/spoke/compare/v9.0.2-rc.0...v9.0.2) (2025-09-11)
 
 
