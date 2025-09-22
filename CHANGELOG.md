@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.7](https://github.com/politics-rewired/spoke/compare/v9.0.6...v9.0.7) (2025-09-22)
+
+
+### Bug Fixes
+
+* **assemble-numbers:** delete failing test file ([#85](https://github.com/politics-rewired/spoke/issues/85)) ([a30ea1e](https://github.com/politics-rewired/spoke/commit/a30ea1eb990553406c9d8cb80bf13e13a888668c))
+
 ### [9.0.6](https://github.com/politics-rewired/spoke/compare/v9.0.5...v9.0.6) (2025-09-22)
 
 
