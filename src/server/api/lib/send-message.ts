@@ -331,7 +331,7 @@ export const sendMessage = async (
 
   // Send message after we are sure messageInstance has been persisted
   const service = serviceMap[service_type];
-  await service.sendMessage(toInsert, record.organization_id);
+  service.sendMessage(toInsert, record.organization_id);
 
   return contactUpdateResult;
 };
