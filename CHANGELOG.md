@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.5](https://github.com/politics-rewired/spoke/compare/v9.0.4...v9.0.5) (2025-09-22)
+
+
+### Bug Fixes
+
+* **send-message:** don't await ([#83](https://github.com/politics-rewired/spoke/issues/83)) ([1f2720d](https://github.com/politics-rewired/spoke/commit/1f2720d93a7589eff43d68890896df6bddfda5b3))
+
 ### [9.0.4](https://github.com/politics-rewired/spoke/compare/v9.0.3...v9.0.4) (2025-09-22)
 
 
