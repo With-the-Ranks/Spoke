@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.4](https://github.com/politics-rewired/spoke/compare/v9.0.3...v9.0.4) (2025-09-22)
+
+
+### Bug Fixes
+
+* **autosending:** only use active initial script ([#81](https://github.com/politics-rewired/spoke/issues/81)) ([98c0c79](https://github.com/politics-rewired/spoke/commit/98c0c79211d65f98ec14e2a093f2c10727ed5a01))
+* **campaign-variable:** pass input types for updates ([#82](https://github.com/politics-rewired/spoke/issues/82)) ([0346b31](https://github.com/politics-rewired/spoke/commit/0346b31c33784441b06e295e7161c07dbef3e688))
+
+
+### Backend Changes
+
+* lint for arrow functions ([#26](https://github.com/politics-rewired/spoke/issues/26)) ([af5e9c6](https://github.com/politics-rewired/spoke/commit/af5e9c6eb43ed703244b469cdb804e9ef54fe88f))
+* remove dynamic assignment ([#79](https://github.com/politics-rewired/spoke/issues/79)) ([84e2df0](https://github.com/politics-rewired/spoke/commit/84e2df0c23cbf55941ed4ad25fb96a6ab0992431))
+
 ### [9.0.3](https://github.com/politics-rewired/spoke/compare/v9.0.2...v9.0.3) (2025-09-12)
 
 
