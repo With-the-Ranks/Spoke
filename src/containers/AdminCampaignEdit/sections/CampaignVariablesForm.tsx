@@ -75,7 +75,7 @@ const CampaignVariablesForm: React.FC<FullComponentProps> = (props) => {
     onCompleted: (data) => {
       const unsortedCampaignVariables = data?.campaign?.campaignVariables;
 
-      const noPrefixCampaignVariables =
+      const inputCampaignVariables =
         unsortedCampaignVariables?.map((campaignVariable) => {
           return {
             displayOrder: campaignVariable.displayOrder,
@@ -85,7 +85,7 @@ const CampaignVariablesForm: React.FC<FullComponentProps> = (props) => {
         }) ?? [];
 
       const campaignVariables = sortCampaignVariableInputs(
-        noPrefixCampaignVariables
+        inputCampaignVariables
       );
       // Wait for useForm's subscription to be ready before reset() sends a signal to flush form state update
       setTimeout(() => {
