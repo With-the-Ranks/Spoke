@@ -18,7 +18,7 @@ import {
 import React, { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-import { sortCampaignVariables } from "../../../api/campaign-variable";
+import { sortCampaignVariableInputs } from "../../../api/campaign-variable";
 import { allScriptFields, VARIABLE_NAME_REGEXP } from "../../../lib/scripts";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
 import type { FullComponentProps } from "../components/SectionWrapper";
@@ -75,16 +75,17 @@ const CampaignVariablesForm: React.FC<FullComponentProps> = (props) => {
     onCompleted: (data) => {
       const unsortedCampaignVariables = data?.campaign?.campaignVariables;
 
-      const noPrefixCampaignVariables =
+      const inputCampaignVariables =
         unsortedCampaignVariables?.map((campaignVariable) => {
           return {
-            ...campaignVariable,
-            name: campaignVariable.name.replace("cv:", "")
+            displayOrder: campaignVariable.displayOrder,
+            name: campaignVariable.name.replace("cv:", ""),
+            value: campaignVariable.value
           };
         }) ?? [];
 
-      const campaignVariables = sortCampaignVariables(
-        noPrefixCampaignVariables
+      const campaignVariables = sortCampaignVariableInputs(
+        inputCampaignVariables
       );
       // Wait for useForm's subscription to be ready before reset() sends a signal to flush form state update
       setTimeout(() => {

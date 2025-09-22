@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import type { CampaignVariable } from "@spoke/spoke-codegen";
+import type { CampaignVariableInput } from "@spoke/spoke-codegen";
 
-export const sortCampaignVariables = (
-  campaignVariables: CampaignVariable[]
+export const sortCampaignVariableInputs = (
+  campaignVariables: CampaignVariableInput[]
 ) => {
   return campaignVariables.sort((cv1, cv2) => {
     if (cv1.displayOrder < cv2.displayOrder) return -1;
