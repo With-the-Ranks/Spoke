@@ -1,15 +1,18 @@
+import type {
+  Assignment,
+  Campaign,
+  CampaignContact,
+  InteractionStep,
+  Message,
+  Organization,
+  Team,
+  User
+} from "@spoke/spoke-codegen";
 import faker from "faker";
 import AuthHasher from "passport-local-authenticate";
 import type { PoolClient } from "pg";
 
-import type { Assignment } from "../../src/api/assignment";
-import type { Campaign } from "../../src/api/campaign";
-import type { CampaignContact } from "../../src/api/campaign-contact";
-import type { InteractionStep } from "../../src/api/interaction-step";
-import type { Message } from "../../src/api/message";
-import type { Organization } from "../../src/api/organization";
 import { UserRoleType } from "../../src/api/organization-membership";
-import type { User } from "../../src/api/user";
 import { DateTime } from "../../src/lib/datetime";
 import { symmetricEncrypt } from "../../src/server/api/lib/crypto";
 import type {
@@ -20,7 +23,9 @@ import type {
   MessageRecord,
   OrganizationRecord,
   QuestionResponseRecord,
-  UserRecord
+  TeamRecord,
+  UserRecord,
+  UserTeamRecord
 } from "../../src/server/api/types";
 import {
   MessageSendStatus,
@@ -267,6 +272,45 @@ export const createTemplate = async (
     )
     .then(({ rows: [template] }) => template);
 };
+
+export type CreateTeamOptions = {
+  organizationId: number;
+} & Partial<Pick<Team, "title">>;
+
+export const createTeam = async (
+  client: PoolClient,
+  options: CreateTeamOptions
+) =>
+  client
+    .query<TeamRecord>(
+      `
+        insert into public.team (organization_id, title)
+        values ($1, $2)
+        returning *
+      `,
+      [options.organizationId, options.title ?? faker.company.companyName()]
+    )
+    .then(({ rows: [team] }) => team);
+
+export type CreateUserTeamOptions = {
+  userId: number;
+  teamId: number;
+};
+
+export const createUserTeam = async (
+  client: PoolClient,
+  options: CreateUserTeamOptions
+) =>
+  client
+    .query<UserTeamRecord>(
+      `
+        insert into public.user_team (user_id, team_id)
+        values ($1, $2)
+        returning *
+      `,
+      [options.userId, options.teamId]
+    )
+    .then(({ rows: [userTeam] }) => userTeam);
 
 export type CreateCampaignContactOptions = Partial<
   Pick<
