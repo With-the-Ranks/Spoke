@@ -13,14 +13,14 @@ if (!key) {
 }
 
 const symmetricEncrypt = (value) => {
-  const cipher = crypto.createCipher(algorithm, key);
+  const cipher = crypto.createCipheriv(algorithm, key);
   let encrypted = cipher.update(value, inputEncoding, outputEncoding);
   encrypted += cipher.final(outputEncoding);
   return encrypted;
 };
 
 const symmetricDecrypt = (encrypted) => {
-  const decipher = crypto.createDecipher(algorithm, key);
+  const decipher = crypto.createDecipheriv(algorithm, key);
   let decrypted = decipher.update(encrypted, outputEncoding, inputEncoding);
   decrypted += decipher.final(inputEncoding);
   return decrypted;
