@@ -18,7 +18,7 @@ that goal. See [`HOWTO_migrate-from-moveon-main.md`](./docs/HOWTO_migrate-from-m
 
 Runtimes and package managers:
 
-- Node (^20.16)
+- Node (^24.11)
 - Yarn (>= 1.19.1)
 
 External services:
