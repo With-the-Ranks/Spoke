@@ -13,15 +13,26 @@ if (!key) {
 }
 
 const symmetricEncrypt = (value) => {
-  const cipher = crypto.createCipheriv(algorithm, key);
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
   let encrypted = cipher.update(value, inputEncoding, outputEncoding);
   encrypted += cipher.final(outputEncoding);
-  return encrypted;
+
+  // Prepend IV to encrypted data (IV is not secret)
+  return `${iv.toString(outputEncoding)}:${encrypted}`;
 };
 
 const symmetricDecrypt = (encrypted) => {
-  const decipher = crypto.createDecipheriv(algorithm, key);
-  let decrypted = decipher.update(encrypted, outputEncoding, inputEncoding);
+  const parts = encrypted.split(":");
+  if (parts.length !== 2) {
+    throw new Error("Invalid encrypted data format");
+  }
+
+  const iv = Buffer.from(parts[0], outputEncoding);
+  const encryptedData = parts[1];
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encryptedData, outputEncoding, inputEncoding);
   decrypted += decipher.final(inputEncoding);
   return decrypted;
 };
