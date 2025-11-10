@@ -15,6 +15,8 @@ if (!key) {
 const symmetricEncrypt = (value) => {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
   let encrypted = cipher.update(value, inputEncoding, outputEncoding);
   encrypted += cipher.final(outputEncoding);
 
