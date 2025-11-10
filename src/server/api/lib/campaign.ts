@@ -368,6 +368,26 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
         [newCampaign.id, campaignId]
       );
 
+      // Copy External System Mappings
+      await trx.raw(
+        `
+          insert into all_external_sync_question_response_configuration (system_id, campaign_id, interaction_step_id, question_response_value)
+          select
+            system_id,
+            parent_step.campaign_id,
+            parent_step.id,
+            question_response_value
+          from all_external_sync_question_response_configuration ext
+          join interaction_step parent_step on parent_step.campaign_id = ? and exists (
+            select 1 from interaction_step child_step 
+            where child_step.parent_interaction_id = parent_step.id
+            and answer_option = question_response_value
+          )
+          where ext.campaign_id = ?
+        `,
+        [newCampaign.id, campaignId]
+      );
+
       return newCampaign;
     };
 
