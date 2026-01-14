@@ -10,6 +10,7 @@ export const errorCodeDescriptions: Record<string, string> = {
   "40009": "Invalid body",
   "40011": "Too many messages",
   "40012": "Invalid destination number",
+  "21211": "Invalid destination number",
   "21610": "Recipient unsubscribed",
   "30001": "Queue overflow",
   "30002": "Account suspended",
