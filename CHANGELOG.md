@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0](https://github.com/politics-rewired/spoke/compare/v9.0.7...v9.1.0) (2026-01-15)
+
+
+### Features
+
+* **telnyx:** add mobiles only error code ([#89](https://github.com/politics-rewired/spoke/issues/89)) ([5200dd0](https://github.com/politics-rewired/spoke/commit/5200dd0aeb023a2e7bdc48bfd4d2f77fd77c9184))
+
 ### [9.0.7](https://github.com/politics-rewired/spoke/compare/v9.0.6...v9.0.7) (2025-09-22)
 
 
