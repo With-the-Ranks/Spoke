@@ -64,9 +64,9 @@
   "author": "Axle Factory",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/With-the-Ranks/spoke/issues"
+    "url": "https://github.com/With-the-Ranks/Spoke/issues"
   },
-  "homepage": "https://github.com/With-the-Ranks/spoke",
+  "homepage": "https://github.com/With-the-Ranks/Spoke",
   "dependencies": {
     "@apollo/client": "^3.4.16",
     "@babel/runtime": "^7.9.2",
