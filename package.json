@@ -48,7 +48,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/politics-rewired/spoke.git"
+    "url": "git+https://github.com/With-the-Ranks/spoke.git"
   },
   "keywords": [
     "spoke",
@@ -64,9 +64,9 @@
   "author": "Axle Factory",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/politics-rewired/Spoke/issues"
+    "url": "https://github.com/With-the-Ranks/Spoke/issues"
   },
-  "homepage": "https://github.com/politics-rewired/Spoke",
+  "homepage": "https://github.com/With-the-Ranks/Spoke",
   "dependencies": {
     "@apollo/client": "^3.4.16",
     "@babel/runtime": "^7.9.2",
