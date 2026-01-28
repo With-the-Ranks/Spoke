@@ -110,6 +110,7 @@ export const EditCampaignFragment = gql`
       interactions
       texters
     }
+    contactsFilename
   }
 `;
 
