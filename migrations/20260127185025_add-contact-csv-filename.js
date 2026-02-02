@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
+exports.up = function up(knex) {
   return knex.schema.alterTable("campaign_contact_upload", (table) => {
     table.text("contacts_filename").nullable();
   });
@@ -12,7 +12,7 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+exports.down = function down(knex) {
   return knex.schema.alterTable("campaign_contact_upload", (table) => {
     table.dropColumn("contacts_filename");
   });
