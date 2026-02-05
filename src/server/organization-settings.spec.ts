@@ -37,7 +37,7 @@ describe("get organization settings", () => {
     defaultAutosendingControlsMode: AutosendingControlsMode.Basic,
     defaulTexterApprovalStatus: RequestAutoApproveType.APPROVAL_REQUIRED,
     numbersApiKey: "SomethingSecret",
-    trollbotWebhookUrl: "https://rewired.coop/trolls",
+    trollbotWebhookUrl: "https://withtheranks.com/trolls",
     maxSmsSegmentLength: 3
   };
 

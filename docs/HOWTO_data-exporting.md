@@ -36,6 +36,6 @@ If you've reached this point in application setup, you've probably configured en
 1.  **Create a Service Account** -- Create a service account from the IAM section of GCP. You'll need to download the json key for that service account. You'll also need to grant the service account acccess to the bucket. This can be done from the GCS bucket configuration page using the service account's email address.
 1.  **Configure Spoke environment variables.** In order for Spoke to connect to GCS, the following environment variables must be set:
     - `EXPORT_DRIVER=gs-json`
-    - `AWS_S3_BUCKET_NAME` -- the name of the GCS bucket (ex. `exports.spokerewired.com`)
+    - `AWS_S3_BUCKET_NAME` -- the name of the GCS bucket (ex. `exports.spokewtr.com`)
     - `GOOGLE_APPLICATION_CREDENTIALS` -- the value of the JSON keyfile for the service account.
     - (optional) `AWS_S3_KEY_PREFIX=client-one/`
