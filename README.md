@@ -1,12 +1,14 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/politics-rewired/Spoke) ![CircleCI](https://img.shields.io/circleci/build/github/politics-rewired/Spoke)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/With-the-Ranks/Spoke) ![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/With-the-Ranks/Spoke/ci-cd.yml)
 
 # Spoke
 
 Spoke is an open source text-distribution tool for organizations to mobilize supporters and members into action. Spoke allows you to upload phone numbers, customize scripts and assign volunteers to communicate with supporters while allowing organizations to manage the process.
 
-Spoke was created by Saikat Chakrabarti and Sheena Pakanati, and is now maintained by MoveOn.org at https://github.com/MoveOnOrg/Spoke.
+Spoke was created by Saikat Chakrabarti and Sheena Pakanati, and the original repository was most recently maintained by Progressive Coders Network at https://github.com/ProgressiveCoders/Spoke
 
-This repository is a branch of MoveOn/Spoke created by Politics Rewired, a small campaign tech consultancy created in 2019.
+From 2019-2023, Politics Rewired, a small campaign tech consultancy, maintained the most recent upstream repository, politics-rewired/spoke
+
+This repository is a branch of ProgressiveCoders/Spoke (formerly MoveOn/Spoke) and politics-rewired/spoke, now maintained by With the Ranks, a worker-owned technology cooperative.
 
 Due to a desire to develop more quickly, we did not maintain compatibility with MoveOn/Spoke, which means although this repository will be
 a useful source of ideas, it may more work than is worth it to merge it back into MoveOn/Spoke, although we welcome any efforts towards
@@ -94,7 +96,7 @@ You can also install and run a Postgres server manually without Docker:
 #### Clone the repo
 
 ```sh
-git clone git@github.com:politics-rewired/Spoke.git
+git clone git@github.com:With-the-Ranks/Spoke.git
 cd Spoke
 git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 ```
