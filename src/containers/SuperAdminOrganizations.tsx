@@ -183,12 +183,6 @@ const SuperAdminOrganizations: React.FC = (_props) => {
             organization ({organization?.name ?? ""})?
             {!organizationActiveEdit && (
               <div>
-                <br />
-                <br />
-                You will continue to be billed for inbound messages to
-                deactivated organizations. If you plan to permanently shut down
-                the organization (and avoid further costs), you can submit a
-                ticket to support@spokerewired.com letting us know.
                 <FormControl style={{ marginTop: 10 }}>
                   <InputLabel id="select-deactivate-mode">
                     Suspend Users?
