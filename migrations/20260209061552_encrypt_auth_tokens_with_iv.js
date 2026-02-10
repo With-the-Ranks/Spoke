@@ -51,6 +51,7 @@ exports.up = function up(knex) {
 
   return knex("messaging_service")
     .select("messaging_service_sid", "encrypted_auth_token")
+    .whereNot("encrypted_auth_token", "")
     .then((rows) => {
       const updates = rows
         .filter((row) => !row.encrypted_auth_token.includes(":"))
