@@ -5,6 +5,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
 import React from "react";
 
 import {
@@ -28,7 +29,13 @@ const ContactDisplaySettingsCard: React.FC<ContactDisplaySettingsCardProps> = ({
   const [editSettings] = useMutation(EDIT_ORGANIZATION_SETTINGS);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading settings</div>;
+  if (error) {
+    return (
+      <Alert severity="error" style={style}>
+        Error loading settings
+      </Alert>
+    );
+  }
 
   const { showContactLastName, showContactCell } =
     data?.organization?.settings || {};

@@ -13,6 +13,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
 import { css, StyleSheet } from "aphrodite";
 import React, { useState } from "react";
 
@@ -65,7 +66,13 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
   const [tempEnd, setTempEnd] = useState<number>(21);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading settings</div>;
+  if (error) {
+    return (
+      <Alert severity="error" style={style}>
+        Error loading settings
+      </Alert>
+    );
+  }
 
   const org = data.organization;
   const {

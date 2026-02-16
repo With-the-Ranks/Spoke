@@ -5,7 +5,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
 import React, { useEffect, useState } from "react";
 
 import { EDIT_ORGANIZATION_NAME, GET_ORGANIZATION_NAME } from "./queries";
@@ -61,9 +61,9 @@ const EditName: React.FC<EditNameProps> = ({ organizationId, style }) => {
       <CardHeader title="Organization Name" />
       <CardContent>
         {errorMsg && (
-          <Typography color="error" paragraph>
-            Error: {errorMsg}
-          </Typography>
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {errorMsg}
+          </Alert>
         )}
         <TextField
           label="Organization Name"

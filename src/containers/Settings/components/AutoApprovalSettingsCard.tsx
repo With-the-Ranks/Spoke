@@ -8,6 +8,7 @@ import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
 import React, { useState } from "react";
 
 import { RequestAutoApproveType } from "../../../api/organization-membership";
@@ -63,7 +64,13 @@ const AutoApprovalSettingsCard: React.FC<AutoApprovalSettingsCardProps> = ({
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading settings</div>;
+  if (error) {
+    return (
+      <Alert severity="error" style={style}>
+        Error loading settings
+      </Alert>
+    );
+  }
 
   return (
     <Card style={style}>

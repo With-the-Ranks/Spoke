@@ -6,6 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -61,7 +62,13 @@ const AssembleNumbersSettingsCard: React.FC<AssembleNumbersSettingsCardProps> = 
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading settings</div>;
+  if (error) {
+    return (
+      <Alert severity="error" style={style}>
+        Error loading settings
+      </Alert>
+    );
+  }
 
   return (
     <Card style={style}>

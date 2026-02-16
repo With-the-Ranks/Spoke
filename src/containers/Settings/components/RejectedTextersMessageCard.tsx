@@ -7,6 +7,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
+import Alert from "@material-ui/lab/Alert";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -40,7 +41,13 @@ const RejectedTextersMessageCard: React.FC<RejectedTextersMessageProps> = ({
   }, [data]);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading settings</div>;
+  if (error) {
+    return (
+      <Alert severity="error" style={style}>
+        Error loading settings
+      </Alert>
+    );
+  }
 
   const { showDoNotAssignMessage } = data?.organization?.settings || {};
   const currentMessage = data?.organization?.settings?.doNotAssignMessage || "";
