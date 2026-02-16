@@ -88,7 +88,7 @@ export const CampaignBuilderSettingsCard: React.FC<CampaignBuilderSettingsCardPr
 
   return (
     <Card style={style}>
-      <CardHeader title="Campaign Builder Settings" disableTypography />
+      <CardHeader title="Campaign Builder Settings" />
       <CardContent>
         {errorMsg && <p>Error: {errorMsg}</p>}
         <FormGroup row>

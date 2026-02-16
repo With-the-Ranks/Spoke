@@ -50,7 +50,7 @@ export const ScriptPreviewSettingsCard: React.FC<ScriptPreviewSettingsCardProps>
 
   return (
     <Card style={style}>
-      <CardHeader title="Script Preview Settings" disableTypography />
+      <CardHeader title="Script Preview Settings" />
       <CardContent>
         {errorMsg && <p>Error: {errorMsg}</p>}
         <FormGroup row>

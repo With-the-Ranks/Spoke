@@ -46,3 +46,97 @@ export const GET_MESSAGING_SERVICES = gql`
     }
   }
 `;
+
+export const GET_ORGANIZATION_SETTINGS = gql`
+  query GetOrganizationSettings($organizationId: String!) {
+    organization(id: $organizationId) {
+      id
+      optOutMessage
+      textingHoursEnforced
+      textingHoursStart
+      textingHoursEnd
+      defaultTextingTz
+      settings {
+        id
+        optOutMessage
+        numbersApiKey
+        trollbotWebhookUrl
+        defaulTexterApprovalStatus
+        showContactLastName
+        showContactCell
+        showDoNotAssignMessage
+        doNotAssignMessage
+      }
+    }
+  }
+`;
+
+export const EDIT_ORGANIZATION_SETTINGS = gql`
+  mutation EditOrganizationSettings(
+    $id: String!
+    $input: OrganizationSettingsInput!
+  ) {
+    editOrganizationSettings(id: $id, input: $input) {
+      id
+      optOutMessage
+      numbersApiKey
+      trollbotWebhookUrl
+      defaulTexterApprovalStatus
+      showContactLastName
+      showContactCell
+      showDoNotAssignMessage
+      doNotAssignMessage
+    }
+  }
+`;
+
+export const UPDATE_TEXTING_HOURS = gql`
+  mutation UpdateTextingHours(
+    $textingHoursStart: Int!
+    $textingHoursEnd: Int!
+    $organizationId: String!
+  ) {
+    updateTextingHours(
+      textingHoursStart: $textingHoursStart
+      textingHoursEnd: $textingHoursEnd
+      organizationId: $organizationId
+    ) {
+      id
+      textingHoursEnforced
+      textingHoursStart
+      textingHoursEnd
+    }
+  }
+`;
+
+export const UPDATE_TEXTING_HOURS_ENFORCEMENT = gql`
+  mutation UpdateTextingHoursEnforcement(
+    $textingHoursEnforced: Boolean!
+    $organizationId: String!
+  ) {
+    updateTextingHoursEnforcement(
+      textingHoursEnforced: $textingHoursEnforced
+      organizationId: $organizationId
+    ) {
+      id
+      textingHoursEnforced
+      textingHoursStart
+      textingHoursEnd
+    }
+  }
+`;
+
+export const UPDATE_DEFAULT_TEXTING_TIMEZONE = gql`
+  mutation UpdateDefaultTextingTimezone(
+    $organizationId: String!
+    $defaultTextingTz: String!
+  ) {
+    updateDefaultTextingTimezone(
+      defaultTextingTz: $defaultTextingTz
+      organizationId: $organizationId
+    ) {
+      id
+      defaultTextingTz
+    }
+  }
+`;
