@@ -6,6 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -26,7 +27,7 @@ const OptOutMessageSettingsCard: React.FC<OptOutMessageSettingsCardProps> = ({
     variables: { organizationId }
   });
 
-  const [editSettings, { loading: saving }] = useMutation(
+  const [editSettings, { loading: saving, error: saveError }] = useMutation(
     EDIT_ORGANIZATION_SETTINGS
   );
 
@@ -57,7 +58,7 @@ const OptOutMessageSettingsCard: React.FC<OptOutMessageSettingsCardProps> = ({
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -70,6 +71,11 @@ const OptOutMessageSettingsCard: React.FC<OptOutMessageSettingsCardProps> = ({
     <Card style={style}>
       <CardHeader title="Opt Out Message" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <TextField
           label="Default Opt-Out Message"
           fullWidth

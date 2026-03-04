@@ -14,6 +14,7 @@ import Select from "@material-ui/core/Select";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import { css, StyleSheet } from "aphrodite";
 import React, { useState } from "react";
 
@@ -55,9 +56,17 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
     variables: { organizationId }
   });
 
-  const [updateTextingHours] = useMutation(UPDATE_TEXTING_HOURS);
-  const [updateEnforcement] = useMutation(UPDATE_TEXTING_HOURS_ENFORCEMENT);
-  const [updateTimezone] = useMutation(UPDATE_DEFAULT_TEXTING_TIMEZONE);
+  const [updateTextingHours, { error: hoursError }] = useMutation(
+    UPDATE_TEXTING_HOURS
+  );
+  const [updateEnforcement, { error: enforcementError }] = useMutation(
+    UPDATE_TEXTING_HOURS_ENFORCEMENT
+  );
+  const [updateTimezone, { error: timezoneError }] = useMutation(
+    UPDATE_DEFAULT_TEXTING_TIMEZONE
+  );
+
+  const saveError = hoursError || enforcementError || timezoneError;
 
   const [hoursDialogOpen, setHoursDialogOpen] = useState(false);
 
@@ -65,7 +74,7 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
   const [tempStart, setTempStart] = useState<number>(9);
   const [tempEnd, setTempEnd] = useState<number>(21);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -86,6 +95,37 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
     setTempStart(textingHoursStart);
     setTempEnd(textingHoursEnd);
     setHoursDialogOpen(true);
+  };
+
+  const handleTimezoneChange = async (
+    e: React.ChangeEvent<{ name?: string | undefined; value: unknown }>
+  ) => {
+    try {
+      await updateTimezone({
+        variables: {
+          organizationId,
+          defaultTextingTz: e.target.value as string
+        }
+      });
+    } catch (tzError) {
+      console.error(tzError);
+    }
+  };
+
+  const handleEnforcementChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    try {
+      await updateEnforcement({
+        variables: {
+          organizationId,
+          textingHoursEnforced: checked
+        }
+      });
+    } catch (enforcementsError) {
+      console.error(enforcementsError);
+    }
   };
 
   const handleSaveHours = async () => {
@@ -112,19 +152,17 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
     <Card style={style}>
       <CardHeader title="Texting Hours" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <Typography variant="body1" gutterBottom>
           Default Texting Timezone
         </Typography>
         <Select
           value={defaultTextingTz ? parseIanaZone(defaultTextingTz) : ""}
-          onChange={(e) =>
-            updateTimezone({
-              variables: {
-                organizationId,
-                defaultTextingTz: e.target.value as string
-              }
-            })
-          }
+          onChange={handleTimezoneChange}
           fullWidth
           native={false}
         >
@@ -140,14 +178,7 @@ const TextingHoursSettingsCard: React.FC<TextingHoursSettingsCardProps> = ({
             control={
               <Switch
                 checked={textingHoursEnforced}
-                onChange={(e) =>
-                  updateEnforcement({
-                    variables: {
-                      organizationId,
-                      textingHoursEnforced: e.target.checked
-                    }
-                  })
-                }
+                onChange={handleEnforcementChange}
                 color="primary"
               />
             }

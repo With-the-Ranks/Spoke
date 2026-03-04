@@ -7,6 +7,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -27,7 +28,7 @@ const TrollWebhookSettingsCard: React.FC<TrollWebhookSettingsCardProps> = ({
     variables: { organizationId }
   });
 
-  const [editSettings, { loading: saving }] = useMutation(
+  const [editSettings, { loading: saving, error: saveError }] = useMutation(
     EDIT_ORGANIZATION_SETTINGS
   );
 
@@ -58,7 +59,7 @@ const TrollWebhookSettingsCard: React.FC<TrollWebhookSettingsCardProps> = ({
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -71,6 +72,11 @@ const TrollWebhookSettingsCard: React.FC<TrollWebhookSettingsCardProps> = ({
     <Card style={style}>
       <CardHeader title="TrollBot" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <Typography variant="body1" gutterBottom>
           If set, a payload will be sent to this URL for every TrollBot alarm.
         </Typography>

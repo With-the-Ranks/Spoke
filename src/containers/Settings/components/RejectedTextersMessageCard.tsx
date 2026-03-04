@@ -8,6 +8,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -28,7 +29,7 @@ const RejectedTextersMessageCard: React.FC<RejectedTextersMessageProps> = ({
     variables: { organizationId }
   });
 
-  const [editSettings, { loading: saving }] = useMutation(
+  const [editSettings, { loading: saving, error: saveError }] = useMutation(
     EDIT_ORGANIZATION_SETTINGS
   );
 
@@ -40,7 +41,7 @@ const RejectedTextersMessageCard: React.FC<RejectedTextersMessageProps> = ({
     }
   }, [data]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -53,15 +54,19 @@ const RejectedTextersMessageCard: React.FC<RejectedTextersMessageProps> = ({
   const currentMessage = data?.organization?.settings?.doNotAssignMessage || "";
   const noChange = message === currentMessage;
 
-  const handleToggle = (checked: boolean) => {
-    editSettings({
-      variables: {
-        id: organizationId,
-        input: {
-          showDoNotAssignMessage: checked
+  const handleToggle = async (checked: boolean) => {
+    try {
+      await editSettings({
+        variables: {
+          id: organizationId,
+          input: {
+            showDoNotAssignMessage: checked
+          }
         }
-      }
-    }).catch(console.error);
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleSave = async () => {
@@ -84,6 +89,11 @@ const RejectedTextersMessageCard: React.FC<RejectedTextersMessageProps> = ({
     <Card style={style}>
       <CardHeader title="Rejected Texters Message" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <FormControlLabel
           label="Show different message when user has do not assign?"
           labelPlacement="start"

@@ -4,7 +4,6 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import React, { useState } from "react";
 
-import AssembleNumbersSettingsCard from "./AssembleNumbersSettingsCard";
 import AutoApprovalSettingsCard from "./AutoApprovalSettingsCard";
 import AutosendingSettingsCard from "./AutosendingSettingsCard";
 import CampaignBuilderSettingsCard from "./CampaignBuilderSettingsCard";
@@ -52,11 +51,6 @@ const General: React.FC<GeneralProps> = ({ match }) => {
       />
 
       <TextingHoursSettingsCard
-        organizationId={organizationId}
-        style={{ marginBottom: 20 }}
-      />
-
-      <AssembleNumbersSettingsCard
         organizationId={organizationId}
         style={{ marginBottom: 20 }}
       />

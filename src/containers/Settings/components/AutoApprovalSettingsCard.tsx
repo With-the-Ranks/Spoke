@@ -9,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useState } from "react";
 
 import { RequestAutoApproveType } from "../../../api/organization-membership";
@@ -31,39 +32,37 @@ const AutoApprovalSettingsCard: React.FC<AutoApprovalSettingsCardProps> = ({
     variables: { organizationId }
   });
 
-  const [editSettings, { loading: saving }] = useMutation(
+  const [editSettings, { loading: saving, error: saveError }] = useMutation(
     EDIT_ORGANIZATION_SETTINGS
   );
 
-  const [approvalLevel, setApprovalLevel] = useState<string | undefined>(
-    undefined
-  );
+  const [draftLevel, setDraftLevel] = useState<
+    RequestAutoApproveType | undefined
+  >(undefined);
 
-  // Derive current level from props or data
   const currentLevel = data?.organization?.settings?.defaulTexterApprovalStatus;
+  if (!draftLevel && currentLevel) setDraftLevel(currentLevel);
 
-  const displayedLevel = approvalLevel || currentLevel;
-  const noChange = displayedLevel === currentLevel;
+  const noChange = draftLevel === currentLevel;
 
   const handleSave = async () => {
-    if (!displayedLevel) return;
+    if (!draftLevel) return;
     try {
       await editSettings({
         variables: {
           id: organizationId,
           input: {
-            defaulTexterApprovalStatus: displayedLevel
+            defaulTexterApprovalStatus: draftLevel
           }
         }
       });
-      setApprovalLevel(undefined); // Reset local state
+      setDraftLevel(undefined);
     } catch (e) {
       console.error(e);
-      // Ideally handle error UI state here or using global flash
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -76,14 +75,21 @@ const AutoApprovalSettingsCard: React.FC<AutoApprovalSettingsCardProps> = ({
     <Card style={style}>
       <CardHeader title="Default Text Request Auto-Approval Level" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <Typography variant="body1" paragraph>
           When a new texter joins your organization they will be given this
           auto-approval level for requesting text assignments.
         </Typography>
         <FormControl fullWidth>
           <Select
-            value={displayedLevel || ""}
-            onChange={(e) => setApprovalLevel(e.target.value as string)}
+            value={draftLevel || ""}
+            onChange={(e) =>
+              setDraftLevel(e.target.value as RequestAutoApproveType)
+            }
             displayEmpty
           >
             {Object.keys(RequestAutoApproveType).map((level) => (

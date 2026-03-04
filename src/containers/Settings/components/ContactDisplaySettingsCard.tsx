@@ -6,6 +6,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React from "react";
 
 import {
@@ -26,9 +27,11 @@ const ContactDisplaySettingsCard: React.FC<ContactDisplaySettingsCardProps> = ({
     variables: { organizationId }
   });
 
-  const [editSettings] = useMutation(EDIT_ORGANIZATION_SETTINGS);
+  const [editSettings, { error: saveError }] = useMutation(
+    EDIT_ORGANIZATION_SETTINGS
+  );
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) {
     return (
       <Alert severity="error" style={style}>
@@ -40,21 +43,30 @@ const ContactDisplaySettingsCard: React.FC<ContactDisplaySettingsCardProps> = ({
   const { showContactLastName, showContactCell } =
     data?.organization?.settings || {};
 
-  const handleToggle = (field: string, value: boolean) => {
-    editSettings({
-      variables: {
-        id: organizationId,
-        input: {
-          [field]: value
+  const handleToggle = async (field: string, value: boolean) => {
+    try {
+      await editSettings({
+        variables: {
+          id: organizationId,
+          input: {
+            [field]: value
+          }
         }
-      }
-    }).catch(console.error);
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
     <Card style={style}>
       <CardHeader title="Contact Information Display" />
       <CardContent>
+        {saveError && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {saveError.message || "Failed to save settings"}
+          </Alert>
+        )}
         <Typography variant="body1" gutterBottom>
           Choose how much information about a contact is displayed to the
           texter.

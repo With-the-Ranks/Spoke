@@ -6,6 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import TextField from "@material-ui/core/TextField";
 import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
 import React, { useEffect, useState } from "react";
 
 import { EDIT_ORGANIZATION_NAME, GET_ORGANIZATION_NAME } from "./queries";
@@ -31,7 +32,7 @@ const EditName: React.FC<EditNameProps> = ({ organizationId, style }) => {
     }
   }, [data]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Skeleton>Loading...</Skeleton>;
   if (error) return <div>Error loading organization name</div>;
 
   const currentName = data?.organization?.name || "";
