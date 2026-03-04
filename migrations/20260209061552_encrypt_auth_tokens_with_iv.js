@@ -26,17 +26,19 @@ function encryptWithIv(value, secret) {
   const key = crypto.createHash("sha256").update(secret).digest();
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
+
   let encrypted = cipher.update(value, inputEncoding, outputEncoding);
   encrypted += cipher.final(outputEncoding);
-  return `${iv.toString(outputEncoding)}:${encrypted}`;
+  return `V2:${iv.toString(outputEncoding)}:${encrypted}`;
 }
 
 // New decryption using createDecipheriv (with IV)
 function decryptWithIv(encrypted, secret) {
   const key = crypto.createHash("sha256").update(secret).digest();
   const parts = encrypted.split(":");
-  const iv = Buffer.from(parts[0], outputEncoding);
-  const encryptedData = parts[1];
+  const iv = Buffer.from(parts[1], outputEncoding);
+  const encryptedData = parts[2];
+
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
   let decrypted = decipher.update(encryptedData, outputEncoding, inputEncoding);
   decrypted += decipher.final(inputEncoding);
@@ -54,7 +56,7 @@ exports.up = function up(knex) {
     .whereNot("encrypted_auth_token", "")
     .then((rows) => {
       const updates = rows
-        .filter((row) => !row.encrypted_auth_token.includes(":"))
+        .filter((row) => !row.encrypted_auth_token.startsWith("V2:"))
         .map((row) => {
           const decrypted = legacyDecrypt(
             row.encrypted_auth_token,
@@ -80,7 +82,7 @@ exports.down = function down(knex) {
     .whereNot("encrypted_auth_token", "")
     .then((rows) => {
       const updates = rows
-        .filter((row) => row.encrypted_auth_token.includes(":"))
+        .filter((row) => row.encrypted_auth_token.startsWith("V2:"))
         .map((row) => {
           const decrypted = decryptWithIv(
             row.encrypted_auth_token,

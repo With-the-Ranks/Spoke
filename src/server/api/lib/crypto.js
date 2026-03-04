@@ -18,18 +18,19 @@ const symmetricEncrypt = (value) => {
   let encrypted = cipher.update(value, inputEncoding, outputEncoding);
   encrypted += cipher.final(outputEncoding);
 
-  // Prepend IV to encrypted data (IV is not secret)
-  return `${iv.toString(outputEncoding)}:${encrypted}`;
+  // Prepend IV to encrypted data (IV is not secret) and prefix with V2
+  return `V2:${iv.toString(outputEncoding)}:${encrypted}`;
 };
 
 const symmetricDecrypt = (encrypted) => {
+  // parts are V2, iv, and encrypted string
   const parts = encrypted.split(":");
-  if (parts.length !== 2) {
+  if (parts.length !== 3) {
     throw new Error("Invalid encrypted data format");
   }
 
-  const iv = Buffer.from(parts[0], outputEncoding);
-  const encryptedData = parts[1];
+  const iv = Buffer.from(parts[1], outputEncoding);
+  const encryptedData = parts[2];
 
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
   let decrypted = decipher.update(encryptedData, outputEncoding, inputEncoding);
