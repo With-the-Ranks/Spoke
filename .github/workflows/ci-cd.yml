@@ -90,6 +90,9 @@ jobs:
     needs: test
     name: Deploy to Staging
     environment: staging
+    concurrency:
+      group: staging-deploy
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -113,7 +116,7 @@ jobs:
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
 
       - name: Configure Docker for GAR
-        run: gcloud auth configure-docker ${{ env.GAR_REGION }}-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -131,7 +134,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GAR_REGION }}
+          location: ${{ env.GCP_REGION }}
 
       - name: Restart staging deployment
         run: |
