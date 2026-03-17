@@ -1,0 +1,45 @@
+name: "Build and Push Docker Image"
+description: "Build and push a Docker image to Google Artifact Registry with caching"
+
+inputs:
+  registry:
+    description: "Full GAR registry path (e.g. us-west1-docker.pkg.dev/project/repo/image)"
+    required: true
+  tags:
+    description: "Newline-separated image tags (without registry prefix)"
+    required: true
+  spoke_version:
+    description: "Value for the SPOKE_VERSION build arg"
+    required: true
+  cache_scope:
+    description: "GitHub Actions cache scope for Docker layer caching"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Prepare tags
+      id: tags
+      shell: bash
+      run: |
+        TAGS=""
+        while IFS= read -r tag; do
+          [ -z "$tag" ] && continue
+          TAGS="${TAGS}${{ inputs.registry }}:${tag}"$'\n'
+        done <<< "${{ inputs.tags }}"
+        echo "full_tags<<EOF" >> "$GITHUB_OUTPUT"
+        echo "$TAGS" >> "$GITHUB_OUTPUT"
+        echo "EOF" >> "$GITHUB_OUTPUT"
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        build-args: |
+          SPOKE_VERSION=${{ inputs.spoke_version }}
+        tags: ${{ steps.tags.outputs.full_tags }}
+        cache-from: type=gha,scope=${{ inputs.cache_scope }}
+        cache-to: type=gha,mode=max,scope=${{ inputs.cache_scope }}

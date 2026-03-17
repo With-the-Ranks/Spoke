@@ -6,6 +6,9 @@ on:
 env:
   GCP_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
+  GKE_CLUSTER: spoke-cluster
+  STAGING_NAMESPACE: spoke-staging
+  STAGING_DEPLOYMENT: main-spoke
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
   WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
 
@@ -84,6 +87,57 @@ jobs:
       - name: Run Tests
         run: yarn jest --forceExit --detectOpenHandles src/**/*
 
+  deploy-staging:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    name: Deploy to Staging
+    environment: staging
+    concurrency:
+      group: staging-deploy
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get short SHA
+        id: build-metadata
+        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/gcp-auth
+        with:
+          wif_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          region: ${{ env.GCP_REGION }}
+
+      - uses: ./.github/actions/docker-build-push
+        with:
+          registry: ${{ env.GAR_REGISTRY }}
+          tags: |
+            main-latest
+            main-${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: main-${{ steps.build-metadata.outputs.sha_short }}
+          cache_scope: staging
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GCP_REGION }}
+
+      - name: Restart staging deployment
+        run: |
+          if kubectl get deployment ${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }} &>/dev/null; then
+            kubectl rollout restart deployment/${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }}
+            kubectl rollout status deployment/${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }} --timeout=5m
+          else
+            echo "Staging deployment not found — skipping restart"
+          fi
+
   publish-docker-image:
     if: startsWith( github.ref, 'refs/tags/v')
     needs: test
@@ -97,37 +151,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Get image tags
-        id: image-tags
+      - name: Get version and SHA
+        id: build-metadata
         run: |
-          GIT_SHA_SHORT=${GITHUB_SHA:0:7}
-          echo "sha=$GIT_SHA_SHORT" >> "$GITHUB_OUTPUT"
+          echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           GIT_REF=${GITHUB_REF#refs/*/}
-          SPOKE_VERSION=${GIT_REF#"v"}
-          SPOKE_VERSION=${SPOKE_VERSION//[\/]/-}
-          echo "version=$SPOKE_VERSION" >> "$GITHUB_OUTPUT"
+          VERSION=${GIT_REF#"v"}
+          VERSION=${VERSION//[\/]/-}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
+      - uses: ./.github/actions/gcp-auth
         with:
-          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          wif_provider: ${{ env.WIF_PROVIDER }}
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          region: ${{ env.GCP_REGION }}
 
-      - name: Configure Docker for GAR
-        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - uses: ./.github/actions/docker-build-push
         with:
-          push: true
-          build-args: |
-            SPOKE_VERSION=${{ steps.image-tags.outputs.version }}
+          registry: ${{ env.GAR_REGISTRY }}
           tags: |
-            ${{ env.GAR_REGISTRY }}:latest
-            ${{ env.GAR_REGISTRY }}:${{ steps.image-tags.outputs.version }}
-            ${{ env.GAR_REGISTRY }}:${{ steps.image-tags.outputs.sha }}
-          cache-from: type=gha,scope=release
-          cache-to: type=gha,mode=max,scope=release
+            latest
+            ${{ steps.build-metadata.outputs.version }}
+            ${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: ${{ steps.build-metadata.outputs.version }}
+          cache_scope: release
