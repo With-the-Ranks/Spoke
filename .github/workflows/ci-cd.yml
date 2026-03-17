@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  GAR_REGION: us-west1
+  GCP_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
   WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
@@ -117,7 +117,7 @@ jobs:
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
 
       - name: Configure Docker for GAR
-        run: gcloud auth configure-docker ${{ env.GAR_REGION }}-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
