@@ -6,6 +6,7 @@ on:
 env:
   GCP_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
+  GKE_CLUSTER: spoke-cluster
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
   WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
 
@@ -83,6 +84,59 @@ jobs:
 
       - name: Run Tests
         run: yarn jest --forceExit --detectOpenHandles src/**/*
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    name: Deploy to Staging
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get short SHA
+        id: image-tags
+        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for GAR
+        run: gcloud auth configure-docker ${{ env.GAR_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          build-args: |
+            SPOKE_VERSION=main-${{ steps.image-tags.outputs.sha_short }}
+          tags: |
+            ${{ env.GAR_REGISTRY }}:main-latest
+            ${{ env.GAR_REGISTRY }}:main-${{ steps.image-tags.outputs.sha_short }}
+          cache-from: type=gha,scope=staging
+          cache-to: type=gha,mode=max,scope=staging
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GAR_REGION }}
+
+      - name: Restart staging deployment
+        run: |
+          kubectl rollout restart deployment/main-spoke -n spoke-staging
+          kubectl rollout status deployment/main-spoke -n spoke-staging --timeout=5m
 
   publish-docker-image:
     if: startsWith( github.ref, 'refs/tags/v')
