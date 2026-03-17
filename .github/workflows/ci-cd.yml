@@ -7,6 +7,8 @@ env:
   GCP_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
   GKE_CLUSTER: spoke-cluster
+  STAGING_NAMESPACE: spoke-staging
+  STAGING_DEPLOYMENT: main-spoke
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
   WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
 
@@ -129,9 +131,9 @@ jobs:
 
       - name: Restart staging deployment
         run: |
-          if kubectl get deployment main-spoke -n spoke-staging &>/dev/null; then
-            kubectl rollout restart deployment/main-spoke -n spoke-staging
-            kubectl rollout status deployment/main-spoke -n spoke-staging --timeout=5m
+          if kubectl get deployment ${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }} &>/dev/null; then
+            kubectl rollout restart deployment/${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }}
+            kubectl rollout status deployment/${{ env.STAGING_DEPLOYMENT }} -n ${{ env.STAGING_NAMESPACE }} --timeout=5m
           else
             echo "Staging deployment not found — skipping restart"
           fi
