@@ -103,7 +103,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get short SHA
-        id: meta
+        id: build-metadata
         run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - uses: ./.github/actions/gcp-auth
@@ -112,13 +112,13 @@ jobs:
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
           region: ${{ env.GCP_REGION }}
 
-      - uses: ./.github/actions/docker-build
+      - uses: ./.github/actions/docker-build-push
         with:
           registry: ${{ env.GAR_REGISTRY }}
           tags: |
             main-latest
-            main-${{ steps.meta.outputs.sha_short }}
-          spoke_version: main-${{ steps.meta.outputs.sha_short }}
+            main-${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: main-${{ steps.build-metadata.outputs.sha_short }}
           cache_scope: staging
 
       - name: Get GKE credentials
@@ -150,7 +150,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get version and SHA
-        id: meta
+        id: build-metadata
         run: |
           echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           GIT_REF=${GITHUB_REF#refs/*/}
@@ -164,12 +164,12 @@ jobs:
           service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
           region: ${{ env.GCP_REGION }}
 
-      - uses: ./.github/actions/docker-build
+      - uses: ./.github/actions/docker-build-push
         with:
           registry: ${{ env.GAR_REGISTRY }}
           tags: |
             latest
-            ${{ steps.meta.outputs.version }}
-            ${{ steps.meta.outputs.sha_short }}
-          spoke_version: ${{ steps.meta.outputs.version }}
+            ${{ steps.build-metadata.outputs.version }}
+            ${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: ${{ steps.build-metadata.outputs.version }}
           cache_scope: release
