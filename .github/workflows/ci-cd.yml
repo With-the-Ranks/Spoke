@@ -4,7 +4,6 @@ on:
   push:
 
 env:
-  GCP_PROJECT_ID: spoke-407503
   GAR_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
