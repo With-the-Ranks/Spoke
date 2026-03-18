@@ -89,7 +89,7 @@ jobs:
         run: yarn jest --forceExit --detectOpenHandles src/**/*
 
   deploy-staging:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix/gke-location'
+    if: github.ref == 'refs/heads/main'
     needs: test
     name: Deploy to Staging
     environment: staging
