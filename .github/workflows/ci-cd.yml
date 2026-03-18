@@ -7,6 +7,7 @@ env:
   GCP_REGION: us-west1
   GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
   GKE_CLUSTER: spoke-cluster
+  GKE_LOCATION: us-west1-a
   STAGING_NAMESPACE: spoke-staging
   STAGING_DEPLOYMENT: main-spoke
   WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
@@ -127,7 +128,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GCP_REGION }}
+          location: ${{ env.GKE_LOCATION }}
 
       - name: Restart staging deployment
         run: |
