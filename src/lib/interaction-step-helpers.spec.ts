@@ -1,7 +1,7 @@
 import type { InteractionStep } from "../api/interaction-step";
 import { makeTree } from "./interaction-step-helpers";
 
-const baseEmptyStep = {
+const baseEmptyStep: Omit<InteractionStep, "id" | "parentInteractionId"> = {
   questionText: "",
   answerActions: "",
   scriptOptions: [""],
@@ -10,187 +10,96 @@ const baseEmptyStep = {
   createdAt: "2021-01-26T00:00:00Z"
 };
 
+const step = (
+  id: string,
+  parentInteractionId: string | null,
+  overrides: Partial<InteractionStep> = {}
+): InteractionStep => ({
+  ...baseEmptyStep,
+  id,
+  parentInteractionId,
+  // Auto-increment createdAt so ordering is deterministic
+  createdAt: `2021-01-26T00:00:0${id}Z`,
+  ...overrides
+});
+
 describe("makeTree", () => {
-  test("handles empty interaction steps argument", () => {
-    const steps: InteractionStep[] = [];
-    const tree = makeTree(steps);
+  it("returns a wrapper with empty children for an empty input", () => {
+    const tree = makeTree([]);
     expect(tree).toEqual({ interactionSteps: [] });
   });
 
-  test("handles building a basic tree", () => {
-    const rootStep: InteractionStep = {
-      ...baseEmptyStep,
-      id: "1",
-      parentInteractionId: null,
-      createdAt: "2021-01-26T00:00:01Z"
-    };
-    const childStepA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "2",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:02Z"
-    };
-    const childStepB: InteractionStep = {
-      ...baseEmptyStep,
-      id: "3",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:03Z"
-    };
-    const childStepAA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "4",
-      parentInteractionId: "2",
-      createdAt: "2021-01-26T00:00:04Z"
-    };
-    const steps: InteractionStep[] = [
-      rootStep,
-      childStepA,
-      childStepB,
-      childStepAA
-    ];
+  it("builds a tree with nested children", () => {
+    const root = step("1", null);
+    const childA = step("2", "1");
+    const childB = step("3", "1");
+    const grandchild = step("4", "2");
 
-    const tree = makeTree(steps);
+    const tree = makeTree([root, childA, childB, grandchild]);
 
     expect(tree).toEqual({
-      ...rootStep,
+      ...root,
       interactionSteps: [
-        { ...childStepB, interactionSteps: [] },
+        { ...childB, interactionSteps: [] },
         {
-          ...childStepA,
-          interactionSteps: [{ ...childStepAA, interactionSteps: [] }]
+          ...childA,
+          interactionSteps: [{ ...grandchild, interactionSteps: [] }]
         }
       ]
     });
   });
 
-  test("handles building a tree with deleted steps", () => {
-    const rootStep: InteractionStep = {
-      ...baseEmptyStep,
-      id: "1",
-      parentInteractionId: null,
-      createdAt: "2021-01-26T00:00:01Z"
-    };
-    const childStepA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "2",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:02Z"
-    };
-    const childStepB: InteractionStep = {
-      ...baseEmptyStep,
-      id: "3",
-      parentInteractionId: "1",
-      isDeleted: true,
-      createdAt: "2021-01-26T00:00:03Z"
-    };
-    const childStepAA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "4",
-      parentInteractionId: "2",
-      createdAt: "2021-01-26T00:00:04Z"
-    };
-    const steps: InteractionStep[] = [
-      rootStep,
-      childStepA,
-      childStepB,
-      childStepAA
-    ];
+  it("includes deleted steps in the tree", () => {
+    const root = step("1", null);
+    const childA = step("2", "1");
+    const deletedChild = step("3", "1", { isDeleted: true });
+    const grandchild = step("4", "2");
 
-    const tree = makeTree(steps);
+    const tree = makeTree([root, childA, deletedChild, grandchild]);
 
     expect(tree).toEqual({
-      ...rootStep,
+      ...root,
       interactionSteps: [
-        { ...childStepB, interactionSteps: [] },
+        { ...deletedChild, interactionSteps: [] },
         {
-          ...childStepA,
-          interactionSteps: [{ ...childStepAA, interactionSteps: [] }]
+          ...childA,
+          interactionSteps: [{ ...grandchild, interactionSteps: [] }]
         }
       ]
     });
   });
 
-  test("handles building a tree when input array is unsorted", () => {
-    const rootStep: InteractionStep = {
-      ...baseEmptyStep,
-      id: "1",
-      parentInteractionId: null,
-      createdAt: "2021-01-26T00:00:01Z"
-    };
-    const childStepA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "2",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:02Z"
-    };
-    const childStepB: InteractionStep = {
-      ...baseEmptyStep,
-      id: "3",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:03Z"
-    };
-    const childStepC: InteractionStep = {
-      ...baseEmptyStep,
-      id: "4",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:04Z"
-    };
-    const steps: InteractionStep[] = [
-      rootStep,
-      childStepA,
-      childStepC,
-      childStepB
-    ];
+  it("sorts children by createdAt (newest first)", () => {
+    const root = step("1", null);
+    const childA = step("2", "1");
+    const childB = step("3", "1");
+    const childC = step("4", "1");
 
-    const tree = makeTree(steps);
+    // Pass in non-chronological order
+    const tree = makeTree([root, childA, childC, childB]);
 
     expect(tree).toEqual({
-      ...rootStep,
+      ...root,
       interactionSteps: [
-        { ...childStepC, interactionSteps: [] },
-        { ...childStepB, interactionSteps: [] },
-        { ...childStepA, interactionSteps: [] }
+        { ...childC, interactionSteps: [] },
+        { ...childB, interactionSteps: [] },
+        { ...childA, interactionSteps: [] }
       ]
     });
   });
 
-  test("handles building a tree when given multiple root interaction steps", () => {
-    const rootStepA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "1",
-      parentInteractionId: null,
-      createdAt: "2021-01-26T00:00:01Z"
-    };
-    const childStepAA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "2",
-      parentInteractionId: "1",
-      createdAt: "2021-01-26T00:00:02Z"
-    };
-    const rootStepB: InteractionStep = {
-      ...baseEmptyStep,
-      id: "3",
-      parentInteractionId: null,
-      createdAt: "2021-01-26T00:00:03Z"
-    };
-    const childStepBA: InteractionStep = {
-      ...baseEmptyStep,
-      id: "4",
-      parentInteractionId: "3",
-      createdAt: "2021-01-26T00:00:04Z"
-    };
+  it("uses the newest root when multiple roots exist", () => {
+    const rootA = step("1", null);
+    const childAA = step("2", "1");
+    const rootB = step("3", null);
+    const childBA = step("4", "3");
 
-    const steps: InteractionStep[] = [
-      rootStepA,
-      childStepAA,
-      rootStepB,
-      childStepBA
-    ];
-    const tree = makeTree(steps);
+    const tree = makeTree([rootA, childAA, rootB, childBA]);
 
+    // rootB is newer (higher id/createdAt), so it becomes the tree root
     expect(tree).toEqual({
-      ...rootStepB,
-      interactionSteps: [{ ...childStepBA, interactionSteps: [] }]
+      ...rootB,
+      interactionSteps: [{ ...childBA, interactionSteps: [] }]
     });
   });
 });

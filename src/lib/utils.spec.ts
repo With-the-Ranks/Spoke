@@ -6,33 +6,33 @@ import {
 } from "./utils";
 
 describe("stringIsAValidUrl", () => {
-  test("recognizes valid URL", () => {
+  it("accepts a valid https URL", () => {
     expect(stringIsAValidUrl("https://www.politicsrewired.com")).toBe(true);
   });
 
-  test("recognizes valid URL with query string", () => {
+  it("accepts a valid URL with query parameters", () => {
     expect(
       stringIsAValidUrl("https://www.politicsrewired.com?foo=bar&bar=baz")
     ).toBe(true);
   });
 
-  test("rejects invalid URL without scheme", () => {
+  it("rejects a URL without a scheme", () => {
     expect(stringIsAValidUrl("www.politicsrewired.com")).toBe(false);
   });
 
-  test("rejects invalid URL", () => {
+  it("rejects a relative path", () => {
     expect(stringIsAValidUrl("foo/bar")).toBe(false);
   });
 });
 
 describe("replaceAll", () => {
-  test("replaces mulitple occurrences", () => {
+  it("replaces multiple occurrences of a substring", () => {
     expect(
       replaceAll("buffalo buffalo buffalo buffalo buffalo", "buffalo", "squid")
     ).toBe("squid squid squid squid squid");
   });
 
-  test("escapes special regex characters", () => {
+  it("escapes special regex characters in the search string", () => {
     expect(replaceAll(`what about \\ characters?`, `\\`, `?`)).toBe(
       "what about ? characters?"
     );
@@ -40,21 +40,21 @@ describe("replaceAll", () => {
 });
 
 describe("asPercent", () => {
-  test("handles 0 denominator correctly", () => {
+  it("returns 0 when denominator is 0", () => {
     expect(asPercent(10, 0)).toBe(0);
   });
 
-  test("handles 100% correctly", () => {
+  it("returns 100 for equal numerator and denominator", () => {
     expect(asPercent(10, 10)).toBe(100);
   });
 });
 
 describe("asPercentWithTotal", () => {
-  test("handles 0 denominator correctly", () => {
+  it("returns 0% with total when denominator is 0", () => {
     expect(asPercentWithTotal(10, 0)).toBe("0%(10)");
   });
 
-  test("truncates decimal", () => {
+  it("truncates to 4 characters of the percentage string", () => {
     expect(asPercentWithTotal(9, 11)).toBe("81.8%(9)");
   });
 });
