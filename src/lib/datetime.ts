@@ -20,7 +20,7 @@ export const deprecatedTimezoneMap: Record<string, string> = {
   "us/samoa": "Pacific/Pago_Pago"
 };
 
-export const parseIanaZone = (name: string) =>
+export const parseIanaZone = (name: string): string =>
   name ? deprecatedTimezoneMap[name.toLowerCase()] || name : name;
 
 export class DateTime extends LuxonDateTime {

@@ -2,17 +2,21 @@
 import { DateFunctions, DateTime, zone } from "timezonecomplete";
 
 class TimezoneOffsetAndDst {
-  constructor(tzOffsetMinutes, hasDst) {
+  tzOffsetMinutes: number;
+
+  hasDst: boolean;
+
+  constructor(tzOffsetMinutes: number, hasDst: boolean) {
     this.tzOffsetMinutes = tzOffsetMinutes;
     this.hasDst = hasDst;
   }
 }
 
-const _timezoneOffsetAndDst = {};
+const _timezoneOffsetAndDst: Record<string, TimezoneOffsetAndDst> = {};
 
 // a class to help us know if a date is DST in a given timezone
 export class DstHelper {
-  static ensureTimezoneDstCalculated(timezone) {
+  static ensureTimezoneDstCalculated(timezone: string): void {
     if (!(timezone in _timezoneOffsetAndDst)) {
       // If a location has DST, the offset from GMT at January 1 and June 1 will certainly
       // be different.  The greater of the two is the DST offset.  For our check, we
@@ -45,17 +49,17 @@ export class DstHelper {
     }
   }
 
-  static getTimezoneOffsetHours(timezone) {
+  static getTimezoneOffsetHours(timezone: string): number {
     DstHelper.ensureTimezoneDstCalculated(timezone);
     return _timezoneOffsetAndDst[timezone].tzOffsetMinutes / 60;
   }
 
-  static timezoneHasDst(timezone) {
+  static timezoneHasDst(timezone: string): boolean {
     DstHelper.ensureTimezoneDstCalculated(timezone);
     return _timezoneOffsetAndDst[timezone].hasDst;
   }
 
-  static isOffsetDst(offset, timezone) {
+  static isOffsetDst(offset: number, timezone: string): boolean {
     DstHelper.ensureTimezoneDstCalculated(timezone);
 
     // if this timezone has DST (meaning, january and july offsets were different)
@@ -68,12 +72,12 @@ export class DstHelper {
     );
   }
 
-  static isDateDst(date, timezone) {
+  static isDateDst(date: Date, timezone: string): boolean {
     const d = new DateTime(date, DateFunctions.Get, zone(timezone));
     return DstHelper.isOffsetDst(d.offset(), timezone);
   }
 
-  static isDateTimeDst(date, timezone) {
+  static isDateTimeDst(date: DateTime, timezone: string): boolean {
     return DstHelper.isOffsetDst(date.offset(), timezone);
   }
 }

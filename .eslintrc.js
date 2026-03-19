@@ -274,6 +274,15 @@ module.exports = {
       rules: {
         "prefer-arrow-functions/prefer-arrow-functions": "off"
       }
+    },
+    {
+      // stricter TS rules for cleaned-up lib modules
+      files: ["src/lib/**/*.ts"],
+      excludedFiles: ["src/lib/**/*.spec.ts"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/explicit-module-boundary-types": "error"
+      }
     }
   ]
 };

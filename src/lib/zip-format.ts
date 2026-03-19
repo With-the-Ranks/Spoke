@@ -1,4 +1,7 @@
-const getFormattedZip = (zip, country = "US") => {
+// [firstZip, lastZip, timezoneOffset, hasDst, zipCount]
+type ZipRange = readonly [number, number, number, number, number];
+
+export const getFormattedZip = (zip: string, country = "US"): string | null => {
   if (country === "US") {
     // Matches 5 digit zip
     // eslint-disable-next-line no-useless-escape
@@ -21,7 +24,7 @@ const getFormattedZip = (zip, country = "US") => {
   throw new Error(`Do not know how to format zip for country: ${country}`);
 };
 
-const commonZipRanges = [
+const commonZipRanges: ZipRange[] = [
   // list of zip ranges. [<firstZip>, <lastZip>, <timezone>, <hasDst>, <zipCount>]
   [1001, 32401, -5, 1, 31400],
   [70000, 79821, -6, 1, 9821],
@@ -69,19 +72,14 @@ const commonZipRanges = [
 
 commonZipRanges.sort((a, b) => a[0] - b[0]);
 
-const getCommonZipRanges = () => commonZipRanges;
+export const getCommonZipRanges = (): ZipRange[] => commonZipRanges;
 
-const zipToTimeZone = (zip) => {
-  // will search common zip ranges -- won't necessarily find something
-  // so fallback on looking it up in db
-  if (typeof zip === "number" || zip.length >= 5) {
-    zip = parseInt(zip, 10);
-    return getCommonZipRanges().find((g) => zip >= g[0] && zip < g[1]);
+export const zipToTimeZone = (zip: string | number): ZipRange | undefined => {
+  if (typeof zip === "number" || (typeof zip === "string" && zip.length >= 5)) {
+    const numericZip = typeof zip === "number" ? zip : parseInt(zip, 10);
+    return getCommonZipRanges().find(
+      (g) => numericZip >= g[0] && numericZip < g[1]
+    );
   }
-};
-
-module.exports = {
-  getFormattedZip,
-  getCommonZipRanges,
-  zipToTimeZone
+  return undefined;
 };

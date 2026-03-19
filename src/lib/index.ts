@@ -1,4 +1,3 @@
-import _ from "lodash";
 import zlib from "zlib";
 
 import { getDisplayPhoneNumber, getFormattedPhoneNumber } from "./phone-format";
@@ -31,7 +30,7 @@ export {
   isRoleGreater
 } from "./permissions";
 
-export const gzip = (str: string) =>
+export const gzip = (str: string): Promise<Buffer> =>
   new Promise((resolve, reject) => {
     zlib.gzip(str, (err, res) => {
       if (err) {
@@ -42,7 +41,7 @@ export const gzip = (str: string) =>
     });
   });
 
-export const gunzip = (buf: zlib.InputType) =>
+export const gunzip = (buf: zlib.InputType): Promise<Buffer> =>
   new Promise((resolve, reject) => {
     zlib.gunzip(buf, (err, res) => {
       if (err) {

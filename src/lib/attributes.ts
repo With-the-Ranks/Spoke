@@ -3,14 +3,27 @@ import isEmpty from "lodash/isEmpty";
 
 import { getFormattedPhoneNumber, phoneNumberRegex } from "./phone-format";
 
+interface DataTestAttribute {
+  "data-test"?: string;
+}
+
+interface NameComponents {
+  firstName: string | undefined;
+  lastName: string | undefined;
+  cellNumber: string | undefined;
+}
+
 // Used to generate data-test attributes on non-production environments and used by end-to-end tests
-export const dataTest = (value: string, disable: boolean) => {
+export const dataTest = (
+  value: string,
+  disable: boolean
+): DataTestAttribute => {
   const attribute =
     window.NODE_ENV !== "production" && !disable ? { "data-test": value } : {};
   return attribute;
 };
 
-export const camelCase = (str: string) => {
+export const camelCase = (str: string): string => {
   return str
     .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
       return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
@@ -18,16 +31,16 @@ export const camelCase = (str: string) => {
     .replace(/\s+/g, "");
 };
 
-export const titleCase = (value: string) =>
+export const titleCase = (value: string): string =>
   `${value.charAt(0).toUpperCase()}${value.substring(1).toLowerCase()}`;
 
-export const snakeToTitleCase = (value: string) =>
+export const snakeToTitleCase = (value: string): string =>
   value
     .split("_")
     .map((s) => titleCase(s))
     .join(" ");
 
-export const nameComponents = (name: string) => {
+export const nameComponents = (name: string): NameComponents => {
   let firstName;
   let lastName;
   let cellNumber;
@@ -55,7 +68,9 @@ export const nameComponents = (name: string) => {
   return { firstName, lastName, cellNumber };
 };
 
-export const recordToCamelCase = <T = any>(record: any) =>
+export const recordToCamelCase = <T = Record<string, unknown>>(
+  record: Record<string, unknown>
+): T =>
   Object.fromEntries(
     Object.entries(record).map(([key, value]) => [humps.camelize(key), value])
   ) as T;

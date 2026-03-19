@@ -1,6 +1,6 @@
 import { DateTime, Interval } from "./datetime";
 
-export const timezones = [
+export const timezones: readonly string[] = [
   "US/Alaska",
   "US/Aleutian",
   "US/Arizona",
@@ -20,11 +20,15 @@ export const timezones = [
 /**
  * Returns true if it is currently between the start and end hours in the specified timezone.
  *
- * @param {string} timezone The timezone in which to evaluate
- * @param {number} starthour Interval starting hour in 24-hour format
- * @param {number} endHour Interval ending hour in 24-hour format
+ * @param timezone The timezone in which to evaluate
+ * @param starthour Interval starting hour in 24-hour format
+ * @param endHour Interval ending hour in 24-hour format
  */
-export const isNowBetween = (timezone, starthour, endHour) => {
+export const isNowBetween = (
+  timezone: string,
+  starthour: number,
+  endHour: number
+): boolean => {
   const campaignTime = DateTime.local().setZone(timezone).startOf("day");
 
   return Interval.fromDateTimes(
@@ -33,13 +37,26 @@ export const isNowBetween = (timezone, starthour, endHour) => {
   ).contains(DateTime.local());
 };
 
+interface ContactWithTimezone {
+  timezone?: string | null;
+}
+
+interface CampaignWithHours {
+  timezone: string;
+  textingHoursStart: number;
+  textingHoursEnd: number;
+}
+
 /**
  * Return true if, in the contact's timezone, it is currently within the campaign texting hours.
  *
- * @param {object} contact GraphQL-type contact
- * @param {object} campaign GraphQL-type campaign type
+ * @param contact GraphQL-type contact
+ * @param campaign GraphQL-type campaign type
  */
-export const isContactNowWithinCampaignHours = (contact, campaign) => {
+export const isContactNowWithinCampaignHours = (
+  contact: ContactWithTimezone,
+  campaign: CampaignWithHours
+): boolean => {
   const timezone = contact.timezone || campaign.timezone;
   const { textingHoursStart, textingHoursEnd } = campaign;
 

@@ -16,7 +16,7 @@ export const delimiters = {
   endDelimiter: "}"
 };
 
-export const delimit = (text: string) => {
+export const delimit = (text: string): string => {
   const { startDelimiter, endDelimiter } = delimiters;
   return `${startDelimiter}${text}${endDelimiter}`;
 };
@@ -49,10 +49,10 @@ export const mediaExtractor = /\[\s*(http[^\]\s]*)\s*\]/;
 const LOWERCASE_FIRST_NAMES = ["friend", "there"];
 
 // TODO: This will include zipCode even if you ddin't upload it
-export const allScriptFields = (customFields: string[]) =>
+export const allScriptFields = (customFields: string[]): string[] =>
   TOP_LEVEL_UPLOAD_FIELDS.concat(TEXTER_SCRIPT_FIELDS).concat(customFields);
 
-export const titleCase = (str: string) =>
+export const titleCase = (str: string): string =>
   str
     .trim()
     .split(" ")
@@ -87,7 +87,9 @@ const getScriptFieldValue = (
   return result;
 };
 
-export const customFieldsJsonStringToArray = (customFieldsJson: string) =>
+export const customFieldsJsonStringToArray = (
+  customFieldsJson: string
+): string[] =>
   customFieldsJson ? Object.keys(JSON.parse(customFieldsJson)) : [];
 
 interface ApplyScriptOptions {
@@ -104,7 +106,7 @@ export const applyScript = ({
   customFields,
   campaignVariables,
   texter
-}: ApplyScriptOptions) => {
+}: ApplyScriptOptions): string => {
   const scriptFields = allScriptFields(customFields);
   let appliedScript = script;
 
@@ -126,7 +128,7 @@ export const applyScript = ({
   return appliedScript;
 };
 
-export const getAttachmentLink = (text: string) => {
+export const getAttachmentLink = (text: string): string | null => {
   const results = text.match(mediaExtractor);
   if (results) {
     return results[1];
@@ -137,7 +139,7 @@ export const getAttachmentLink = (text: string) => {
 export const getMessageType = (
   text: string,
   maxSmsSegmentLength: number | null
-) => {
+): string => {
   const { msgCount } = getSpokeCharCount(text);
   if (
     mediaExtractor.test(text) ||

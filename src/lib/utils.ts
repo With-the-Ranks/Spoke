@@ -8,7 +8,9 @@ import os from "os";
 import path from "path";
 import request from "superagent";
 
-export type TempDownloadHandler = (filePath: string) => Promise<any> | any;
+export type TempDownloadHandler = (
+  filePath: string
+) => Promise<unknown> | unknown;
 
 export const VALID_CONTENT_TYPES = [
   "image/jpeg",
@@ -18,35 +20,46 @@ export const VALID_CONTENT_TYPES = [
   "video/mp4"
 ];
 
-export const sleep = (ms = 0) =>
+export const sleep = (ms = 0): Promise<void> =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 
 /**
  * Deep diff between two object, using lodash
- * @param  {Object} object Object compared
- * @param  {Object} base   Object to compare with
- * @return {Object}        Return a new object who represent the diff
+ * @param  object Object compared
+ * @param  base   Object to compare with
+ * @return Return a new object who represent the diff
  */
 export const difference = (
-  object: Record<any, any>,
-  base: Record<any, any>
-) => {
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const changes = (object: Record<any, any>, base: Record<any, any>) =>
-    transform(object, (result: Record<any, any>, value, key) => {
-      if (!isEqual(value, base[key])) {
-        result[key] =
-          isObject(value) && isObject(base[key])
-            ? changes(value, base[key])
-            : value;
+  object: Record<string, unknown>,
+  base: Record<string, unknown>
+): Record<string, unknown> => {
+  const changes = (
+    obj: Record<string, unknown>,
+    ref: Record<string, unknown>
+  ): Record<string, unknown> =>
+    transform(
+      obj,
+      (result: Record<string, unknown>, value: unknown, key: string) => {
+        if (!isEqual(value, ref[key])) {
+          result[key] =
+            isObject(value) && isObject(ref[key])
+              ? changes(
+                  value as Record<string, unknown>,
+                  ref[key] as Record<string, unknown>
+                )
+              : value;
+        }
       }
-    });
+    );
   return changes(object, base);
 };
 
-export const downloadFromUrl = async (url: string, filePath: string) => {
+export const downloadFromUrl = async (
+  url: string,
+  filePath: string
+): Promise<boolean> => {
   let fileDownloaded = false;
   const file = fs.createWriteStream(filePath);
 
@@ -79,7 +92,7 @@ export const downloadFromUrl = async (url: string, filePath: string) => {
 export const withTempDownload = async (
   fileUrl: string,
   handler: TempDownloadHandler
-) => {
+): Promise<unknown> => {
   const tempFilePath = path.join(
     os.tmpdir(),
     `tempFile-${Crypto.randomBytes(16).toString("hex")}`
@@ -94,7 +107,7 @@ export const withTempDownload = async (
   return result;
 };
 
-export const stringIsAValidUrl = (s: string) => {
+export const stringIsAValidUrl = (s: string): boolean => {
   try {
     // eslint-disable-next-line no-new
     new URL(s);
@@ -104,11 +117,17 @@ export const stringIsAValidUrl = (s: string) => {
   }
 };
 
-export const asPercent = (numerator: number, denominator: number) =>
+export const asPercent = (numerator: number, denominator: number): number =>
   denominator === 0 ? 0 : (numerator / denominator) * 100;
 
-export const asPercentWithTotal = (numerator: number, denominator: number) =>
+export const asPercentWithTotal = (
+  numerator: number,
+  denominator: number
+): string =>
   `${asPercent(numerator, denominator).toString().slice(0, 4)}%(${numerator})`;
 
-export const replaceAll = (str: string, find: string, replace: string) =>
-  str.replace(new RegExp(escapeRegExp(find), "g"), replace);
+export const replaceAll = (
+  str: string,
+  find: string,
+  replace: string
+): string => str.replace(new RegExp(escapeRegExp(find), "g"), replace);
