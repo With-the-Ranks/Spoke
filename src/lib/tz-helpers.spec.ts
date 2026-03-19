@@ -1,5 +1,35 @@
 import { DateTime } from "./datetime";
-import { getSendBeforeUtc } from "./tz-helpers";
+import { asUtc, getSendBeforeUtc, isValidTimezone } from "./tz-helpers";
+
+describe("isValidTimezone", () => {
+  it("returns true for a valid IANA timezone", () => {
+    expect(isValidTimezone("America/New_York")).toBe(true);
+  });
+
+  it("returns true for UTC", () => {
+    expect(isValidTimezone("utc")).toBe(true);
+  });
+
+  it("returns false for a nonsense string", () => {
+    expect(isValidTimezone("Not/A/Timezone")).toBe(false);
+  });
+
+  it("returns true for deprecated US timezone names (via DateTime wrapper)", () => {
+    expect(isValidTimezone("US/Eastern")).toBe(true);
+  });
+});
+
+describe("asUtc", () => {
+  it("converts a JS Date to a DateTime in UTC", () => {
+    const jsDate = new Date("2020-06-15T12:00:00Z");
+    const result = asUtc(jsDate);
+    expect(result.zoneName).toBe("UTC");
+    expect(result.year).toBe(2020);
+    expect(result.month).toBe(6);
+    expect(result.day).toBe(15);
+    expect(result.hour).toBe(12);
+  });
+});
 
 describe("getSendBeforeUtc", () => {
   it("returns end-of-day UTC for a midday local time", () => {
