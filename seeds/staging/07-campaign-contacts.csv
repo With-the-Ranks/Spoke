@@ -1,0 +1,11 @@
+id,campaign_id,assignment_id,first_name,last_name,cell,zip,external_id,custom_fields,message_status,is_opted_out,timezone_offset
+1,1,1,Maria,Garcia,+15550100001,10001,ext-001,"{}",needsMessage,false,-5
+2,1,1,James,Johnson,+15550100002,60601,ext-002,"{}",needsMessage,false,-6
+3,1,1,Sarah,Williams,+15550100003,90001,ext-003,"{}",needsMessage,false,-8
+4,1,1,David,Brown,+15550100004,30301,ext-004,"{}",needsMessage,false,-5
+5,1,1,Lisa,Jones,+15550100005,77001,ext-005,"{}",needsMessage,false,-6
+6,1,1,Michael,Davis,+15550100006,98101,ext-006,"{}",messaged,false,-8
+7,1,1,Jennifer,Miller,+15550100007,02101,ext-007,"{}",messaged,false,-5
+8,1,1,Robert,Wilson,+15550100008,85001,ext-008,"{}",needsResponse,false,-7
+9,1,1,Emily,Taylor,+15550100009,80201,ext-009,"{}",convo,false,-7
+10,1,1,Daniel,Anderson,+15550100010,97201,ext-010,"{}",closed,false,-8
