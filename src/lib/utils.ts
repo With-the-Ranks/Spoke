@@ -1,6 +1,5 @@
 import Crypto from "crypto";
 import fs from "fs";
-import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
 import isObject from "lodash/isObject";
 import transform from "lodash/transform";
@@ -123,11 +122,14 @@ export const asPercent = (numerator: number, denominator: number): number =>
 export const asPercentWithTotal = (
   numerator: number,
   denominator: number
-): string =>
-  `${asPercent(numerator, denominator).toString().slice(0, 4)}%(${numerator})`;
+): string => {
+  const pct = asPercent(numerator, denominator);
+  const formatted = Number.isInteger(pct) ? pct.toString() : pct.toFixed(1);
+  return `${formatted}%(${numerator})`;
+};
 
 export const replaceAll = (
   str: string,
   find: string,
   replace: string
-): string => str.replace(new RegExp(escapeRegExp(find), "g"), replace);
+): string => str.replaceAll(find, replace);

@@ -38,13 +38,10 @@ describe("interactionStepForId", () => {
     expect(interactionStepForId("999", steps)).toBeNull();
   });
 
-  // Documents known behavior: uses forEach instead of find, so returns
-  // the *last* match if there are duplicates (unlike Array.find which
-  // returns the first).
-  it("returns the last match when duplicate ids exist", () => {
+  it("returns the first match when duplicate ids exist", () => {
     const first = step("1", null, { questionText: "first" });
     const duplicate = step("1", null, { questionText: "duplicate" });
-    expect(interactionStepForId("1", [first, duplicate])).toEqual(duplicate);
+    expect(interactionStepForId("1", [first, duplicate])).toEqual(first);
   });
 });
 

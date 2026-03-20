@@ -20,8 +20,8 @@ export const hasRoleAtLeast = (
 ): boolean =>
   ROLE_HIERARCHY.indexOf(hasRole) >= ROLE_HIERARCHY.indexOf(wantsRole);
 
-export const getHighestRole = (roles: UserRoleType[]): UserRoleType =>
-  roles.sort(
+const getHighestRole = (roles: UserRoleType[]): UserRoleType =>
+  [...roles].sort(
     (roleA: UserRoleType, roleB: UserRoleType) =>
       ROLE_HIERARCHY.indexOf(roleA) - ROLE_HIERARCHY.indexOf(roleB)
   )[roles.length - 1];

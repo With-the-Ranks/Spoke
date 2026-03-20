@@ -1,6 +1,5 @@
 import { UserRoleType } from "../api/organization-membership";
 import {
-  getHighestRole,
   hasRole,
   hasRoleAtLeast,
   isRoleGreater,
@@ -60,39 +59,6 @@ describe("hasRoleAtLeast", () => {
   });
 });
 
-describe("getHighestRole", () => {
-  it("returns the highest role from a list", () => {
-    expect(getHighestRole([UserRoleType.TEXTER, UserRoleType.ADMIN])).toBe(
-      UserRoleType.ADMIN
-    );
-  });
-
-  it("returns the only role in a single-element array", () => {
-    expect(getHighestRole([UserRoleType.TEXTER])).toBe(UserRoleType.TEXTER);
-  });
-
-  it("handles all roles and returns SUPERADMIN", () => {
-    expect(
-      getHighestRole([
-        UserRoleType.TEXTER,
-        UserRoleType.SUPERVOLUNTEER,
-        UserRoleType.ADMIN,
-        UserRoleType.OWNER,
-        UserRoleType.SUPERADMIN
-      ])
-    ).toBe(UserRoleType.SUPERADMIN);
-  });
-
-  // Documents known bug: getHighestRole mutates the input array via .sort()
-  it("mutates the input array (known bug)", () => {
-    const roles = [UserRoleType.ADMIN, UserRoleType.TEXTER];
-    getHighestRole(roles);
-    // After calling getHighestRole, the array is sorted in place
-    expect(roles[0]).toBe(UserRoleType.TEXTER);
-    expect(roles[1]).toBe(UserRoleType.ADMIN);
-  });
-});
-
 describe("hasRole", () => {
   it("returns true when user has a role at or above the required level", () => {
     expect(hasRole(UserRoleType.ADMIN, [UserRoleType.OWNER])).toBe(true);
@@ -106,5 +72,26 @@ describe("hasRole", () => {
     expect(
       hasRole(UserRoleType.ADMIN, [UserRoleType.TEXTER, UserRoleType.ADMIN])
     ).toBe(true);
+  });
+
+  // getHighestRole (internal) picks the highest from the list
+  it("picks the highest from a multi-role list", () => {
+    expect(
+      hasRole(UserRoleType.SUPERADMIN, [
+        UserRoleType.TEXTER,
+        UserRoleType.SUPERVOLUNTEER,
+        UserRoleType.ADMIN,
+        UserRoleType.OWNER,
+        UserRoleType.SUPERADMIN
+      ])
+    ).toBe(true);
+  });
+
+  // Verify getHighestRole doesn't mutate (tested indirectly)
+  it("does not mutate the input roles array", () => {
+    const roles = [UserRoleType.ADMIN, UserRoleType.TEXTER];
+    hasRole(UserRoleType.TEXTER, roles);
+    expect(roles[0]).toBe(UserRoleType.ADMIN);
+    expect(roles[1]).toBe(UserRoleType.TEXTER);
   });
 });

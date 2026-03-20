@@ -1,7 +1,10 @@
 import humps from "humps";
-import isEmpty from "lodash/isEmpty";
 
-import { getFormattedPhoneNumber, phoneNumberRegex } from "./phone-format";
+import {
+  extractPhoneNumber,
+  getFormattedPhoneNumber,
+  stripPhoneNumbers
+} from "./phone-format";
 
 interface DataTestAttribute {
   "data-test"?: string;
@@ -13,6 +16,7 @@ interface NameComponents {
   cellNumber: string | undefined;
 }
 
+// TODO: Remove once E2E tests are overhauled — they are not running in CI currently
 // Used to generate data-test attributes on non-production environments and used by end-to-end tests
 export const dataTest = (
   value: string,
@@ -21,14 +25,6 @@ export const dataTest = (
   const attribute =
     window.NODE_ENV !== "production" && !disable ? { "data-test": value } : {};
   return attribute;
-};
-
-export const camelCase = (str: string): string => {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
-      return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
-    })
-    .replace(/\s+/g, "");
 };
 
 export const titleCase = (value: string): string =>
@@ -45,15 +41,15 @@ export const nameComponents = (name: string): NameComponents => {
   let lastName;
   let cellNumber;
 
-  const unformattedNumber = name.match(phoneNumberRegex)?.[0];
+  const unformattedNumber = extractPhoneNumber(name);
 
   if (unformattedNumber) {
     cellNumber = getFormattedPhoneNumber(unformattedNumber);
   }
 
-  name = name.replace(phoneNumberRegex, "").trim();
+  name = stripPhoneNumbers(name);
 
-  if (isEmpty(name)) return { firstName, lastName, cellNumber };
+  if (!name) return { firstName, lastName, cellNumber };
 
   const splitName = name.split(" ");
   if (splitName.length === 1) {

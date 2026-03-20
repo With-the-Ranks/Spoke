@@ -15,11 +15,12 @@ import DoneIcon from "@material-ui/icons/Done";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import WarningIcon from "@material-ui/icons/Warning";
 import clsx from "clsx";
+import humps from "humps";
 import isNil from "lodash/isNil";
 import React from "react";
 import { compose, withProps } from "recompose";
 
-import { camelCase, dataTest } from "../../../lib/attributes";
+import { dataTest } from "../../../lib/attributes";
 import assemblePalette from "../../../styles/assemble-palette";
 import type { MuiThemeProviderProps } from "../../../styles/types";
 import type { AuthzContextType } from "../../AuthzProvider";
@@ -230,7 +231,7 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
   };
 
   return (
-    <Card {...dataTest(camelCase(title))} className={classes.card}>
+    <Card {...dataTest(humps.camelize(title))} className={classes.card}>
       <div className={clsx({ [classes.cardHeaderWrapper]: isSaving })}>
         <CardHeader
           title={title}

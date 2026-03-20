@@ -1,27 +1,22 @@
 // [firstZip, lastZip, timezoneOffset, hasDst, zipCount]
 type ZipRange = readonly [number, number, number, number, number];
 
-export const getFormattedZip = (zip: string, country = "US"): string | null => {
-  if (country === "US") {
-    // Matches 5 digit zip
-    // eslint-disable-next-line no-useless-escape
-    const fiveDigitRegex = /(\d{5})([ \-]\d{4})?/;
-    const [, first5] = zip.match(fiveDigitRegex) || [];
+export const getFormattedZip = (zip: string): string | null => {
+  // Matches 5 digit zip, optionally with a +4 suffix
+  const fiveDigitRegex = /(\d{5})(?:[ -]\d{4})?/;
+  const [, first5] = zip.match(fiveDigitRegex) || [];
 
-    if (first5) return first5;
+  if (first5) return first5;
 
-    // 4 Digit zips are almost certainly excel treating
-    // NH, MA, and other 0 initial zips as numbers
-    // Because of that, we should just 0 pad it
-    const fourDigitRegex = /\d{4}/;
-    if (zip.match(fourDigitRegex)) {
-      return `0${zip}`;
-    }
-
-    return null;
+  // 4 Digit zips are almost certainly Excel treating
+  // NH, MA, and other 0-initial zips as numbers.
+  // Zero-pad to restore the leading 0.
+  const fourDigitRegex = /^\d{4}$/;
+  if (fourDigitRegex.test(zip)) {
+    return `0${zip}`;
   }
 
-  throw new Error(`Do not know how to format zip for country: ${country}`);
+  return null;
 };
 
 const commonZipRanges: ZipRange[] = [

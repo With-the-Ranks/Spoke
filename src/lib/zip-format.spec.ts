@@ -21,27 +21,14 @@ describe("getFormattedZip", () => {
     expect(getFormattedZip("abc")).toBeNull();
   });
 
-  // Known bug: the 4-digit fallback doesn't validate that the input is
-  // purely numeric, so 'a2345-abcd' matches the 4-digit regex on '2345'
-  // but zero-pads the full input string instead of returning null.
-  // The original test expected null — the correct behavior — but the
-  // source code returns "0a2345-abcd". Tracked for fix in PR 5.
-  it("zero-pads input containing a 4-digit sequence (known bug)", () => {
-    // Original test expected: null (correct behavior)
-    // Actual source behavior: "0a2345-abcd" (bug — pads full input)
-    expect(getFormattedZip("a2345-abcd")).toBe("0a2345-abcd");
+  // These were bugs in the original code where the 4-digit regex matched
+  // substrings. Now fixed: the 4-digit fallback only matches pure 4-digit input.
+  it("returns null for input containing a 4-digit sequence with other chars", () => {
+    expect(getFormattedZip("a2345-abcd")).toBeNull();
   });
 
-  // Same bug: '2345-abcd' should strip the suffix or return null, but
-  // the 4-digit fallback zero-pads the entire string including the suffix.
-  it("zero-pads a bare 4-digit input with suffix (known bug)", () => {
-    // Original test expected: null (correct behavior)
-    // Actual source behavior: "02345-abcd" (bug — pads without stripping)
-    expect(getFormattedZip("2345-abcd")).toBe("02345-abcd");
-  });
-
-  it("throws for a non-US country", () => {
-    expect(() => getFormattedZip("11790", "OZ")).toThrow(/OZ/);
+  it("returns null for a 4-digit zip with a non-numeric suffix", () => {
+    expect(getFormattedZip("2345-abcd")).toBeNull();
   });
 });
 

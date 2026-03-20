@@ -1,7 +1,7 @@
 import {
-  getDisplayPhoneNumber,
+  extractPhoneNumber,
   getFormattedPhoneNumber,
-  phoneNumberRegex
+  stripPhoneNumbers
 } from "./phone-format";
 
 describe("getFormattedPhoneNumber", () => {
@@ -38,30 +38,35 @@ describe("getFormattedPhoneNumber", () => {
   });
 });
 
-describe("getDisplayPhoneNumber", () => {
-  it("formats E164 to national display format", () => {
-    expect(getDisplayPhoneNumber("+12025551234")).toBe("(202) 555-1234");
+describe("extractPhoneNumber", () => {
+  it("extracts a 10-digit number with dashes from text", () => {
+    expect(extractPhoneNumber("Call 202-555-1234 now")).toBe(" 202-555-1234");
+  });
+
+  it("extracts a number with country code prefix", () => {
+    const result = extractPhoneNumber("Call +1 202 555 1234 now");
+    expect(result).not.toBeNull();
+  });
+
+  it("returns null when no phone number is found", () => {
+    expect(extractPhoneNumber("Call 555-1234 now")).toBeNull();
+  });
+
+  it("returns null for an empty string", () => {
+    expect(extractPhoneNumber("")).toBeNull();
   });
 });
 
-describe("phoneNumberRegex", () => {
-  it("matches a 10-digit number with dashes", () => {
-    // Reset lastIndex since the regex has the global flag
-    phoneNumberRegex.lastIndex = 0;
-    const match = "Call 202-555-1234 now".match(phoneNumberRegex);
-    expect(match).not.toBeNull();
-    expect(match![0].trim()).toBe("202-555-1234");
+describe("stripPhoneNumbers", () => {
+  it("removes a phone number from a string", () => {
+    expect(stripPhoneNumbers("Jane Doe 2025551234")).toBe("Jane Doe");
   });
 
-  it("matches a number with country code prefix", () => {
-    phoneNumberRegex.lastIndex = 0;
-    const match = "Call +1 202 555 1234 now".match(phoneNumberRegex);
-    expect(match).not.toBeNull();
+  it("returns the original string when no phone number is present", () => {
+    expect(stripPhoneNumbers("Jane Doe")).toBe("Jane Doe");
   });
 
-  it("does not match a short number", () => {
-    phoneNumberRegex.lastIndex = 0;
-    const match = "Call 555-1234 now".match(phoneNumberRegex);
-    expect(match).toBeNull();
+  it("trims whitespace after removal", () => {
+    expect(stripPhoneNumbers("2025551234 Jane")).toBe("Jane");
   });
 });

@@ -63,9 +63,8 @@ export const findParent = (
         };
       }
     } else if (
-      isModel ||
-      ((step as GraphQLInteractionStep).question &&
-        (step as GraphQLInteractionStep).question?.answerOptions)
+      (step as GraphQLInteractionStep).question &&
+      (step as GraphQLInteractionStep).question?.answerOptions
     ) {
       (step as GraphQLInteractionStep).question!.answerOptions!.forEach(
         (answer) => {
@@ -106,15 +105,8 @@ export const getInteractionPath = (
 export const interactionStepForId = (
   id: string,
   interactionSteps: BaseInteractionStep[]
-): BaseInteractionStep | null => {
-  let interactionStep: BaseInteractionStep | null = null;
-  interactionSteps.forEach((step) => {
-    if (step.id === id) {
-      interactionStep = step;
-    }
-  });
-  return interactionStep;
-};
+): BaseInteractionStep | null =>
+  interactionSteps.find((step) => step.id === id) ?? null;
 
 export const getChildren = (
   interactionStep: InteractionStep,

@@ -1,28 +1,9 @@
 import {
-  camelCase,
   nameComponents,
   recordToCamelCase,
   snakeToTitleCase,
   titleCase
 } from "./attributes";
-
-describe("camelCase", () => {
-  it("converts a space-separated string", () => {
-    expect(camelCase("hello world")).toBe("helloWorld");
-  });
-
-  it("converts a multi-word string", () => {
-    expect(camelCase("the quick brown fox")).toBe("theQuickBrownFox");
-  });
-
-  it("handles a single word", () => {
-    expect(camelCase("hello")).toBe("hello");
-  });
-
-  it("handles an already camelCase string", () => {
-    expect(camelCase("helloWorld")).toBe("helloWorld");
-  });
-});
 
 describe("titleCase", () => {
   it("capitalizes the first letter and lowercases the rest", () => {

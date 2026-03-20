@@ -74,18 +74,15 @@ describe("asPercentWithTotal", () => {
     expect(asPercentWithTotal(10, 0)).toBe("0%(10)");
   });
 
-  it("truncates to 4 characters of the percentage string", () => {
+  it("formats fractional percentage with one decimal place", () => {
     expect(asPercentWithTotal(9, 11)).toBe("81.8%(9)");
   });
 
-  it("handles 100% correctly", () => {
+  it("formats integer percentage without decimals", () => {
     expect(asPercentWithTotal(10, 10)).toBe("100%(10)");
   });
 
-  // Documents known fragility: slice(0, 4) truncates to 4 chars of the
-  // stringified percentage, which breaks for values >= 1000
-  it("truncates large percentages at 4 characters (known fragility)", () => {
-    // 1000% should be "1000%(10)" but slice(0,4) gives "1000"
+  it("handles large percentages correctly", () => {
     expect(asPercentWithTotal(100, 10)).toBe("1000%(100)");
   });
 });
