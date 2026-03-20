@@ -13,15 +13,7 @@ export {
 
 export { isClient } from "./is-client";
 export { sleep };
-export {
-  findParent,
-  getInteractionPath,
-  getInteractionTree,
-  interactionStepForId,
-  getTopMostParent,
-  getChildren,
-  makeTree
-} from "./interaction-step-helpers";
+export { getTopMostParent, makeTree } from "./interaction-step-helpers";
 
 export { ROLE_HIERARCHY, hasRole, isRoleGreater } from "./permissions";
 

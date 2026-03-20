@@ -3,10 +3,12 @@ import type {
   CampaignVariable,
   User
 } from "@spoke/spoke-codegen";
-import escapeRegExp from "lodash/escapeRegExp";
-import isNil from "lodash/isNil";
 
 import { getSpokeCharCount } from "./charset-utils";
+
+/** Escape special regex characters in a string for use in `new RegExp()`. */
+const escapeRegExp = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 type ScriptCampaignContact = Partial<Omit<CampaignContact, "tags">>;
 type ScriptUser = Pick<User, "firstName" | "lastName">;
@@ -202,7 +204,7 @@ export const scriptToTokens = (
     invalidVariables: string[];
   }>(
     (acc, campaignVariable) => {
-      if (isNil(campaignVariable.value)) {
+      if (campaignVariable.value == null) {
         return {
           ...acc,
           invalidVariables: [

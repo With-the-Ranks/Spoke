@@ -1,9 +1,5 @@
 import type { InteractionStep } from "../api/interaction-step";
-import {
-  getTopMostParent,
-  interactionStepForId,
-  makeTree
-} from "./interaction-step-helpers";
+import { getTopMostParent, makeTree } from "./interaction-step-helpers";
 
 const baseEmptyStep: Omit<InteractionStep, "id" | "parentInteractionId"> = {
   questionText: "",
@@ -25,24 +21,6 @@ const step = (
   // Auto-increment createdAt so ordering is deterministic
   createdAt: `2021-01-26T00:00:0${id}Z`,
   ...overrides
-});
-
-describe("interactionStepForId", () => {
-  it("returns the step matching the given id", () => {
-    const steps = [step("1", null), step("2", "1"), step("3", "1")];
-    expect(interactionStepForId("2", steps)).toEqual(steps[1]);
-  });
-
-  it("returns null when no step matches", () => {
-    const steps = [step("1", null)];
-    expect(interactionStepForId("999", steps)).toBeNull();
-  });
-
-  it("returns the first match when duplicate ids exist", () => {
-    const first = step("1", null, { questionText: "first" });
-    const duplicate = step("1", null, { questionText: "duplicate" });
-    expect(interactionStepForId("1", [first, duplicate])).toEqual(first);
-  });
 });
 
 describe("getTopMostParent", () => {
