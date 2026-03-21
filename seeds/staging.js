@@ -11,7 +11,7 @@ try {
   logger = require(`${__dirname}/../build/src/logger`);
 }
 
-const STAGING_DIR = path.join(__dirname, "staging-copy");
+const STAGING_DIR = path.join(__dirname, "staging");
 
 /*
  * Tables in insertion order (reverse for truncation).
