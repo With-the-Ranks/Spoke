@@ -1,26 +1,31 @@
 import { titleCase } from "./scripts";
 
-describe("script utilities", () => {
-  it("converts uppercase single word to title case", () => {
-    expect(titleCase("SPOKE")).toEqual("Spoke");
-  });
-  it("converts lowercase single word to title case", () => {
-    expect(titleCase("spoke")).toEqual("Spoke");
-  });
-  it("converts mixed-case single word to title case", () => {
-    expect(titleCase("sPoKe")).toEqual("Spoke");
+describe("titleCase", () => {
+  it("converts an uppercase single word", () => {
+    expect(titleCase("SPOKE")).toBe("Spoke");
   });
 
-  it("converts uppercase words to title case", () => {
-    expect(titleCase("SPOKE REWIRED")).toEqual("Spoke Rewired");
+  it("converts a lowercase single word", () => {
+    expect(titleCase("spoke")).toBe("Spoke");
   });
-  it("converts lowercase words to title case", () => {
-    expect(titleCase("spoke rewired")).toEqual("Spoke Rewired");
+
+  it("converts a mixed-case single word", () => {
+    expect(titleCase("sPoKe")).toBe("Spoke");
   });
-  it("converts mixed-case words to title case", () => {
-    expect(titleCase("sPoKe ReWirEd")).toEqual("Spoke Rewired");
+
+  it("converts multiple uppercase words", () => {
+    expect(titleCase("SPOKE REWIRED")).toBe("Spoke Rewired");
   });
-  it("ignores hyphens", () => {
-    expect(titleCase("spoke-rewired")).toEqual("Spoke-rewired");
+
+  it("converts multiple lowercase words", () => {
+    expect(titleCase("spoke rewired")).toBe("Spoke Rewired");
+  });
+
+  it("converts multiple mixed-case words", () => {
+    expect(titleCase("sPoKe ReWirEd")).toBe("Spoke Rewired");
+  });
+
+  it("does not split on hyphens", () => {
+    expect(titleCase("spoke-rewired")).toBe("Spoke-rewired");
   });
 });
