@@ -82,6 +82,5 @@ const zipToTimeZone = (zip) => {
 
 module.exports = {
   getFormattedZip,
-  getCommonZipRanges,
   zipToTimeZone
 };

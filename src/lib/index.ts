@@ -1,35 +1,23 @@
-import _ from "lodash";
 import zlib from "zlib";
 
-import { getDisplayPhoneNumber, getFormattedPhoneNumber } from "./phone-format";
+import { getFormattedPhoneNumber } from "./phone-format";
 import { sleep } from "./utils";
 
-export { getFormattedPhoneNumber, getDisplayPhoneNumber };
+export { getFormattedPhoneNumber };
 
-export {
-  getFormattedZip,
-  zipToTimeZone,
-  getCommonZipRanges
-} from "./zip-format";
-export { DstHelper } from "./dst-helper";
+export { getFormattedZip, zipToTimeZone } from "./zip-format";
 export { isClient } from "./is-client";
 export { sleep };
 export {
   findParent,
   getInteractionPath,
-  getInteractionTree,
   interactionStepForId,
   getTopMostParent,
   getChildren,
   makeTree
 } from "./interaction-step-helpers";
 
-export {
-  ROLE_HIERARCHY,
-  getHighestRole,
-  hasRole,
-  isRoleGreater
-} from "./permissions";
+export { ROLE_HIERARCHY, hasRole, isRoleGreater } from "./permissions";
 
 export const gzip = (str: string) =>
   new Promise((resolve, reject) => {

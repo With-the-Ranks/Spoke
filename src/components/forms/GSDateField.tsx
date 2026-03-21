@@ -3,9 +3,10 @@ import { DatePicker } from "material-ui";
 import React from "react";
 
 import { DateTime } from "../../lib/datetime";
-import type { ISODateString } from "../../lib/js-types";
 import type { GSFormFieldProps } from "./GSFormField";
 import { GSFormField } from "./GSFormField";
+
+type ISODateString = string | undefined | null | false | 0;
 
 interface GSDateFieldProps {
   onChange: (d: ISODateString | null) => void;

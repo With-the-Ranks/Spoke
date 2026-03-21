@@ -46,7 +46,7 @@ export const difference = (
   return changes(object, base);
 };
 
-export const downloadFromUrl = async (url: string, filePath: string) => {
+const downloadFromUrl = async (url: string, filePath: string) => {
   let fileDownloaded = false;
   const file = fs.createWriteStream(filePath);
 
