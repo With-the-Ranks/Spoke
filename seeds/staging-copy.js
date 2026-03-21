@@ -44,14 +44,25 @@ const TABLES = [
  * Type coercion (string → int, string → boolean, etc.) is also handled
  * natively by Postgres, so CSV values like "true" and "9" just work.
  *
- * The HEADER option tells Postgres to read the first row as column names,
- * which determines the column mapping for the insert.
+ * The column list is read from the CSV header row and passed explicitly
+ * in the COPY command. This is necessary because Postgres COPY's HEADER
+ * option only skips the first row — it does NOT use it for column mapping.
+ * Columns are mapped positionally to all table columns without an explicit
+ * list, which breaks when the CSV has fewer columns than the table.
  */
 const copyInsert = async (client, { file, table }) => {
   const filePath = path.join(STAGING_DIR, file);
   const content = fs.readFileSync(filePath, { encoding: "utf-8" });
 
-  const copyQuery = `COPY "${table}" FROM STDIN WITH (FORMAT csv, HEADER true)`;
+  /* Extract column names from the CSV header row */
+  const headerLine = content.split("\n")[0];
+  const columns = headerLine
+    .trim()
+    .split(",")
+    .map((col) => `"${col}"`)
+    .join(", ");
+
+  const copyQuery = `COPY "${table}" (${columns}) FROM STDIN WITH (FORMAT csv, HEADER true)`;
   const stream = client.query(copyFrom(copyQuery));
   await pipeline(Readable.from(content), stream);
 };
