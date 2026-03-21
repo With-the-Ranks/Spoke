@@ -1,4 +1,4 @@
-import {getFormattedZip, zipToTimeZone} from "../../src/lib";
+import {getFormattedZip, zipToTimeZone} from "../../src/lib/zip-format";
 
 describe('test getFormattedZip', () => {
   it('handles zip correctly', () => {

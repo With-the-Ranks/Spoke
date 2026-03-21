@@ -3,7 +3,7 @@ import _ from "lodash";
 import zipCodeToTimeZone from "zipcode-to-timezone";
 
 import { config } from "../../config";
-import { gunzip } from "../../lib";
+import { gunzip } from "../../lib/gzip";
 import { getFormattedPhoneNumber } from "../../lib/phone-format";
 import { isValidTimezone } from "../../lib/tz-helpers";
 import logger from "../../logger";
