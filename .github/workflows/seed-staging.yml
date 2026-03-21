@@ -3,15 +3,6 @@ name: Seed Staging Database
 on:
   workflow_dispatch:
 
-env:
-  GCP_REGION: us-west1
-  GKE_CLUSTER: spoke-cluster
-  GKE_LOCATION: us-west1-a
-  STAGING_NAMESPACE: spoke-staging
-  STAGING_DEPLOYMENT: main-spoke
-  WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
-  WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
-
 jobs:
   seed-staging:
     runs-on: ubuntu-latest
@@ -27,18 +18,18 @@ jobs:
 
       - uses: ./.github/actions/gcp-auth
         with:
-          wif_provider: ${{ env.WIF_PROVIDER }}
-          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
-          region: ${{ env.GCP_REGION }}
+          wif_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+          region: ${{ vars.GCP_REGION }}
 
       - name: Get GKE credentials
         uses: google-github-actions/get-gke-credentials@v2
         with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_LOCATION }}
+          cluster_name: ${{ vars.GKE_CLUSTER }}
+          location: ${{ vars.GKE_LOCATION }}
 
       - name: Run staging seed
         run: |
-          kubectl exec deployment/${{ env.STAGING_DEPLOYMENT }} \
-            -n ${{ env.STAGING_NAMESPACE }} \
-            -- yarn knex seed:run --specific=staging/staging.js
+          kubectl exec deployment/${{ vars.STAGING_DEPLOYMENT }} \
+            -n ${{ vars.STAGING_NAMESPACE }} \
+            -- yarn knex seed:run --specific=staging-copy.js

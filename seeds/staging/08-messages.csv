@@ -1,6 +1,0 @@
-id,user_number,user_id,contact_number,is_from_contact,text,service_response,assignment_id,service,service_id,send_status,campaign_contact_id
-1,+15551000002,2,+15550100006,false,"Hi Maria! This is Test from Staging Test Org. We're reaching out to ask about your plans for the upcoming election. Are you planning to vote this year?","[]",1,fakeservice,fake-001,SENT,6
-2,+15551000002,2,+15550100007,false,"Hi Jennifer! This is Test from Staging Test Org. We're reaching out to ask about your plans for the upcoming election. Are you planning to vote this year?","[]",1,fakeservice,fake-002,SENT,7
-3,DEFAULT,NULL,+15550100008,true,"Yes I am planning to vote!","[]",1,fakeservice,fake-003,DELIVERED,8
-4,+15551000002,2,+15550100009,false,"Hi Emily! This is Test from Staging Test Org. We're reaching out to ask about your plans for the upcoming election. Are you planning to vote this year?","[]",1,fakeservice,fake-004,SENT,9
-5,DEFAULT,NULL,+15550100009,true,"Not sure yet, can you tell me more?","[]",1,fakeservice,fake-005,DELIVERED,9

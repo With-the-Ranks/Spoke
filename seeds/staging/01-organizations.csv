@@ -1,2 +1,0 @@
-id,name,uuid,features,texting_hours_enforced,texting_hours_start,texting_hours_end
-1,Staging Test Org,staging-test-org-uuid,"{}",false,9,21
