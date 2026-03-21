@@ -16,12 +16,20 @@ describe("stringIsAValidUrl", () => {
     ).toBe(true);
   });
 
+  it("accepts an http URL", () => {
+    expect(stringIsAValidUrl("http://example.com")).toBe(true);
+  });
+
   it("rejects a URL without a scheme", () => {
     expect(stringIsAValidUrl("www.politicsrewired.com")).toBe(false);
   });
 
   it("rejects a relative path", () => {
     expect(stringIsAValidUrl("foo/bar")).toBe(false);
+  });
+
+  it("rejects an empty string", () => {
+    expect(stringIsAValidUrl("")).toBe(false);
   });
 });
 
@@ -37,6 +45,10 @@ describe("replaceAll", () => {
       "what about ? characters?"
     );
   });
+
+  it("returns the original string when search is not found", () => {
+    expect(replaceAll("hello world", "xyz", "abc")).toBe("hello world");
+  });
 });
 
 describe("asPercent", () => {
@@ -47,6 +59,14 @@ describe("asPercent", () => {
   it("returns 100 for equal numerator and denominator", () => {
     expect(asPercent(10, 10)).toBe(100);
   });
+
+  it("returns a fractional percentage", () => {
+    expect(asPercent(1, 3)).toBeCloseTo(33.33, 1);
+  });
+
+  it("returns 50 for half", () => {
+    expect(asPercent(5, 10)).toBe(50);
+  });
 });
 
 describe("asPercentWithTotal", () => {
@@ -56,5 +76,9 @@ describe("asPercentWithTotal", () => {
 
   it("truncates decimal to 4 characters", () => {
     expect(asPercentWithTotal(9, 11)).toBe("81.8%(9)");
+  });
+
+  it("handles 100% correctly", () => {
+    expect(asPercentWithTotal(10, 10)).toBe("100%(10)");
   });
 });
