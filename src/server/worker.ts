@@ -4,7 +4,7 @@ import type { LogFunctionFactory, Runner, TaskList } from "graphile-worker";
 import { Logger, run } from "graphile-worker";
 
 import { config } from "../config";
-import { sleep } from "../lib";
+import { sleep } from "../lib/utils";
 import logger from "../logger";
 import pgPool from "./db";
 import {

@@ -3,7 +3,7 @@ import { createLightship } from "lightship";
 import cron from "node-cron";
 
 import { config, ServerMode } from "../config";
-import { sleep } from "../lib";
+import { sleep } from "../lib/utils";
 import logger from "../logger";
 import { checkForBadDeliverability } from "./api/lib/alerts";
 import { createApp } from "./app";

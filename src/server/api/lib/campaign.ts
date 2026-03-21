@@ -11,8 +11,9 @@ import type { QueryResult } from "pg";
 
 import type { RelayPaginatedResponse } from "../../../api/pagination";
 import { config } from "../../../config";
-import { gzip, makeTree } from "../../../lib";
 import { parseIanaZone } from "../../../lib/datetime";
+import { gzip } from "../../../lib/gzip";
+import { makeTree } from "../../../lib/interaction-step-helpers";
 import { allScriptFields } from "../../../lib/scripts";
 import {
   loadContactsFromDataWarehouse,
