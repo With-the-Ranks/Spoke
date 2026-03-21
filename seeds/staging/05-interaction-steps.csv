@@ -1,4 +1,4 @@
-id,campaign_id,question,script,parent_interaction_id,answer_option,answer_actions,is_deleted
-1,1,Are you planning to vote this year?,"Hi {firstName}! This is {texterFirstName} from Staging Test Org. We're reaching out to ask about your plans for the upcoming election. Are you planning to vote this year?",,,,false
-2,1,,"That's great to hear! We can help you find your polling location if you need it.",1,Yes,,false
-3,1,,"No worries! If you change your mind, we're here to help with any voting questions.",1,No,,false
+id,campaign_id,question,script_options,parent_interaction_id,answer_option,answer_actions,is_deleted
+1,1,Are you planning to vote this year?,"{""Hi {firstName}! This is {texterFirstName} from Staging Test Org. We're reaching out to ask about your plans for the upcoming election. Are you planning to vote this year?""}",NULL,DEFAULT,DEFAULT,false
+2,1,DEFAULT,"{""That's great to hear! We can help you find your polling location if you need it.""}",1,Yes,DEFAULT,false
+3,1,DEFAULT,"{""No worries! If you change your mind, we're here to help with any voting questions.""}",1,No,DEFAULT,false

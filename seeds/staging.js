@@ -4,19 +4,19 @@ const Papa = require("papaparse");
 
 let logger;
 try {
-  logger = require("../../src/logger");
+  logger = require("../src/logger");
 } catch {
-  logger = require(`${__dirname}/../../build/src/logger`);
+  logger = require(`${__dirname}/../build/src/logger`);
 }
 
-const STAGING_DIR = __dirname;
+const STAGING_DIR = path.join(__dirname, "staging");
 
 // Tables in insertion order (reverse for truncation)
 const TABLES = [
   { file: "01-organizations.csv", table: "organization" },
   { file: "02-users.csv", table: "user" },
   { file: "03-user-organizations.csv", table: "user_organization" },
-  { file: "04-campaigns.csv", table: "campaign" },
+  { file: "04-campaigns.csv", table: "all_campaign", sequence: "campaign_id_seq" },
   { file: "05-interaction-steps.csv", table: "interaction_step" },
   { file: "06-assignments.csv", table: "assignment" },
   { file: "07-campaign-contacts.csv", table: "campaign_contact" },
@@ -30,7 +30,7 @@ const loadCsv = (filename) => {
   const { data, errors } = Papa.parse(content, {
     header: true,
     skipEmptyLines: true,
-    dynamicTyping: true
+    dynamicTyping: false
   });
   if (errors.length > 0) {
     throw new Error(
@@ -43,7 +43,12 @@ const loadCsv = (filename) => {
 const cleanRow = (row) => {
   const cleaned = {};
   for (const [key, value] of Object.entries(row)) {
-    cleaned[key] = value === "" ? null : value;
+    if (value === "DEFAULT") continue; // omit key — Postgres uses column default
+    if (value === "NULL") {
+      cleaned[key] = null; // explicit SQL NULL
+      continue;
+    }
+    cleaned[key] = value; // empty string stays as empty string
   }
   return cleaned;
 };
@@ -67,10 +72,9 @@ exports.seed = async function seed(knex) {
   }
 
   // Reset sequences
-  for (const { table } of TABLES) {
-    await knex.raw(
-      `ALTER SEQUENCE IF EXISTS ${table}_id_seq RESTART WITH 1`
-    );
+  for (const { table, sequence } of TABLES) {
+    const seqName = sequence || `${table}_id_seq`;
+    await knex.raw(`ALTER SEQUENCE IF EXISTS ${seqName} RESTART WITH 1`);
   }
   logger.info("Reset sequences");
 
@@ -86,10 +90,11 @@ exports.seed = async function seed(knex) {
   }
 
   // Advance sequences past the explicitly set IDs
-  for (const { table } of TABLES) {
+  for (const { table, sequence } of TABLES) {
+    const seqName = sequence || `${table}_id_seq`;
     await knex.raw(`
       SELECT setval(
-        '${table}_id_seq',
+        '${seqName}',
         COALESCE((SELECT MAX(id) FROM "${table}"), 0) + 1,
         false
       )
