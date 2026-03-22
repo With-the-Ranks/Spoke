@@ -38,12 +38,20 @@ module.exports = {
     "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
   },
   collectCoverageFrom: [
-    "**/*.{js,jsx}",
+    "**/*.{js,jsx,ts,tsx}",
     "!**/node_modules/**",
     "!**/__test__/**",
     "!**/deploy/**",
     "!**/coverage/**"
   ],
+  coverageThreshold: {
+    "src/lib/": {
+      branches: 30,
+      functions: 45,
+      lines: 45,
+      statements: 45
+    }
+  },
   setupFilesAfterEnv: ["<rootDir>/__test__/setup-framework.js"],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/__test__/e2e/"]
 };
