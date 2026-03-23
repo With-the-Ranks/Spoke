@@ -274,6 +274,14 @@ module.exports = {
       rules: {
         "prefer-arrow-functions/prefer-arrow-functions": "off"
       }
+    },
+    {
+      // Stricter TypeScript rules for modernized src/lib/
+      files: ["src/lib/**/*.ts"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/explicit-module-boundary-types": "error"
+      }
     }
   ]
 };
