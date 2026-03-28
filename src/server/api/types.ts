@@ -322,6 +322,22 @@ export interface TagRecord {
   deleted_at: string;
 }
 
+export interface TeamRecord {
+  id: number;
+  organization_id: number;
+  title: string;
+  description: string;
+  text_color: string;
+  background_color: string;
+  assignment_priority: number | null;
+  author_id: number | null;
+  created_at: string;
+  is_assignment_enabled: boolean;
+  assignment_type: string | null;
+  max_request_count: number | null;
+  updated_at: string;
+}
+
 export interface UserRecord {
   id: number;
   auth0_id: string;
@@ -335,4 +351,12 @@ export interface UserRecord {
   terms: boolean;
   updated_at: string;
   is_suspended: boolean;
+}
+
+export interface UserTeamRecord {
+  id: number;
+  user_id: number | null;
+  team_id: number | null;
+  created_at: string;
+  updated_at: string | null;
 }
