@@ -79,16 +79,6 @@ export const getChildren = (interactionStep, allInteractionSteps, isModel) => {
   return children;
 };
 
-export const getInteractionTree = (allInteractionSteps, isModel) => {
-  const pathLengthHash = {};
-  allInteractionSteps.forEach((step) => {
-    const path = getInteractionPath(step, allInteractionSteps, isModel);
-    pathLengthHash[path.length] = pathLengthHash[path.length] || [];
-    pathLengthHash[path.length].push({ interactionStep: step, path });
-  });
-  return pathLengthHash;
-};
-
 export const getTopMostParent = (interactionSteps, isModel) =>
   sortByNewest(interactionSteps).find((step) =>
     isModel
