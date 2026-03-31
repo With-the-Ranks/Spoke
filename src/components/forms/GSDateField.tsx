@@ -1,5 +1,4 @@
-import type { DatePickerProps } from "material-ui";
-import { DatePicker } from "material-ui";
+import TextField from "@material-ui/core/TextField";
 import React from "react";
 
 import { DateTime } from "../../lib/datetime";
@@ -13,11 +12,17 @@ interface GSDateFieldProps {
 }
 
 export default class GSDateField extends GSFormField<
-  GSFormFieldProps & DatePickerProps & GSDateFieldProps,
+  GSFormFieldProps & GSDateFieldProps,
   Record<string, unknown>
 > {
-  pickerOnChange(newDate: DateTime): void {
-    const oldDate: DateTime = DateTime.fromISO(this.props.value as string);
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newDateStr = event.target.value;
+    if (!newDateStr) {
+      this.props.onChange(null);
+      return;
+    }
+    const newDate = DateTime.fromISO(newDateStr);
+    const oldDate = DateTime.fromISO(this.props.value as string);
     const newDateWithHMS = oldDate.isValid
       ? newDate.set({
           hour: oldDate.hour,
@@ -26,23 +31,27 @@ export default class GSDateField extends GSFormField<
         })
       : newDate;
     this.props.onChange(newDateWithHMS.isValid ? newDateWithHMS.toISO() : null);
-  }
+  };
 
   render() {
     const parsedPropDate = DateTime.fromISO(this.props.value as string);
+    const dateValue = parsedPropDate.isValid
+      ? parsedPropDate.toFormat("yyyy-MM-dd")
+      : "";
+
     return (
-      <DatePicker
-        value={parsedPropDate.isValid ? parsedPropDate.toJSDate() : undefined}
-        fullWidth={this.props.fullWidth}
-        autoOk={this.props.autoOk}
-        locale={this.props.locale}
-        className={this.props.className}
+      <TextField
+        type="date"
+        label={this.floatingLabelText()}
+        variant="outlined"
+        size="small"
+        fullWidth={this.props.fullWidth !== false}
+        InputLabelProps={{ shrink: true }}
         name={this.props.name}
-        data-test={this.props["data-test"] as Date}
-        floatingLabelText={this.floatingLabelText()}
-        onChange={(_, newDate) => {
-          this.pickerOnChange(DateTime.fromJSDate(newDate));
-        }}
+        className={this.props.className}
+        data-test={this.props["data-test"]}
+        value={dateValue}
+        onChange={this.handleChange}
       />
     );
   }
