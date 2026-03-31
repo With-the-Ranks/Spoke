@@ -26,7 +26,7 @@ const colors: SpokeColors = {
   lightYellow: "rgb(252, 214, 120)"
 };
 
-const defaultFont = "Karla";
+const defaultFont = "Inter";
 
 const text: TextStyles = {
   body: {
@@ -71,7 +71,7 @@ const text: TextStyles = {
   header: {
     color: colors.darkGray,
     fontSize: "1.5em",
-    fontWeight: 400,
+    fontWeight: 700,
     fontFamily: defaultFont
   },
   secondaryHeader: {
