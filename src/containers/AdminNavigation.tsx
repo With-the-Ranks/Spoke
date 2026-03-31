@@ -12,6 +12,7 @@ interface AdminNavigationProps {
   sections: NavigationSection[];
   showMenu?: boolean;
   onToggleMenu: () => React.MouseEventHandler<unknown>;
+  title?: string;
 }
 
 const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
@@ -26,6 +27,8 @@ const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
     <Navigation
       onToggleMenu={onToggleMenu}
       showMenu={showMenu}
+      title={props.title}
+      organizationId={organizationId}
       sections={sections.map((section) => ({
         ...section,
         url: urlFromPath(section.path)

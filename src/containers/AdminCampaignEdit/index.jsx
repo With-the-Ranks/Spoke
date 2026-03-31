@@ -82,7 +82,7 @@ class AdminCampaignEdit extends React.Component {
     // So campaignFormValues should always be the diffs between server and client form data
     let { expandedSection } = this.state;
     let expandedKeys = [];
-    if (expandedSection !== null) {
+    if (expandedSection != null) {
       expandedSection = this.sections()[expandedSection];
       expandedKeys = expandedSection.keys;
     }

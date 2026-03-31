@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
+import Typography from "@material-ui/core/Typography";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
-import TopNav from "../../components/TopNav";
 import { hasRole } from "../../lib/permissions";
 import theme from "../../styles/theme";
 import AdminNavigation from "../AdminNavigation";
@@ -15,9 +16,6 @@ import NotificationCard from "./components/NotificationCard";
 const styles = StyleSheet.create({
   container: {
     ...theme.layouts.multiColumn.container
-  },
-  sidebar: {
-    minHeight: "calc(100vh - 56px)"
   },
   content: {
     ...theme.layouts.multiColumn.flexColumn,
@@ -32,29 +30,24 @@ class AdminDashboard extends React.Component {
     showMenu: true
   };
 
-  urlFromPath = (path) => {
-    const { organizationId } = this.props.match.params;
-    return `/admin/${organizationId}/${path}`;
-  };
-
   handleToggleMenu = () => this.setState({ showMenu: !this.state.showMenu });
 
   renderNavigation(sections) {
     const { organizationId } = this.props.match.params;
+    const { organizationData } = this.props;
 
     if (!organizationId) {
       return "";
     }
 
     return (
-      <div className={css(styles.sidebar)}>
-        <AdminNavigation
-          onToggleMenu={this.handleToggleMenu}
-          showMenu={this.state.showMenu}
-          organizationId={organizationId}
-          sections={sections}
-        />
-      </div>
+      <AdminNavigation
+        onToggleMenu={this.handleToggleMenu}
+        showMenu={this.state.showMenu}
+        organizationId={organizationId}
+        sections={sections}
+        title={organizationData?.organization?.name}
+      />
     );
   }
 
@@ -136,28 +129,24 @@ class AdminDashboard extends React.Component {
 
     currentSection = currentSection.length > 0 ? currentSection.shift() : null;
     const title = currentSection ? currentSection.name : "Admin";
-    const backToURL =
-      currentSection &&
-      location.pathname.split("/").pop() !== currentSection.path
-        ? this.urlFromPath(currentSection.path)
-        : null;
+
+    const pageTitle = `${title} - ${organizationData.organization.name}`;
 
     return (
-      <div>
-        <TopNav
-          title={title}
-          backToURL={backToURL}
-          orgId={match.params.organizationId}
-          sectionTitle={organizationData.organization.name}
-        />
-        <div className={css(styles.container)}>
-          {this.renderNavigation(
-            sections.filter((s) => hasRole(s.role, roles))
-          )}
-          <div className={css(styles.content)}>
-            <NotificationCard organizationId={match.params.organizationId} />
-            {children}
-          </div>
+      <div className={css(styles.container)}>
+        <Helmet>
+          <title>{pageTitle}</title>
+        </Helmet>
+        {this.renderNavigation(sections.filter((s) => hasRole(s.role, roles)))}
+        <div className={css(styles.content)}>
+          <Typography
+            variant="h5"
+            style={{ fontWeight: 700, marginBottom: 16 }}
+          >
+            {title}
+          </Typography>
+          <NotificationCard organizationId={match.params.organizationId} />
+          {children}
         </div>
       </div>
     );
