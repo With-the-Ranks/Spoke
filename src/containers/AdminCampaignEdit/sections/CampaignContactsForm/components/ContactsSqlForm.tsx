@@ -1,5 +1,5 @@
+import TextField from "@material-ui/core/TextField";
 import { css, StyleSheet } from "aphrodite";
-import TextField from "material-ui/TextField";
 import React from "react";
 
 import theme from "../../../../../styles/theme";
@@ -98,12 +98,16 @@ class ContactsSqlForm extends React.Component<
         </ul>
         <TextField
           name="contactSql"
-          floatingLabelText="Data Warehouse SQL"
-          hintText="Enter your query here"
-          errorText={sqlError}
-          value={pendingSql}
+          label="Data Warehouse SQL"
+          variant="outlined"
+          size="small"
           fullWidth
-          multiLine
+          InputLabelProps={{ shrink: true }}
+          placeholder="Enter your query here"
+          error={!!sqlError}
+          helperText={sqlError}
+          value={pendingSql}
+          multiline
           rows={5}
           onChange={this.handleSqlTextChange}
         />

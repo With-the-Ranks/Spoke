@@ -1,4 +1,4 @@
-import { TextField } from "material-ui";
+import TextField from "@material-ui/core/TextField";
 import React from "react";
 
 export class NameSearchBar extends React.Component<
@@ -21,13 +21,14 @@ export class NameSearchBar extends React.Component<
         }}
       >
         <TextField
-          underlineShow
-          onChange={(_, newText) => {
+          variant="outlined"
+          size="small"
+          placeholder="Search"
+          onChange={(ev) => {
+            const newText = ev.target.value;
             this.setState({ currentText: newText });
             this.props.onChange(newText);
           }}
-          hintStyle={{ left: 18 }}
-          hintText="Search"
         />
       </form>
     );
