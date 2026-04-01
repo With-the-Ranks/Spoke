@@ -4,6 +4,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import Switch from "@material-ui/core/Switch";
+import Alert from "@material-ui/lab/Alert";
 import {
   useGetScriptPreviewSettingsQuery,
   useUpdateScriptPreviewSettingsMutation
@@ -50,9 +51,13 @@ export const ScriptPreviewSettingsCard: React.FC<ScriptPreviewSettingsCardProps>
 
   return (
     <Card style={style}>
-      <CardHeader title="Script Preview Settings" disableTypography />
+      <CardHeader title="Script Preview Settings" />
       <CardContent>
-        {errorMsg && <p>Error: {errorMsg}</p>}
+        {errorMsg && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {errorMsg}
+          </Alert>
+        )}
         <FormGroup row>
           <FormControlLabel
             control={

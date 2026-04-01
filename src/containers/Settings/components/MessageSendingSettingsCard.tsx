@@ -73,7 +73,7 @@ export const MessageSendingSettingsCard: React.FC<MessageSendingSettingsCardProp
 
   return (
     <Card style={style}>
-      <CardHeader title="Message Sending Settings" disableTypography />
+      <CardHeader title="Message Sending Settings" />
       <CardContent>
         {errorMsg && <Alert severity="error">Error: {errorMsg}</Alert>}
         <p>
