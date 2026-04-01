@@ -3,8 +3,8 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
 import type { GraphQLError } from "graphql";
-import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
 import React, { useState } from "react";
 
@@ -63,13 +63,16 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
         </p>
         <TextField
           type="number"
-          floatingLabelText="Number of Hours"
+          label="Number of Hours"
+          variant="outlined"
+          size="small"
+          InputLabelProps={{ shrink: true }}
           defaultValue={1}
           value={inProgress.payload.ageInHours}
-          onChange={(_ev, val) => {
+          onChange={(ev) => {
             const newInProgress = setVal<ReleaseUnrepliedMessages>(
               "ageInHours",
-              parseInt(val, 10)
+              parseInt(ev.target.value, 10)
             );
             setInProgress(newInProgress);
           }}
@@ -128,12 +131,15 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
                 <TextField
                   style={{ flexGrow: 1, margin: "10px" }}
                   type="number"
-                  floatingLabelText="Number of Days"
+                  label="Number of Days"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
                   value={days}
-                  onChange={(_ev, val) => {
+                  onChange={(ev) => {
                     const newInProgress = setVal<MarkForSecondPass>(
                       "days",
-                      parseInt(val, 10)
+                      parseInt(ev.target.value, 10)
                     );
                     setInProgress(newInProgress);
                   }}
@@ -141,12 +147,15 @@ export const OperationDialogBody = (props: OperationDialogBodyProps) => {
                 <TextField
                   style={{ flexGrow: 1, margin: "10px" }}
                   type="number"
-                  floatingLabelText="Number of Hours"
+                  label="Number of Hours"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
                   value={hours}
-                  onChange={(_ev, val) => {
+                  onChange={(ev) => {
                     const newInProgress = setVal<MarkForSecondPass>(
                       "hours",
-                      parseInt(val, 10)
+                      parseInt(ev.target.value, 10)
                     );
                     setInProgress(newInProgress);
                   }}
@@ -246,9 +255,12 @@ export const OperationDialog: React.FC<OperationDialogProps> = (props) => {
         <OperationDialogBody {...props} />
         {!(executing || finished) && pendingDeletionProtectionCheck && (
           <TextField
-            floatingLabelText={`To continue, type ${DELETION_PROTECTION_TEXT}`}
+            label={`To continue, type ${DELETION_PROTECTION_TEXT}`}
+            variant="outlined"
+            size="small"
             fullWidth
-            onChange={(_, val) => setDeletionProtectionCheckText(val)}
+            InputLabelProps={{ shrink: true }}
+            onChange={(ev) => setDeletionProtectionCheckText(ev.target.value)}
             value={deletionProtectionCheckText}
           />
         )}

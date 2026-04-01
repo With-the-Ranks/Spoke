@@ -2,8 +2,8 @@
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import TextField from "@material-ui/core/TextField";
 import DataTable from "material-ui-datatables";
-import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
 import React from "react";
 
@@ -191,6 +191,8 @@ class CampaignOverlapManager extends React.Component {
         </div>
         <TextField
           fullWidth
+          variant="outlined"
+          size="small"
           placeholder="Search for campaigns"
           onChange={this.setOverlapSearch}
         />
