@@ -6,10 +6,10 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Fab from "@material-ui/core/Fab";
+import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import pick from "lodash/pick";
 import ColorPicker from "material-ui-color-picker";
-import TextField from "material-ui/TextField";
 import Toggle from "material-ui/Toggle";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
@@ -100,7 +100,11 @@ class AdminTagEditor extends Component {
 
   createTagEditorHandle = (event, value) => {
     let { editingTag } = this.state;
-    editingTag = Object.assign(editingTag, { [event.target.name]: value });
+    // v4 TextField passes value in event.target.value; v0 Toggle passes it as 2nd arg
+    const newValue = value !== undefined ? value : event.target.value;
+    editingTag = Object.assign(editingTag, {
+      [event.target.name]: newValue
+    });
     this.setState({ editingTag });
   };
 
@@ -216,17 +220,30 @@ class AdminTagEditor extends Component {
               <DialogTitle>{`${tagVerb} Tag`}</DialogTitle>
               <DialogContent>
                 <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between"
-                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 16 }}
                 >
-                  <div>
+                  {/* Row 1: Tag title */}
+                  <TextField
+                    name="title"
+                    label="Tag title"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    value={editingTag.title || ""}
+                    onChange={this.createTagEditorHandle}
+                  />
+                  {/* Row 2: Tag description | Tag script */}
+                  <div style={{ display: "flex", gap: 16 }}>
                     <TextField
-                      name="title"
-                      floatingLabelText="Tag title"
-                      value={editingTag.title || ""}
+                      name="description"
+                      label="Tag description"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      multiline
+                      InputLabelProps={{ shrink: true }}
+                      value={editingTag.description || ""}
                       onChange={this.createTagEditorHandle}
                     />
                     <GSScriptField
@@ -236,41 +253,58 @@ class AdminTagEditor extends Component {
                       customFields={customFields}
                       campaignVariables={campaignVariables}
                       integrationSourced={integrationSourced}
+                      fullWidth
                       value={editingTag.onApplyScript || ""}
                       onChange={this.handleEditTagScript}
                       onClick={this.handleOpenScriptEditor}
                     />
-                    <br />
-                    <Toggle
-                      name="isAssignable"
-                      label="Allow assignment?"
-                      toggled={editingTag.isAssignable}
-                      onToggle={this.createTagEditorHandle}
-                    />
                   </div>
-                  <div>
-                    <TextField
-                      name="description"
-                      floatingLabelText="Tag description"
-                      multiLine
-                      value={editingTag.description || ""}
-                      onChange={this.createTagEditorHandle}
-                    />
-                    <ColorPicker
-                      name="Text Color"
-                      floatingLabelText="Text color"
-                      defaultValue={editingTag.textColor}
-                      value={editingTag.textColor || ""}
-                      onChange={this.handleEditTextColor}
-                    />
-                    <ColorPicker
-                      name="Background Color"
-                      floatingLabelText="Background color"
-                      defaultValue={editingTag.backgroundColor}
-                      value={editingTag.backgroundColor || ""}
-                      onChange={this.handleEditBackgroundColor}
-                    />
+                  {/* Row 3: Text color | Background color */}
+                  <div style={{ display: "flex", gap: 16 }}>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "#374151",
+                          marginBottom: 4,
+                          fontWeight: 500
+                        }}
+                      >
+                        Text color
+                      </div>
+                      <ColorPicker
+                        name="Text Color"
+                        defaultValue={editingTag.textColor}
+                        value={editingTag.textColor || ""}
+                        onChange={this.handleEditTextColor}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "#374151",
+                          marginBottom: 4,
+                          fontWeight: 500
+                        }}
+                      >
+                        Background color
+                      </div>
+                      <ColorPicker
+                        name="Background Color"
+                        defaultValue={editingTag.backgroundColor}
+                        value={editingTag.backgroundColor || ""}
+                        onChange={this.handleEditBackgroundColor}
+                      />
+                    </div>
                   </div>
+                  {/* Row 4: Allow assignment toggle */}
+                  <Toggle
+                    name="isAssignable"
+                    label="Allow assignment?"
+                    toggled={editingTag.isAssignable}
+                    onToggle={this.createTagEditorHandle}
+                  />
                 </div>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <span>
@@ -287,11 +321,14 @@ class AdminTagEditor extends Component {
                 </div>
                 <TextField
                   name="webhookUrl"
-                  floatingLabelText="Webhook url"
-                  hintText="If set, a request will be sent to this URL whenever this tag is applied."
+                  label="Webhook url"
+                  placeholder="If set, a request will be sent to this URL whenever this tag is applied."
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
                   value={editingTag.webhookUrl || ""}
                   onChange={this.createTagEditorHandle}
-                  fullWidth
                 />
               </DialogContent>
               <DialogActions>{actions}</DialogActions>
