@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
-import TextField from "material-ui/TextField";
 import React from "react";
 import * as yup from "yup";
 
@@ -231,6 +231,9 @@ class TexterRequest extends React.Component {
             <TextField
               name="count"
               label="Count"
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
               type="number"
               value={count}
               onChange={(e) => {

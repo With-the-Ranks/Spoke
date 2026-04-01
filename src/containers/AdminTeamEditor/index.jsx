@@ -6,9 +6,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Fab from "@material-ui/core/Fab";
+import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import pick from "lodash/pick";
-import TextField from "material-ui/TextField";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 
@@ -93,9 +93,11 @@ class AdminTeamEditor extends Component {
     }
   };
 
-  createTeamEditorHandle = (event, value) => {
+  createTeamEditorHandle = (event) => {
     let { editingTeam } = this.state;
-    editingTeam = Object.assign(editingTeam, { [event.target.name]: value });
+    editingTeam = Object.assign(editingTeam, {
+      [event.target.name]: event.target.value
+    });
     this.setState({ editingTeam });
   };
 
@@ -154,22 +156,32 @@ class AdminTeamEditor extends Component {
             <DialogContent>
               <TextField
                 name="title"
-                floatingLabelText="Team name"
+                label="Team name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
                 value={editingTeam.title || ""}
                 onChange={this.createTeamEditorHandle}
               />
-              <br />
               <TextField
                 name="description"
-                floatingLabelText="Team description"
-                multiLine
+                label="Team description"
+                variant="outlined"
+                size="small"
+                fullWidth
+                multiline
+                InputLabelProps={{ shrink: true }}
                 value={editingTeam.description || ""}
                 onChange={this.createTeamEditorHandle}
               />
-              <br />
               <TextField
                 name="assignmentPriority"
-                floatingLabelText="Assignment priority"
+                label="Assignment priority"
+                variant="outlined"
+                size="small"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
                 value={editingTeam.assignmentPriority || 500}
                 onChange={this.createTeamEditorHandle}
               />

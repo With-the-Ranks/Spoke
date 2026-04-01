@@ -1,7 +1,7 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import { TextField } from "material-ui";
+import TextField from "@material-ui/core/TextField";
 import Toggle from "material-ui/Toggle";
 import React from "react";
 import { compose } from "recompose";
@@ -148,7 +148,10 @@ class CampaignAutoassignModeForm extends React.Component<
           <div>
             <TextField
               name="idle_minutes"
-              floatingLabelText="Idle Minutes"
+              label="Idle Minutes"
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
               type="number"
               value={repliesStaleAfter!}
               onChange={this.handleReleaseStaleRepliesAfterChange}
