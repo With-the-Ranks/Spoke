@@ -75,7 +75,7 @@ const Terms: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 380, maxHeight: 400, margin: "auto" }}>
-      <Paper style={{ padding: 20, margin: 20 }}>
+      <Paper variant="outlined" style={{ padding: 20, margin: 20 }}>
         <h2>Code Of Conduct</h2>
         <Divider />
         <Stepper activeStep={stepIndex} orientation="vertical">

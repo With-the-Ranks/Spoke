@@ -790,10 +790,10 @@ class AdminCampaignEdit extends React.Component {
             : "You need to complete all the sections below before you can start this campaign"}
           {this.renderCurrentEditors()}
         </div>
-        <div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {this.props.campaignData.campaign.isArchived ? (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.unarchiveCampaign(
                   this.props.campaignData.campaign.id
@@ -804,7 +804,7 @@ class AdminCampaignEdit extends React.Component {
             </Button>
           ) : (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.archiveCampaign(
                   this.props.campaignData.campaign.id
