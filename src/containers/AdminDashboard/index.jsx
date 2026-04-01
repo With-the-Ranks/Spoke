@@ -15,7 +15,12 @@ import NotificationCard from "./components/NotificationCard";
 
 const styles = StyleSheet.create({
   container: {
-    ...theme.layouts.multiColumn.container
+    ...theme.layouts.multiColumn.container,
+    backgroundColor: "#fafafa",
+    backgroundImage: "radial-gradient(circle, #0000000d 1px, #0000 1px)",
+    backgroundPosition: "0 0",
+    backgroundSize: "10px 10px",
+    minHeight: "100vh"
   },
   content: {
     ...theme.layouts.multiColumn.flexColumn,
