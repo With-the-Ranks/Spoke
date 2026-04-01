@@ -3,13 +3,17 @@ import ListItemText from "@material-ui/core/ListItemText";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
-import type { NavigationSection } from "../components/Navigation";
+import type {
+  NavigationGroup,
+  NavigationSection
+} from "../components/Navigation";
 import Navigation from "../components/Navigation";
 import { dataTest } from "../lib/attributes";
 
 interface AdminNavigationProps {
   organizationId: string;
-  sections: NavigationSection[];
+  sections?: NavigationSection[];
+  groups?: NavigationGroup[];
   showMenu?: boolean;
   onToggleMenu: () => React.MouseEventHandler<unknown>;
   title?: string;
@@ -17,11 +21,25 @@ interface AdminNavigationProps {
 
 const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
   const history = useHistory();
-  const { organizationId, sections, showMenu = true, onToggleMenu } = props;
+  const {
+    organizationId,
+    sections,
+    groups,
+    showMenu = true,
+    onToggleMenu
+  } = props;
 
-  const urlFromPath = (path: string) => {
-    return `/admin/${organizationId}/${path}`;
-  };
+  const urlFromPath = (path: string) => `/admin/${organizationId}/${path}`;
+
+  const addUrls = (items: NavigationSection[]) =>
+    items.map((section) => ({ ...section, url: urlFromPath(section.path) }));
+
+  const groupsWithUrls = groups?.map((group) => ({
+    ...group,
+    items: addUrls(group.items)
+  }));
+
+  const sectionsWithUrls = sections ? addUrls(sections) : undefined;
 
   return (
     <Navigation
@@ -29,10 +47,8 @@ const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
       showMenu={showMenu}
       title={props.title}
       organizationId={organizationId}
-      sections={sections.map((section) => ({
-        ...section,
-        url: urlFromPath(section.path)
-      }))}
+      groups={groupsWithUrls}
+      sections={sectionsWithUrls}
       switchListItem={
         <ListItem
           button
