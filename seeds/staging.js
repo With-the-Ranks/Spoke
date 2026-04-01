@@ -29,7 +29,8 @@ const TABLES = [
   { file: "05-interaction-steps.csv", table: "interaction_step" },
   { file: "06-assignments.csv", table: "assignment" },
   { file: "07-campaign-contacts.csv", table: "campaign_contact" },
-  { file: "08-messages.csv", table: "message" }
+  { file: "08-messages.csv", table: "message" },
+  { file: "09-messaging-services.csv", table: "messaging_service", skipSequence: true }
 ];
 
 /*
@@ -109,7 +110,8 @@ exports.seed = async function seed(knex) {
      * application-generated rows (via DEFAULT / nextval) don't collide
      * with the seeded data.
      */
-    for (const { table, sequence } of TABLES) {
+    for (const { table, sequence, skipSequence } of TABLES) {
+      if (skipSequence) continue;
       const seqName = sequence || `${table}_id_seq`;
       await client.query(`
         SELECT setval(
