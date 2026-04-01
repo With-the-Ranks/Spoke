@@ -68,9 +68,10 @@ const styles = StyleSheet.create({
     marginRight: 0
   },
   inline: {
-    display: "inline-block",
-    marginLeft: 20,
-    verticalAlign: "middle"
+    display: "inline-flex",
+    flexWrap: "nowrap",
+    gap: 8,
+    alignItems: "center"
   },
   secondaryHeader: {
     ...theme.text.secondaryHeader
@@ -319,6 +320,7 @@ class AdminCampaignStats extends React.Component {
                     <Button
                       {...dataTest("editCampaign")}
                       variant="contained"
+                      color="primary"
                       onClick={this.handleNavigateToEdit}
                     >
                       Edit
@@ -332,7 +334,7 @@ class AdminCampaignStats extends React.Component {
                         // export
                         <Button
                           key="export"
-                          variant="contained"
+                          variant="outlined"
                           disabled={shouldDisableExport}
                           onClick={this.handleOnClickExport}
                         >
@@ -341,7 +343,7 @@ class AdminCampaignStats extends React.Component {
                         // Export for VAN
                         <Button
                           key="van-export"
-                          variant="contained"
+                          variant="outlined"
                           disabled={isVanExportDisabled}
                           onClick={this.handleOnClickVanExport}
                         >
@@ -350,7 +352,7 @@ class AdminCampaignStats extends React.Component {
                         // Sync to VAN
                         <Button
                           key="van-sync"
-                          variant="contained"
+                          variant="outlined"
                           disabled={isVanSyncDisabled}
                           onClick={this.handleOnClickVanSync}
                         >
@@ -360,7 +362,7 @@ class AdminCampaignStats extends React.Component {
                         campaign.isArchived ? (
                           <Button
                             key="unarchive"
-                            variant="contained"
+                            variant="outlined"
                             onClick={() =>
                               this.props.mutations.unarchiveCampaign()
                             }
@@ -371,7 +373,7 @@ class AdminCampaignStats extends React.Component {
                         !campaign.isArchived ? (
                           <Button
                             key="archive"
-                            variant="contained"
+                            variant="outlined"
                             onClick={() =>
                               this.props.mutations.archiveCampaign()
                             }
@@ -383,7 +385,7 @@ class AdminCampaignStats extends React.Component {
                         <Button
                           key="copy"
                           {...dataTest("copyCampaign")}
-                          variant="contained"
+                          variant="outlined"
                           disabled={this.state.copyingCampaign}
                           onClick={
                             onlyCopyCampaignSameOrg

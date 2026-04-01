@@ -24,6 +24,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
+import BadgePlusIcon from "../components/BadgePlusIcon";
 import CreateCampaignFromTemplateDialog from "../components/CreateCampaignFromTemplateDialog";
 import LoadingIndicator from "../components/LoadingIndicator";
 import theme from "../styles/theme";
@@ -380,14 +381,21 @@ class AdminCampaignList extends React.Component {
                   <Box
                     sx={{
                       display: "flex",
-                      alignContent: "center",
-                      justifyContent: "center"
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6
                     }}
                   >
-                    <SpeedDialIcon />
-                    <Typography variant="button">
-                      {" "}
-                      Create a campaign{" "}
+                    <BadgePlusIcon style={{ width: 20, height: 20 }} />
+                    <Typography
+                      variant="button"
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "0.875rem",
+                        textTransform: "none"
+                      }}
+                    >
+                      Create a campaign
                     </Typography>
                   </Box>
                 }
@@ -395,7 +403,7 @@ class AdminCampaignList extends React.Component {
                   <Box
                     sx={{
                       display: "flex",
-                      alignContent: "center",
+                      alignItems: "center",
                       justifyContent: "center"
                     }}
                   >
