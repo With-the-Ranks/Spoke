@@ -68,10 +68,12 @@ const EditName: React.FC<EditNameProps> = ({ organizationId, style }) => {
         )}
         <TextField
           label="Organization Name"
+          variant="outlined"
+          size="small"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
           value={value}
           onChange={(e) => setOrgName(e.target.value)}
-          fullWidth
-          variant="standard"
         />
       </CardContent>
       <CardActions>

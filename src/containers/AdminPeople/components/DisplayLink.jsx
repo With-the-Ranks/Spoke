@@ -1,4 +1,4 @@
-import TextField from "material-ui/TextField";
+import TextField from "@material-ui/core/TextField";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -11,6 +11,8 @@ const DisplayLink = ({ url, textContent }) => (
       {...dataTest("url")}
       name={url}
       value={url}
+      variant="outlined"
+      size="small"
       autoFocus
       onFocus={(event) => event.target.select()}
       fullWidth
