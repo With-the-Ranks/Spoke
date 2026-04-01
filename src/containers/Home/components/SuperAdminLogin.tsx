@@ -3,7 +3,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "material-ui/TextField";
+import TextField from "@material-ui/core/TextField";
 import React from "react";
 import request from "superagent";
 
@@ -109,15 +109,23 @@ class SuperAdminLogin extends React.Component<
         <DialogTitle>Superadmin Login</DialogTitle>
         <DialogContent>
           <TextField
-            floatingLabelText="Superadmin secret"
-            errorText={error}
+            label="Superadmin secret"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            error={!!error}
+            helperText={error}
             type="password"
             value={superAdminToken}
-            fullWidth
             onChange={this.handleOnChangeSecret}
           />
           <TextField
-            floatingLabelText="Organization ID"
+            label="Organization ID"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
             value={superAdminOrgId}
             onChange={this.handleOnChangeOrgId}
           />

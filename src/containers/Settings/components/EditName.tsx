@@ -1,7 +1,7 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
 import { Card, CardActions, CardHeader, CardText } from "material-ui/Card";
-import TextField from "material-ui/TextField";
 import React, { useState } from "react";
 import { compose } from "recompose";
 
@@ -63,7 +63,11 @@ const EditName: React.FC<InnerProps> = (props) => {
       <CardText>
         {errorMsg && <p>Error: {errorMsg}</p>}
         <TextField
-          floatingLabelText="Organization Name"
+          label="Organization Name"
+          variant="outlined"
+          size="small"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
           value={value}
           onChange={handleNameChange}
         />
