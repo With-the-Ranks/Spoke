@@ -84,6 +84,7 @@ const ConversationPreviewModal: React.FC<ConversationPreviewModalProps> = (
 
   return (
     <Paper
+      variant="outlined"
       style={{
         display: "flex",
         flexDirection: "column",

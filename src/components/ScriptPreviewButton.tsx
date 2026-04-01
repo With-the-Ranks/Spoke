@@ -31,7 +31,7 @@ export const ScriptPreviewButton: React.FC<ScriptPreviewButtonProps> = (
     <Tooltip title="View an outline of your script" placement="top">
       <Button
         key="open-script-preview"
-        variant="contained"
+        variant="outlined"
         onClick={() => {
           window.open(`/preview/${previewUrl}`, "_blank");
         }}

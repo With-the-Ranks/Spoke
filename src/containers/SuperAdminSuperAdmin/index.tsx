@@ -130,7 +130,7 @@ const SuperAdminSuperAdmin: React.FC = (_props) => {
   }
   return (
     <div>
-      <Paper>
+      <Paper variant="outlined">
         <DataGridPro
           autoHeight
           columns={columns}
