@@ -181,7 +181,7 @@ const AdminTrollAlarms: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <Paper style={styles.controlsContainer}>
+      <Paper variant="outlined" style={styles.controlsContainer}>
         <AutoComplete
           floatingLabelText="Token"
           hintText="Search for a trigger token"

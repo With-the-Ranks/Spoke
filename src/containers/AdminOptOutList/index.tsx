@@ -189,7 +189,7 @@ const AdminOptOutList: React.FC = (props) => {
           </ButtonGroup>
         </CardContent>
       </Card>
-      <Paper>
+      <Paper variant="outlined">
         <DataGridPro
           autoHeight
           pagination
