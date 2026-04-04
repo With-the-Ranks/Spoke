@@ -66,21 +66,67 @@ const DeliverabilityStats = (props: {
         </Grid>
       </Grid>
 
-      <div className={css(styles.secondaryHeader)}>Top errors:</div>
-      {specificErrors
-        .sort((a, b) => b.count - a.count)
-        .map((e) => {
-          const errorCode = e.errorCode ? `${e.errorCode}` : "n/a";
-          return (
-            <div key={errorCode}>
-              {errorCode}{" "}
-              {errorCodeDescriptions[errorCode]
-                ? `(${errorCodeDescriptions[errorCode]})`
-                : "Unknown error"}
-              : {asPercentWithTotal(e.count, total)}
-            </div>
-          );
-        })}
+      <div
+        className={css(styles.secondaryHeader)}
+        style={{ marginTop: 24, marginBottom: 8 }}
+      >
+        Top errors:
+      </div>
+      <table
+        style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
+      >
+        <thead>
+          <tr style={{ borderBottom: "1px solid #E5E7EB" }}>
+            {["Error ID", "Error Label", "Percentage", "Number of Errors"].map(
+              (h) => (
+                <th
+                  key={h}
+                  style={{
+                    textAlign: "left",
+                    padding: "6px 12px",
+                    fontWeight: 600,
+                    color: "#6B7280",
+                    textTransform: "uppercase",
+                    fontSize: 11,
+                    letterSpacing: "0.05em"
+                  }}
+                >
+                  {h}
+                </th>
+              )
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {[...specificErrors]
+            .sort((a, b) => b.count - a.count)
+            .map((e) => {
+              const errorCode = e.errorCode ? `${e.errorCode}` : "n/a";
+              const description =
+                errorCodeDescriptions[errorCode] || "Unknown error";
+              const pct = `${((e.count / total) * 100).toFixed(2)}%`;
+              return (
+                <tr
+                  key={errorCode}
+                  style={{ borderBottom: "1px solid #F3F4F6" }}
+                >
+                  <td style={{ padding: "8px 12px", fontWeight: 600 }}>
+                    {errorCode}
+                  </td>
+                  <td style={{ padding: "8px 12px", color: "#374151" }}>
+                    {description}
+                  </td>
+                  <td style={{ padding: "8px 12px", color: "#374151" }}>
+                    {pct}
+                  </td>
+                  <td style={{ padding: "8px 12px", color: "#374151" }}>
+                    {e.count}
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
     </div>
   );
 };

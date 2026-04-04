@@ -35,15 +35,18 @@ const CampaignSurveyStats = (props) => {
   return (
     <div>
       {interactionSteps
-        .filter((iStep) => iStep.question !== "")
+        .filter((iStep) => iStep.question.text !== "")
         .map((step) => {
           const { answerOptions } = step.question;
           const countReducer = (acc, answer) => acc + answer.responderCount;
           const responseCount = answerOptions.reduce(countReducer, 0);
 
           return (
-            <div key={step.id}>
-              <div className={css(styles.secondaryHeader)}>
+            <div key={step.id} style={{ marginBottom: 48 }}>
+              <div
+                className={css(styles.secondaryHeader)}
+                style={{ marginBottom: 16 }}
+              >
                 {step.question.text}
               </div>
               {responseCount > 0 ? (
