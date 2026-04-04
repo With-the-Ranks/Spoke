@@ -1,20 +1,32 @@
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
-import { css, StyleSheet } from "aphrodite";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
 import isNil from "lodash/isNil";
 import React from "react";
 
 import LoadingIndicator from "../../../components/LoadingIndicator";
 
-const inlineStyles = StyleSheet.create({
-  cardContent: {
-    textAlign: "center",
-    height: "50%",
-    padding: "5px"
+const useStyles = makeStyles((theme) => ({
+  card: {
+    alignSelf: "flex-start"
   },
-  colorRed: { color: "red" }
-});
+  label: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(0.5)
+  },
+  count: {
+    fontSize: 32,
+    fontWeight: 700,
+    color: theme.palette.primary.main,
+    lineHeight: 1.1
+  },
+  countHighlight: {
+    color: theme.palette.error.main
+  }
+}));
 
 export interface CampaignStatProps {
   title: string;
@@ -25,36 +37,30 @@ export interface CampaignStatProps {
 }
 
 export const CampaignStat: React.FC<CampaignStatProps> = (props) => {
-  // shrink text if large top line number
-  const maxLargeNumberLength = 4;
-  const count = props.count?.toString();
-  const heading =
-    count && !count.includes("%") && count.length > maxLargeNumberLength
-      ? "h4"
-      : "h3";
-
-  const countStyle = props.highlight
-    ? css(inlineStyles.cardContent, inlineStyles.colorRed)
-    : css(inlineStyles.cardContent);
+  const classes = useStyles();
 
   return (
-    <Card key={props.title} style={{ height: "100%" }}>
+    <Card className={classes.card}>
       {props.loading && <LoadingIndicator />}
       {props.error && (
-        <CardContent className={css(inlineStyles.cardContent)}>
-          {props.error}
+        <CardContent>
+          <Typography variant="body2" color="error">
+            {props.error}
+          </Typography>
         </CardContent>
       )}
       {!isNil(props.count) && (
-        <CardHeader
-          title={props.count}
-          titleTypographyProps={{ variant: heading }}
-          className={countStyle}
-        />
+        <CardContent>
+          <Typography className={classes.label}>{props.title}</Typography>
+          <Typography
+            className={`${classes.count}${
+              props.highlight ? ` ${classes.countHighlight}` : ""
+            }`}
+          >
+            {props.count}
+          </Typography>
+        </CardContent>
       )}
-      <CardContent className={css(inlineStyles.cardContent)}>
-        {props.title}
-      </CardContent>
     </Card>
   );
 };

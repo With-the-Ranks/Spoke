@@ -295,21 +295,29 @@ class AdminCampaignStats extends React.Component {
             ""
           )}
 
-          <div className={css(styles.header)}>
-            {campaign.title}
-            <br />
-            Campaign ID: {campaign.id}
-            <br />
-            Due:{" "}
-            <span style={{ color: isOverdue ? red[600] : undefined }}>
-              {dueFormatted} {isOverdue && "(Overdue)"}
-            </span>
-            {showMessagingServiceName && (
-              <>
-                <br />
-                Messaging Service: {msgServiceName}
-              </>
-            )}
+          <div>
+            <div className={css(styles.header)}>{campaign.title}</div>
+            <div
+              style={{
+                fontSize: 13,
+                color: "#6B7280",
+                marginTop: 4,
+                lineHeight: 1.6
+              }}
+            >
+              Campaign ID: {campaign.id}
+              <br />
+              Due:{" "}
+              <span style={{ color: isOverdue ? red[600] : undefined }}>
+                {dueFormatted} {isOverdue && "(Overdue)"}
+              </span>
+              {showMessagingServiceName && (
+                <>
+                  <br />
+                  Messaging Service: {msgServiceName}
+                </>
+              )}
+            </div>
           </div>
           <div className={css(styles.flexColumn)}>
             <div className={css(styles.rightAlign)}>
@@ -403,16 +411,23 @@ class AdminCampaignStats extends React.Component {
           </div>
         </div>
         <TopLineStats campaignId={campaign.id} />
-        <div className={css(styles.header)}>Survey Questions</div>
+        <div
+          style={{ marginTop: 32, marginBottom: 16 }}
+          className={css(styles.header)}
+        >
+          Survey Questions
+        </div>
         <CampaignSurveyStats campaignId={campaign.id} />
 
-        <br />
-        <div className={css(styles.header)}>Outbound Deliverability</div>
+        <div className={css(styles.header)} style={{ marginTop: 16 }}>
+          Outbound Deliverability
+        </div>
         <DeliverabilityStats campaignId={campaign.id} />
-        <br />
+        <div style={{ marginBottom: 32 }} />
 
-        <div className={css(styles.header)}>Texter stats</div>
-        <div className={css(styles.secondaryHeader)}>% of first texts sent</div>
+        <div className={css(styles.header)} style={{ marginBottom: 8 }}>
+          Texter stats
+        </div>
         <TexterStats campaignId={campaign.id} />
 
         <Snackbar
