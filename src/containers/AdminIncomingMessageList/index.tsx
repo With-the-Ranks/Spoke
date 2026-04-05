@@ -8,6 +8,7 @@ import {
   useMegaBulkReassignCampaignContactsMutation,
   useMegaReassignCampaignContactsMutation
 } from "@spoke/spoke-codegen";
+import isEqual from "lodash/isEqual";
 import omit from "lodash/omit";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -29,7 +30,7 @@ import {
   TagsFilterParam
 } from "./types";
 
-/* Initialized as objects to later facillitate shallow comparison */
+/* Initial filter defaults used for value comparison via isEqual */
 const initialCampaignsFilter = { isArchived: false };
 const initialContactsFilter = { isOptedOut: false };
 const initialAssignmentsFilter = {};
@@ -367,16 +368,16 @@ const AdminIncomingMessageList: React.FC<AdminIncomingMessageListProps> = (
   };
 
   /*
-    Shallow comparison here done intentionally – we want to know if its changed, not if it's different,
-    since we want to allow the user to make the same query as the default one, but we don't want to
-    pre-emptively run the default (and most expensive) one
+    We compare filter values (not references) to check if filters have changed from defaults.
+    This allows users to make the same query as the default, but prevents pre-emptively
+    running the default (and most expensive) query on initial load.
   */
   const haveFiltersChangedFromDefaults = () => {
     return (
-      campaignsFilter !== initialCampaignsFilter ||
-      contactsFilter !== initialContactsFilter ||
-      assignmentsFilter !== initialAssignmentsFilter ||
-      tagsFilter !== initialTagsFilter ||
+      !isEqual(campaignsFilter, initialCampaignsFilter) ||
+      !isEqual(contactsFilter, initialContactsFilter) ||
+      !isEqual(assignmentsFilter, initialAssignmentsFilter) ||
+      !isEqual(tagsFilter, initialTagsFilter) ||
       contactNameFilter !== undefined
     );
   };
