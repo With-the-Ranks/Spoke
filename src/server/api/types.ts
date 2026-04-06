@@ -125,6 +125,7 @@ export interface CampaignRecord {
   autosend_user_id: number;
   messaging_service_sid: string | null;
   column_mapping: string | null;
+  contacts_filename: string | null;
 }
 
 export interface CampaignVariableRecord {
