@@ -1,10 +1,11 @@
+import Typography from "@material-ui/core/Typography";
 import { useGetOrganizationNameQuery } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { withRouter } from "react-router-dom";
 
-import TopNav from "../components/TopNav";
 import theme from "../styles/theme";
 
 const styles = StyleSheet.create({
@@ -16,6 +17,10 @@ const styles = StyleSheet.create({
     paddingLeft: "2rem",
     paddingRight: "2rem",
     margin: "24px auto"
+  },
+  texterText: {
+    fontWeight: 700,
+    marginBottom: "16px"
   }
 });
 
@@ -39,19 +44,20 @@ const TexterDashboard = (props) => {
 
   const sectionTitle = loading ? "Spoke" : organization?.organization?.name;
 
-  const TopNavComponent = topNavTitle ? (
-    <TopNav
-      sectionTitle={sectionTitle}
-      title={topNavTitle}
-      orgId={props.match.params.organizationId}
-    />
-  ) : undefined;
-
   return (
     <div>
-      {TopNavComponent}
+      {topNavTitle && (
+        <Helmet>
+          <title>{`${topNavTitle} - ${sectionTitle}`}</title>
+        </Helmet>
+      )}
       <div className={css(styles.container)}>
         <div className={css(styles.content)}>
+          {topNavTitle && (
+            <Typography variant="h5" className={css(styles.texterText)}>
+              {topNavTitle}
+            </Typography>
+          )}
           <MainComponent {...rest} />
         </div>
       </div>

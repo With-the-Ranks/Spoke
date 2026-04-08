@@ -15,6 +15,7 @@ import Select from "@material-ui/core/Select";
 import { withTheme } from "@material-ui/core/styles";
 import { CampaignBuilderMode } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
+import isNil from "lodash/isNil";
 import pick from "lodash/pick";
 import PropTypes from "prop-types";
 import React from "react";
@@ -82,7 +83,7 @@ class AdminCampaignEdit extends React.Component {
     // So campaignFormValues should always be the diffs between server and client form data
     let { expandedSection } = this.state;
     let expandedKeys = [];
-    if (expandedSection !== null) {
+    if (!isNil(expandedSection)) {
       expandedSection = this.sections()[expandedSection];
       expandedKeys = expandedSection.keys;
     }

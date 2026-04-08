@@ -1,10 +1,11 @@
 import { makeStyles } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 import React, { useState } from "react";
+import { Helmet } from "react-helmet";
 import type { RouterProps } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 
 import Navigation from "../components/Navigation";
-import TopNav from "../components/TopNav";
 import theme from "../styles/theme";
 import { useAuthzContext } from "./AuthzProvider";
 
@@ -12,14 +13,15 @@ const useStyles = makeStyles({
   container: {
     ...theme.layouts.multiColumn.container
   },
-  sidebar: {
-    minHeight: "calc(100vh - 56px)"
-  },
   content: {
     ...theme.layouts.multiColumn.flexColumn,
     paddingLeft: "2rem",
     paddingRight: "2rem",
     margin: "24px auto"
+  },
+  superadminText: {
+    fontWeight: 700,
+    marginBottom: "16px"
   }
 });
 
@@ -56,30 +58,32 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     .filter((section) => location.pathname.match(`/${section.path}`))
     .at(0);
 
+  const title = currentSection?.name ?? "SuperAdmin";
+
   return isSuperadmin ? (
-    <div>
-      <TopNav
-        sectionTitle="SuperAdmin"
-        title={currentSection?.name ?? "SuperAdmin"}
+    <div className={classes.container}>
+      <Helmet>
+        <title>{`${title} - SuperAdmin`}</title>
+      </Helmet>
+      <Navigation
+        onToggleMenu={onToggleMenu}
+        sections={sections}
+        showMenu={showMenu}
+        title="SuperAdmin"
       />
-      <div className={classes.container}>
-        <div className={classes.sidebar}>
-          <Navigation
-            onToggleMenu={onToggleMenu}
-            sections={sections}
-            showMenu={showMenu}
-          />
-        </div>
-        <div className={classes.content}>{children}</div>
+      <div className={classes.content}>
+        <Typography variant="h5" className={classes.superadminText}>
+          {title}
+        </Typography>
+        {children}
       </div>
     </div>
   ) : (
     <div>
-      <TopNav
-        sectionTitle="SuperAdmin"
-        title={currentSection?.name ?? "SuperAdmin"}
-      />
-      <h1>You don't have permission to access this page</h1>
+      <Helmet>
+        <title>SuperAdmin - Access Denied</title>
+      </Helmet>
+      <h1>You don&apos;t have permission to access this page</h1>
     </div>
   );
 };
