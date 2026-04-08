@@ -18,6 +18,10 @@ const useStyles = makeStyles({
     paddingLeft: "2rem",
     paddingRight: "2rem",
     margin: "24px auto"
+  },
+  superadminText: {
+    fontWeight: 700,
+    marginBottom: "16px"
   }
 });
 
@@ -68,7 +72,7 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         title="SuperAdmin"
       />
       <div className={classes.content}>
-        <Typography variant="h5" style={{ fontWeight: 700, marginBottom: 16 }}>
+        <Typography variant="h5" className={classes.superadminText}>
           {title}
         </Typography>
         {children}

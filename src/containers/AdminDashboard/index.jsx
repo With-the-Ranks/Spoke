@@ -22,6 +22,10 @@ const styles = StyleSheet.create({
     paddingLeft: "2rem",
     paddingRight: "2rem",
     margin: "24px auto"
+  },
+  adminText: {
+    fontWeight: 700,
+    marginBottom: "16px"
   }
 });
 
@@ -139,10 +143,7 @@ class AdminDashboard extends React.Component {
         </Helmet>
         {this.renderNavigation(sections.filter((s) => hasRole(s.role, roles)))}
         <div className={css(styles.content)}>
-          <Typography
-            variant="h5"
-            style={{ fontWeight: 700, marginBottom: 16 }}
-          >
+          <Typography variant="h5" className={css(styles.adminText)}>
             {title}
           </Typography>
           <NotificationCard organizationId={match.params.organizationId} />

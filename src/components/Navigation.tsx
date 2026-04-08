@@ -8,12 +8,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import clsx from "clsx";
-import camelCase from "lodash/camelCase";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
 import UserMenu from "../containers/UserMenu";
-import { dataTest } from "../lib/attributes";
 import assemblePalette from "../styles/assemble-palette";
 import navigationIconMap from "./NavigationIconMap";
 
@@ -105,6 +103,9 @@ const useStyles = makeStyles((theme) => ({
     height: 32,
     fontSize: 14,
     backgroundColor: theme.palette.primary.main
+  },
+  sectionDivider: {
+    margin: theme.spacing(1, 2)
   }
 }));
 
@@ -153,7 +154,6 @@ const Navigation: React.FC<Props> = (props) => {
           return (
             <ListItem
               button
-              {...dataTest(camelCase(`nav ${section.path}`))}
               key={section.name}
               className={clsx(classes.navItem, {
                 [classes.navItemActive]: active
