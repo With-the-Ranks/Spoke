@@ -48,15 +48,11 @@ class SuperAdminLogin extends React.Component<
 
   handleRequestClose = () => this.setState({ isOpen: false });
 
-  handleOnChangeSecret = (
-    _event: React.FormEvent<unknown>,
-    superAdminToken: string
-  ) => this.setState({ superAdminToken });
+  handleOnChangeSecret = (event: React.ChangeEvent<HTMLInputElement>) =>
+    this.setState({ superAdminToken: event.target.value });
 
-  handleOnChangeOrgId = (
-    _event: React.FormEvent<unknown>,
-    superAdminOrgId: string
-  ) => this.setState({ superAdminOrgId });
+  handleOnChangeOrgId = (event: React.ChangeEvent<HTMLInputElement>) =>
+    this.setState({ superAdminOrgId: event.target.value });
 
   handleSubmit = async () => {
     const { superAdminToken, superAdminOrgId } = this.state;
