@@ -10,7 +10,7 @@ RUN jq '{ dependencies, devDependencies, resolutions }' < /tmp/package.json > /t
 
 ### Fat Build
 ### -------------------------
-FROM node:20.16.0 AS builder
+FROM node:24.11.0 AS builder
 
 WORKDIR /usr/Spoke
 
@@ -36,7 +36,7 @@ RUN yarn run build
 
 ### Slim Deploy
 ### -------------------------
-FROM node:20.16.0
+FROM node:24.11.0
 
 WORKDIR /usr/Spoke
 
