@@ -1,11 +1,8 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import DeleteIcon from "@material-ui/icons/Delete";
 import isEmpty from "lodash/isEmpty";
-import ColorPicker from "material-ui-color-picker";
 import React from "react";
 import { compose } from "recompose";
 import * as yup from "yup";
@@ -13,7 +10,6 @@ import * as yup from "yup";
 import GSForm from "../../../components/forms/GSForm";
 import SpokeFormField from "../../../components/forms/SpokeFormField";
 import { dataTest } from "../../../lib/attributes";
-import { DateTime } from "../../../lib/datetime";
 import { difference } from "../../../lib/utils";
 import { loadData } from "../../hoc/with-operations";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
@@ -102,11 +98,6 @@ class CampaignBasicsForm extends React.Component<
     }
   };
 
-  deleteDueDate = () => {
-    const pendingChanges = { ...this.state.pendingChanges, dueBy: null };
-    this.setState({ pendingChanges });
-  };
-
   render() {
     const { pendingChanges, isWorking } = this.state;
     const {
@@ -131,13 +122,62 @@ class CampaignBasicsForm extends React.Component<
         >
           <CampaignFormSectionHeading title="What&#39;s your campaign about?" />
 
-          <SpokeFormField
-            {...dataTest("title")}
-            name="title"
-            label="Title"
-            hintText="e.g. Election Day 2016"
-            fullWidth
-          />
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <SpokeFormField name="primaryColor">
+              {({
+                value: colorValue,
+                onChange
+              }: {
+                value: string;
+                onChange: (val: string) => void;
+              }) => {
+                const color = colorValue || "#ffffff";
+                return (
+                  <Tooltip title="Campaign color" placement="top">
+                    <div style={{ position: "relative", flexShrink: 0 }}>
+                      <div
+                        onClick={() => {
+                          const input = document.getElementById(
+                            "primary-color-input"
+                          ) as HTMLInputElement;
+                          input?.click();
+                        }}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          backgroundColor: color,
+                          border: "1px solid rgba(0, 0, 0, 0.23)",
+                          cursor: "pointer"
+                        }}
+                      />
+                      <input
+                        id="primary-color-input"
+                        type="color"
+                        value={color}
+                        onChange={(e) => onChange(e.target.value)}
+                        style={{
+                          position: "absolute",
+                          opacity: 0,
+                          width: 0,
+                          height: 0,
+                          top: 0,
+                          left: 0
+                        }}
+                      />
+                    </div>
+                  </Tooltip>
+                );
+              }}
+            </SpokeFormField>
+            <SpokeFormField
+              {...dataTest("title")}
+              name="title"
+              label="Title"
+              hintText="e.g. Election Day 2016"
+              fullWidth
+            />
+          </div>
 
           <SpokeFormField
             {...dataTest("description")}
@@ -145,46 +185,6 @@ class CampaignBasicsForm extends React.Component<
             label="Description"
             hintText="Get out the vote"
             fullWidth
-          />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 256 }}>
-              <SpokeFormField
-                {...dataTest("dueBy")}
-                name="dueBy"
-                label="Due date"
-                type="date"
-                locale="en-US"
-                shouldDisableDate={(date: Date) =>
-                  DateTime.fromJSDate(date) < DateTime.local()
-                }
-                autoOk
-              />
-            </div>
-            <Tooltip title="Delete the Due Date" placement="top">
-              <IconButton onClick={this.deleteDueDate} style={{ width: 50 }}>
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-
-          <SpokeFormField
-            name="introHtml"
-            label="Intro HTML"
-            multiLine
-            fullWidth
-          />
-          <SpokeFormField
-            name="logoImageUrl"
-            label="Logo Image URL"
-            hintText="https://www.mysite.com/images/logo.png"
-            fullWidth
-          />
-          <p>Primary color</p>
-          <SpokeFormField
-            name="primaryColor"
-            label="Primary color"
-            defaultValue={value.primaryColor || "#ffffff"}
-            type={ColorPicker}
           />
         </GSForm>
 
