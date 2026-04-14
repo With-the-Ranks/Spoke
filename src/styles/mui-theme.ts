@@ -86,6 +86,12 @@ export const createMuiThemev1 = (theme: Partial<CustomTheme> = {}) => {
           "&:hover": {
             boxShadow: "none"
           }
+        },
+        outlined: {
+          backgroundColor: "#ffffff",
+          "&:hover": {
+            backgroundColor: grey[50]
+          }
         }
       },
       MuiPaper: {
