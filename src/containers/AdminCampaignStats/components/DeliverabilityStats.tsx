@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Grid } from "@material-ui/core";
+import { Grid, Paper } from "@material-ui/core";
 import type { Campaign } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
@@ -72,13 +72,18 @@ const DeliverabilityStats = (props: {
       >
         Top errors:
       </div>
-      <table
-        style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
-      >
-        <thead>
-          <tr style={{ borderBottom: "1px solid #E5E7EB" }}>
-            {["Error ID", "Error Label", "Percentage", "Number of Errors"].map(
-              (h) => (
+      <Paper variant="outlined" style={{ padding: 16 }}>
+        <table
+          style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
+        >
+          <thead>
+            <tr style={{ borderBottom: "1px solid #E5E7EB" }}>
+              {[
+                "Error ID",
+                "Error Label",
+                "Percentage",
+                "Number of Errors"
+              ].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -93,40 +98,40 @@ const DeliverabilityStats = (props: {
                 >
                   {h}
                 </th>
-              )
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {[...specificErrors]
-            .sort((a, b) => b.count - a.count)
-            .map((e) => {
-              const errorCode = e.errorCode ? `${e.errorCode}` : "n/a";
-              const description =
-                errorCodeDescriptions[errorCode] || "Unknown error";
-              const pct = `${((e.count / total) * 100).toFixed(2)}%`;
-              return (
-                <tr
-                  key={errorCode}
-                  style={{ borderBottom: "1px solid #F3F4F6" }}
-                >
-                  <td style={{ padding: "8px 12px", fontWeight: 600 }}>
-                    {errorCode}
-                  </td>
-                  <td style={{ padding: "8px 12px", color: "#374151" }}>
-                    {description}
-                  </td>
-                  <td style={{ padding: "8px 12px", color: "#374151" }}>
-                    {pct}
-                  </td>
-                  <td style={{ padding: "8px 12px", color: "#374151" }}>
-                    {e.count}
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...specificErrors]
+              .sort((a, b) => b.count - a.count)
+              .map((e) => {
+                const errorCode = e.errorCode ? `${e.errorCode}` : "n/a";
+                const description =
+                  errorCodeDescriptions[errorCode] || "Unknown error";
+                const pct = `${((e.count / total) * 100).toFixed(2)}%`;
+                return (
+                  <tr
+                    key={errorCode}
+                    style={{ borderBottom: "1px solid #F3F4F6" }}
+                  >
+                    <td style={{ padding: "8px 12px", fontWeight: 600 }}>
+                      {errorCode}
+                    </td>
+                    <td style={{ padding: "8px 12px", color: "#374151" }}>
+                      {description}
+                    </td>
+                    <td style={{ padding: "8px 12px", color: "#374151" }}>
+                      {pct}
+                    </td>
+                    <td style={{ padding: "8px 12px", color: "#374151" }}>
+                      {e.count}
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      </Paper>
     </div>
   );
 };

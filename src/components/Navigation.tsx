@@ -10,10 +10,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
 import camelCase from "lodash/camelCase";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
 import UserMenu from "../containers/UserMenu";
@@ -206,8 +207,6 @@ const Navigation: React.FC<Props> = (props) => {
   const location = useLocation();
   const classes = useStyles();
   const { sections, groups, switchListItem, title } = props;
-  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
-
   const collapsed = !props.showMenu;
 
   const isActive = (section: NavigationSection) =>
@@ -215,6 +214,18 @@ const Navigation: React.FC<Props> = (props) => {
 
   const isGroupActive = (group: NavigationGroup) =>
     group.items.some((item) => isActive(item));
+
+  // Initialize open group to the active group on first render
+  const [openGroup, setOpenGroup] = useState<string | null>(() => {
+    const active = groups?.find((g) => isGroupActive(g));
+    return active?.name ?? null;
+  });
+
+  // When the route changes, auto-open the active group
+  useEffect(() => {
+    const active = groups?.find((g) => isGroupActive(g));
+    if (active) setOpenGroup(active.name);
+  }, [location.pathname]);
 
   const renderSection = (section: NavigationSection, indented = false) => {
     const active = isActive(section);
@@ -296,27 +307,29 @@ const Navigation: React.FC<Props> = (props) => {
             {groups &&
               groups.map((group) => {
                 const groupActive = isGroupActive(group);
-                const isOpen = hoveredGroup === group.name || groupActive;
+                const isOpen = openGroup === group.name;
 
                 return (
-                  <div
-                    key={group.name}
-                    onMouseEnter={() => setHoveredGroup(group.name)}
-                    onMouseLeave={() => setHoveredGroup(null)}
-                  >
+                  <div key={group.name}>
                     {/* Group header */}
                     <ListItem
                       button
                       className={clsx(classes.groupHeader, {
                         [classes.groupHeaderActive]: groupActive
                       })}
-                      onClick={() =>
-                        setHoveredGroup(isOpen ? null : group.name)
-                      }
+                      onClick={() => setOpenGroup(isOpen ? null : group.name)}
                     >
                       <ListItemText
                         primary={group.name}
                         className={classes.groupHeaderText}
+                      />
+                      <ExpandMoreIcon
+                        fontSize="small"
+                        style={{
+                          color: "inherit",
+                          transition: "transform 0.2s",
+                          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
+                        }}
                       />
                     </ListItem>
 

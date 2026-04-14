@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
@@ -192,14 +193,16 @@ class AdminDashboard extends React.Component {
         </Helmet>
         {this.renderNavigation(groups)}
         <div className={css(styles.content)}>
-          <Typography
-            variant="h5"
-            style={{ fontWeight: 700, marginBottom: 16 }}
-          >
-            {title}
-          </Typography>
-          <NotificationCard organizationId={match.params.organizationId} />
-          {children}
+          <Container maxWidth="md" disableGutters>
+            <Typography
+              variant="h5"
+              style={{ fontWeight: 700, marginBottom: 16 }}
+            >
+              {title}
+            </Typography>
+            <NotificationCard organizationId={match.params.organizationId} />
+            {children}
+          </Container>
         </div>
       </div>
     );
