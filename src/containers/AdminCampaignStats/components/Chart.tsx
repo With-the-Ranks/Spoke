@@ -43,7 +43,7 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
   };
 
   return (
-    <>
+    <div style={{ maxWidth: 500 }}>
       {/* Chart.js doesn't handle a long list of options well so we do the legend outselves */}
       <Pie data={pieData} options={{ legend: { display: false } }} />
       <div className={css(styles.legendWrapper)}>
@@ -57,7 +57,7 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
           </span>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

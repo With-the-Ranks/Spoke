@@ -10,19 +10,11 @@ import Chart from "./Chart";
 
 const styles = StyleSheet.create({
   container: {
-    ...theme.layouts.multiColumn.container,
-    marginBottom: 40,
-    justifyContent: "space-around",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: "24px",
     flexWrap: "wrap"
-  },
-  flexColumn: {
-    flex: 1,
-    textAlign: "right",
-    display: "flex"
-  },
-  rightAlign: {
-    marginLeft: "auto",
-    marginRight: 0
   },
   secondaryHeader: {
     ...theme.text.secondaryHeader
@@ -51,19 +43,13 @@ const CampaignSurveyStats = (props) => {
               </div>
               {responseCount > 0 ? (
                 <div className={css(styles.container)}>
-                  <div className={css(styles.flexColumn)}>
-                    <CampaignStat title="responses" count={responseCount} />
-                  </div>
-                  <div className={css(styles.flexColumn)}>
-                    <div className={css(styles.rightAlign)}>
-                      <Chart
-                        data={step.question.answerOptions.map((answer) => [
-                          answer.value,
-                          answer.responderCount
-                        ])}
-                      />
-                    </div>
-                  </div>
+                  <CampaignStat title="responses" count={responseCount} />
+                  <Chart
+                    data={step.question.answerOptions.map((answer) => [
+                      answer.value,
+                      answer.responderCount
+                    ])}
+                  />
                 </div>
               ) : (
                 "No responses yet"

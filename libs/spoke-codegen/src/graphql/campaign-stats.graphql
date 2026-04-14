@@ -21,6 +21,7 @@ query getCampaign($campaignId: String!) {
     dueBy
     isArchived
     isStarted
+    previewUrl
     pendingJobs {
       id
       jobType

@@ -1,8 +1,9 @@
 import { makeStyles } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
+import CardHeader from "@material-ui/core/CardHeader";
 import Divider from "@material-ui/core/Divider";
 import type { Assignment } from "@spoke/spoke-codegen ";
-import { Card, CardTitle } from "material-ui/Card";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
@@ -119,13 +120,16 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   return (
     <div className={classes.container}>
       <Card key={assignment.id}>
-        <CardTitle
+        <CardHeader
           title={title}
-          subtitle={subtitle}
-          style={{ backgroundColor: primaryColor }}
-        >
-          {logoImageUrl && <img src={logoImageUrl} className={classes.image} />}
-        </CardTitle>
+          subheader={subtitle}
+          style={{ backgroundColor: primaryColor, position: "relative" }}
+          action={
+            logoImageUrl ? (
+              <img src={logoImageUrl} className={classes.image} />
+            ) : undefined
+          }
+        />
         <Divider />
         <div style={{ margin: "20px" }}>
           <div dangerouslySetInnerHTML={{ __html: introHtml || "" }} />
