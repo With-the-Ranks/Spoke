@@ -146,24 +146,26 @@ class CampaignBasicsForm extends React.Component<
             hintText="Get out the vote"
             fullWidth
           />
-          <div style={{ display: "inline-block", width: 256 }}>
-            <SpokeFormField
-              {...dataTest("dueBy")}
-              name="dueBy"
-              label="Due date"
-              type="date"
-              locale="en-US"
-              shouldDisableDate={(date: Date) =>
-                DateTime.fromJSDate(date) < DateTime.local()
-              }
-              autoOk
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 256 }}>
+              <SpokeFormField
+                {...dataTest("dueBy")}
+                name="dueBy"
+                label="Due date"
+                type="date"
+                locale="en-US"
+                shouldDisableDate={(date: Date) =>
+                  DateTime.fromJSDate(date) < DateTime.local()
+                }
+                autoOk
+              />
+            </div>
+            <Tooltip title="Delete the Due Date" placement="top">
+              <IconButton onClick={this.deleteDueDate} style={{ width: 50 }}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           </div>
-          <Tooltip title="Delete the Due Date" placement="top">
-            <IconButton onClick={this.deleteDueDate} style={{ width: 50 }}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
 
           <SpokeFormField
             name="introHtml"

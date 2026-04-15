@@ -1,8 +1,20 @@
+import TextField from "@material-ui/core/TextField";
 import omit from "lodash/omit";
-import TextField from "material-ui/TextField";
 import React from "react";
 
 import GSFormField from "./GSFormField";
+
+// Props from MUI v0 or react-formal that should not be passed to MUI v4 TextField
+const V0_PROPS = [
+  "errors",
+  "floatingLabelText",
+  "floatingLabelStyle",
+  "fullWidth",
+  "hintText",
+  "errorText",
+  "underlineShow",
+  "underlineFocusStyle"
+];
 
 export default class GSTextField extends GSFormField {
   handleNewRef = (el) => {
@@ -11,16 +23,18 @@ export default class GSTextField extends GSFormField {
 
   render() {
     const { value } = this.props;
-    const safeProps = omit(this.props, "errors");
+    const safeProps = omit(this.props, V0_PROPS);
     return (
       <TextField
         ref={this.handleNewRef}
-        floatingLabelText={this.floatingLabelText()}
-        floatingLabelStyle={{
-          zIndex: 0
-        }}
-        onFocus={(event) => event.target.select()}
         {...safeProps}
+        label={this.floatingLabelText()}
+        placeholder={this.props.hintText || undefined}
+        variant="outlined"
+        size="small"
+        fullWidth={this.props.fullWidth}
+        InputLabelProps={{ shrink: true }}
+        onFocus={(event) => event.target.select()}
         value={value || ""}
         onChange={(event) => {
           this.props.onChange(event.target.value);
