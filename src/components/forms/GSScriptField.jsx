@@ -166,7 +166,7 @@ class GSScriptField extends GSFormField {
           multiline
           variant="outlined"
           size="small"
-          fullWidth={this.props.fullWidth !== false}
+          fullWidth={this.props.fullWidth}
           InputLabelProps={{ shrink: true }}
           placeholder={this.props.hintText || undefined}
           onClick={this.handleOpenDialog}

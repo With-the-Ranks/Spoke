@@ -9,15 +9,21 @@ export interface GSFormFieldProps extends FieldProps {
   ["data-test"]?: any;
 }
 
+/** Standalone helper – usable from functional components */
+export const floatingLabelText = (
+  props: Pick<GSFormFieldProps, "floatingLabelText" | "label">
+) =>
+  props.floatingLabelText === false
+    ? null
+    : props.floatingLabelText || props.label;
+
 export class GSFormField<P extends GSFormFieldProps, S> extends Component<
   P,
   S
 > {
   // eslint-disable-next-line react/no-unused-class-component-methods
   floatingLabelText() {
-    return this.props.floatingLabelText === false
-      ? null
-      : this.props.floatingLabelText || this.props.label;
+    return floatingLabelText(this.props);
   }
 }
 
