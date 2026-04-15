@@ -22,7 +22,7 @@ export default class GSDateField extends GSFormField<
       return;
     }
     const newDate = DateTime.fromISO(newDateStr);
-    const oldDate = DateTime.fromISO(this.props.value as string);
+    const oldDate = DateTime.fromISO(this.props.value || "");
     const newDateWithHMS = oldDate.isValid
       ? newDate.set({
           hour: oldDate.hour,
