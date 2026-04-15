@@ -22,7 +22,7 @@ export default class GSSelectField extends GSFormField {
       <FormControl
         variant="outlined"
         size="small"
-        fullWidth={this.props.fullWidth !== false}
+        fullWidth={this.props.fullWidth}
       >
         {label && (
           <InputLabel id={labelId} shrink>

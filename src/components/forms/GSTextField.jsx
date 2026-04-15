@@ -32,7 +32,7 @@ export default class GSTextField extends GSFormField {
         placeholder={this.props.hintText || undefined}
         variant="outlined"
         size="small"
-        fullWidth={this.props.fullWidth !== false}
+        fullWidth={this.props.fullWidth}
         InputLabelProps={{ shrink: true }}
         onFocus={(event) => event.target.select()}
         value={value || ""}
