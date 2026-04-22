@@ -155,6 +155,11 @@ const useStyles = makeStyles((theme) => ({
     borderTop: `1px solid ${assemblePalette.common.cardBorder}`,
     padding: theme.spacing(1)
   },
+  bottomSectionCollapsed: {
+    display: "flex",
+    justifyContent: "center",
+    padding: theme.spacing(0.5, 0)
+  },
   userItem: {
     borderRadius: 8,
     margin: theme.spacing(0.25, 1)
@@ -298,66 +303,68 @@ const Navigation: React.FC<Props> = (props) => {
       <Divider />
 
       {!collapsed && (
-        <>
-          <List className={classes.navList}>
-            {/* Grouped navigation */}
-            {groups &&
-              groups.map((group) => {
-                const groupActive = isGroupActive(group);
-                const isOpen = openGroup === group.name;
+        <List className={classes.navList}>
+          {/* Grouped navigation */}
+          {groups &&
+            groups.map((group) => {
+              const groupActive = isGroupActive(group);
+              const isOpen = openGroup === group.name;
 
-                return (
-                  <div key={group.name}>
-                    {/* Group header */}
-                    <ListItem
-                      button
-                      className={clsx(classes.groupHeader, {
-                        [classes.groupHeaderActive]: groupActive
-                      })}
-                      onClick={() => setOpenGroup(isOpen ? null : group.name)}
-                    >
-                      <ListItemText
-                        primary={group.name}
-                        className={classes.groupHeaderText}
-                      />
-                      <ExpandMoreIcon
-                        fontSize="small"
-                        style={{
-                          color: "inherit",
-                          transition: "transform 0.2s",
-                          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
-                        }}
-                      />
-                    </ListItem>
+              return (
+                <div key={group.name}>
+                  {/* Group header */}
+                  <ListItem
+                    button
+                    className={clsx(classes.groupHeader, {
+                      [classes.groupHeaderActive]: groupActive
+                    })}
+                    onClick={() => setOpenGroup(isOpen ? null : group.name)}
+                  >
+                    <ListItemText
+                      primary={group.name}
+                      className={classes.groupHeaderText}
+                    />
+                    <ExpandMoreIcon
+                      fontSize="small"
+                      style={{
+                        color: "inherit",
+                        transition: "transform 0.2s",
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
+                      }}
+                    />
+                  </ListItem>
 
-                    {/* Group children */}
-                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                      <List disablePadding>
-                        {group.items.map((item) => renderSection(item, true))}
-                      </List>
-                    </Collapse>
-                  </div>
-                );
-              })}
+                  {/* Group children */}
+                  <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                    <List disablePadding>
+                      {group.items.map((item) => renderSection(item, true))}
+                    </List>
+                  </Collapse>
+                </div>
+              );
+            })}
 
-            {/* Flat (ungrouped) navigation fallback */}
-            {!groups &&
-              sections &&
-              sections.map((section) => renderSection(section, false))}
+          {/* Flat (ungrouped) navigation fallback */}
+          {!groups &&
+            sections &&
+            sections.map((section) => renderSection(section, false))}
 
-            {switchListItem && (
-              <>
-                <Divider style={{ margin: "8px 16px" }} />
-                {switchListItem}
-              </>
-            )}
-          </List>
-
-          <div className={classes.bottomSection}>
-            <UserMenu organizationId={props.organizationId} />
-          </div>
-        </>
+          {switchListItem && (
+            <>
+              <Divider style={{ margin: "8px 16px" }} />
+              {switchListItem}
+            </>
+          )}
+        </List>
       )}
+
+      <div
+        className={clsx(classes.bottomSection, {
+          [classes.bottomSectionCollapsed]: collapsed
+        })}
+      >
+        <UserMenu organizationId={props.organizationId} />
+      </div>
     </div>
   );
 };
