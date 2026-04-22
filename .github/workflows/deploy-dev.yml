@@ -1,0 +1,61 @@
+name: Deploy to Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+
+jobs:
+  deploy-dev:
+    name: Deploy to Dev
+    environment: dev
+    concurrency:
+      group: dev-deploy
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Get short SHA
+        id: build-metadata
+        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/gcp-auth
+        with:
+          wif_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+          region: ${{ vars.GCP_REGION }}
+
+      - uses: ./.github/actions/docker-build-push
+        with:
+          registry: ${{ vars.GAR_REGISTRY }}
+          tags: |
+            dev-latest
+            dev-${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: dev-${{ steps.build-metadata.outputs.sha_short }}
+          cache_scope: dev
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ vars.GKE_CLUSTER }}
+          location: ${{ vars.GKE_LOCATION }}
+
+      - name: Restart dev deployment
+        run: |
+          if kubectl get deployment ${{ vars.DEV_DEPLOYMENT }} -n ${{ vars.DEV_NAMESPACE }} &>/dev/null; then
+            kubectl rollout restart deployment/${{ vars.DEV_DEPLOYMENT }} -n ${{ vars.DEV_NAMESPACE }}
+            kubectl rollout status deployment/${{ vars.DEV_DEPLOYMENT }} -n ${{ vars.DEV_NAMESPACE }} --timeout=5m
+          else
+            echo "Dev deployment not found — skipping restart"
+          fi
