@@ -1,11 +1,18 @@
+import { gql, useQuery } from "@apollo/client";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { useGetOrganizationNameQuery } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
-import { withRouter } from "react-router-dom";
+import { useHistory, withRouter } from "react-router-dom";
 
+import Navigation from "../components/Navigation";
+import { hasRole } from "../lib/permissions";
 import theme from "../styles/theme";
 
 const styles = StyleSheet.create({
@@ -20,6 +27,15 @@ const styles = StyleSheet.create({
   }
 });
 
+const CURRENT_USER_ROLES = gql`
+  query getTexterCurrentUserRoles($organizationId: String!) {
+    currentUser {
+      id
+      roles(organizationId: $organizationId)
+    }
+  }
+`;
+
 const TexterDashboard = (props) => {
   const {
     main: MainComponent,
@@ -28,15 +44,25 @@ const TexterDashboard = (props) => {
     ...rest
   } = props;
 
+  const [showMenu, setShowMenu] = useState(false);
+  const history = useHistory();
+  const { organizationId } = props.match.params;
+
+  const { data: organization, loading } = useGetOrganizationNameQuery({
+    variables: { organizationId }
+  });
+
+  const { data: userData } = useQuery(CURRENT_USER_ROLES, {
+    variables: { organizationId },
+    skip: !organizationId
+  });
+
+  const roles = userData?.currentUser?.roles ?? [];
+  const isAdmin = hasRole("ADMIN", roles) || hasRole("SUPERVOLUNTEER", roles);
+
   if (FullScreenComponent) {
     return <FullScreenComponent {...rest} />;
   }
-
-  const { data: organization, loading } = useGetOrganizationNameQuery({
-    variables: {
-      organizationId: props.match.params.organizationId
-    }
-  });
 
   const sectionTitle = loading ? "Spoke" : organization?.organization?.name;
 
@@ -48,6 +74,27 @@ const TexterDashboard = (props) => {
         </Helmet>
       )}
       <div className={css(styles.container)}>
+        <Navigation
+          onToggleMenu={() => setShowMenu((s) => !s)}
+          showMenu={showMenu}
+          organizationId={organizationId}
+          title={sectionTitle}
+          switchListItem={
+            isAdmin ? (
+              <ListItem
+                button
+                onClick={() =>
+                  history.push(`/admin/${organizationId}/campaigns`)
+                }
+              >
+                <ListItemIcon style={{ minWidth: 32 }}>
+                  <ArrowBackIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Switch to admin" />
+              </ListItem>
+            ) : undefined
+          }
+        />
         <div className={css(styles.content)}>
           {topNavTitle && (
             <Typography
