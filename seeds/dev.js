@@ -46,10 +46,10 @@ const fakeUserNumber = "+15551000003";
 
 exports.seed = async function seed(knex) {
   const baseUrl = process.env.BASE_URL || "";
-  if (!baseUrl.includes("dev")) {
+  if (!baseUrl.includes("staging")) {
     throw new Error(
-      `Refusing to seed: BASE_URL "${baseUrl}" does not contain "dev". ` +
-        "This seed is only intended for dev environments."
+      `Refusing to seed: BASE_URL "${baseUrl}" does not contain "staging". ` +
+        "This seed is only intended for staging environments."
     );
   }
 
