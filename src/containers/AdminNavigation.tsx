@@ -8,14 +8,13 @@ import type {
   NavigationSection
 } from "../components/Navigation";
 import Navigation from "../components/Navigation";
-import { dataTest } from "../lib/attributes";
 
 interface AdminNavigationProps {
   organizationId: string;
   sections?: NavigationSection[];
   groups?: NavigationGroup[];
   showMenu?: boolean;
-  onToggleMenu: () => React.MouseEventHandler<unknown>;
+  onToggleMenu: () => void;
   title?: string;
 }
 
@@ -52,7 +51,6 @@ const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
       switchListItem={
         <ListItem
           button
-          {...dataTest("navSwitchToTexter")}
           onClick={() => history.push(`/app/${organizationId}/todos`)}
         >
           <ListItemText primary="Switch to texter" />

@@ -1,7 +1,6 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import Tooltip from "@material-ui/core/Tooltip";
 import isEmpty from "lodash/isEmpty";
 import React from "react";
 import { compose } from "recompose";
@@ -13,6 +12,7 @@ import { dataTest } from "../../../lib/attributes";
 import { difference } from "../../../lib/utils";
 import { loadData } from "../../hoc/with-operations";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
+import ColorPicker from "../components/ColorPicker";
 import type {
   FullComponentProps,
   RequiredComponentProps
@@ -130,45 +130,7 @@ class CampaignBasicsForm extends React.Component<
               }: {
                 value: string;
                 onChange: (val: string) => void;
-              }) => {
-                const color = colorValue || "#ffffff";
-                return (
-                  <Tooltip title="Campaign color" placement="top">
-                    <div style={{ position: "relative", flexShrink: 0 }}>
-                      <div
-                        onClick={() => {
-                          const input = document.getElementById(
-                            "primary-color-input"
-                          ) as HTMLInputElement;
-                          input?.click();
-                        }}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          backgroundColor: color,
-                          border: "1px solid rgba(0, 0, 0, 0.23)",
-                          cursor: "pointer"
-                        }}
-                      />
-                      <input
-                        id="primary-color-input"
-                        type="color"
-                        value={color}
-                        onChange={(e) => onChange(e.target.value)}
-                        style={{
-                          position: "absolute",
-                          opacity: 0,
-                          width: 0,
-                          height: 0,
-                          top: 0,
-                          left: 0
-                        }}
-                      />
-                    </div>
-                  </Tooltip>
-                );
-              }}
+              }) => <ColorPicker value={colorValue} onChange={onChange} />}
             </SpokeFormField>
             <SpokeFormField
               {...dataTest("title")}
