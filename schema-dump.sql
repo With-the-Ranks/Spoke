@@ -1890,7 +1890,8 @@ CREATE TABLE public.campaign_contact_upload (
     campaign_id integer NOT NULL,
     column_mapping json,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    contacts_filename text
 );
 
 

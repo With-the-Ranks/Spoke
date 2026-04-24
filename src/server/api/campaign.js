@@ -577,6 +577,14 @@ export const resolvers = {
           .where({ campaign_id: campaign.id })
           .whereRaw(`archived = ${campaign.is_archived}`) // partial index friendly
       ),
+    contactsFilename: async (campaign) => {
+      const row = await r
+        .reader("campaign_contact_upload")
+        .where({ campaign_id: campaign.id })
+        .select("contacts_filename")
+        .first();
+      return row?.contacts_filename ?? null;
+    },
     hasUnassignedContacts: async (campaign) => {
       if (config.BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS) {
         return false;

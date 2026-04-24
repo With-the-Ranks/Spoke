@@ -124,6 +124,7 @@ export const schema = `
     autosendLimit: Int
     columnMapping: [CsvColumnMapping!]
     messagingService: MessagingService
+    contactsFilename: String
   }
 
   type CampaignEdge {

@@ -38,6 +38,7 @@ interface ContactsValues {
   contactsFile: File | null;
   filterOutLandlines: boolean;
   excludeCampaignIds: string[];
+  contactsFilename: string | null;
 }
 
 interface ContactsCampaign {
@@ -46,6 +47,7 @@ interface ContactsCampaign {
   contactsCount: number;
   externalSystem: { id: string } | null;
   datawarehouseAvailable: boolean;
+  contactsFilename: string | null;
 }
 
 interface ContactsOrganization {
@@ -105,7 +107,8 @@ class CampaignContactsForm extends React.Component<
     contactsFile: null,
     externalListId: null,
     filterOutLandlines: false,
-    configureMappingOpen: false
+    configureMappingOpen: false,
+    columnMapping: []
   };
 
   constructor(props: ContactsInnerProps) {
@@ -245,7 +248,8 @@ class CampaignContactsForm extends React.Component<
     const {
       customFields,
       contactsCount,
-      externalSystem
+      externalSystem,
+      contactsFilename
     } = campaignData.campaign;
 
     const {
@@ -330,6 +334,7 @@ class CampaignContactsForm extends React.Component<
           contactsCount={contactsCount}
           customFields={customFields}
           pendingJob={pendingJob}
+          contactsFilename={contactsFilename}
         />
         <br />
         <Button
@@ -366,6 +371,7 @@ const queries = {
             column
             remap
           }
+          contactsFilename
         }
       }
     `,
@@ -422,6 +428,7 @@ const mutations = {
             id
             contacts
           }
+          contactsFilename
         }
       }
     `,

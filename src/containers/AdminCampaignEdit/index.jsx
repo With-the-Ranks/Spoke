@@ -392,7 +392,8 @@ class AdminCampaignEdit extends React.Component {
           "contactsFile",
           "contactSql",
           "excludeCampaignIds",
-          "columnMapping"
+          "columnMapping",
+          "contactsFilename"
         ],
         checkCompleted: () => this.state.campaignFormValues.contactsCount > 0,
         checkSaved: () => {
