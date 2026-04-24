@@ -1,10 +1,12 @@
-import { gql, useQuery } from "@apollo/client";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import { useGetOrganizationNameQuery } from "@spoke/spoke-codegen";
+import {
+  useCurrentUserOrganizationRolesQuery,
+  useGetOrganizationNameQuery
+} from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
@@ -27,15 +29,6 @@ const styles = StyleSheet.create({
   }
 });
 
-const CURRENT_USER_ROLES = gql`
-  query getTexterCurrentUserRoles($organizationId: String!) {
-    currentUser {
-      id
-      roles(organizationId: $organizationId)
-    }
-  }
-`;
-
 const TexterDashboard = (props) => {
   const {
     main: MainComponent,
@@ -52,13 +45,14 @@ const TexterDashboard = (props) => {
     variables: { organizationId }
   });
 
-  const { data: userData } = useQuery(CURRENT_USER_ROLES, {
+  const { data: userData } = useCurrentUserOrganizationRolesQuery({
     variables: { organizationId },
     skip: !organizationId
   });
 
   const roles = userData?.currentUser?.roles ?? [];
-  const isAdmin = hasRole("ADMIN", roles) || hasRole("SUPERVOLUNTEER", roles);
+  const isSuperadmin = userData?.currentUser?.isSuperadmin ?? false;
+  const isAdmin = hasRole("SUPERVOLUNTEER", roles) || isSuperadmin;
 
   if (FullScreenComponent) {
     return <FullScreenComponent {...rest} />;

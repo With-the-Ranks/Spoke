@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Grid, Paper } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import type { Campaign } from "@spoke/spoke-codegen";
-import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -11,17 +11,53 @@ import theme from "../../../styles/theme";
 import { loadData } from "../../hoc/with-operations";
 import CampaignStat from "./CampaignStat";
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles({
   secondaryHeader: {
     ...theme.text.secondaryHeader
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse" as const,
+    fontSize: 13
+  },
+  headerRow: {
+    borderBottom: "1px solid #E5E7EB"
+  },
+  headerCell: {
+    textAlign: "left" as const,
+    padding: "6px 12px",
+    fontWeight: 600,
+    color: "#6B7280",
+    textTransform: "uppercase" as const,
+    fontSize: 11,
+    letterSpacing: "0.05em"
+  },
+  bodyRow: {
+    borderBottom: "1px solid #F3F4F6"
+  },
+  cellBold: {
+    padding: "8px 12px",
+    fontWeight: 600
+  },
+  cell: {
+    padding: "8px 12px",
+    color: "#374151"
   }
 });
+
+const ERROR_TABLE_HEADERS = [
+  "Error ID",
+  "Error Label",
+  "Percentage",
+  "Number of Errors"
+];
 
 const DeliverabilityStats = (props: {
   data: {
     campaign: Pick<Campaign, "id" | "deliverabilityStats">;
   };
 }) => {
+  const classes = useStyles();
   const {
     data: {
       campaign: {
@@ -67,35 +103,17 @@ const DeliverabilityStats = (props: {
       </Grid>
 
       <div
-        className={css(styles.secondaryHeader)}
+        className={classes.secondaryHeader}
         style={{ marginTop: 24, marginBottom: 8 }}
       >
         Top errors:
       </div>
       <Paper variant="outlined" style={{ padding: 16 }}>
-        <table
-          style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
-        >
+        <table className={classes.table}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #E5E7EB" }}>
-              {[
-                "Error ID",
-                "Error Label",
-                "Percentage",
-                "Number of Errors"
-              ].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    textAlign: "left",
-                    padding: "6px 12px",
-                    fontWeight: 600,
-                    color: "#6B7280",
-                    textTransform: "uppercase",
-                    fontSize: 11,
-                    letterSpacing: "0.05em"
-                  }}
-                >
+            <tr className={classes.headerRow}>
+              {ERROR_TABLE_HEADERS.map((h) => (
+                <th key={h} className={classes.headerCell}>
                   {h}
                 </th>
               ))}
@@ -110,22 +128,11 @@ const DeliverabilityStats = (props: {
                   errorCodeDescriptions[errorCode] || "Unknown error";
                 const pct = `${((e.count / total) * 100).toFixed(2)}%`;
                 return (
-                  <tr
-                    key={errorCode}
-                    style={{ borderBottom: "1px solid #F3F4F6" }}
-                  >
-                    <td style={{ padding: "8px 12px", fontWeight: 600 }}>
-                      {errorCode}
-                    </td>
-                    <td style={{ padding: "8px 12px", color: "#374151" }}>
-                      {description}
-                    </td>
-                    <td style={{ padding: "8px 12px", color: "#374151" }}>
-                      {pct}
-                    </td>
-                    <td style={{ padding: "8px 12px", color: "#374151" }}>
-                      {e.count}
-                    </td>
+                  <tr key={errorCode} className={classes.bodyRow}>
+                    <td className={classes.cellBold}>{errorCode}</td>
+                    <td className={classes.cell}>{description}</td>
+                    <td className={classes.cell}>{pct}</td>
+                    <td className={classes.cell}>{e.count}</td>
                   </tr>
                 );
               })}

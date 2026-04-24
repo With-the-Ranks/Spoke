@@ -17,7 +17,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap"
   },
   secondaryHeader: {
-    ...theme.text.secondaryHeader
+    ...theme.text.secondaryHeader,
+    marginBottom: 16
   }
 });
 
@@ -35,10 +36,7 @@ const CampaignSurveyStats = (props) => {
 
           return (
             <div key={step.id} style={{ marginBottom: 48 }}>
-              <div
-                className={css(styles.secondaryHeader)}
-                style={{ marginBottom: 16 }}
-              >
+              <div className={css(styles.secondaryHeader)}>
                 {step.question.text}
               </div>
               {responseCount > 0 ? (
