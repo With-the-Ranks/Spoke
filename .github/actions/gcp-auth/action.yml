@@ -1,0 +1,26 @@
+name: "Authenticate to GCP and Configure Docker"
+description: "Authenticate via Workload Identity Federation and configure Docker for Google Artifact Registry"
+
+inputs:
+  wif_provider:
+    description: "Workload Identity Federation provider"
+    required: true
+  service_account:
+    description: "GCP service account email"
+    required: true
+  region:
+    description: "GCP region for Artifact Registry"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: ${{ inputs.wif_provider }}
+        service_account: ${{ inputs.service_account }}
+
+    - name: Configure Docker for GAR
+      shell: bash
+      run: gcloud auth configure-docker ${{ inputs.region }}-docker.pkg.dev --quiet

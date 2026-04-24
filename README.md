@@ -6,7 +6,7 @@ Spoke is an open source text-distribution tool for organizations to mobilize sup
 
 Spoke was created by Saikat Chakrabarti and Sheena Pakanati, and the original repository was most recently maintained by Progressive Coders Network at https://github.com/ProgressiveCoders/Spoke
 
-From 2019-2023, Politics Rewired, a small campaign tech consultancy, maintained the most recent upstream repository, politics-rewired/spoke
+From 2019-2023, Politics Rewired, a small campaign tech consultancy, maintained the most recent upstream repository https://github.com/politics-rewired/spoke
 
 This repository is a branch of ProgressiveCoders/Spoke (formerly MoveOn/Spoke) and politics-rewired/spoke, now maintained by With the Ranks, a worker-owned technology cooperative.
 

@@ -490,17 +490,20 @@ export const editCampaign = async (
     });
     campaign.contacts = processedContacts.contacts;
     validationStats = processedContacts.validationStats;
+    const contactsFile = await campaign.contactsFile;
+    const contactsFilename = contactsFile?.filename;
 
     await r.knex.raw(
       `
         ? ON CONFLICT (campaign_id)
-        DO UPDATE SET column_mapping = EXCLUDED.column_mapping, updated_at = CURRENT_TIMESTAMP 
+        DO UPDATE SET column_mapping = EXCLUDED.column_mapping, contacts_filename = EXCLUDED.contacts_filename, updated_at = CURRENT_TIMESTAMP 
         RETURNING *;
       `,
       [
         r.knex("campaign_contact_upload").insert({
           campaign_id: id,
-          column_mapping: JSON.stringify(columnMapping)
+          column_mapping: JSON.stringify(columnMapping),
+          contacts_filename: contactsFilename || null
         })
       ]
     );

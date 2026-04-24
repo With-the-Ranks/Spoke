@@ -1,0 +1,2 @@
+messaging_service_sid,organization_id,account_sid,encrypted_auth_token,service_type,active,name,is_default
+staging-messaging-service-1,1,staging-account-sid,staging-encrypted-token,assemble-numbers,true,Default Staging Service,true
