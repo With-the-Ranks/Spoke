@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.2.0](https://github.com/With-the-Ranks/spoke/compare/v9.1.0...v9.2.0) (2026-04-24)
+
+
+### Features
+
+* add staging seed data and on-demand workflow ([#130](https://github.com/With-the-Ranks/spoke/issues/130)) ([6d871a7](https://github.com/With-the-Ranks/spoke/commit/6d871a733fbe23940111765146d559827c5c8126))
+* store the name of the uploaded CSV & render for user ([#91](https://github.com/With-the-Ranks/spoke/issues/91)) ([9fbf157](https://github.com/With-the-Ranks/spoke/commit/9fbf1577acbf957fadde48e2e8ede9c6ead75238))
+
+
+### Bug Fixes
+
+* add messaging service to staging seed data ([#140](https://github.com/With-the-Ranks/spoke/issues/140)) ([c5d67aa](https://github.com/With-the-Ranks/spoke/commit/c5d67aad41002b30aea86ea93f3b62ed2b5e25cd))
+* **gh:** use wtr urls in package json ([#90](https://github.com/With-the-Ranks/spoke/issues/90)) ([5186569](https://github.com/With-the-Ranks/spoke/commit/5186569f93df697f994715f507c83a761370c6ec))
+* **message-review:** stop query on initial load ([#101](https://github.com/With-the-Ranks/spoke/issues/101)) ([90d293e](https://github.com/With-the-Ranks/spoke/commit/90d293e025c98027316cf3424736273a968575dd))
+
+
+### Backend Changes
+
+* remove remaining rewired references ([#100](https://github.com/With-the-Ranks/spoke/issues/100)) ([eb18af5](https://github.com/With-the-Ranks/spoke/commit/eb18af5547f7f6cefcbc34c79eb69949148a0640))
+* update OrganizationSettings to use MUI4 ([#104](https://github.com/With-the-Ranks/spoke/issues/104)) ([810cfe4](https://github.com/With-the-Ranks/spoke/commit/810cfe493617dca99fde661307560ae27b1f0780))
+
 ## [9.1.0](https://github.com/With-the-Ranks/spoke/compare/v9.0.7...v9.1.0) (2026-01-15)
 
 
