@@ -274,12 +274,14 @@ class AdminExternalSystems extends Component<Props, State> {
           <DialogContent>
             <TextField
               name="name"
-              floatingLabelText="Integration Name"
+              label="Integration Name"
+              variant="outlined"
+              size="small"
               fullWidth
+              InputLabelProps={{ shrink: true }}
               value={name}
               onChange={this.editExternalSystemProp("name")}
             />
-            <br />
             <SelectField floatingLabelText="System Type" value={type} fullWidth>
               {EXTERNAL_SYSTEM_OPTS.map(([display, val]) => (
                 <MenuItem key={val} value={val} primaryText={display} />
@@ -297,19 +299,23 @@ class AdminExternalSystems extends Component<Props, State> {
                 ))}
               </SelectField>
             )}
-            <br />
             <TextField
               name="username"
-              floatingLabelText="Username"
+              label="Username"
+              variant="outlined"
+              size="small"
               fullWidth
+              InputLabelProps={{ shrink: true }}
               value={username}
               onChange={this.editExternalSystemProp("username")}
             />
-            <br />
             <TextField
               name="apiKey"
-              floatingLabelText="API Key"
+              label="API Key"
+              variant="outlined"
+              size="small"
               fullWidth
+              InputLabelProps={{ shrink: true }}
               value={apiKey}
               onChange={this.editExternalSystemProp("apiKey")}
             />
