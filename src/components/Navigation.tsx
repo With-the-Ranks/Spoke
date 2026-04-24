@@ -179,6 +179,13 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: assemblePalette.common.lightGrey
     }
+  },
+  expandIcon: {
+    color: "inherit",
+    transition: "transform 0.2s"
+  },
+  expandIconOpen: {
+    transform: "rotate(180deg)"
   }
 }));
 
@@ -198,7 +205,7 @@ export interface NavigationGroup {
 interface Props {
   sections?: NavigationSection[];
   groups?: NavigationGroup[];
-  onToggleMenu: () => React.MouseEventHandler<unknown>;
+  onToggleMenu: () => void;
   switchListItem?: JSX.Element;
   showMenu?: boolean;
   title?: string;
@@ -326,11 +333,9 @@ const Navigation: React.FC<Props> = (props) => {
                     />
                     <ExpandMoreIcon
                       fontSize="small"
-                      style={{
-                        color: "inherit",
-                        transition: "transform 0.2s",
-                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)"
-                      }}
+                      className={clsx(classes.expandIcon, {
+                        [classes.expandIconOpen]: isOpen
+                      })}
                     />
                   </ListItem>
 
