@@ -12,12 +12,10 @@ import Typography from "@material-ui/core/Typography";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
-import camelCase from "lodash/camelCase";
 import React, { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
 import UserMenu from "../containers/UserMenu";
-import { dataTest } from "../lib/attributes";
 import assemblePalette from "../styles/assemble-palette";
 import navigationIconMap from "./NavigationIconMap";
 
@@ -147,7 +145,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
     fontWeight: 700,
     borderRadius: 8,
-    textTransform: "none" as const,
+    textTransform: "none",
     "&:hover": {
       backgroundColor: "#D97706"
     }
@@ -223,7 +221,6 @@ const Navigation: React.FC<Props> = (props) => {
     return (
       <ListItem
         button
-        {...dataTest(camelCase(`nav ${section.path}`))}
         key={section.name}
         className={clsx(indented ? classes.navItem : classes.flatNavItem, {
           [classes.navItemActive]: active
@@ -276,7 +273,7 @@ const Navigation: React.FC<Props> = (props) => {
         <IconButton
           className={classes.toggleBtn}
           size="small"
-          onClick={props.onToggleMenu as any}
+          onClick={props.onToggleMenu}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
