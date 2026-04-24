@@ -163,7 +163,7 @@ const AdminAutosending: React.FC = () => {
       {data?.organization && data.organization.autosendingMps === null ? (
         <CardHeader
           title="No autosending throughput has been allocated to this organization."
-          subheader="Please contact the administrator of your Spoke Rewired instance."
+          subheader="Please contact the administrator of your Spoke instance."
         />
       ) : (
         <>

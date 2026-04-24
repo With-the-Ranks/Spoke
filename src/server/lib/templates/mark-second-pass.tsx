@@ -29,7 +29,7 @@ const MarkSecondPass: React.FC<MarkSecondPassProps> = ({
         Your second pass {unmark ? "un" : ""}marking for {titleLink} is
         complete! Navigate back to the campaign here: {titleLink}
       </p>
-      <p>-- The Spoke Rewired Team</p>
+      <p>-- The Spoke With the Ranks Team</p>
     </>
   );
 };
