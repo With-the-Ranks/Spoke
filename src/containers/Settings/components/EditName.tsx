@@ -1,78 +1,84 @@
-import type { ApolloQueryResult } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import { Card, CardActions, CardHeader, CardText } from "material-ui/Card";
-import TextField from "material-ui/TextField";
-import React, { useState } from "react";
-import { compose } from "recompose";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
+import TextField from "@material-ui/core/TextField";
+import Alert from "@material-ui/lab/Alert";
+import Skeleton from "@material-ui/lab/Skeleton";
+import React, { useEffect, useState } from "react";
 
-import type { MutationMap, QueryMap } from "../../../network/types";
-import { loadData } from "../../hoc/with-operations";
-import type { OrganizationNameType } from "./queries";
 import { EDIT_ORGANIZATION_NAME, GET_ORGANIZATION_NAME } from "./queries";
 
-interface HocProps {
-  data: OrganizationNameType;
-  mutations: {
-    editName(name: string): ApolloQueryResult<any>;
-    deleteConfig(id: string): ApolloQueryResult<any>;
-  };
-}
-
-export interface OuterProps {
+interface EditNameProps {
   organizationId: string;
   style?: React.CSSProperties;
 }
 
-interface InnerProps extends OuterProps, HocProps {}
+const EditName: React.FC<EditNameProps> = ({ organizationId, style }) => {
+  const { data, loading, error } = useQuery(GET_ORGANIZATION_NAME, {
+    variables: { organizationId }
+  });
 
-const EditName: React.FC<InnerProps> = (props) => {
-  const {
-    data: {
-      organization: { name }
-    },
-    style
-  } = props;
+  const [editName, { loading: saving }] = useMutation(EDIT_ORGANIZATION_NAME);
+
   const [orgName, setOrgName] = useState<string | undefined>(undefined);
-  const [working, setWorking] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
 
-  const value = orgName ?? name;
-  const isDifferent = orgName && orgName !== name;
+  useEffect(() => {
+    if (data?.organization?.name) {
+      setOrgName(data.organization.name);
+    }
+  }, [data]);
 
-  const handleNameChange = (e: React.FormEvent<unknown>, newValue: string) =>
-    setOrgName(newValue);
+  if (loading) return <Skeleton>Loading...</Skeleton>;
+  if (error) return <div>Error loading organization name</div>;
+
+  const currentName = data?.organization?.name || "";
+  const value = orgName ?? currentName;
+  const isDifferent = orgName !== undefined && orgName !== currentName;
 
   const saveOrganizationName = async () => {
-    if (!orgName || orgName === name) return;
+    if (!orgName || !isDifferent) return;
 
     setErrorMsg(undefined);
-    setWorking(true);
     try {
-      const result = await props.mutations.editName(orgName);
-      if (result.errors) throw new Error(result.errors[0].message);
+      await editName({
+        variables: {
+          organizationId,
+          input: {
+            name: orgName
+          }
+        }
+      });
     } catch (err: any) {
       setErrorMsg(err.message);
-    } finally {
-      setWorking(false);
     }
   };
 
   return (
     <Card style={style}>
       <CardHeader title="Organization Name" />
-      <CardText>
-        {errorMsg && <p>Error: {errorMsg}</p>}
+      <CardContent>
+        {errorMsg && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {errorMsg}
+          </Alert>
+        )}
         <TextField
-          floatingLabelText="Organization Name"
+          label="Organization Name"
           value={value}
-          onChange={handleNameChange}
+          onChange={(e) => setOrgName(e.target.value)}
+          fullWidth
+          variant="standard"
         />
-      </CardText>
+      </CardContent>
       <CardActions>
         <Button
           variant="contained"
           color="primary"
-          disabled={working || !isDifferent}
+          disabled={saving || !isDifferent}
           onClick={saveOrganizationName}
         >
           Save Name
@@ -82,27 +88,4 @@ const EditName: React.FC<InnerProps> = (props) => {
   );
 };
 
-const queries: QueryMap<OuterProps> = {
-  data: {
-    query: GET_ORGANIZATION_NAME,
-    options: ({ organizationId }) => ({
-      variables: { organizationId }
-    })
-  }
-};
-
-const mutations: MutationMap<OuterProps> = {
-  editName: ({ organizationId }) => (name: string) => ({
-    mutation: EDIT_ORGANIZATION_NAME,
-    variables: {
-      organizationId,
-      input: {
-        name
-      }
-    }
-  })
-};
-
-export default compose<InnerProps, OuterProps>(
-  loadData({ queries, mutations })
-)(EditName);
+export default EditName;

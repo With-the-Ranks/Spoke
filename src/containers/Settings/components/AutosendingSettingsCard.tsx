@@ -56,7 +56,7 @@ export const AutosendingSettingsCard: React.FC<AutosendingSettingsCardProps> = (
 
   return (
     <Card style={style}>
-      <CardHeader title="Autosending Settings" disableTypography />
+      <CardHeader title="Autosending Settings" />
       <CardContent>
         {errorMsg && <Alert severity="error">Error: {errorMsg}</Alert>}
         <FormGroup row>

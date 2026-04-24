@@ -9,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import type { SelectInputProps } from "@material-ui/core/Select/SelectInput";
 import Switch from "@material-ui/core/Switch";
+import Alert from "@material-ui/lab/Alert";
 import {
   CampaignBuilderMode,
   useGetCampaignBuilderSettingsQuery,
@@ -88,9 +89,13 @@ export const CampaignBuilderSettingsCard: React.FC<CampaignBuilderSettingsCardPr
 
   return (
     <Card style={style}>
-      <CardHeader title="Campaign Builder Settings" disableTypography />
+      <CardHeader title="Campaign Builder Settings" />
       <CardContent>
-        {errorMsg && <p>Error: {errorMsg}</p>}
+        {errorMsg && (
+          <Alert severity="error" style={{ marginBottom: 16 }}>
+            {errorMsg}
+          </Alert>
+        )}
         <FormGroup row>
           <FormControlLabel
             control={
