@@ -3,7 +3,10 @@ import Button from "@material-ui/core/Button";
 import { red } from "@material-ui/core/colors";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import Snackbar from "@material-ui/core/Snackbar";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Alert from "@material-ui/lab/Alert";
 import {
   GetCampaignDocument,
@@ -18,7 +21,6 @@ import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
 import CampaignNavigation from "../../components/CampaignNavigation";
-import ScriptPreviewButton from "../../components/ScriptPreviewButton";
 import { dataTest } from "../../lib/attributes";
 import { DateTime } from "../../lib/datetime";
 import theme from "../../styles/theme";
@@ -93,13 +95,27 @@ class AdminCampaignStats extends React.Component {
     copiedCampaignId: undefined,
     copyCampaignError: undefined,
     exportCampaignOpen: false,
-    exportCampaignError: undefined
+    exportCampaignError: undefined,
+    moreMenuAnchor: null
   };
 
   handleNavigateToEdit = () => {
     const { organizationId, campaignId } = this.props.match.params;
     const editUrl = `/admin/${organizationId}/campaigns/${campaignId}/edit`;
     this.props.history.push(editUrl);
+  };
+
+  handleNavigateToAutosending = () => {
+    const { organizationId } = this.props.match.params;
+    this.props.history.push(`/admin/${organizationId}/autosending`);
+  };
+
+  handleOpenMoreMenu = (event) => {
+    this.setState({ moreMenuAnchor: event.currentTarget });
+  };
+
+  handleCloseMoreMenu = () => {
+    this.setState({ moreMenuAnchor: null });
   };
 
   handleOnClickExport = async () => {
@@ -234,7 +250,7 @@ class AdminCampaignStats extends React.Component {
       disableExportButton || currentExportJob !== undefined;
     const exportLabel = currentExportJob
       ? `Exporting (${currentExportJob.status}%)`
-      : "Export Data";
+      : "Export Data as CSV";
 
     const vanExportJob = pendingJobs.find(
       (job) => job.jobType === "van-export"
@@ -295,124 +311,168 @@ class AdminCampaignStats extends React.Component {
             ""
           )}
 
-          <div className={css(styles.header)}>
-            {campaign.title}
-            <br />
-            Campaign ID: {campaign.id}
-            <br />
-            Due:{" "}
-            <span style={{ color: isOverdue ? red[600] : undefined }}>
-              {dueFormatted} {isOverdue && "(Overdue)"}
-            </span>
-            {showMessagingServiceName && (
-              <>
-                <br />
-                Messaging Service: {msgServiceName}
-              </>
-            )}
+          <div>
+            <div className={css(styles.header)}>{campaign.title}</div>
+            <div
+              style={{
+                fontSize: 13,
+                color: "#6B7280",
+                marginTop: 4,
+                lineHeight: 1.6
+              }}
+            >
+              Campaign ID: {campaign.id}
+              <br />
+              Due:{" "}
+              <span style={{ color: isOverdue ? red[600] : undefined }}>
+                {dueFormatted} {isOverdue && "(Overdue)"}
+              </span>
+              {showMessagingServiceName && (
+                <>
+                  <br />
+                  Messaging Service: {msgServiceName}
+                </>
+              )}
+            </div>
           </div>
           <div className={css(styles.flexColumn)}>
             <div className={css(styles.rightAlign)}>
               <div className={css(styles.inline)}>
-                <div className={css(styles.inline)}>
-                  {
-                    // edit
+                <Button
+                  {...dataTest("editCampaign")}
+                  variant="contained"
+                  color="primary"
+                  onClick={this.handleNavigateToEdit}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleNavigateToAutosending}
+                >
+                  Autosending
+                </Button>
+                {isAdmin && (
+                  <>
                     <Button
-                      {...dataTest("editCampaign")}
-                      variant="contained"
-                      color="primary"
-                      onClick={this.handleNavigateToEdit}
+                      variant="outlined"
+                      onClick={this.handleOpenMoreMenu}
+                      endIcon={<ArrowDropDownIcon />}
                     >
-                      Edit
+                      More
                     </Button>
-                  }
-                  <ScriptPreviewButton campaignId={campaignId} />
-
-                  {isAdmin
-                    ? [
-                        // Buttons for Admins (and not Supervolunteers)
-                        // export
-                        <Button
-                          key="export"
-                          variant="outlined"
-                          disabled={shouldDisableExport}
-                          onClick={this.handleOnClickExport}
+                    <Menu
+                      anchorEl={this.state.moreMenuAnchor}
+                      open={Boolean(this.state.moreMenuAnchor)}
+                      onClose={this.handleCloseMoreMenu}
+                      getContentAnchorEl={null}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right"
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right"
+                      }}
+                    >
+                      {campaign.previewUrl && (
+                        <MenuItem
+                          onClick={() => {
+                            this.handleCloseMoreMenu();
+                            window.open(
+                              `/preview/${campaign.previewUrl}`,
+                              "_blank"
+                            );
+                          }}
                         >
-                          {exportLabel}
-                        </Button>,
-                        // Export for VAN
-                        <Button
-                          key="van-export"
-                          variant="outlined"
-                          disabled={isVanExportDisabled}
-                          onClick={this.handleOnClickVanExport}
+                          Open Script Preview
+                        </MenuItem>
+                      )}
+                      <MenuItem
+                        disabled={shouldDisableExport}
+                        onClick={() => {
+                          this.handleCloseMoreMenu();
+                          this.handleOnClickExport();
+                        }}
+                      >
+                        {exportLabel}
+                      </MenuItem>
+                      <MenuItem
+                        disabled={isVanExportDisabled}
+                        onClick={() => {
+                          this.handleCloseMoreMenu();
+                          this.handleOnClickVanExport();
+                        }}
+                      >
+                        {vanExportLabel}
+                      </MenuItem>
+                      <MenuItem
+                        disabled={isVanSyncDisabled}
+                        onClick={() => {
+                          this.handleCloseMoreMenu();
+                          this.handleOnClickVanSync();
+                        }}
+                      >
+                        {vanSyncLabel}
+                      </MenuItem>
+                      {campaign.isArchived ? (
+                        <MenuItem
+                          onClick={() => {
+                            this.handleCloseMoreMenu();
+                            this.props.mutations.unarchiveCampaign();
+                          }}
                         >
-                          {vanExportLabel}
-                        </Button>,
-                        // Sync to VAN
-                        <Button
-                          key="van-sync"
-                          variant="outlined"
-                          disabled={isVanSyncDisabled}
-                          onClick={this.handleOnClickVanSync}
+                          Unarchive
+                        </MenuItem>
+                      ) : (
+                        <MenuItem
+                          onClick={() => {
+                            this.handleCloseMoreMenu();
+                            this.props.mutations.archiveCampaign();
+                          }}
                         >
-                          {vanSyncLabel}
-                        </Button>,
-                        // unarchive
-                        campaign.isArchived ? (
-                          <Button
-                            key="unarchive"
-                            variant="outlined"
-                            onClick={() =>
-                              this.props.mutations.unarchiveCampaign()
-                            }
-                          >
-                            Unarchive
-                          </Button>
-                        ) : null, // archive
-                        !campaign.isArchived ? (
-                          <Button
-                            key="archive"
-                            variant="outlined"
-                            onClick={() =>
-                              this.props.mutations.archiveCampaign()
-                            }
-                          >
-                            Archive
-                          </Button>
-                        ) : null,
-                        // Copy
-                        <Button
-                          key="copy"
-                          {...dataTest("copyCampaign")}
-                          variant="outlined"
-                          disabled={this.state.copyingCampaign}
-                          onClick={
-                            onlyCopyCampaignSameOrg
-                              ? this.handleCopyCampaignSameOrg
-                              : this.openCopyCampaignModal
+                          Archive
+                        </MenuItem>
+                      )}
+                      <MenuItem
+                        {...dataTest("copyCampaign")}
+                        disabled={this.state.copyingCampaign}
+                        onClick={() => {
+                          this.handleCloseMoreMenu();
+                          if (onlyCopyCampaignSameOrg) {
+                            this.handleCopyCampaignSameOrg();
+                          } else {
+                            this.openCopyCampaignModal();
                           }
-                        >
-                          Copy Campaign
-                        </Button>
-                      ]
-                    : null}
-                </div>
+                        }}
+                      >
+                        Copy Campaign
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
         <TopLineStats campaignId={campaign.id} />
-        <div className={css(styles.header)}>Survey Questions</div>
+        <div
+          style={{ marginTop: 32, marginBottom: 16 }}
+          className={css(styles.header)}
+        >
+          Survey Questions
+        </div>
         <CampaignSurveyStats campaignId={campaign.id} />
 
-        <br />
-        <div className={css(styles.header)}>Outbound Deliverability</div>
+        <div className={css(styles.header)} style={{ marginTop: 16 }}>
+          Outbound Deliverability
+        </div>
         <DeliverabilityStats campaignId={campaign.id} />
-        <br />
+        <div style={{ marginBottom: 32 }} />
 
-        <div className={css(styles.header)}>Texter stats</div>
-        <div className={css(styles.secondaryHeader)}>% of first texts sent</div>
+        <div className={css(styles.header)} style={{ marginBottom: 8 }}>
+          Texter stats
+        </div>
         <TexterStats campaignId={campaign.id} />
 
         <Snackbar

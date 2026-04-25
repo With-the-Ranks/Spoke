@@ -5,12 +5,20 @@ import React from "react";
 import { Pie } from "react-chartjs-2";
 
 const styles = StyleSheet.create({
+  legendWrapper: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 12
+  },
   label: {
-    width: 20,
-    padding: 5,
-    margin: 5,
-    fontSize: 12,
-    color: "#ffffff"
+    display: "inline-block",
+    padding: "4px 8px",
+    borderRadius: 4,
+    fontSize: 11,
+    fontWeight: 600,
+    color: "#ffffff",
+    whiteSpace: "nowrap"
   }
 });
 
@@ -35,10 +43,10 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
   };
 
   return (
-    <>
+    <div style={{ maxWidth: 500 }}>
       {/* Chart.js doesn't handle a long list of options well so we do the legend outselves */}
       <Pie data={pieData} options={{ legend: { display: false } }} />
-      <div>
+      <div className={css(styles.legendWrapper)}>
         {data.map(([label], index) => (
           <span
             key={label}
@@ -49,7 +57,7 @@ const Chart: React.FC<ChartProps> = ({ data }) => {
           </span>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

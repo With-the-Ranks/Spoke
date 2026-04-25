@@ -10,9 +10,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
 import UserMenu from "../containers/UserMenu";
@@ -154,6 +155,11 @@ const useStyles = makeStyles((theme) => ({
     borderTop: `1px solid ${assemblePalette.common.cardBorder}`,
     padding: theme.spacing(1)
   },
+  bottomSectionCollapsed: {
+    display: "flex",
+    justifyContent: "center",
+    padding: theme.spacing(0.5, 0)
+  },
   userItem: {
     borderRadius: 8,
     margin: theme.spacing(0.25, 1)
@@ -173,6 +179,13 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: assemblePalette.common.lightGrey
     }
+  },
+  expandIcon: {
+    color: "inherit",
+    transition: "transform 0.2s"
+  },
+  expandIconOpen: {
+    transform: "rotate(180deg)"
   }
 }));
 
@@ -192,7 +205,7 @@ export interface NavigationGroup {
 interface Props {
   sections?: NavigationSection[];
   groups?: NavigationGroup[];
-  onToggleMenu: () => React.MouseEventHandler<unknown>;
+  onToggleMenu: () => void;
   switchListItem?: JSX.Element;
   showMenu?: boolean;
   title?: string;
@@ -204,8 +217,6 @@ const Navigation: React.FC<Props> = (props) => {
   const location = useLocation();
   const classes = useStyles();
   const { sections, groups, switchListItem, title } = props;
-  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
-
   const collapsed = !props.showMenu;
 
   const isActive = (section: NavigationSection) =>
@@ -213,6 +224,18 @@ const Navigation: React.FC<Props> = (props) => {
 
   const isGroupActive = (group: NavigationGroup) =>
     group.items.some((item) => isActive(item));
+
+  // Initialize open group to the active group on first render
+  const [openGroup, setOpenGroup] = useState<string | null>(() => {
+    const active = groups?.find((g) => isGroupActive(g));
+    return active?.name ?? null;
+  });
+
+  // When the route changes, auto-open the active group
+  useEffect(() => {
+    const active = groups?.find((g) => isGroupActive(g));
+    if (active) setOpenGroup(active.name);
+  }, [location.pathname]);
 
   const renderSection = (section: NavigationSection, indented = false) => {
     const active = isActive(section);
@@ -287,64 +310,66 @@ const Navigation: React.FC<Props> = (props) => {
       <Divider />
 
       {!collapsed && (
-        <>
-          <List className={classes.navList}>
-            {/* Grouped navigation */}
-            {groups &&
-              groups.map((group) => {
-                const groupActive = isGroupActive(group);
-                const isOpen = hoveredGroup === group.name || groupActive;
+        <List className={classes.navList}>
+          {/* Grouped navigation */}
+          {groups &&
+            groups.map((group) => {
+              const groupActive = isGroupActive(group);
+              const isOpen = openGroup === group.name;
 
-                return (
-                  <div
-                    key={group.name}
-                    onMouseEnter={() => setHoveredGroup(group.name)}
-                    onMouseLeave={() => setHoveredGroup(null)}
+              return (
+                <div key={group.name}>
+                  {/* Group header */}
+                  <ListItem
+                    button
+                    className={clsx(classes.groupHeader, {
+                      [classes.groupHeaderActive]: groupActive
+                    })}
+                    onClick={() => setOpenGroup(isOpen ? null : group.name)}
                   >
-                    {/* Group header */}
-                    <ListItem
-                      button
-                      className={clsx(classes.groupHeader, {
-                        [classes.groupHeaderActive]: groupActive
+                    <ListItemText
+                      primary={group.name}
+                      className={classes.groupHeaderText}
+                    />
+                    <ExpandMoreIcon
+                      fontSize="small"
+                      className={clsx(classes.expandIcon, {
+                        [classes.expandIconOpen]: isOpen
                       })}
-                      onClick={() =>
-                        setHoveredGroup(isOpen ? null : group.name)
-                      }
-                    >
-                      <ListItemText
-                        primary={group.name}
-                        className={classes.groupHeaderText}
-                      />
-                    </ListItem>
+                    />
+                  </ListItem>
 
-                    {/* Group children */}
-                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                      <List disablePadding>
-                        {group.items.map((item) => renderSection(item, true))}
-                      </List>
-                    </Collapse>
-                  </div>
-                );
-              })}
+                  {/* Group children */}
+                  <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                    <List disablePadding>
+                      {group.items.map((item) => renderSection(item, true))}
+                    </List>
+                  </Collapse>
+                </div>
+              );
+            })}
 
-            {/* Flat (ungrouped) navigation fallback */}
-            {!groups &&
-              sections &&
-              sections.map((section) => renderSection(section, false))}
+          {/* Flat (ungrouped) navigation fallback */}
+          {!groups &&
+            sections &&
+            sections.map((section) => renderSection(section, false))}
 
-            {switchListItem && (
-              <>
-                <Divider style={{ margin: "8px 16px" }} />
-                {switchListItem}
-              </>
-            )}
-          </List>
-
-          <div className={classes.bottomSection}>
-            <UserMenu organizationId={props.organizationId} />
-          </div>
-        </>
+          {switchListItem && (
+            <>
+              <Divider style={{ margin: "8px 16px" }} />
+              {switchListItem}
+            </>
+          )}
+        </List>
       )}
+
+      <div
+        className={clsx(classes.bottomSection, {
+          [classes.bottomSectionCollapsed]: collapsed
+        })}
+      >
+        <UserMenu organizationId={props.organizationId} />
+      </div>
     </div>
   );
 };

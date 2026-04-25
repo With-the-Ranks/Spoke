@@ -786,7 +786,7 @@ class AdminCampaignEdit extends React.Component {
           }}
         >
           {isCompleted
-            ? "Your campaign is all good to go! >>>>>>>>>"
+            ? "Your campaign is all good to go!"
             : "You need to complete all the sections below before you can start this campaign"}
           {this.renderCurrentEditors()}
         </div>

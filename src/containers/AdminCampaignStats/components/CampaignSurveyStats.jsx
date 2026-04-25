@@ -10,22 +10,15 @@ import Chart from "./Chart";
 
 const styles = StyleSheet.create({
   container: {
-    ...theme.layouts.multiColumn.container,
-    marginBottom: 40,
-    justifyContent: "space-around",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: "24px",
     flexWrap: "wrap"
   },
-  flexColumn: {
-    flex: 1,
-    textAlign: "right",
-    display: "flex"
-  },
-  rightAlign: {
-    marginLeft: "auto",
-    marginRight: 0
-  },
   secondaryHeader: {
-    ...theme.text.secondaryHeader
+    ...theme.text.secondaryHeader,
+    marginBottom: 16
   }
 });
 
@@ -35,32 +28,26 @@ const CampaignSurveyStats = (props) => {
   return (
     <div>
       {interactionSteps
-        .filter((iStep) => iStep.question !== "")
+        .filter((iStep) => iStep.question.text !== "")
         .map((step) => {
           const { answerOptions } = step.question;
           const countReducer = (acc, answer) => acc + answer.responderCount;
           const responseCount = answerOptions.reduce(countReducer, 0);
 
           return (
-            <div key={step.id}>
+            <div key={step.id} style={{ marginBottom: 48 }}>
               <div className={css(styles.secondaryHeader)}>
                 {step.question.text}
               </div>
               {responseCount > 0 ? (
                 <div className={css(styles.container)}>
-                  <div className={css(styles.flexColumn)}>
-                    <CampaignStat title="responses" count={responseCount} />
-                  </div>
-                  <div className={css(styles.flexColumn)}>
-                    <div className={css(styles.rightAlign)}>
-                      <Chart
-                        data={step.question.answerOptions.map((answer) => [
-                          answer.value,
-                          answer.responderCount
-                        ])}
-                      />
-                    </div>
-                  </div>
+                  <CampaignStat title="responses" count={responseCount} />
+                  <Chart
+                    data={step.question.answerOptions.map((answer) => [
+                      answer.value,
+                      answer.responderCount
+                    ])}
+                  />
                 </div>
               ) : (
                 "No responses yet"
