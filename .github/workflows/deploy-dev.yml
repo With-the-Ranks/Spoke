@@ -48,6 +48,7 @@ jobs:
       - uses: ./.github/actions/docker-build-push
         with:
           registry: ${{ env.GAR_REGISTRY }}
+          context: .
           tags: |
             dev-latest
             dev-${{ steps.build-metadata.outputs.sha_short }}
