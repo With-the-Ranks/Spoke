@@ -8,6 +8,7 @@ import {
   useMegaBulkReassignCampaignContactsMutation,
   useMegaReassignCampaignContactsMutation
 } from "@spoke/spoke-codegen";
+import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import omit from "lodash/omit";
 import React, { useState } from "react";
@@ -378,7 +379,7 @@ const AdminIncomingMessageList: React.FC<AdminIncomingMessageListProps> = (
       !isEqual(contactsFilter, initialContactsFilter) ||
       !isEqual(assignmentsFilter, initialAssignmentsFilter) ||
       !isEqual(tagsFilter, initialTagsFilter) ||
-      contactNameFilter !== undefined
+      !isEmpty(contactNameFilter)
     );
   };
 
