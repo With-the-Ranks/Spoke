@@ -32,9 +32,6 @@ const main = async (lastId) => {
     .where((builder) =>
       builder
         .where({ is_archived: false })
-        .orWhereRaw(
-          `due_by > now() - interval '${ARCHIVED_CAMPAIGN_AGE_DAYS} day'`
-        )
     )
     .where("id", ">", lastId)
     .limit(CAMPAIGN_FETCH_CHUNK_SIZE)

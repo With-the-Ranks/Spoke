@@ -1,6 +1,5 @@
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { red } from "@material-ui/core/colors";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -24,7 +23,6 @@ import { compose } from "recompose";
 import { withSpokeContext } from "../../client/spoke-context";
 import CampaignNavigation from "../../components/CampaignNavigation";
 import { dataTest } from "../../lib/attributes";
-import { DateTime } from "../../lib/datetime";
 import theme from "../../styles/theme";
 import { withAuthzContext } from "../AuthzProvider";
 import { loadData } from "../hoc/with-operations";
@@ -312,7 +310,6 @@ class AdminCampaignEdit extends React.Component {
         keys: [
           "title",
           "description",
-          "dueBy",
           "logoImageUrl",
           "primaryColor",
           "introHtml"
@@ -667,21 +664,17 @@ class AdminCampaignEdit extends React.Component {
 
   renderHeader = () => {
     const {
-      campaign: { dueBy, isStarted, title, isTemplate } = {}
+      campaign: { isStarted, title, isTemplate } = {}
     } = this.props.campaignData;
-
-    const isOverdue = DateTime.local() >= DateTime.fromISO(dueBy);
 
     const notStarting = isStarted ? (
       <div
         {...dataTest("campaignIsStarted")}
         style={{
-          color: isOverdue ? red[600] : theme.colors.green
+          color: theme.colors.green
         }}
       >
-        {isOverdue
-          ? "This campaign is running but is overdue!"
-          : "This campaign is running!"}
+        This campaign is running!
         {this.renderCurrentEditors()}
       </div>
     ) : (

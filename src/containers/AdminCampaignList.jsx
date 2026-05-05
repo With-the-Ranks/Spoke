@@ -98,7 +98,6 @@ class AdminCampaignList extends React.Component {
     const newCampaign = await this.props.mutations.createCampaign({
       title: "New Campaign",
       description: "",
-      dueBy: null,
       organizationId,
       interactionSteps: {
         scriptOptions: [""]
