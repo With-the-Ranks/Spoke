@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.1](https://github.com/With-the-Ranks/spoke/compare/v9.2.0...v9.2.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* **message-review:** check for empty name filter ([#153](https://github.com/With-the-Ranks/spoke/issues/153)) ([acfa19c](https://github.com/With-the-Ranks/spoke/commit/acfa19c7124a68995a097da1f0b966c1f029b616))
+* **staging:** match expected organization uuid format ([#154](https://github.com/With-the-Ranks/spoke/issues/154)) ([70c3228](https://github.com/With-the-Ranks/spoke/commit/70c3228c4fe9be005912bdec12bebf52d270139e))
+* update dev-deploy.yml so Docker deploys branch instead of main ([#152](https://github.com/With-the-Ranks/spoke/issues/152)) ([98ce815](https://github.com/With-the-Ranks/spoke/commit/98ce8150fef20eb190aa04b24dde86218adf6531))
+
+
+### Backend Changes
+
+* remove obsolete Claudia Deploy and nyc entries from .gitignore ([#144](https://github.com/With-the-Ranks/spoke/issues/144)) ([9200df4](https://github.com/With-the-Ranks/spoke/commit/9200df4fb95b2261e26f56aa23225ff48562645a))
+
 ## [9.2.0](https://github.com/With-the-Ranks/spoke/compare/v9.1.0...v9.2.0) (2026-04-24)
 
 
