@@ -52,10 +52,6 @@ export const getContacts = (
   campaign,
   forCount = false
 ) => {
-  if (contactsFilter && contactsFilter.messageStatus === "needsMessage") {
-    return [];
-  }
-
   let query = r
     .reader("campaign_contact")
     .where({
