@@ -225,28 +225,24 @@ class TexterRequest extends React.Component {
           value={{ email, count }}
           onSubmit={this.submit}
         >
-          <label htmlFor="count">
-            {" "}
-            Count:
-            <TextField
-              name="count"
-              label="Count"
-              variant="outlined"
-              size="small"
-              InputLabelProps={{ shrink: true }}
-              type="number"
-              value={count}
-              onChange={(e) => {
-                const formVal = parseInt(e.target.value, 10) || 0;
-                let newCount =
-                  maxRequestCount > 0
-                    ? Math.min(maxRequestCount, formVal)
-                    : formVal;
-                newCount = Math.max(newCount, 0);
-                this.setState({ count: newCount });
-              }}
-            />
-          </label>
+          <TextField
+            name="count"
+            label="Count"
+            variant="outlined"
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            type="number"
+            value={count}
+            onChange={(e) => {
+              const formVal = parseInt(e.target.value, 10) || 0;
+              let newCount =
+                maxRequestCount > 0
+                  ? Math.min(maxRequestCount, formVal)
+                  : formVal;
+              newCount = Math.max(newCount, 0);
+              this.setState({ count: newCount });
+            }}
+          />
           <br />
           <Button
             variant="contained"
