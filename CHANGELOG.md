@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.0](https://github.com/With-the-Ranks/spoke/compare/v9.2.1...v10.0.0) (2026-05-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* visual refresh (phase 1 - 6) (#147)
+
+### Features
+
+* visual refresh (phase 1 - 6) ([#147](https://github.com/With-the-Ranks/spoke/issues/147)) ([8034d07](https://github.com/With-the-Ranks/spoke/commit/8034d073185845cd041bdee054a32daa949fc6ac))
+
 ### [9.2.1](https://github.com/With-the-Ranks/spoke/compare/v9.2.0...v9.2.1) (2026-05-05)
 
 
