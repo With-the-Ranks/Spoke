@@ -605,11 +605,13 @@ export const editCampaign = async (
       .where({ id });
   }
   if (Object.prototype.hasOwnProperty.call(campaign, "teamIds")) {
+    const { teamIds } = campaign;
     await r.knex.transaction(async (trx) => {
       // Remove all existing team memberships and then add everything again
       await trx("campaign_team").where({ campaign_id: id }).del();
+      if (!teamIds || teamIds.length < 1) return;
       await trx("campaign_team").insert(
-        campaign.teamIds?.map((team_id) => ({
+        teamIds.map((team_id) => ({
           team_id,
           campaign_id: id
         }))
