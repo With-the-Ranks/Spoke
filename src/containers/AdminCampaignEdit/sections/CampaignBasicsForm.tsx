@@ -123,7 +123,14 @@ class CampaignBasicsForm extends React.Component<
         >
           <CampaignFormSectionHeading title="What&#39;s your campaign about?" />
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              marginBottom: 8
+            }}
+          >
             <SpokeFormField name="primaryColor">
               {({ value: colorValue, onChange }: ColorPickerProps) => (
                 <ColorPicker value={colorValue} onChange={onChange} />

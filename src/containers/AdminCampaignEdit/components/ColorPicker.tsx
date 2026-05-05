@@ -1,5 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
 import React, { useRef } from "react";
 
 const useStyles = makeStyles({
@@ -21,6 +22,17 @@ const useStyles = makeStyles({
   wrapper: {
     position: "relative" as const,
     flexShrink: 0
+  },
+  outerWrapper: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    gap: 2
+  },
+  label: {
+    fontSize: 11,
+    color: "#6B7280",
+    whiteSpace: "nowrap" as const
   }
 });
 
@@ -38,22 +50,25 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const color = value || "#ffffff";
 
   return (
-    <Tooltip title="Campaign color" placement="top">
-      <div className={classes.wrapper}>
-        <div
-          className={classes.swatch}
-          style={{ backgroundColor: color }}
-          onClick={() => inputRef.current?.click()}
-        />
-        <input
-          ref={inputRef}
-          type="color"
-          value={color}
-          onChange={(e) => onChange(e.target.value)}
-          className={classes.hiddenInput}
-        />
-      </div>
-    </Tooltip>
+    <div className={classes.outerWrapper}>
+      <Tooltip title="Campaign color" placement="top">
+        <div className={classes.wrapper}>
+          <div
+            className={classes.swatch}
+            style={{ backgroundColor: color }}
+            onClick={() => inputRef.current?.click()}
+          />
+          <input
+            ref={inputRef}
+            type="color"
+            value={color}
+            onChange={(e) => onChange(e.target.value)}
+            className={classes.hiddenInput}
+          />
+        </div>
+      </Tooltip>
+      <Typography className={classes.label}>Color</Typography>
+    </div>
   );
 };
 
