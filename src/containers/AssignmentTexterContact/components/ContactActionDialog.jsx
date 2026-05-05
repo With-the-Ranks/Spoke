@@ -87,7 +87,7 @@ class ContactActionDialog extends Component {
                 this.contactActionTextRef = el;
               }}
             >
-              <SpokeFormField name={FIELD_NAME} fullWidth autoFocus multiLine />
+              <SpokeFormField name={FIELD_NAME} fullWidth autoFocus multiline />
             </div>
             <div className={css(styles.dialogActions)}>
               <Button
