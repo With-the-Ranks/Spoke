@@ -82,7 +82,7 @@ class AdminCampaignEdit extends React.Component {
     // So campaignFormValues should always be the diffs between server and client form data
     let { expandedSection } = this.state;
     let expandedKeys = [];
-    if (expandedSection !== null) {
+    if (expandedSection != null) {
       expandedSection = this.sections()[expandedSection];
       expandedKeys = expandedSection.keys;
     }
@@ -787,14 +787,14 @@ class AdminCampaignEdit extends React.Component {
           }}
         >
           {isCompleted
-            ? "Your campaign is all good to go! >>>>>>>>>"
+            ? "Your campaign is all good to go!"
             : "You need to complete all the sections below before you can start this campaign"}
           {this.renderCurrentEditors()}
         </div>
-        <div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {this.props.campaignData.campaign.isArchived ? (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.unarchiveCampaign(
                   this.props.campaignData.campaign.id
@@ -805,7 +805,7 @@ class AdminCampaignEdit extends React.Component {
             </Button>
           ) : (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.archiveCampaign(
                   this.props.campaignData.campaign.id

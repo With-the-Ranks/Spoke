@@ -2,8 +2,8 @@ import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
 import pick from "lodash/pick";
-import TextField from "material-ui/TextField";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -153,10 +153,6 @@ class GSScriptField extends GSFormField {
     // The "errors" prop is an empty object and is not mentioned in yum or react-formal documentation
     const passThroughProps = pick(this.props, [
       "className",
-      "fullWidth",
-      "hintText",
-      "label",
-      "multiLine",
       "name",
       "value",
       "data-test",
@@ -166,13 +162,15 @@ class GSScriptField extends GSFormField {
     return (
       <div>
         <TextField
-          multiLine
-          onClick={this.handleOpenDialog}
-          floatingLabelText={this.floatingLabelText()}
-          floatingLabelStyle={{
-            zIndex: 0
-          }}
           {...passThroughProps}
+          multiline
+          variant="outlined"
+          size="small"
+          fullWidth={this.props.fullWidth}
+          InputLabelProps={{ shrink: true }}
+          placeholder={this.props.hintText || undefined}
+          onClick={this.handleOpenDialog}
+          label={this.floatingLabelText()}
         />
         {this.renderDialog()}
       </div>

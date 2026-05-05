@@ -89,11 +89,11 @@ const useStyles = makeStyles((theme) => ({
   },
   done: {
     backgroundColor: theme.palette.getContrastText(theme.palette.primary.main),
-    color: theme.palette.primary.main
+    color: theme.palette.text.primary
   },
   notDone: {
     backgroundColor: theme.palette.warning.main,
-    color: theme.palette.text.primary
+    color: "#fff"
   },
   cardAvatar: {
     backgroundColor: assemblePalette.common.lightGrey,
@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.getContrastText(theme.palette.primary.main)
   },
   expandClosedText: {
-    color: theme.palette.primary.main
+    color: theme.palette.text.primary
   }
 }));
 

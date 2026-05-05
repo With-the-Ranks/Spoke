@@ -159,7 +159,7 @@ const SuperAdminOrganizations: React.FC = (_props) => {
   }
   return (
     <div>
-      <Paper>
+      <Paper variant="outlined">
         <DataGridPro
           disableSelectionOnClick
           autoHeight

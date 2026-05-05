@@ -101,7 +101,10 @@ export const OrganizationList: React.FC = () => {
           mailbox icon.
         </p>
       )}
-      <Paper style={{ margin: "15px auto", maxWidth: "450px" }}>
+      <Paper
+        variant="outlined"
+        style={{ margin: "15px auto", maxWidth: "450px" }}
+      >
         <List>
           {sortedList.map(({ membership, hasAssignments }) => {
             const leftIcon = showIcons ? (

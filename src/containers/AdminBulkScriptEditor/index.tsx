@@ -203,7 +203,7 @@ const AdminBulkScriptEditor: React.FC = (props) => {
   return (
     <div>
       <h1>Bulk Script Editor</h1>
-      <Paper style={styles.paddedPaper}>
+      <Paper variant="outlined" style={styles.paddedPaper}>
         <p style={{ fontSize: "1.3em" }}>Find and replace</p>
         <TextField
           label="Replace this text..."
@@ -236,7 +236,7 @@ const AdminBulkScriptEditor: React.FC = (props) => {
           <span style={styles.code}>’</span>
         </p>
       </Paper>
-      <Paper style={styles.paddedPaper}>
+      <Paper variant="outlined" style={styles.paddedPaper}>
         <p style={{ fontSize: "1.3em" }}>Filter campaigns</p>
         <FormControlLabel
           label="Include archived campaigns? "

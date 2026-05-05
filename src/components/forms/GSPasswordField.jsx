@@ -1,25 +1,40 @@
-import TextField from "material-ui/TextField";
+import TextField from "@material-ui/core/TextField";
+import omit from "lodash/omit";
 import React from "react";
 
-import GSFormField from "./GSFormField";
+import { floatingLabelText } from "./GSFormField";
 
-export default class GSPasswordField extends GSFormField {
-  render() {
-    const { value } = this.props;
-    return (
-      <TextField
-        floatingLabelText={this.floatingLabelText()}
-        floatingLabelStyle={{
-          zIndex: 0
-        }}
-        onFocus={(event) => event.target.select()}
-        {...this.props}
-        value={value}
-        onChange={(event) => {
-          this.props.onChange(event.target.value);
-        }}
-        type="password"
-      />
-    );
-  }
-}
+const V0_PROPS = [
+  "errors",
+  "floatingLabelText",
+  "floatingLabelStyle",
+  "fullWidth",
+  "hintText",
+  "errorText",
+  "underlineShow",
+  "underlineFocusStyle"
+];
+
+const GSPasswordField = (props) => {
+  const { value, onChange, hintText, fullWidth } = props;
+  const safeProps = omit(props, V0_PROPS);
+  return (
+    <TextField
+      {...safeProps}
+      label={floatingLabelText(props)}
+      placeholder={hintText || undefined}
+      variant="outlined"
+      size="small"
+      fullWidth={fullWidth}
+      InputLabelProps={{ shrink: true }}
+      onFocus={(event) => event.target.select()}
+      value={value}
+      onChange={(event) => {
+        onChange(event.target.value);
+      }}
+      type="password"
+    />
+  );
+};
+
+export default GSPasswordField;

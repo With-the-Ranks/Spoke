@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
-import TextField from "material-ui/TextField";
 import React from "react";
 import * as yup from "yup";
 
@@ -124,7 +124,7 @@ class TexterRequest extends React.Component {
       const { amount } = this.props.data.currentUser.currentRequest;
 
       return (
-        <Paper>
+        <Paper variant="outlined">
           <div style={{ padding: "20px" }}>
             <h3> You currently have a pending request</h3>
             <p>
@@ -141,7 +141,7 @@ class TexterRequest extends React.Component {
       settings.showDoNotAssignMessage
     ) {
       return (
-        <Paper>
+        <Paper variant="outlined">
           <div style={{ padding: "20px" }}>
             <h3>Assignment Request Disabled</h3>
             <p>{settings.doNotAssignMessage}</p>
@@ -152,7 +152,7 @@ class TexterRequest extends React.Component {
 
     if (!textsAvailable) {
       return (
-        <Paper>
+        <Paper variant="outlined">
           <div style={{ padding: "20px" }}>
             <h3> No texts available right now </h3>
             <p> Watch out for an announcement when new texts are available! </p>
@@ -231,6 +231,9 @@ class TexterRequest extends React.Component {
             <TextField
               name="count"
               label="Count"
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
               type="number"
               value={count}
               onChange={(e) => {

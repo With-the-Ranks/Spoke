@@ -7,6 +7,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Snackbar from "@material-ui/core/Snackbar";
+import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import ClearIcon from "@material-ui/icons/Clear";
 import CreateIcon from "@material-ui/icons/Create";
@@ -16,7 +17,7 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import { TextField, Toggle } from "material-ui";
+import { Toggle } from "material-ui";
 import DropDownMenu from "material-ui/DropDownMenu";
 import { MenuItem } from "material-ui/Menu";
 import PropTypes from "prop-types";
@@ -24,6 +25,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
+import BadgePlusIcon from "../components/BadgePlusIcon";
 import CreateCampaignFromTemplateDialog from "../components/CreateCampaignFromTemplateDialog";
 import LoadingIndicator from "../components/LoadingIndicator";
 import theme from "../styles/theme";
@@ -380,14 +382,21 @@ class AdminCampaignList extends React.Component {
                   <Box
                     sx={{
                       display: "flex",
-                      alignContent: "center",
-                      justifyContent: "center"
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6
                     }}
                   >
-                    <SpeedDialIcon />
-                    <Typography variant="button">
-                      {" "}
-                      Create a campaign{" "}
+                    <BadgePlusIcon style={{ width: 20, height: 20 }} />
+                    <Typography
+                      variant="button"
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "0.875rem",
+                        textTransform: "none"
+                      }}
+                    >
+                      Create a campaign
                     </Typography>
                   </Box>
                 }
@@ -395,7 +404,7 @@ class AdminCampaignList extends React.Component {
                   <Box
                     sx={{
                       display: "flex",
-                      alignContent: "center",
+                      alignItems: "center",
                       justifyContent: "center"
                     }}
                   >

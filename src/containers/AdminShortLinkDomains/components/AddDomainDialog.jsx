@@ -4,7 +4,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "material-ui/TextField";
+import TextField from "@material-ui/core/TextField";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 
@@ -55,17 +55,28 @@ class AddDomainDialog extends Component {
           <DialogContentText>Add a new shortlink domain.</DialogContentText>
 
           <TextField
-            floatingLabelText="Shortlink Domain"
-            hintText="bit.ly"
+            label="Shortlink Domain"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            placeholder="bit.ly"
             value={domain}
-            errorText={isDomainValid ? undefined : "You must provide a domain."}
+            error={!isDomainValid}
+            helperText={
+              isDomainValid ? undefined : "You must provide a domain."
+            }
             onChange={this.handleDomainChange}
           />
-          <br />
           <TextField
-            floatingLabelText="Shortlink Domain"
+            label="Max Usage Count"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
             value={maxUsageCount}
-            errorText={
+            error={!isMaxUsageCountValid}
+            helperText={
               isMaxUsageCountValid
                 ? undefined
                 : "You must provide a maximum usage count."
