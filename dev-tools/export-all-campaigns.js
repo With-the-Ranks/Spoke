@@ -29,10 +29,7 @@ const main = async (lastId) => {
   );
   const campaignIds = await r
     .knex("campaign")
-    .where((builder) =>
-      builder
-        .where({ is_archived: false })
-    )
+    .where((builder) => builder.where({ is_archived: false }))
     .where("id", ">", lastId)
     .limit(CAMPAIGN_FETCH_CHUNK_SIZE)
     .orderBy("id")
