@@ -14,6 +14,10 @@ inputs:
   cache_scope:
     description: "GitHub Actions cache scope for Docker layer caching"
     required: true
+  context:
+    description: "Build context path"
+    required: false
+    default: "."
 
 runs:
   using: "composite"
@@ -37,6 +41,7 @@ runs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
+        context: ${{ inputs.context }}
         push: true
         build-args: |
           SPOKE_VERSION=${{ inputs.spoke_version }}
