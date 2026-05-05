@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.0.1](https://github.com/With-the-Ranks/spoke/compare/v10.0.0...v10.0.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* correct multiLine -> multiline prop for MUI v4 in ContactActionDialog ([#164](https://github.com/With-the-Ranks/spoke/issues/164)) ([5c181c2](https://github.com/With-the-Ranks/spoke/commit/5c181c226461151239de607dc21a699ed7e86aa6))
+
 ## [10.0.0](https://github.com/With-the-Ranks/spoke/compare/v9.2.1...v10.0.0) (2026-05-05)
 
 
