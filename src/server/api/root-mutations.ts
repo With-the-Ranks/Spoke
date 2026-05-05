@@ -797,7 +797,6 @@ const rootMutations = {
           creator_id: user.id,
           title: campaign.title,
           description: campaign.description,
-          due_by: campaign.dueBy,
           timezone: parseIanaZone(organization.default_texting_tz),
           is_started: false,
           is_archived: false,

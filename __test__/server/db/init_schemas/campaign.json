@@ -29,12 +29,6 @@
     "nullable": true,
     "defaultValue": null
   },
-  "due_by": {
-    "type": "timestamp with time zone",
-    "maxLength": null,
-    "nullable": true,
-    "defaultValue": null
-  },
   "created_at": {
     "type": "timestamp with time zone",
     "maxLength": null,

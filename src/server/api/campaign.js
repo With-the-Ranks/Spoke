@@ -500,10 +500,6 @@ export const resolvers = {
     repliesStaleAfter: (campaign) => campaign.replies_stale_after_minutes,
     isAssignmentLimitedToTeams: (campaign) =>
       campaign.limit_assignment_to_teams,
-    dueBy: (campaign) =>
-      campaign.due_by instanceof Date || !campaign.due_by
-        ? campaign.due_by || null
-        : new Date(campaign.due_by),
     organization: async (campaign, _, { loaders }) =>
       campaign.organization ||
       loaders.organization.load(campaign.organization_id),

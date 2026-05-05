@@ -130,7 +130,6 @@ export interface campaign {
   title: string
   description: string
   is_started?: boolean | null
-  due_by?: Date | null
   created_at: Date
   is_archived?: boolean | null
   logo_image_url?: string | null
@@ -208,7 +207,6 @@ export interface campaign_with_groups {
   title?: string | null
   description?: string | null
   is_started?: boolean | null
-  due_by?: Date | null
   created_at?: Date | null
   is_archived?: boolean | null
   logo_image_url?: string | null

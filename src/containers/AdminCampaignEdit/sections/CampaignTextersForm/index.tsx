@@ -2,19 +2,15 @@ import type { ApolloQueryResult } from "@apollo/client";
 import type { WithApolloClient } from "@apollo/client/react/hoc";
 import { withApollo } from "@apollo/client/react/hoc";
 import Button from "@material-ui/core/Button";
-import { red } from "@material-ui/core/colors";
 import IconButton from "@material-ui/core/IconButton";
 import Snackbar from "@material-ui/core/Snackbar";
 import CloseIcon from "@material-ui/icons/Close";
+import type { Campaign, TexterAssignmentInput } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import orderBy from "lodash/orderBy";
 import React, { useState } from "react";
 import { compose } from "recompose";
 
-import type { TexterAssignmentInput } from "../../../../api/assignment";
-import type { Campaign } from "../../../../api/campaign";
-import type { User } from "../../../../api/user";
-import { DateTime } from "../../../../lib/datetime";
 import type { MutationMap, QueryMap } from "../../../../network/types";
 import theme from "../../../../styles/theme";
 import { loadData } from "../../../hoc/with-operations";
@@ -58,7 +54,7 @@ const inlineStyles = {
 
 type CampaignWithTexter = Pick<
   Campaign,
-  "id" | "isStarted" | "dueBy" | "contactsCount"
+  "id" | "isStarted" | "contactsCount"
 > & {
   texters: Texter[];
 };
@@ -79,7 +75,7 @@ interface HocProps extends WithApolloClient<unknown> {
   organizationData: {
     organization: {
       id: string;
-      texters: Pick<User, "id" | "firstName" | "lastName" | "displayName">[];
+      texters: OrgTexter[];
     };
   };
 }
@@ -114,7 +110,7 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
       organization: { texters: orgTexters }
     },
     campaignData: {
-      campaign: { contactsCount, texters, dueBy }
+      campaign: { contactsCount, texters }
     }
   } = props;
 
@@ -122,6 +118,7 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
     ({ assignment }) => assignment.contactsCount > 0
   );
 
+  if (!contactsCount) return null;
   const {
     lastReset,
     autoSplit,
@@ -138,7 +135,7 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
   const resetJobsOrTexters = async () => {
     // Check for new pending jobs -- if there is one, asSection will rerender CampaignTextersForm
     // when the job completes, resetting the reducer state
-    const response = await client.query({
+    const response = await client?.query({
       query: GET_CAMPAIGN_JOBS_QUERY,
       variables: { campaignId, jobTypes: JOB_QUEUE_NAMES },
       fetchPolicy: "network-only"
@@ -146,12 +143,14 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
 
     // If there is no pending job then the assignment job completed _much_ faster than usual and
     // we need to refresh and reset texters state ourselves
+    if (!response) return null;
     const { pendingJobs } = response.data.campaign;
+
     if (pendingJobs.length === 0) {
       const {
         data: { campaign }
       } = await props.campaignData.refetch();
-      reset(campaign.texters, campaign.contactsCount);
+      reset(campaign.texters, contactsCount);
     }
   };
 
@@ -166,10 +165,9 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
   };
 
   // Campaign stuff
-  const isOverdue = dueBy ? DateTime.local() >= DateTime.fromISO(dueBy) : false;
   const shouldShowTextersManager = orgTexters.length > 0;
   const finalSaveLabel = working ? "Working..." : saveLabel;
-  const finalSaveDisabled = isOverdue || working || saveDisabled;
+  const finalSaveDisabled = working || saveDisabled;
 
   const handleAddTexters = (newTexters: OrgTexter[]) => addTexters(newTexters);
 
@@ -198,7 +196,7 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
       if (response.errors) throw response.errors;
       // Force refetch of pending jobs for _this_ campaign and section -- refetchQueries wasn't doing the trick
       await resetJobsOrTexters();
-    } catch (err) {
+    } catch (err: any) {
       props.onError(err.message);
     } finally {
       setWorking(false);
@@ -209,17 +207,7 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
 
   return (
     <>
-      <CampaignFormSectionHeading
-        title="Who should send the texts?"
-        subtitle={
-          isOverdue && (
-            <span style={{ color: red[600] }}>
-              This campaign is overdue! Please change the due date before
-              editing Texters
-            </span>
-          )
-        }
-      />
+      <CampaignFormSectionHeading title="Who should send the texts?" />
       {shouldShowTextersManager && (
         <AddRemoveTexters
           orgTexters={orgTexters}
