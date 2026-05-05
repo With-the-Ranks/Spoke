@@ -12,6 +12,7 @@ import { dataTest } from "../../../lib/attributes";
 import { difference } from "../../../lib/utils";
 import { loadData } from "../../hoc/with-operations";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
+import type { ColorPickerProps } from "../components/ColorPicker";
 import ColorPicker from "../components/ColorPicker";
 import type {
   FullComponentProps,
@@ -124,13 +125,9 @@ class CampaignBasicsForm extends React.Component<
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <SpokeFormField name="primaryColor">
-              {({
-                value: colorValue,
-                onChange
-              }: {
-                value: string;
-                onChange: (val: string) => void;
-              }) => <ColorPicker value={colorValue} onChange={onChange} />}
+              {({ value: colorValue, onChange }: ColorPickerProps) => (
+                <ColorPicker value={colorValue} onChange={onChange} />
+              )}
             </SpokeFormField>
             <SpokeFormField
               {...dataTest("title")}
