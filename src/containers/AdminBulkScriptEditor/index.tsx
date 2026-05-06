@@ -202,7 +202,6 @@ const AdminBulkScriptEditor: React.FC = (props) => {
 
   return (
     <div>
-      <h1>Bulk Script Editor</h1>
       <Paper variant="outlined" style={styles.paddedPaper}>
         <p style={{ fontSize: "1.3em" }}>Find and replace</p>
         <TextField

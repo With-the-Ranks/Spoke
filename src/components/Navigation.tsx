@@ -51,9 +51,7 @@ const useStyles = makeStyles((theme) => ({
   logoText: {
     fontWeight: 700,
     fontSize: 20,
-    color: theme.palette.primary.main,
-    whiteSpace: "nowrap",
-    overflow: "hidden"
+    color: theme.palette.primary.main
   },
   toggleBtn: {
     padding: 6,
