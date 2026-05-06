@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.1.0](https://github.com/With-the-Ranks/spoke/compare/v10.0.1...v10.1.0) (2026-05-06)
+
+
+### Features
+
+* hide due date in campaigns list ([#166](https://github.com/With-the-Ranks/spoke/issues/166)) ([d5d661a](https://github.com/With-the-Ranks/spoke/commit/d5d661a831a946c4a06cc8f8fc6f1b4ee69c466b))
+
+
+### Bug Fixes
+
+* **v10 ui:** tweaks from prod feedback ([#162](https://github.com/With-the-Ranks/spoke/issues/162)) ([68588af](https://github.com/With-the-Ranks/spoke/commit/68588afbd6352653ee89c3fc5c3de044e066b5cd))
+* avoid mutating frozen Apollo cache array in TexterTodoList ([#160](https://github.com/With-the-Ranks/spoke/issues/160)) ([265ed77](https://github.com/With-the-Ranks/spoke/commit/265ed773de034d2d6f594103c347a9cf49431945))
+* clear campaign teams when teamIds is empty array ([#161](https://github.com/With-the-Ranks/spoke/issues/161)) ([e4ecb05](https://github.com/With-the-Ranks/spoke/commit/e4ecb050f0ef2ba3c5f76b626151b375f93d5700))
+
+
+### Backend Changes
+
+* update code style for components using textarea dom queries ([#165](https://github.com/With-the-Ranks/spoke/issues/165)) ([0716ef3](https://github.com/With-the-Ranks/spoke/commit/0716ef378a9e25f3241aa9aa0aa2252924fa42ca))
+
 ### [10.0.1](https://github.com/With-the-Ranks/spoke/compare/v10.0.0...v10.0.1) (2026-05-05)
 
 
