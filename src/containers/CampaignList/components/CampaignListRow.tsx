@@ -12,7 +12,6 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 
 import { dataTest } from "../../../lib/attributes";
-import { DateTime } from "../../../lib/datetime";
 import type { CampaignOperationsProps } from "../utils";
 import CampaignListMenu from "./CampaignListMenu";
 
@@ -72,16 +71,8 @@ export const CampaignListRow: React.FC<Props> = (props) => {
       color: theme.palette.success.dark
     };
   }
-  const dueBy = DateTime.fromISO(campaign.dueBy || "");
   const creatorName = campaign.creator ? campaign.creator.displayName : null;
   let tags = [];
-  if (DateTime.local() >= dueBy) {
-    tags.push({
-      title: "Overdue",
-      color: theme.palette.grey[900],
-      backgroundColor: theme.palette.error.main
-    });
-  }
 
   if (externalSystem) {
     const title = `${externalSystem.type}: ${externalSystem.name}`;
@@ -124,7 +115,6 @@ export const CampaignListRow: React.FC<Props> = (props) => {
           label={tag.title}
           className={styles.chip}
           style={{
-            color: tag.color,
             backgroundColor: tag.backgroundColor
           }}
         />
@@ -139,7 +129,6 @@ export const CampaignListRow: React.FC<Props> = (props) => {
         {campaign.description}
         {creatorName ? <span> &mdash; Created by {creatorName}</span> : null}
         <br />
-        {dueBy.isValid ? dueBy.toFormat("DD") : "No due date set"}
       </span>
     </span>
   );
