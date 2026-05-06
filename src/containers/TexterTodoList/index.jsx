@@ -49,6 +49,7 @@ class TexterTodoList extends React.Component {
   renderTodoList(assignments) {
     const { organizationId } = this.props.match.params;
     return assignments
+      .slice()
       .sort()
       .map((assignment) => {
         if (
