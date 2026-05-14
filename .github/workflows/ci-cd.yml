@@ -4,14 +4,14 @@ on:
   push:
 
 env:
-  GCP_REGION: us-west1
-  GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
-  GKE_CLUSTER: spoke-cluster
-  GKE_LOCATION: us-west1-a
-  STAGING_NAMESPACE: spoke-staging
-  STAGING_DEPLOYMENT: main-spoke
-  WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
-  WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  GAR_REGISTRY: ${{ vars.GAR_REGISTRY }}
+  GKE_CLUSTER: ${{ vars.GKE_CLUSTER }}
+  GKE_LOCATION: ${{ vars.GKE_LOCATION }}
+  STAGING_NAMESPACE: ${{ vars.STAGING_NAMESPACE }}
+  STAGING_DEPLOYMENT: ${{ vars.STAGING_DEPLOYMENT }}
+  WIF_PROVIDER: ${{ vars.WIF_PROVIDER }}
+  WIF_SERVICE_ACCOUNT: ${{ vars.WIF_SERVICE_ACCOUNT }}
 
 jobs:
   hadolint:
