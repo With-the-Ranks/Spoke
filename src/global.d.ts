@@ -15,6 +15,11 @@ interface Window {
   BASE_URL: string;
   ENABLE_TROLLBOT: boolean;
 
+  /** When set with CHATWOOT_BASE_URL, loads the Chatwoot support widget. */
+  CHATWOOT_WEBSITE_TOKEN?: string;
+  /** Chatwoot installation URL, e.g. https://app.chatwoot.com */
+  CHATWOOT_BASE_URL?: string;
+
   AuthService: any;
 }
 

@@ -47,6 +47,33 @@ const externalLinks = config.NO_EXTERNAL_LINKS
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.auth0.com/js/lock/11.0.1/lock.min.js"></script>`;
 
+const chatwootBase = config.CHATWOOT_BASE_URL
+  ? String(config.CHATWOOT_BASE_URL).replace(/\/$/, "")
+  : "";
+const chatwootScript =
+  config.CHATWOOT_WEBSITE_TOKEN && chatwootBase
+    ? `
+    <script>
+      (function (d, t) {
+        var BASE_URL = ${JSON.stringify(chatwootBase)};
+        var TOKEN = ${JSON.stringify(config.CHATWOOT_WEBSITE_TOKEN)};
+        window.chatwootSettings = { hideMessageBubble: false };
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = BASE_URL + "/packs/js/sdk.js";
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+        g.onload = function () {
+          window.chatwootSDK.run({
+            websiteToken: TOKEN,
+            baseUrl: BASE_URL
+          });
+        };
+      })(document, "script");
+    </script>
+  `
+    : "";
+
 const rollbarScript = config.ROLLBAR_ACCESS_TOKEN
   ? `
     <script>
@@ -99,6 +126,7 @@ const indexHtml = `
       ${windowVars.join("      \n")}
     </script>
     ${rollbarScript}
+    ${chatwootScript}
   </head>
   <body>
     <div id="mount"></div>

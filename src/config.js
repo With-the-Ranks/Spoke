@@ -186,6 +186,18 @@ const validators = {
     desc: "The key prefix to use for memoredis memoization (memoredis)",
     default: undefined
   }),
+  CHATWOOT_BASE_URL: url({
+    desc: "Base URL of your Chatwoot installation for the website widget.",
+    example: "https://app.chatwoot.com",
+    default: undefined,
+    isClient: true
+  }),
+  CHATWOOT_WEBSITE_TOKEN: str({
+    desc:
+      "Website inbox token from Chatwoot Settings → Inboxes → Website channel.",
+    default: undefined,
+    isClient: true
+  }),
   CAMPAIGN_ID: num({
     desc:
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
