@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
     "align-items": "center",
     flexDirection: "column",
     height: "100vh",
-    "padding-top": "10vh",
     background: theme.colors.veryLightGray
   },
   button: {
