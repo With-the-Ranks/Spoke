@@ -13,6 +13,7 @@ import requestLogging from "../lib/request-logging";
 import logger from "../logger";
 import { fulfillPendingRequestFor } from "./api/assignment";
 import pgPool from "./db";
+import { httpRequestDuration, httpRequestsTotal, registry } from "./metrics";
 import appRenderer from "./middleware/app-renderer";
 import { userLoggedIn } from "./models/cacheable_queries";
 import {
@@ -36,6 +37,34 @@ const {
 
 export const createApp = async () => {
   const app = express();
+
+  // Prometheus metrics endpoint — must be before the HTTP instrumentation
+  // middleware so the /metrics route itself isn't double-counted
+  if (config.METRICS_ENABLED) {
+    app.get("/metrics", async (_req, res) => {
+      res.set("Content-Type", registry.contentType);
+      res.end(await registry.metrics());
+    });
+  }
+
+  // Instrument every request: record duration and total count by method/route/status
+  app.use((req, res, next) => {
+    const startNs = process.hrtime.bigint();
+    res.on("finish", () => {
+      const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
+      // req.route.path gives the matched route pattern (e.g. "/graphql"),
+      // avoiding high-cardinality labels from path params like IDs
+      const route = (req.route?.path as string | undefined) ?? "unmatched";
+      const labels = {
+        method: req.method,
+        route,
+        status_code: String(res.statusCode)
+      };
+      httpRequestDuration.observe(labels, durationSeconds);
+      httpRequestsTotal.inc(labels);
+    });
+    next();
+  });
 
   if (config.LOG_LEVEL === "verbose" || config.LOG_LEVEL === "debug") {
     app.use(requestLogging);

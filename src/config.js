@@ -182,6 +182,11 @@ const validators = {
     desc: "This enables caching using simple memoization (memoredis)",
     default: undefined
   }),
+  CLIENT_LABEL: str({
+    desc:
+      "Label identifying this Spoke instance (e.g. 'fobs'). Attached to all Prometheus metrics as a 'client' label to support per-instance filtering in Grafana.",
+    default: "default"
+  }),
   CACHING_PREFIX: str({
     desc: "The key prefix to use for memoredis memoization (memoredis)",
     default: undefined
@@ -462,6 +467,10 @@ const validators = {
       "The maximum size for a message that a texter can send. When you send a SMS message over 160 characters the message will be split, so you might want to set this as 160 or less if you have a high SMS-only target demographic.",
     default: 99999,
     isClient: true
+  }),
+  METRICS_ENABLED: bool({
+    desc: "Whether to expose the /metrics endpoint for Prometheus scraping.",
+    default: true
   }),
   MODE: str({
     desc: "Server mode",

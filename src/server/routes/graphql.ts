@@ -4,7 +4,10 @@ import { addMocksToSchema } from "@graphql-tools/mock";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloError, ApolloServer } from "apollo-server-express";
+import type { ApolloServerPlugin } from "apollo-server-plugin-base";
 import express from "express";
+import type { OperationDefinitionNode } from "graphql";
+import { Kind } from "graphql";
 import { graphqlUploadExpress } from "graphql-upload";
 
 import { schema } from "../../../libs/gql-schema/schema";
@@ -13,6 +16,42 @@ import logger from "../../logger";
 import mocks from "../api/mocks";
 import { resolvers } from "../api/schema";
 import { contextForRequest } from "../contexts";
+import { graphqlErrorsTotal, graphqlRequestDuration } from "../metrics";
+
+const metricsPlugin: ApolloServerPlugin = {
+  requestDidStart: async () => {
+    const startNs = process.hrtime.bigint();
+    let operationType = "unknown";
+
+    return {
+      executionDidStart: async ({ document }) => {
+        const opDef = document.definitions.find(
+          (d): d is OperationDefinitionNode =>
+            d.kind === Kind.OPERATION_DEFINITION
+        );
+        operationType = opDef?.operation ?? "unknown";
+      },
+      willSendResponse: async ({ request }) => {
+        const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
+        graphqlRequestDuration.observe(
+          {
+            operation_name: request.operationName ?? "anonymous",
+            operation_type: operationType
+          },
+          durationSeconds
+        );
+      },
+      didEncounterErrors: async ({ request, errors }) => {
+        for (const error of errors) {
+          graphqlErrorsTotal.inc({
+            operation_name: request.operationName ?? "anonymous",
+            error_type: String(error.extensions?.code ?? "UNKNOWN")
+          });
+        }
+      }
+    };
+  }
+};
 
 export const createRouter = async () => {
   const router = express();
@@ -58,8 +97,8 @@ export const createRouter = async () => {
   const protection = armor.protect();
 
   const plugins = config.isProduction
-    ? []
-    : [ApolloServerPluginLandingPageGraphQLPlayground()];
+    ? [metricsPlugin]
+    : [ApolloServerPluginLandingPageGraphQLPlayground(), metricsPlugin];
 
   const server = new ApolloServer({
     schema: schemaWithMocks,
