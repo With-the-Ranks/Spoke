@@ -6,13 +6,15 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import type {
+  Campaign,
+  CampaignContact,
+  InteractionStep
+} from "@spoke/spoke-codegen";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import React, { useEffect, useState } from "react";
 
-import type { Campaign } from "../../../../../api/campaign";
-import type { CampaignContact } from "../../../../../api/campaign-contact";
-import type { InteractionStep } from "../../../../../api/interaction-step";
 import LoadingIndicator from "../../../../../components/LoadingIndicator";
 import type { MutationMap, QueryMap } from "../../../../../network/types";
 import {
@@ -57,36 +59,42 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
 
   useEffect(() => {
     const { interactionSteps } = props.campaign;
-    const newQuestionResponses = interactionSteps.reduce<QuestionResponseMap>(
+    const newQuestionResponses = interactionSteps?.reduce<QuestionResponseMap>(
       (collector, iStep) => {
-        return iStep.questionResponse
-          ? { ...collector, [iStep.id]: iStep.questionResponse.value }
-          : collector;
+        if (!iStep) return collector;
+        const value = iStep.questionResponse?.value;
+        return value ? { ...collector, [iStep.id]: value } : collector;
       },
       {}
     );
-    setQuestionResponses(newQuestionResponses);
+    setQuestionResponses(newQuestionResponses ?? {});
   }, [props.campaign.interactionSteps]);
 
   const getResponsesFrom = (startingStepId: string) => {
     const { interactionSteps } = props.campaign;
-
     const iSteps: (InteractionStep & { children: InteractionStep[] })[] = [];
+
     let currentStep: InteractionStep | null =
-      interactionSteps.find(
-        (iStep) => iStep.questionText && iStep.id === startingStepId
+      interactionSteps?.find(
+        (iStep) => iStep?.questionText && iStep.id === startingStepId
       ) ?? null;
+
     while (currentStep) {
       const currentStepId = currentStep.id;
-      const children = interactionSteps.filter(
-        (iStep) => iStep.parentInteractionId === currentStepId
-      );
+
+      const children = (
+        interactionSteps?.filter(
+          (iStep) => iStep?.parentInteractionId === currentStepId
+        ) ?? []
+      ).filter((iStep): iStep is InteractionStep => iStep !== null);
+
       iSteps.push({ ...currentStep, children });
       const value = questionResponses[currentStep.id];
+
       currentStep = value
         ? // Only show actionable questions
-          children.find(
-            (iStep) => iStep.questionText && iStep.answerOption === value
+          children?.find(
+            (iStep) => iStep?.questionText && iStep.answerOption === value
           ) ?? null
         : null;
     }
@@ -143,7 +151,8 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
           });
         }
       } catch (error) {
-        setRequestError(formatErrorMessage(error.message));
+        const message = error instanceof Error ? error.message : String(error);
+        setRequestError(formatErrorMessage(message));
         setQuestionResponses(initialQuestionResponses);
       } finally {
         setIsMakingRequest(false);
@@ -157,8 +166,8 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
 
   const { interactionSteps } = props.campaign;
 
-  const startingStep = interactionSteps.find(
-    (iStep) => iStep.parentInteractionId === null
+  const startingStep = interactionSteps?.find(
+    (iStep) => iStep?.parentInteractionId === null
   );
 
   // There may not be an interaction step, or it may not define a question
