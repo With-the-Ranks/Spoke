@@ -46,11 +46,13 @@ export interface ManageSurveyResponsesProps {
   campaign: Pick<Campaign, "interactionSteps">;
   contact: CampaignContact;
   mutations: Mutations;
+  onScriptSelected?: (script: string) => void;
 }
 
 export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
   props
 ) => {
+  const { onScriptSelected } = props;
   const [isMakingRequest, setIsMakingRequest] = useState(false);
   const [requestError, setRequestError] = useState("");
   const [questionResponses, setQuestionResponses] = useState<
@@ -141,14 +143,24 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
             interactionStepId: iStepId,
             value
           };
+
           const response = await updateQuestionResponses([input], contact.id);
           if (response.errors) throw response.errors;
+
           updatedQuestionResponses =
             updatedQuestionResponses ?? questionResponses;
           setQuestionResponses({
             ...updatedQuestionResponses,
             [iStepId]: value
           });
+
+          if (onScriptSelected) {
+            const matchingChild = affectedSteps[0]?.children.find(
+              (c: any) => c.answerOption === value
+            );
+            const script = (matchingChild as any)?.scriptOptions?.[0];
+            if (script) onScriptSelected(script);
+          }
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -222,13 +234,14 @@ export interface WrapperProps {
   campaign: Campaign;
   contact: CampaignContact;
   mutations: Mutations;
+  onScriptSelected?: (script: string) => void;
   surveyQuestions: {
     campaign: Pick<Campaign, "id" | "interactionSteps">;
   } & ApolloQueryResult<unknown>;
 }
 
 const ManageSurveyResponsesWrapper: React.FC<WrapperProps> = (props) => {
-  const { surveyQuestions, mutations, contact } = props;
+  const { surveyQuestions, mutations, contact, onScriptSelected } = props;
   return (
     <div>
       <h2>Survey Responses</h2>
@@ -241,6 +254,7 @@ const ManageSurveyResponsesWrapper: React.FC<WrapperProps> = (props) => {
           campaign={surveyQuestions.campaign}
           contact={contact}
           mutations={mutations}
+          onScriptSelected={onScriptSelected}
         />
       )}
     </div>
@@ -260,6 +274,7 @@ const queries: QueryMap<WrapperProps> = {
             parentInteractionId
             isDeleted
             answerActions
+            scriptOptions
 
             questionResponse(campaignContactId: $contactId) {
               id
