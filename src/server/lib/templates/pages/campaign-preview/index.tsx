@@ -115,8 +115,10 @@ const InteractionStep: React.FC<InteractionStepProps> = ({
       )}
       {childSteps && (
         <>
-          <i className="bi bi-chevron-down" />
-          <i className="bi bi-chevron-up" />
+          <span className="chevron-toggle">
+            <i className="bi bi-chevron-down" />
+            <i className="bi bi-chevron-up" />
+          </span>
           <ul>
             {childSteps.map((childStep) => (
               <InteractionStep
@@ -247,17 +249,24 @@ export const renderCampaignPreview = (
           li.collapsed ul {
             display: none;
           }
-          li.interaction-step > i.bi-chevron-down {
+          .chevron-toggle {
+            cursor: pointer;
+            display: inline-block;
+          }
+          .chevron-toggle > i.bi-chevron-down {
             display: none;
           }
-          li.collapsed > i.bi-chevron-up {
+          li.collapsed > .chevron-toggle > i.bi-chevron-up {
             display: none;
           }
-          li.collapsed > i.bi-chevron-down {
+          li.collapsed > .chevron-toggle > i.bi-chevron-down {
             display: inline !important;
           }
-          .no-children i.bi {
+          .no-children .chevron-toggle {
             display: none !important;
+          }
+          .interaction-step > p {
+            pointer-events: none;
           }
           .script {
             font-style: italic;
@@ -269,10 +278,10 @@ export const renderCampaignPreview = (
       <body>
         ${campaignPreviewHtml}
       <script>
-        $(".interaction-step.with-children").on('click', function(event){
+        $(".interaction-step.with-children > .chevron-toggle").on('click', function(event){
           event.stopPropagation();
           event.stopImmediatePropagation();
-          $(this).toggleClass("collapsed");
+          $(this).closest(".interaction-step").toggleClass("collapsed");
         });
       </script>
       </body>
