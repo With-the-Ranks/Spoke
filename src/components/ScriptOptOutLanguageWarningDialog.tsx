@@ -44,7 +44,7 @@ const ScriptOptOutLanguageWarningDialog = ({
           recommend a phrase with the individual word STOP, such as "Reply STOP
           to quit" Please see our{" "}
           <a
-            href="https://docs.spokerewired.com/article/168-spoke-101-tips-for-a-successful-mass-text"
+            href="https://withtheranks.com/docs/spoke/for-spoke-admins/spoke-101-tips-for-a-successful-mass-text/"
             target="_blank"
             rel="noopener noreferrer"
           >

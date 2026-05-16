@@ -47,12 +47,6 @@
     "nullable": true,
     "defaultValue": null
   },
-  "use_dynamic_assignment": {
-    "type": "boolean",
-    "maxLength": null,
-    "nullable": true,
-    "defaultValue": null
-  },
   "logo_image_url": {
     "type": "text",
     "maxLength": null,

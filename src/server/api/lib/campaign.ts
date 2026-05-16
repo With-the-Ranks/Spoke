@@ -8,7 +8,6 @@ import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import isNil from "lodash/isNil";
 import type { QueryResult } from "pg";
-import MemoizeHelper, { Buckets, cacheOpts } from "src/server/memoredis";
 
 import type { RelayPaginatedResponse } from "../../../api/pagination";
 import { config } from "../../../config";
@@ -20,6 +19,7 @@ import {
   uploadContacts
 } from "../../../workers/jobs";
 import type { SpokeDbContext } from "../../contexts/types";
+import MemoizeHelper, { Buckets, cacheOpts } from "../../memoredis";
 import { cacheableData, datawarehouse, r } from "../../models";
 import { addAssignTexters } from "../../tasks/assign-texters";
 import { accessRequired } from "../errors";
@@ -425,7 +425,6 @@ export const editCampaign = async (
     title,
     description,
     dueBy,
-    useDynamicAssignment: _useDynamicAssignment,
     logoImageUrl,
     introHtml,
     primaryColor,
@@ -446,8 +445,6 @@ export const editCampaign = async (
     description: description ?? undefined,
     due_by: dueBy,
     organization_id: organizationId,
-    // TODO: re-enable once dynamic assignment is fixed (#548)
-    // use_dynamic_assignment: useDynamicAssignment,
     logo_image_url: logoImageUrl,
     primary_color: primaryColor,
     intro_html: introHtml,
@@ -493,17 +490,20 @@ export const editCampaign = async (
     });
     campaign.contacts = processedContacts.contacts;
     validationStats = processedContacts.validationStats;
+    const contactsFile = await campaign.contactsFile;
+    const contactsFilename = contactsFile?.filename;
 
     await r.knex.raw(
       `
         ? ON CONFLICT (campaign_id)
-        DO UPDATE SET column_mapping = EXCLUDED.column_mapping, updated_at = CURRENT_TIMESTAMP 
+        DO UPDATE SET column_mapping = EXCLUDED.column_mapping, contacts_filename = EXCLUDED.contacts_filename, updated_at = CURRENT_TIMESTAMP 
         RETURNING *;
       `,
       [
         r.knex("campaign_contact_upload").insert({
           campaign_id: id,
-          column_mapping: JSON.stringify(columnMapping)
+          column_mapping: JSON.stringify(columnMapping),
+          contacts_filename: contactsFilename || null
         })
       ]
     );
@@ -547,7 +547,9 @@ export const editCampaign = async (
       filterOutLandlines: campaign.filterOutLandlines,
       validationStats
     };
-    const compressedString = await gzip(JSON.stringify(jobPayload));
+    const compressedString: Buffer = (await gzip(
+      JSON.stringify(jobPayload)
+    )) as Buffer;
     const [job] = await r
       .knex("job_request")
       .insert({
@@ -603,11 +605,13 @@ export const editCampaign = async (
       .where({ id });
   }
   if (Object.prototype.hasOwnProperty.call(campaign, "teamIds")) {
+    const { teamIds } = campaign;
     await r.knex.transaction(async (trx) => {
       // Remove all existing team memberships and then add everything again
       await trx("campaign_team").where({ campaign_id: id }).del();
+      if (!teamIds || teamIds.length < 1) return;
       await trx("campaign_team").insert(
-        campaign.teamIds.map((team_id) => ({
+        teamIds.map((team_id) => ({
           team_id,
           campaign_id: id
         }))
@@ -756,7 +760,7 @@ export const editCampaign = async (
     await unstartIfNecessary();
 
     // Ignore the mocked `id` automatically created on the input by GraphQL
-    const convertedResponses = campaign.cannedResponses.map(
+    const convertedResponses = campaign.cannedResponses?.map(
       ({
         id: _cannedResponseId,
         displayOrder,

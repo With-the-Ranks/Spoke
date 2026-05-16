@@ -16,11 +16,7 @@ export const resolvers = {
     serviceType: (service: MessagingServiceRecord) =>
       service.service_type === MessagingServiceType.AssembleNumbers
         ? GraphQLMessagingServiceType.ASSEMBLE_NUMBERS
-        : GraphQLMessagingServiceType.TWILIO,
-    tcrBrandRegistrationLink: (service: MessagingServiceRecord) =>
-      service.service_type === MessagingServiceType.AssembleNumbers
-        ? `https://portal.spokerewired.com/10dlc-registration/${service.messaging_service_sid}`
-        : null
+        : GraphQLMessagingServiceType.TWILIO
   }
 };
 

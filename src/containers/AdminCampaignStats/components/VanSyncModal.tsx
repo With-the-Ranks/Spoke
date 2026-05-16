@@ -165,7 +165,7 @@ class VanSyncModal extends React.Component<InnerProps, State> {
             This will sync question responses and tags to VAN. For more
             information see{" "}
             <a
-              href="https://docs.spokerewired.com/article/93-van-list-loading"
+              href="https://withtheranks.com/docs/spoke/for-spoke-admins/van-list-loading"
               target="_blank"
               rel="noopener noreferrer"
             >

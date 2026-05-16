@@ -1,5 +1,4 @@
 import { ForbiddenError, UserInputError } from "apollo-server-errors";
-import camelCaseKeys from "camelcase-keys";
 import { GraphQLError } from "graphql/error";
 import _ from "lodash";
 import groupBy from "lodash/groupBy";
@@ -13,7 +12,6 @@ import { CampaignExportType, TextRequestType } from "../../api/types";
 import { config } from "../../config";
 import { parseIanaZone } from "../../lib/datetime";
 import { hasRole } from "../../lib/permissions";
-import { applyScript } from "../../lib/scripts";
 import { replaceAll } from "../../lib/utils";
 import logger from "../../logger";
 import type { SpokeRequestContext } from "../contexts/types";
@@ -30,14 +28,14 @@ import MemoizeHelper, { cacheOpts } from "../memoredis";
 import { cacheableData, r } from "../models";
 import { getUserById } from "../models/cacheable_queries";
 import { Notifications, sendUserNotification } from "../notifications";
-import { addExportCampaign } from "../tasks/export-campaign";
+import { addExportCampaign } from "../tasks/chunk-tasks/export-campaign";
+import { addMarkSecondPass } from "../tasks/chunk-tasks/mark-second-pass";
 import { addExportForVan } from "../tasks/export-for-van";
 import { TASK_IDENTIFIER as exportOptOutsIdentifier } from "../tasks/export-opt-outs";
 import { addFilterLandlines } from "../tasks/filter-landlines";
 import { QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER } from "../tasks/queue-autosend-initials";
 import { getWorker } from "../worker";
 import { giveUserMoreTexts, myCurrentAssignmentTarget } from "./assignment";
-import { resolvers as campaignContactResolvers } from "./campaign-contact";
 import { queryCampaignOverlapCount } from "./campaign-overlap";
 import {
   getCampaignIdMessageIdsAndCampaignIdContactIdsMapsChunked,
@@ -63,6 +61,7 @@ import {
   markAutosendingPaused,
   unqueueAutosending
 } from "./lib/campaign";
+import { getSecondPassCampaign } from "./lib/mark-second-pass";
 import { saveNewIncomingMessage } from "./lib/message-sending";
 import { processNumbers } from "./lib/opt-out";
 import { sendMessage } from "./lib/send-message";
@@ -76,12 +75,12 @@ import { ActionType, DeactivateMode } from "./types";
 
 const uuidv4 = require("uuid").v4;
 
-async function updateQuestionResponses(
+const updateQuestionResponses = async (
   trx,
   campaignContactId,
   questionResponses,
   loaders
-) {
+) => {
   // TODO: wrap in transaction
   // TODO - batch insert / delete
   const count = questionResponses.length;
@@ -110,15 +109,15 @@ async function updateQuestionResponses(
 
   const contact = loaders.campaignContact.load(campaignContactId);
   return contact;
-}
+};
 
-async function deleteQuestionResponses(
+const deleteQuestionResponses = async (
   trx,
   campaignContactId,
   interactionStepIds,
   loaders,
   user
-) {
+) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
   try {
     await assignmentRequired(user, contact.assignment_id);
@@ -147,9 +146,9 @@ async function deleteQuestionResponses(
   );
 
   return contact;
-}
+};
 
-async function createOptOut(trx, campaignContactId, optOut, loaders, user) {
+const createOptOut = async (trx, campaignContactId, optOut, loaders, user) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
   let organizationId = contact.organization_id;
   if (!organizationId) {
@@ -211,15 +210,15 @@ async function createOptOut(trx, campaignContactId, optOut, loaders, user) {
     campaignContact,
     optOutId
   };
-}
+};
 
-async function editCampaignContactMessageStatus(
+const editCampaignContactMessageStatus = async (
   trx,
   campaignContactId,
   messageStatus,
   loaders,
   user
-) {
+) => {
   const contact = await loaders.campaignContact.load(campaignContactId);
 
   await assignmentRequiredOrHasOrgRoleForCampaign(
@@ -235,7 +234,7 @@ async function editCampaignContactMessageStatus(
     .returning("*");
 
   return campaign;
-}
+};
 
 const rootMutations = {
   RootMutation: {
@@ -296,7 +295,13 @@ const rootMutations = {
     },
 
     exportCampaign: async (_root, { options }, { user, loaders }) => {
-      const { campaignId, exportType, vanOptions, spokeOptions } = options;
+      const {
+        campaignId,
+        campaignTitle,
+        exportType,
+        vanOptions,
+        spokeOptions
+      } = options;
 
       if (exportType === CampaignExportType.VAN && !vanOptions) {
         throw new Error("Input must include vanOptions when exporting as VAN!");
@@ -313,6 +318,7 @@ const rootMutations = {
       if (exportType === CampaignExportType.SPOKE) {
         return addExportCampaign({
           campaignId,
+          campaignTitle,
           requesterId: user.id,
           spokeOptions
         });
@@ -649,48 +655,6 @@ const rootMutations = {
       });
 
       return organization;
-    },
-
-    assignUserToCampaign: async (
-      _root,
-      { organizationUuid, campaignId },
-      { user }
-    ) => {
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      throw new Error("Invalid join request");
-      // eslint-disable-next-line no-unreachable
-      const campaign = await r
-        .knex("campaign")
-        .join("organization", "campaign.organization_id", "organization.id")
-        .where({
-          "campaign.id": parseInt(campaignId, 10),
-          "campaign.use_dynamic_assignment": true,
-          "organization.uuid": organizationUuid
-        })
-        .select("campaign.*")
-        .first();
-      if (!campaign) {
-        throw new Error("Invalid join request");
-      }
-      const assignment = await r
-        .knex("assignment")
-        .where({
-          user_id: user.id,
-          campaign_id: campaign.id
-        })
-        .first();
-      if (!assignment) {
-        const [newAssignment] = await r
-          .knex("assignment")
-          .insert({
-            user_id: user.id,
-            campaign_id: campaign.id,
-            max_contacts: config.MAX_CONTACTS_PER_TEXTER
-          })
-          .returning("*");
-        eventBus.emit(EventType.AssignmentCreated, newAssignment);
-      }
-      return campaign;
     },
 
     updateDefaultTextingTimezone: async (
@@ -1449,83 +1413,6 @@ const rootMutations = {
       return contactIds.map((cid) => contactsById[cid]);
     },
 
-    findNewCampaignContact: async (
-      _root,
-      { assignmentId, numberContacts },
-      { user }
-    ) => {
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      throw new GraphQLError("Invalid assignment");
-      /* This attempts to find a new contact for the assignment, in the case that useDynamicAssigment == true */
-      // eslint-disable-next-line no-unreachable
-      const assignment = await r
-        .knex("assignment")
-        .where({ id: assignmentId })
-        .first();
-      if (assignment.user_id !== user.id) {
-        throw new GraphQLError("Invalid assignment");
-      }
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: assignment.campaign_id })
-        .first();
-      if (!campaign.use_dynamic_assignment || assignment.max_contacts === 0) {
-        return { found: false };
-      }
-
-      const contactsCount = await r.getCount(
-        r
-          .knex("campaign_contact")
-          .where({ assignment_id: assignmentId })
-          .whereRaw("archived = false") // partial index friendly
-      );
-
-      numberContacts = numberContacts || 1;
-      if (
-        assignment.max_contacts &&
-        contactsCount + numberContacts > assignment.max_contacts
-      ) {
-        numberContacts = assignment.max_contacts - contactsCount;
-      }
-      // Don't add more if they already have that many
-      const result = await r.getCount(
-        r
-          .knex("campaign_contact")
-          .where({
-            assignment_id: assignmentId,
-            message_status: "needsMessage",
-            is_opted_out: false
-          })
-          .whereRaw("archived = false") // partial index friendly
-      );
-
-      if (result >= numberContacts) {
-        return { found: false };
-      }
-
-      const updateResult = await r
-        .knex("campaign_contact")
-        .where(
-          "id",
-          "in",
-          r
-            .knex("campaign_contact")
-            .where({
-              assignment_id: null,
-              campaign_id: campaign.id
-            })
-            .whereRaw("archived = false") // partial index friendly
-            .limit(numberContacts)
-            .select("id")
-        )
-        .update({ assignment_id: assignmentId })
-        .catch(logger.error);
-
-      if (updateResult > 0) {
-        return { found: true };
-      }
-      return { found: false };
-    },
     tagConversation: async (_root, { campaignContactId, tag }, { user }) => {
       const campaignContact = await r
         .knex("campaign_contact")
@@ -1535,7 +1422,11 @@ const rootMutations = {
       try {
         await assignmentRequired(user, campaignContact.assignment_id);
       } catch (err) {
-        accessRequired(user, campaignContact.organization_id, "SUPERVOLUNTEER");
+        await accessRequired(
+          user,
+          campaignContact.organization_id,
+          "SUPERVOLUNTEER"
+        );
       }
 
       const { addedTagIds, removedTagIds } = tag;
@@ -1544,14 +1435,15 @@ const rootMutations = {
         tag_id: tagId,
         tagger_id: user.id
       }));
-      await Promise.all([
+
+      if (removedTagIds.length > 0)
         await r
           .knex("campaign_contact_tag")
           .where({ campaign_contact_id: parseInt(campaignContactId, 10) })
           .whereIn("tag_id", removedTagIds)
-          .del(),
-        await r.knex("campaign_contact_tag").insert(tagsToInsert)
-      ]);
+          .del();
+      if (tagsToInsert.length > 0)
+        await r.knex("campaign_contact_tag").insert(tagsToInsert);
 
       // See if any of the newly applied tags are is_assignable = false
       const newlyAssignedTagsThatShouldUnassign = await r
@@ -1683,81 +1575,6 @@ const rootMutations = {
       }));
     },
 
-    bulkSendMessages: async (_root, args, loaders) => {
-      if (!config.ALLOW_SEND_ALL || !config.NOT_IN_USA) {
-        logger.error("Not allowed to send all messages at once");
-        throw new GraphQLError("Not allowed to send all messages at once");
-      }
-
-      const assignmentId = parseInt(args.assignmentId, 10);
-
-      const assignment = await r
-        .knex("assignment")
-        .where({ id: assignmentId })
-        .first();
-      // Assign some contacts
-      await rootMutations.RootMutation.findNewCampaignContact(
-        _,
-        {
-          assignmentId,
-          numberContacts: Number(config.BULK_SEND_CHUNK_SIZE) - 1
-        },
-        loaders
-      );
-
-      const contacts = await r
-        .knex("campaign_contact")
-        .where({
-          message_status: "needsMessage",
-          assignment_id: assignmentId
-        })
-        .whereRaw("archived = false") // partial index friendly
-        .orderByRaw("updated_at")
-        .limit(config.BULK_SEND_CHUNK_SIZE);
-
-      const texter = camelCaseKeys(
-        await r.knex("user").where({ id: assignment.user_id }).first()
-      );
-      const customFields = Object.keys(JSON.parse(contacts[0].custom_fields));
-
-      const campaignVariables = await r
-        .knex("campaign_variable")
-        .where({ campaign_id: assignment.campaign_id });
-
-      await Promise.all(
-        contacts.map(async (contactRecord) => {
-          const script = await campaignContactResolvers.CampaignContact.currentInteractionStepScript(
-            contactRecord
-          );
-          const { external_id, ...restOfContact } = contactRecord;
-          const contact = {
-            ...camelCaseKeys(restOfContact),
-            external_id
-          };
-          const text = applyScript({
-            contact,
-            texter,
-            script,
-            customFields,
-            campaignVariables
-          });
-          const contactMessage = {
-            contactNumber: contactRecord.cell,
-            userId: assignment.user_id,
-            text,
-            assignmentId
-          };
-          await rootMutations.RootMutation.sendMessage(
-            _,
-            { message: contactMessage, campaignContactId: contactRecord.id },
-            loaders
-          );
-        })
-      );
-
-      return [];
-    },
-
     sendMessage: async (_root, { message, campaignContactId }, { user }) => {
       return sendMessage(r.knex, user, campaignContactId, message);
     },
@@ -1867,18 +1684,12 @@ const rootMutations = {
 
     markForSecondPass: async (
       _ignore,
-      { campaignId, input: { excludeAgeInHours, excludeNewer } },
+      { campaignId, campaignTitle, input: { excludeAgeInHours, excludeNewer } },
       { user }
     ) => {
       // verify permissions
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: parseInt(campaignId, 10) })
-        .first(["organization_id", "is_archived", "autosend_status"]);
-
-      const organizationId = campaign.organization_id;
-
-      await accessRequired(user, organizationId, "ADMIN", true);
+      const numCampaignId = parseInt(campaignId, 10);
+      const campaign = await getSecondPassCampaign(campaignId, user);
 
       if (!["complete", "unstarted"].includes(campaign.autosend_status)) {
         throw new Error(
@@ -1888,61 +1699,21 @@ const rootMutations = {
         );
       }
 
-      await r
-        .knex("campaign")
-        .update({ autosend_status: "unstarted" })
-        .where({ id: parseInt(campaignId, 10) });
+      const [{ count: contactsCount }] = await r
+        .knex("campaign_contact")
+        .where({ campaign_id: numCampaignId, message_status: "messaged" })
+        .count();
 
-      const queryArgs = [parseInt(campaignId, 10)];
-      if (excludeAgeInHours) {
-        queryArgs.push(parseFloat(excludeAgeInHours));
-      }
+      addMarkSecondPass({
+        organizationId: campaign.organization_id,
+        campaignId,
+        campaignTitle,
+        requesterId: user.id,
+        excludeAgeInHours,
+        excludeNewer
+      });
 
-      const excludeNewerSql = `
-          and not exists (
-            select
-              cell
-            from
-              campaign_contact as newer_contact
-            where
-              newer_contact.cell = current_contact.cell
-              and newer_contact.created_at > current_contact.created_at
-          )
-      `;
-
-      /**
-       * "Mark Campaign for Second Pass", will only mark contacts for a second
-       * pass that do not have a more recently created membership in another campaign.
-       * Using SQL injection to avoid passing archived as a binding
-       * Should help with guaranteeing partial index usage
-       */
-      const updateSql = `
-        update
-          campaign_contact as current_contact
-        set
-          message_status = 'needsMessage'
-        where current_contact.campaign_id = ?
-          and current_contact.message_status = 'messaged'
-          and current_contact.archived = ${campaign.is_archived}
-          ${excludeNewer ? excludeNewerSql : ""}
-          and not exists (
-            select 1
-            from message
-            where current_contact.id = message.campaign_contact_id
-              and is_from_contact = true
-          )
-          ${
-            excludeAgeInHours
-              ? "and current_contact.updated_at < now() - interval '?? hour'"
-              : ""
-          }
-        ;
-      `;
-
-      const updateResultRaw = await r.knex.raw(updateSql, queryArgs);
-      const updateResult = updateResultRaw.rowCount;
-
-      return `Marked ${updateResult} campaign contacts for a second pass.`;
+      return `Queuing ${contactsCount} campaign contacts for a second pass. You'll receive an email when the second pass is fully marked!`;
     },
 
     startAutosending: async (_ignore, { campaignId }, { loaders, user }) => {
@@ -2037,53 +1808,30 @@ const rootMutations = {
       return updatedCampaign;
     },
 
-    unMarkForSecondPass: async (_ignore, { campaignId }, { user }) => {
+    unMarkForSecondPass: async (
+      _ignore,
+      { campaignId, campaignTitle },
+      { user }
+    ) => {
       // verify permissions
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: parseInt(campaignId, 10) })
-        .first(["organization_id", "is_archived"]);
+      const numCampaignId = parseInt(campaignId, 10);
+      const campaign = await getSecondPassCampaign(numCampaignId, user);
 
-      const organizationId = campaign.organization_id;
+      // The precise count unmarked may be lower if some contacts never got a first message
+      const [{ count: contactsCount }] = await r
+        .knex("campaign_contact")
+        .where({ campaign_id: numCampaignId, message_status: "needsMessage" })
+        .count();
 
-      await accessRequired(user, organizationId, "ADMIN", true);
+      addMarkSecondPass({
+        unmark: true,
+        organizationId: campaign.organization_id,
+        campaignId,
+        campaignTitle,
+        requesterId: user.id
+      });
 
-      /**
-       * "Un-Mark Campaign for Second Pass", will only mark contacts as messaged
-       * if they are currently needsMessage and have been sent a message and have not replied
-       *
-       * Using SQL injection to avoid passing archived as a binding
-       * Should help with guaranteeing partial index usage
-       */
-      const updateResultRaw = await r.knex.raw(
-        `
-        update
-          campaign_contact
-        set
-          message_status = 'messaged'
-        where campaign_contact.campaign_id = ?
-          and campaign_contact.message_status = 'needsMessage'
-          and campaign_contact.archived = ${campaign.is_archived}
-          and exists (
-            select 1
-            from message
-            where message.campaign_contact_id = campaign_contact.id
-              and is_from_contact = false
-          ) 
-          and not exists (
-            select 1
-            from message
-            where message.campaign_contact_id = campaign_contact.id
-              and is_from_contact = true
-          )
-        ;
-      `,
-        [parseInt(campaignId, 10)]
-      );
-
-      const updateResult = updateResultRaw.rowCount;
-
-      return `Un-Marked ${updateResult} campaign contacts for a second pass.`;
+      return `Queuing ${contactsCount} campaign contacts to remove second pass marking. You'll receive an email when this is complete!`;
     },
 
     deleteNeedsMessage: async (_ignore, { campaignId }, { user }) => {
@@ -3509,8 +3257,8 @@ const rootMutations = {
                 ].join("\n\n");
 
                 await sendEmail({
-                  to: "support@spokerewired.com",
-                  subject: "Automated organization shutdown request",
+                  to: "support@withtheranks.com",
+                  subject: "Automated Spoke organization shutdown request",
                   text
                 });
               }

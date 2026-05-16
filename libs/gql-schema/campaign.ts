@@ -99,14 +99,13 @@ export const schema = `
     stats: CampaignStats,
     pendingJobs(jobTypes: [String]): [JobRequest]!
     datawarehouseAvailable: Boolean
-    useDynamicAssignment: Boolean
     introHtml: String
     primaryColor: String
     logoImageUrl: String
     editors: String
     teams: [Team!]!
     campaignGroups: CampaignGroupPage
-    campaignVariables: CampaignVariablePage!
+    campaignVariables: [CampaignVariable!]!
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean!
@@ -124,6 +123,8 @@ export const schema = `
     messagingServiceSid: String
     autosendLimit: Int
     columnMapping: [CsvColumnMapping!]
+    messagingService: MessagingService
+    contactsFilename: String
   }
 
   type CampaignEdge {
@@ -175,8 +176,7 @@ export const schema = `
     primaryColor: String
     introHtml: String
     externalSystemId: String
-    useDynamicAssignment: Boolean
-    contacts: [CampaignContactInput]
+    contacts: [CampaignContactInput!]
     contactsFile: Upload
     externalListId: String
     filterOutLandlines: Boolean
@@ -189,7 +189,7 @@ export const schema = `
     campaignVariables: [CampaignVariableInput!]
     texters: TexterInput
     interactionSteps: InteractionStepInput
-    cannedResponses: [CannedResponseInput]
+    cannedResponses: [CannedResponseInput!]
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean

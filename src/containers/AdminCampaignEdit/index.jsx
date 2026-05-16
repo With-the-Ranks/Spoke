@@ -17,7 +17,6 @@ import { CampaignBuilderMode } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
 import pick from "lodash/pick";
 import PropTypes from "prop-types";
-import queryString from "query-string";
 import React from "react";
 import { Helmet } from "react-helmet";
 import { compose } from "recompose";
@@ -61,9 +60,7 @@ import CampaignVariablesForm from "./sections/CampaignVariablesForm";
 class AdminCampaignEdit extends React.Component {
   constructor(props) {
     super(props);
-    const isNew = queryString.parse(props.location.search).new;
     this.state = {
-      expandedSection: isNew ? 0 : null,
       campaignFormValues: { ...props.campaignData.campaign },
       startingCampaign: false,
       isWorking: false,
@@ -85,7 +82,7 @@ class AdminCampaignEdit extends React.Component {
     // So campaignFormValues should always be the diffs between server and client form data
     let { expandedSection } = this.state;
     let expandedKeys = [];
-    if (expandedSection !== null) {
+    if (expandedSection != null) {
       expandedSection = this.sections()[expandedSection];
       expandedKeys = expandedSection.keys;
     }
@@ -144,10 +141,6 @@ class AdminCampaignEdit extends React.Component {
     return sectionState;
   }
 
-  isNew = () => {
-    return Boolean(queryString.parse(this.props.location.search).new);
-  };
-
   handleDeleteJob = async (jobId) => {
     if (
       // eslint-disable-next-line no-alert,no-restricted-globals
@@ -175,8 +168,7 @@ class AdminCampaignEdit extends React.Component {
     await this.handleSave();
     this.setState({
       expandedSection:
-        this.state.expandedSection >= this.sections().length - 1 ||
-        !this.isNew()
+        this.state.expandedSection >= this.sections().length - 1
           ? null
           : this.state.expandedSection + 1
     }); // currently throws an unmounted component error in the console
@@ -400,7 +392,8 @@ class AdminCampaignEdit extends React.Component {
           "contactsFile",
           "contactSql",
           "excludeCampaignIds",
-          "columnMapping"
+          "columnMapping",
+          "contactsFilename"
         ],
         checkCompleted: () => this.state.campaignFormValues.contactsCount > 0,
         checkSaved: () => {
@@ -506,15 +499,14 @@ class AdminCampaignEdit extends React.Component {
         content: CampaignTextersForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
-        keys: ["texters", "contactsCount", "useDynamicAssignment"],
+        keys: ["texters", "contactsCount"],
         checkCompleted: () =>
-          (this.state.campaignFormValues.texters.length > 0 &&
-            this.state.campaignFormValues.contactsCount ===
-              this.state.campaignFormValues.texters.reduce(
-                (left, right) => left + right.assignment.contactsCount,
-                0
-              )) ||
-          this.state.campaignFormValues.useDynamicAssignment === true,
+          this.state.campaignFormValues.texters.length > 0 &&
+          this.state.campaignFormValues.contactsCount ===
+            this.state.campaignFormValues.texters.reduce(
+              (left, right) => left + right.assignment.contactsCount,
+              0
+            ),
         blocksStarting: false,
         expandAfterCampaignStarts: true,
         expandableBySuperVolunteers: true
@@ -654,14 +646,8 @@ class AdminCampaignEdit extends React.Component {
   renderCampaignFormSection = (section, forceDisable) => {
     const { isWorking } = this.state;
     const shouldDisable =
-      isWorking ||
-      forceDisable ||
-      (!this.isNew() && this.checkSectionSaved(section));
-    const saveLabel = isWorking
-      ? "Working..."
-      : this.isNew()
-      ? "Save and goto next section"
-      : "Save";
+      isWorking || forceDisable || this.checkSectionSaved(section);
+    const saveLabel = isWorking ? "Working..." : "Save";
     const ContentComponent = section.content;
     const formValues = this.getSectionState(section);
     return (
@@ -801,14 +787,14 @@ class AdminCampaignEdit extends React.Component {
           }}
         >
           {isCompleted
-            ? "Your campaign is all good to go! >>>>>>>>>"
+            ? "Your campaign is all good to go!"
             : "You need to complete all the sections below before you can start this campaign"}
           {this.renderCurrentEditors()}
         </div>
-        <div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {this.props.campaignData.campaign.isArchived ? (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.unarchiveCampaign(
                   this.props.campaignData.campaign.id
@@ -819,7 +805,7 @@ class AdminCampaignEdit extends React.Component {
             </Button>
           ) : (
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() =>
                 this.props.mutations.archiveCampaign(
                   this.props.campaignData.campaign.id
@@ -859,8 +845,7 @@ class AdminCampaignEdit extends React.Component {
     const { expandedSection, requestError } = this.state;
     const { isAdmin, match } = this.props;
     const { campaignId } = match.params;
-    const isNew = this.isNew();
-    const saveLabel = isNew ? "Save and goto next section" : "Save";
+    const saveLabel = "Save";
 
     const errorActions = [
       <Button key="ok" color="primary" onClick={this.handleCloseError}>
@@ -885,7 +870,6 @@ class AdminCampaignEdit extends React.Component {
                 organizationId={match.params.organizationId}
                 campaignId={campaignId}
                 active={expandedSection === sectionIndex}
-                isNew={isNew}
                 saveLabel={saveLabel}
                 onError={this.handleSectionError}
                 onExpandChange={this.handleExpandChange(sectionIndex)}

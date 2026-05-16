@@ -43,7 +43,7 @@ const ExportCampaign: React.FC<ExportProps> = ({
         </p>
       )}
       <br />
-      -- The Spoke Rewired Team
+      -- The Spoke With the Ranks Team
     </div>
   );
 };

@@ -14,13 +14,21 @@ import React, { useState } from "react";
 interface CampaignExportModalProps {
   open: boolean;
   campaignId: string;
+  campaignTitle: string;
   onError(errorMessage: string): void;
   onClose(): void;
   onComplete(): void;
 }
 
 const CampaignExportModal: React.FC<CampaignExportModalProps> = (props) => {
-  const { campaignId, open, onClose, onComplete, onError } = props;
+  const {
+    campaignId,
+    campaignTitle,
+    open,
+    onClose,
+    onComplete,
+    onError
+  } = props;
   const [exportCampaign, setExportCampaign] = useState<boolean>(true);
   const [exportMessages, setExportMessages] = useState<boolean>(true);
   const [exportOptOut, setExportOptOut] = useState<boolean>(false);
@@ -39,6 +47,7 @@ const CampaignExportModal: React.FC<CampaignExportModalProps> = (props) => {
       variables: {
         options: {
           campaignId,
+          campaignTitle,
           exportType: CampaignExportType.Spoke,
           spokeOptions: {
             campaign: exportCampaign,

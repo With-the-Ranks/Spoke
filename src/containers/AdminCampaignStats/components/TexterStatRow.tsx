@@ -23,10 +23,14 @@ export const TexterStatRow: React.FC<TexterStatRowProps> = ({ assignment }) => {
   );
 
   return (
-    <div key={id}>
-      {texter.firstName} {texter.lastName}
-      <div>{percentComplete}%</div>
-      <LinearProgress variant="determinate" value={percentComplete} />
-    </div>
+    <tr key={id} style={{ borderBottom: "1px solid #F3F4F6" }}>
+      <td style={{ padding: "8px 12px", fontWeight: 600 }}>
+        {texter.firstName} {texter.lastName}
+      </td>
+      <td style={{ padding: "8px 12px", color: "#374151", minWidth: 200 }}>
+        <div style={{ marginBottom: 4 }}>{percentComplete}%</div>
+        <LinearProgress variant="determinate" value={percentComplete} />
+      </td>
+    </tr>
   );
 };

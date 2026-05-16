@@ -24,21 +24,15 @@ const CHUNK_SIZE = 1000;
 const BATCH_SIZE = Math.max(1, Math.floor(config.DB_MAX_POOL * 0.5));
 
 let warehouseConnection = null;
-function optOutsByOrgId(orgId) {
-  return r.knex.select("cell").from("opt_out").where("organization_id", orgId);
-}
+const optOutsByOrgId = (orgId) =>
+  r.knex.select("cell").from("opt_out").where("organization_id", orgId);
 
-function optOutsByInstance() {
-  return r.knex.select("cell").from("opt_out");
-}
+const optOutsByInstance = () => r.knex.select("cell").from("opt_out");
 
-function getOptOutSubQuery(orgId) {
-  return config.OPTOUTS_SHARE_ALL_ORGS
-    ? optOutsByInstance()
-    : optOutsByOrgId(orgId);
-}
+const getOptOutSubQuery = (orgId) =>
+  config.OPTOUTS_SHARE_ALL_ORGS ? optOutsByInstance() : optOutsByOrgId(orgId);
 
-export async function sendJobToAWSLambda(job) {
+export const sendJobToAWSLambda = async (job) => {
   // job needs to be json-serializable
   // requires a 'command' key which should map to a function in job-processes.js
   logger.info(
@@ -77,9 +71,9 @@ export async function sendJobToAWSLambda(job) {
     logger.info("LAMBDA INVOCATION RESULT", result);
   });
   return p;
-}
+};
 
-export async function processSqsMessages() {
+export const processSqsMessages = async () => {
   // hit endpoint on SQS
   // ask for a list of messages from SQS (with quantity tied to it)
   // if SQS has messages, process messages into pending_message_part and dequeue messages (mark them as handled)
@@ -139,9 +133,9 @@ export async function processSqsMessages() {
     });
   });
   return p;
-}
+};
 
-export async function uploadContacts(job) {
+export const uploadContacts = async (job) => {
   const campaignId = job.campaign_id;
   // We do this deletion in schema.js but we do it again here just in case the the queue broke and we had a backlog of
   // contact uploads for one campaign
@@ -329,7 +323,7 @@ export async function uploadContacts(job) {
   await notifyLargeCampaignEvent(campaignId, "upload");
 
   await cacheableData.campaign.reload(campaignId);
-}
+};
 
 export async function loadContactsFromDataWarehouseFragment(jobEvent) {
   const jobMessages = [];
@@ -556,7 +550,7 @@ export async function loadContactsFromDataWarehouseFragment(jobEvent) {
   }
 }
 
-export async function loadContactsFromDataWarehouse(job) {
+export const loadContactsFromDataWarehouse = async (job) => {
   logger.info("STARTING loadContactsFromDataWarehouse", job.payload);
   const jobMessages = [];
   const sqlQuery = job.payload;
@@ -645,7 +639,7 @@ export async function loadContactsFromDataWarehouse(job) {
     part: 0,
     limit: totalParts > 1 ? STEP : 0 // 0 is unlimited
   });
-}
+};
 
 export const deleteJob = async (jobId, retries = 0) => {
   try {
@@ -663,7 +657,7 @@ export const deleteJob = async (jobId, retries = 0) => {
 // not related to stale filter
 let pastMessages = [];
 
-export async function sendMessages(queryFunc, defaultStatus) {
+export const sendMessages = async (queryFunc, defaultStatus) => {
   try {
     await r.knex.transaction(async (trx) => {
       let messages = [];
@@ -714,9 +708,9 @@ export async function sendMessages(queryFunc, defaultStatus) {
   } catch (err) {
     logger.error("sendMessages transaction errored: ", err);
   }
-}
+};
 
-export async function handleIncomingMessageParts() {
+export const handleIncomingMessageParts = async () => {
   const messageParts = await r
     .reader("pending_message_part")
     .select("*")
@@ -830,12 +824,12 @@ export async function handleIncomingMessageParts() {
       .whereIn("id", messageIdsToDelete)
       .del();
   }
-}
+};
 
 // Temporary fix for orgless users
 // See https://github.com/MoveOnOrg/Spoke/issues/934
 // and job-processes.js
-export async function fixOrgless() {
+export const fixOrgless = async () => {
   if (config.FIX_ORGLESS) {
     const orgless = await r.knex
       .select("user.id")
@@ -857,9 +851,9 @@ export async function fixOrgless() {
       }
     }); // forEach
   } // if
-} // function
+}; // function
 
-export async function clearOldJobs(delay) {
+export const clearOldJobs = async (delay) => {
   // to clear out old stuck jobs
   const twoHoursAgo = new Date(new Date() - 1000 * 60 * 60 * 2);
   delay = delay || twoHoursAgo;
@@ -868,4 +862,4 @@ export async function clearOldJobs(delay) {
     .where({ assigned: true })
     .where("updated_at", "<", delay)
     .delete();
-}
+};

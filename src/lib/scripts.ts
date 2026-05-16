@@ -1,9 +1,15 @@
-import type { CampaignVariable } from "@spoke/spoke-codegen";
+import type {
+  CampaignContact,
+  CampaignVariable,
+  User
+} from "@spoke/spoke-codegen";
 import escapeRegExp from "lodash/escapeRegExp";
 import isNil from "lodash/isNil";
 
-import type { CampaignContact } from "../api/campaign-contact";
-import type { User } from "../api/user";
+import { getSpokeCharCount } from "./charset-utils";
+
+type ScriptCampaignContact = Partial<Omit<CampaignContact, "tags">>;
+type ScriptUser = Pick<User, "firstName" | "lastName">;
 
 export const delimiters = {
   startDelimiter: "{",
@@ -37,7 +43,7 @@ const TITLE_CASE_FIELDS = [
   "texterLastName"
 ];
 
-const mediaExtractor = /\[\s*(http[^\]\s]*)\s*\]/;
+export const mediaExtractor = /\[\s*(http[^\]\s]*)\s*\]/;
 
 // Special first names that should not be capitalized
 const LOWERCASE_FIRST_NAMES = ["friend", "there"];
@@ -54,8 +60,8 @@ export const titleCase = (str: string) =>
     .join(" ");
 
 const getScriptFieldValue = (
-  contact: CampaignContact,
-  texter: User,
+  contact: ScriptCampaignContact,
+  texter: ScriptUser,
   fieldName: string
 ) => {
   let result;
@@ -64,7 +70,7 @@ const getScriptFieldValue = (
   } else if (fieldName === "texterLastName") {
     result = texter.lastName;
   } else if (TOP_LEVEL_UPLOAD_FIELDS.indexOf(fieldName) !== -1) {
-    result = contact[fieldName as keyof CampaignContact];
+    result = contact[fieldName as keyof ScriptCampaignContact];
   } else {
     const customFieldNames = JSON.parse(contact.customFields);
     result = customFieldNames[fieldName];
@@ -81,12 +87,15 @@ const getScriptFieldValue = (
   return result;
 };
 
+export const customFieldsJsonStringToArray = (customFieldsJson: string) =>
+  customFieldsJson ? Object.keys(JSON.parse(customFieldsJson)) : [];
+
 interface ApplyScriptOptions {
   script: string;
-  contact: CampaignContact;
+  contact: ScriptCampaignContact;
   customFields: string[];
-  campaignVariables: { name: string; value: string }[];
-  texter: User;
+  campaignVariables: Pick<CampaignVariable, "name" | "value">[];
+  texter: ScriptUser;
 }
 
 export const applyScript = ({
@@ -107,17 +116,11 @@ export const applyScript = ({
     );
   }
 
-  for (const field of campaignVariables) {
-    const re = new RegExp(escapeRegExp(delimit(field.name)), "g");
-    appliedScript = appliedScript.replace(re, field.value);
-  }
-
-  for (const field of campaignVariables) {
-    const re = new RegExp(
-      escapeRegExp(delimit(field.name.replace("cv:", ""))),
-      "g"
-    );
-    appliedScript = appliedScript.replace(re, field.value);
+  for (const campaignVariable of campaignVariables) {
+    if (campaignVariable.value) {
+      const re = new RegExp(escapeRegExp(delimit(campaignVariable.name)), "g");
+      appliedScript = appliedScript.replace(re, campaignVariable.value);
+    }
   }
 
   return appliedScript;
@@ -131,8 +134,17 @@ export const getAttachmentLink = (text: string) => {
   return null;
 };
 
-export const getMessageType = (text: string) => {
-  return mediaExtractor.test(text) ? "MMS" : "SMS";
+export const getMessageType = (
+  text: string,
+  maxSmsSegmentLength: number | null
+) => {
+  const { msgCount } = getSpokeCharCount(text);
+  if (
+    mediaExtractor.test(text) ||
+    (maxSmsSegmentLength && msgCount > maxSmsSegmentLength)
+  )
+    return "MMS";
+  return "SMS";
 };
 
 export enum ScriptTokenType {

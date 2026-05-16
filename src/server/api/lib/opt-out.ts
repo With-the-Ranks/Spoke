@@ -1,6 +1,6 @@
 import type { Upload } from "graphql-upload";
-import { getFormattedPhoneNumber } from "src/lib/phone-format";
 
+import { getFormattedPhoneNumber } from "../../../lib/phone-format";
 import { processContactsFile } from "./edit-campaign";
 
 export const processNumbers = async (csvFile: Upload, numbersList: string) => {

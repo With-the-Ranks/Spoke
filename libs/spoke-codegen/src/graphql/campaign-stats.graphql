@@ -1,7 +1,6 @@
 query GetTexterStats($campaignId: String!, $contactsFilter: ContactsFilter!) {
   campaign(id: $campaignId) {
     id
-    useDynamicAssignment
     assignments {
       id
       texter {
@@ -21,12 +20,17 @@ query getCampaign($campaignId: String!) {
     title
     dueBy
     isArchived
-    useDynamicAssignment
+    isStarted
+    previewUrl
     pendingJobs {
       id
       jobType
       assigned
       status
+    }
+    messagingService {
+      name
+      id
     }
   }
 }
@@ -52,6 +56,11 @@ query getOrganizationData($organizationId: String!) {
         id
         title
         createdAt
+      }
+    }
+    messagingServices {
+      pageInfo {
+        totalCount
       }
     }
   }

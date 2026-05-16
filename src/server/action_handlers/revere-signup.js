@@ -21,12 +21,12 @@ const sqsUrl = config.REVERE_SQS_URL;
 export const instructions = () =>
   "This option triggers a new user request to Revere when selected.";
 
-export async function available(organizationId) {
+export const available = async (organizationId) => {
   if (organizationId && listId && mobileApiKey) {
     return true;
   }
   return false;
-}
+};
 
 const actionKitSignup = (cell, contact) => {
   // Currently we add the user to Revere and Action Kit. When we add them to AK
@@ -86,11 +86,11 @@ const actionKitSignup = (cell, contact) => {
   }
 };
 
-export async function processAction(
+export const processAction = async (
   questionResponse,
   interactionStep,
   campaignContactId
-) {
+) => {
   const contactRes = await r
     .knex("campaign_contact")
     .where("campaign_contact.id", campaignContactId)
@@ -152,4 +152,4 @@ export async function processAction(
   }
 
   actionKitSignup(contactCell, contact);
-}
+};

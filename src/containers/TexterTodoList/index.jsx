@@ -49,13 +49,13 @@ class TexterTodoList extends React.Component {
   renderTodoList(assignments) {
     const { organizationId } = this.props.match.params;
     return assignments
+      .slice()
       .sort()
       .map((assignment) => {
         if (
           assignment.unmessagedCount > 0 ||
           assignment.unrepliedCount > 0 ||
           assignment.badTimezoneCount > 0 ||
-          assignment.campaign.useDynamicAssignment ||
           assignment.pastMessagesCount > 0 ||
           assignment.skippedMessagesCount > 0
         ) {
@@ -187,7 +187,6 @@ const queries = {
               id
               title
               description
-              useDynamicAssignment
               hasUnassignedContacts
               introHtml
               primaryColor

@@ -4,10 +4,10 @@ import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import React from "react";
 
 import Empty from "../../../components/Empty";
-import type { CampaignOperations } from "./CampaignListMenu";
+import type { CampaignOperationsProps } from "../utils";
 import CampaignListRow from "./CampaignListRow";
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   campaigns: CampaignListEntryFragment[];
   isAdmin: boolean;

@@ -5,33 +5,29 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
-import { useTheme } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import WarningIcon from "@material-ui/icons/Warning";
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
 import { dataTest } from "../../../lib/attributes";
-import { DateTime } from "../../../lib/datetime";
-import type { CampaignOperations } from "./CampaignListMenu";
+import type { CampaignOperationsProps } from "../utils";
 import CampaignListMenu from "./CampaignListMenu";
 
-const inlineStyles = {
+const useStyles = makeStyles({
   chipWrapper: {
     display: "flex",
     flexWrap: "wrap",
     alignItems: "center"
   },
   chip: { margin: "4px" },
-  past: {
-    opacity: 0.6
-  },
   secondaryText: {
     whiteSpace: "pre-wrap"
   }
-};
+});
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   isAdmin: boolean;
   campaign: CampaignListEntryFragment;
@@ -40,6 +36,8 @@ interface Props extends CampaignOperations {
 export const CampaignListRow: React.FC<Props> = (props) => {
   const theme = useTheme();
   const history = useHistory();
+  const styles = useStyles();
+
   const { organizationId, isAdmin, campaign } = props;
   const {
     isStarted,
@@ -53,10 +51,12 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     externalSystem
   } = campaign;
 
-  let listItemStyle = {};
+  let listItemStyle: React.CSSProperties = {};
   let leftIcon;
   if (isArchived) {
-    listItemStyle = inlineStyles.past;
+    listItemStyle = {
+      opacity: 0.6
+    };
   } else if (!isStarted || hasUnassignedContacts) {
     listItemStyle = {
       color: theme.palette.warning.dark
@@ -71,16 +71,8 @@ export const CampaignListRow: React.FC<Props> = (props) => {
       color: theme.palette.success.dark
     };
   }
-  const dueBy = DateTime.fromISO(campaign.dueBy || "");
   const creatorName = campaign.creator ? campaign.creator.displayName : null;
   let tags = [];
-  if (DateTime.local() >= dueBy) {
-    tags.push({
-      title: "Overdue",
-      color: theme.palette.grey[900],
-      backgroundColor: theme.palette.error.main
-    });
-  }
 
   if (externalSystem) {
     const title = `${externalSystem.type}: ${externalSystem.name}`;
@@ -115,15 +107,14 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   }
 
   const primaryText = (
-    <div style={inlineStyles.chipWrapper}>
+    <div className={styles.chipWrapper}>
       {campaign.title}
       {tags.map((tag) => (
         <Chip
           key={tag.title}
           label={tag.title}
+          className={styles.chip}
           style={{
-            ...inlineStyles.chip,
-            color: tag.color,
             backgroundColor: tag.backgroundColor
           }}
         />
@@ -131,14 +122,13 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     </div>
   );
   const secondaryText = (
-    <span style={inlineStyles.secondaryText}>
+    <span className={styles.secondaryText}>
       <span>
         Campaign ID: {campaign.id}
         <br />
         {campaign.description}
         {creatorName ? <span> &mdash; Created by {creatorName}</span> : null}
         <br />
-        {dueBy.isValid ? dueBy.toFormat("DD") : "No due date set"}
       </span>
     </span>
   );
@@ -146,9 +136,10 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   const campaignUrl = `/admin/${organizationId}/campaigns/${campaign.id}${
     isStarted ? "" : "/edit"
   }`;
+
   return (
     <ListItem
-      {...dataTest("campaignRow")}
+      {...dataTest("campaignRow", false)}
       style={listItemStyle}
       onClick={() => history.push(campaignUrl)}
     >

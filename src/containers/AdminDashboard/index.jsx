@@ -1,11 +1,13 @@
 import { gql } from "@apollo/client";
+import Container from "@material-ui/core/Container";
+import Typography from "@material-ui/core/Typography";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
-import TopNav from "../../components/TopNav";
 import { hasRole } from "../../lib/permissions";
 import theme from "../../styles/theme";
 import AdminNavigation from "../AdminNavigation";
@@ -14,10 +16,12 @@ import NotificationCard from "./components/NotificationCard";
 
 const styles = StyleSheet.create({
   container: {
-    ...theme.layouts.multiColumn.container
-  },
-  sidebar: {
-    minHeight: "calc(100vh - 56px)"
+    ...theme.layouts.multiColumn.container,
+    backgroundColor: "#fafafa",
+    backgroundImage: "radial-gradient(circle, #0000000d 1px, #0000 1px)",
+    backgroundPosition: "0 0",
+    backgroundSize: "10px 10px",
+    minHeight: "100vh"
   },
   content: {
     ...theme.layouts.multiColumn.flexColumn,
@@ -32,29 +36,24 @@ class AdminDashboard extends React.Component {
     showMenu: true
   };
 
-  urlFromPath = (path) => {
-    const { organizationId } = this.props.match.params;
-    return `/admin/${organizationId}/${path}`;
-  };
-
   handleToggleMenu = () => this.setState({ showMenu: !this.state.showMenu });
 
-  renderNavigation(sections) {
+  renderNavigation(navGroups) {
     const { organizationId } = this.props.match.params;
+    const { organizationData } = this.props;
 
     if (!organizationId) {
       return "";
     }
 
     return (
-      <div className={css(styles.sidebar)}>
-        <AdminNavigation
-          onToggleMenu={this.handleToggleMenu}
-          showMenu={this.state.showMenu}
-          organizationId={organizationId}
-          sections={sections}
-        />
-      </div>
+      <AdminNavigation
+        onToggleMenu={this.handleToggleMenu}
+        showMenu={this.state.showMenu}
+        organizationId={organizationId}
+        groups={navGroups}
+        title={organizationData?.organization?.name}
+      />
     );
   }
 
@@ -66,98 +65,144 @@ class AdminDashboard extends React.Component {
     const { totalCount: trollCount } =
       (this.props.trollAlarmsCount || {}).trollAlarmsCount || {};
 
-    const sections = [
-      { name: "Campaigns", path: "campaigns", role: "ADMIN" },
-      { name: "Template Campaigns", path: "template-campaigns", role: "ADMIN" },
-      { name: "Campaign Groups", path: "campaign-groups", role: "ADMIN" },
-      { name: "People", path: "people", role: "ADMIN" },
-      { name: "Teams", path: "teams", role: "ADMIN" },
-      { name: "Assignment Control", path: "assignment-control", role: "ADMIN" },
-      { name: "Autosending", path: "autosending", role: "ADMIN" },
-      { name: "Tags", path: "tag-editor", role: "ADMIN" },
-      { name: "Opt Outs", path: "optouts", role: "ADMIN" },
-      { name: "Message Review", path: "incoming", role: "SUPERVOLUNTEER" },
+    const allGroups = [
       {
-        name: "Escalated Convos",
-        path: "escalated",
-        role: "ADMIN",
-        badge: window.DISABLE_SIDEBAR_BADGES
-          ? undefined
-          : { count: escalatedConversationCount }
-      },
-      { name: "Bulk Script Editor", path: "bulk-script-editor", role: "OWNER" },
-      { name: "Short Link Domains", path: "short-link-domains", role: "OWNER" },
-      {
-        name: "Assignment Requests",
-        path: "assignment-requests",
-        role: "SUPERVOLUNTEER",
-        badge: window.DISABLE_SIDEBAR_BADGES
-          ? undefined
-          : { count: pendingAssignmentRequestCount }
+        name: "Campaigns",
+        items: [
+          { name: "Campaigns", path: "campaigns", role: "ADMIN" },
+          {
+            name: "Template Campaigns",
+            path: "template-campaigns",
+            role: "ADMIN"
+          },
+          ...(window.ENABLE_CAMPAIGN_GROUPS
+            ? [
+                {
+                  name: "Campaign Groups",
+                  path: "campaign-groups",
+                  role: "ADMIN"
+                }
+              ]
+            : [])
+        ]
       },
       {
-        name: "Troll Alarms",
-        path: "trollalarms",
-        role: "SUPERVOLUNTEER",
-        badge: window.DISABLE_SIDEBAR_BADGES ? undefined : { count: trollCount }
+        name: "People",
+        items: [
+          { name: "People", path: "people", role: "ADMIN" },
+          { name: "Teams", path: "teams", role: "ADMIN" },
+          { name: "Opt Outs", path: "optouts", role: "ADMIN" }
+        ]
       },
-      { name: "Integrations", path: "integrations", role: "OWNER" },
-      { name: "Settings", path: "settings", role: "OWNER" }
+      {
+        name: "Messages",
+        items: [
+          { name: "Message Review", path: "incoming", role: "SUPERVOLUNTEER" },
+          {
+            name: "Assignment Control",
+            path: "assignment-control",
+            role: "ADMIN"
+          },
+          ...(!window.DISABLE_ASSIGNMENT_PAGE
+            ? [
+                {
+                  name: "Assignment Requests",
+                  path: "assignment-requests",
+                  role: "SUPERVOLUNTEER",
+                  badge: window.DISABLE_SIDEBAR_BADGES
+                    ? undefined
+                    : { count: pendingAssignmentRequestCount }
+                }
+              ]
+            : []),
+          ...(window.ENABLE_AUTOSENDING
+            ? [{ name: "Autosending", path: "autosending", role: "ADMIN" }]
+            : []),
+          { name: "Tags", path: "tag-editor", role: "ADMIN" }
+        ]
+      },
+      {
+        name: "Management",
+        items: [
+          {
+            name: "Bulk Script Editor",
+            path: "bulk-script-editor",
+            role: "OWNER"
+          },
+          ...(window.ENABLE_TROLLBOT
+            ? [
+                {
+                  name: "Troll Alarms",
+                  path: "trollalarms",
+                  role: "SUPERVOLUNTEER",
+                  badge: window.DISABLE_SIDEBAR_BADGES
+                    ? undefined
+                    : { count: trollCount }
+                }
+              ]
+            : []),
+          {
+            name: "Escalated Convos",
+            path: "escalated",
+            role: "ADMIN",
+            badge: window.DISABLE_SIDEBAR_BADGES
+              ? undefined
+              : { count: escalatedConversationCount }
+          },
+          ...(window.ENABLE_SHORTLINK_DOMAINS
+            ? [
+                {
+                  name: "Short Link Domains",
+                  path: "short-link-domains",
+                  role: "OWNER"
+                }
+              ]
+            : [])
+        ]
+      },
+      {
+        name: "Settings",
+        items: [
+          { name: "Settings", path: "settings", role: "OWNER" },
+          { name: "Integrations", path: "integrations", role: "OWNER" }
+        ]
+      }
     ];
 
-    if (!window.ENABLE_AUTOSENDING) {
-      const index = sections.findIndex((s) => s.name === "Autosending");
-      sections.splice(index, 1);
-    }
+    // Filter items by role within each group, remove empty groups
+    const groups = allGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((s) => hasRole(s.role, roles))
+      }))
+      .filter((group) => group.items.length > 0);
 
-    if (window.DISABLE_ASSIGNMENT_PAGE) {
-      const index = sections.findIndex((s) => s.name === "Assignment Requests");
-      sections.splice(index, 1);
-    }
-
-    if (!window.ENABLE_TROLLBOT) {
-      const index = sections.findIndex((s) => s.name === "Troll Alarms");
-      sections.splice(index, 1);
-    }
-
-    if (!window.ENABLE_SHORTLINK_DOMAINS) {
-      const index = sections.findIndex((s) => s.name === "Short Link Domains");
-      sections.splice(index, 1);
-    }
-
-    if (!window.ENABLE_CAMPAIGN_GROUPS) {
-      const index = sections.findIndex((s) => s.name === "Campaign Groups");
-      sections.splice(index, 1);
-    }
-
-    let currentSection = sections.filter((section) =>
+    // Flatten for page title lookup
+    const allSections = allGroups.flatMap((g) => g.items);
+    const currentSection = allSections.find((section) =>
       location.pathname.match(`/${section.path}`)
     );
-
-    currentSection = currentSection.length > 0 ? currentSection.shift() : null;
     const title = currentSection ? currentSection.name : "Admin";
-    const backToURL =
-      currentSection &&
-      location.pathname.split("/").pop() !== currentSection.path
-        ? this.urlFromPath(currentSection.path)
-        : null;
+
+    const pageTitle = `${title} - ${organizationData.organization.name}`;
 
     return (
-      <div>
-        <TopNav
-          title={title}
-          backToURL={backToURL}
-          orgId={match.params.organizationId}
-          sectionTitle={organizationData.organization.name}
-        />
-        <div className={css(styles.container)}>
-          {this.renderNavigation(
-            sections.filter((s) => hasRole(s.role, roles))
-          )}
-          <div className={css(styles.content)}>
+      <div className={css(styles.container)}>
+        <Helmet>
+          <title>{pageTitle}</title>
+        </Helmet>
+        {this.renderNavigation(groups)}
+        <div className={css(styles.content)}>
+          <Container maxWidth="md" disableGutters>
+            <Typography
+              variant="h5"
+              style={{ fontWeight: 700, marginBottom: 16 }}
+            >
+              {title}
+            </Typography>
             <NotificationCard organizationId={match.params.organizationId} />
             {children}
-          </div>
+          </Container>
         </div>
       </div>
     );

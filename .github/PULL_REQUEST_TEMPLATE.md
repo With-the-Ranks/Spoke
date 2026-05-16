@@ -20,7 +20,7 @@
 ## Documentation Changes
 
 <!--- Does your code change the way users interact with Spoke? If so please include proposed documentation changes below -->
-<!--- Spoke's user facing documentation is located at http://docs.spokerewired.com/ -->
+<!--- Spoke's user facing documentation is located at https://withtheranks.com/docs/spoke/ -->
 
 ## Checklist:
 

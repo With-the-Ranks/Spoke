@@ -10,12 +10,10 @@ interface Window {
   PASSPORT_STRATEGY: string;
   TZ: string;
   RENDERED_CLASS_NAMES: string[];
-  NOT_IN_USA: boolean;
   ALLOW_SEND_ALL: boolean;
   NODE_ENV: string;
   BASE_URL: string;
   ENABLE_TROLLBOT: boolean;
-  SHOW_10DLC_REGISTRATION_NOTICES: boolean;
 
   AuthService: any;
 }

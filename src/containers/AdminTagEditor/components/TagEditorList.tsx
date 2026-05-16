@@ -45,7 +45,7 @@ const TagEditorList: React.FC<TagEditorListProps> = ({
   return (
     <div style={styles.wrapper}>
       {tags.map((tag) => (
-        <Paper key={tag.id} style={styles.card}>
+        <Paper key={tag.id} variant="outlined" style={styles.card}>
           <div style={{ display: "flex" }}>
             <Chip
               label={tag.title}

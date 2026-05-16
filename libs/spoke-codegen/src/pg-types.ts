@@ -133,7 +133,6 @@ export interface campaign {
   due_by?: Date | null
   created_at: Date
   is_archived?: boolean | null
-  use_dynamic_assignment?: boolean | null
   logo_image_url?: string | null
   intro_html?: string | null
   primary_color?: string | null
@@ -212,7 +211,6 @@ export interface campaign_with_groups {
   due_by?: Date | null
   created_at?: Date | null
   is_archived?: boolean | null
-  use_dynamic_assignment?: boolean | null
   logo_image_url?: string | null
   intro_html?: string | null
   primary_color?: string | null

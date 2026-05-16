@@ -1,8 +1,9 @@
 import { makeStyles } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
+import CardHeader from "@material-ui/core/CardHeader";
 import Divider from "@material-ui/core/Divider";
 import type { Assignment } from "@spoke/spoke-codegen ";
-import { Card, CardTitle } from "material-ui/Card";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
@@ -104,14 +105,11 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   const {
     title,
     description,
-    hasUnassignedContacts,
     dueBy,
     primaryColor = context.theme?.defaultCampaignColor,
     logoImageUrl = context.theme?.defaultCampaignLogo,
-    introHtml,
-    useDynamicAssignment
+    introHtml
   } = assignment.campaign;
-  const { maxContacts } = assignment;
   const dueByText = dueBy
     ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
     : "No Due Date";
@@ -122,49 +120,42 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   return (
     <div className={classes.container}>
       <Card key={assignment.id}>
-        <CardTitle
+        <CardHeader
           title={title}
-          subtitle={subtitle}
-          style={{ backgroundColor: primaryColor }}
-        >
-          {logoImageUrl && <img src={logoImageUrl} className={classes.image} />}
-        </CardTitle>
+          subheader={subtitle}
+          style={{ backgroundColor: primaryColor, position: "relative" }}
+          action={
+            logoImageUrl ? (
+              <img src={logoImageUrl} className={classes.image} />
+            ) : undefined
+          }
+        />
         <Divider />
         <div style={{ margin: "20px" }}>
           <div dangerouslySetInnerHTML={{ __html: introHtml || "" }} />
         </div>
         <CardActions className={classes.cardActions}>
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? ""
-            : renderBadgedButton({
-                dataTestText: "sendFirstTexts",
-                assignment,
-                title: "Send first texts",
-                type: "initial",
-                count: unmessagedCount,
-                primary: true,
-                disabled:
-                  (useDynamicAssignment &&
-                    !hasUnassignedContacts &&
-                    unmessagedCount === 0) ||
-                  (useDynamicAssignment && maxContacts === 0) ||
-                  undefined,
-                contactsFilter: "text",
-                hideIfZero: !useDynamicAssignment
-              })}
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? ""
-            : renderBadgedButton({
-                dataTestText: "sendReplies",
-                assignment,
-                title: "Send replies",
-                type: "reply",
-                count: unrepliedCount,
-                primary: false,
-                disabled: false,
-                contactsFilter: "reply",
-                hideIfZero: true
-              })}
+          {renderBadgedButton({
+            dataTestText: "sendFirstTexts",
+            assignment,
+            title: "Send first texts",
+            type: "initial",
+            count: unmessagedCount,
+            primary: true,
+            contactsFilter: "text",
+            hideIfZero: true
+          })}
+          {renderBadgedButton({
+            dataTestText: "sendReplies",
+            assignment,
+            title: "Send replies",
+            type: "reply",
+            count: unrepliedCount,
+            primary: false,
+            disabled: false,
+            contactsFilter: "reply",
+            hideIfZero: true
+          })}
           {renderBadgedButton({
             assignment,
             title: "Past Messages",
@@ -185,18 +176,6 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
             contactsFilter: "skipped",
             hideIfZero: true
           })}
-          {window.NOT_IN_USA && window.ALLOW_SEND_ALL
-            ? renderBadgedButton({
-                assignment,
-                title: "Send messages",
-                type: "initial",
-                primary: true,
-                disabled: false,
-                contactsFilter: "all",
-                count: 0,
-                hideIfZero: false
-              })
-            : ""}
           {renderBadgedButton({
             assignment,
             title: "Send later",

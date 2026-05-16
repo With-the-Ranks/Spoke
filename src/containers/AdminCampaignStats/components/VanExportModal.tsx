@@ -94,7 +94,7 @@ class VanExportModal extends React.Component<InnerProps, State> {
             This will export data collected from contacts for upload into VAN.
             For more information see{" "}
             <a
-              href="https://docs.spokerewired.com/article/97-export-for-upload-to-van"
+              href="https://withtheranks.com/docs/spoke/for-spoke-admins/export-for-upload-to-van/"
               target="_blank"
               rel="noopener noreferrer"
             >
