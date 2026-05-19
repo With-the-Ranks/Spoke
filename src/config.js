@@ -187,14 +187,15 @@ const validators = {
     default: undefined
   }),
   CHATWOOT_BASE_URL: url({
-    desc: "Base URL of your Chatwoot installation for the website widget.",
+    desc:
+      "Optional Chatwoot website widget. Base URL of your Chatwoot install (no trailing slash). When set together with CHATWOOT_WEBSITE_TOKEN, the server injects the widget in the HTML shell (see app-renderer). README: Support widget (Chatwoot).",
     example: "https://app.chatwoot.com",
     default: undefined,
     isClient: true
   }),
   CHATWOOT_WEBSITE_TOKEN: str({
     desc:
-      "Website inbox token from Chatwoot Settings → Inboxes → Website channel.",
+      "Optional Chatwoot website widget. Website inbox token (Chatwoot Settings → Inboxes → Website). Must be set with CHATWOOT_BASE_URL to enable the launcher.",
     default: undefined,
     isClient: true
   }),
