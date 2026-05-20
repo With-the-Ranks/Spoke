@@ -6,8 +6,6 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-co
 import { ApolloError, ApolloServer } from "apollo-server-express";
 import type { ApolloServerPlugin } from "apollo-server-plugin-base";
 import express from "express";
-import type { OperationDefinitionNode } from "graphql";
-import { Kind } from "graphql";
 import { graphqlUploadExpress } from "graphql-upload";
 
 import { schema } from "../../../libs/gql-schema/schema";
@@ -21,22 +19,14 @@ import { graphqlErrorsTotal, graphqlRequestDuration } from "../metrics";
 const metricsPlugin: ApolloServerPlugin = {
   requestDidStart: async () => {
     const startNs = process.hrtime.bigint();
-    let operationType = "unknown";
 
     return {
-      executionDidStart: async ({ document }) => {
-        const opDef = document.definitions.find(
-          (d): d is OperationDefinitionNode =>
-            d.kind === Kind.OPERATION_DEFINITION
-        );
-        operationType = opDef?.operation ?? "unknown";
-      },
-      willSendResponse: async ({ request }) => {
+      willSendResponse: async ({ request, operation }) => {
         const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
         graphqlRequestDuration.observe(
           {
             operation_name: request.operationName ?? "anonymous",
-            operation_type: operationType
+            operation_type: operation?.operation ?? "unknown"
           },
           durationSeconds
         );

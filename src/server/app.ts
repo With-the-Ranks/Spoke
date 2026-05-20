@@ -54,7 +54,7 @@ export const createApp = async () => {
       const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
       // req.route.path gives the matched route pattern (e.g. "/graphql"),
       // avoiding high-cardinality labels from path params like IDs
-      const route = (req.route?.path as string | undefined) ?? "unmatched";
+      const route: string = req.route?.path ?? "unmatched";
       const labels = {
         method: req.method,
         route,
