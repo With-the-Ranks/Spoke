@@ -41,6 +41,7 @@ export const contextForRequest = async (
   return {
     user: (<Request & { user: any }>req).user,
     loaders: createLoaders(hostContext),
+    requestId: req.res?.locals.requestId as string | undefined,
     ...hostContext
   };
 };

@@ -78,6 +78,8 @@ const withMetrics = (taskIdentifier: string, task: Task): Task => async (
   helpers
 ) => {
   const startNs = process.hrtime.bigint();
+  const logCtx = { task: taskIdentifier, jobId: helpers.job.id };
+
   try {
     await task(payload, helpers);
     const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
@@ -86,6 +88,11 @@ const withMetrics = (taskIdentifier: string, task: Task): Task => async (
       durationSeconds
     );
     workerTaskTotal.inc({ task_identifier: taskIdentifier, status: "success" });
+    logger.info("Worker task completed", {
+      ...logCtx,
+      elapsedMs: durationSeconds * 1000,
+      attempt: helpers.job.attempts
+    });
   } catch (err) {
     const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
     workerTaskDuration.observe(
@@ -93,6 +100,12 @@ const withMetrics = (taskIdentifier: string, task: Task): Task => async (
       durationSeconds
     );
     workerTaskTotal.inc({ task_identifier: taskIdentifier, status: "error" });
+    logger.warn("Worker task failed", {
+      ...logCtx,
+      elapsedMs: durationSeconds * 1000,
+      attempt: helpers.job.attempts,
+      maxAttempts: helpers.job.max_attempts
+    });
     throw err;
   }
 };
