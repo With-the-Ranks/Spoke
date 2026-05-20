@@ -5,10 +5,7 @@ import {
   Registry
 } from "prom-client";
 
-import { config } from "../config";
-
 export const registry = new Registry();
-registry.setDefaultLabels({ client: config.CLIENT_LABEL });
 
 // Collect Node.js runtime metrics (CPU, memory, event loop lag, GC, etc.)
 collectDefaultMetrics({ register: registry });

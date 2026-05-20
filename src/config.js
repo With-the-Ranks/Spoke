@@ -182,11 +182,6 @@ const validators = {
     desc: "This enables caching using simple memoization (memoredis)",
     default: undefined
   }),
-  CLIENT_LABEL: str({
-    desc:
-      "Label identifying this Spoke instance (e.g. 'fobs'). Attached to all Prometheus metrics as a 'client' label to support per-instance filtering in Grafana.",
-    default: "default"
-  }),
   CACHING_PREFIX: str({
     desc: "The key prefix to use for memoredis memoization (memoredis)",
     default: undefined
