@@ -3,12 +3,11 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardHeader from "@material-ui/core/CardHeader";
 import Divider from "@material-ui/core/Divider";
-import type { Assignment } from "@spoke/spoke-codegen ";
+import type { Assignment } from "@spoke/spoke-codegen";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
 import { useSpokeContext } from "../../../client/spoke-context";
-import { DateTime } from "../../../lib/datetime";
 import type { MessageType } from "./BadgeButton";
 import BadgeButton from "./BadgeButton";
 
@@ -105,15 +104,12 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   const {
     title,
     description,
-    dueBy,
     primaryColor = context.theme?.defaultCampaignColor,
     logoImageUrl = context.theme?.defaultCampaignLogo,
     introHtml
   } = assignment.campaign;
-  const dueByText = dueBy
-    ? DateTime.fromISO(dueBy).toFormat("MMM d, yyyy")
-    : "No Due Date";
-  const subtitle = `${description} - ${dueByText}`;
+
+  const subtitle = `${description}}`;
 
   const classes = useStyles();
 

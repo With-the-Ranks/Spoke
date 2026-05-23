@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import { red } from "@material-ui/core/colors";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Menu from "@material-ui/core/Menu";
@@ -22,7 +21,6 @@ import { compose } from "recompose";
 
 import CampaignNavigation from "../../components/CampaignNavigation";
 import { dataTest } from "../../lib/attributes";
-import { DateTime } from "../../lib/datetime";
 import theme from "../../styles/theme";
 import { withAuthzContext } from "../AuthzProvider";
 import { loadData } from "../hoc/with-operations";
@@ -267,10 +265,6 @@ class AdminCampaignStats extends React.Component {
       ? `Syncing to VAN (${vanSyncJob.status}%)`
       : "Sync to VAN";
 
-    const dueFormatted = campaign.dueBy
-      ? DateTime.fromISO(campaign.dueBy).toFormat("DD")
-      : "No Due Date";
-    const isOverdue = DateTime.local() >= DateTime.fromISO(campaign.dueBy);
     const newTitle = `${organization.name} - Campaigns - ${campaignId}: ${campaign.title}`;
 
     // only a superadmin with multiple active orgs can copy a campaign to another org
@@ -323,10 +317,6 @@ class AdminCampaignStats extends React.Component {
             >
               Campaign ID: {campaign.id}
               <br />
-              Due:{" "}
-              <span style={{ color: isOverdue ? red[600] : undefined }}>
-                {dueFormatted} {isOverdue && "(Overdue)"}
-              </span>
               {showMessagingServiceName && (
                 <>
                   <br />
