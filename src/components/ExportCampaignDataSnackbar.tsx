@@ -2,13 +2,13 @@ import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import React from "react";
 
-interface Props {
+interface ExportCampaignDataSnackbarProps {
   open: boolean;
   errorMessage: string | null;
   onClose: () => void;
 }
 
-const ExportCampaignDataSnackbar: React.FC<Props> = ({
+const ExportCampaignDataSnackbar: React.FC<ExportCampaignDataSnackbarProps> = ({
   open,
   errorMessage,
   onClose

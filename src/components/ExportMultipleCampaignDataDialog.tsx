@@ -15,7 +15,7 @@ export type CampaignDetailsForExport = {
   id: string;
   title: string;
 };
-interface Props {
+interface CampaignDetailsForExportProps {
   campaignDetailsForExport: CampaignDetailsForExport[];
   open: boolean;
   onClose: () => void;
@@ -23,7 +23,8 @@ interface Props {
   onComplete(): void;
 }
 
-const ExportMultipleCampaignDataDialog: React.FC<Props> = ({
+// eslint-disable-next-line max-len
+const ExportMultipleCampaignDataDialog: React.FC<CampaignDetailsForExportProps> = ({
   campaignDetailsForExport,
   open,
   onClose,
