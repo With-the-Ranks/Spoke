@@ -1,6 +1,6 @@
 import Chip from "@material-ui/core/Chip";
 import { useTheme } from "@material-ui/core/styles";
-import type { AssignmentTarget } from "@spoke/spoke-codegen";
+import type { CurrentAssignmentTargetFragment } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import { Card, CardHeader, CardText } from "material-ui/Card";
 import React from "react";
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  assignmentTargets: AssignmentTarget[];
+  assignmentTargets: CurrentAssignmentTargetFragment[];
 }
 
 const AssignmentHUD: React.FC<Props> = (props) => {
@@ -34,24 +34,31 @@ const AssignmentHUD: React.FC<Props> = (props) => {
         showExpandableButton
       />
       <CardText expandable>
-        {assignmentTargets.map((target) => (
-          <div key={target.teamTitle} className={css(styles.row)}>
-            {!target.enabled && (
-              <Chip
-                label="Disabled"
-                className={css(styles.disabledChip)}
-                style={disabledStyle}
-              />
-            )}
-            <Chip className={css(styles.chip)} label={target.teamTitle} />
-            <div className={css(styles.prefix)}>{target.type} &#8594;</div>
-            <div className={css(styles.title)}>
-              {target.campaign.id}: {target.campaign.title}
-            </div>
-            <div className={css(styles.spacer)} />
-            <div className={css(styles.count)}>({target.countLeft} left)</div>
-          </div>
-        ))}
+        {assignmentTargets.map((target) => {
+          const { campaign } = target;
+          return (
+            target && (
+              <div key={target.teamTitle} className={css(styles.row)}>
+                {!target.enabled && (
+                  <Chip
+                    label="Disabled"
+                    className={css(styles.disabledChip)}
+                    style={disabledStyle}
+                  />
+                )}
+                <Chip className={css(styles.chip)} label={target.teamTitle} />
+                <div className={css(styles.prefix)}>{target.type} &#8594;</div>
+                <div className={css(styles.title)}>
+                  {campaign?.id}: {campaign?.title}
+                </div>
+                <div className={css(styles.spacer)} />
+                <div className={css(styles.count)}>
+                  ({target.countLeft} left)
+                </div>
+              </div>
+            )
+          );
+        })}
       </CardText>
     </Card>
   );

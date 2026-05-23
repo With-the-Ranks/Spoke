@@ -44,7 +44,7 @@ export const sendEmail = async (options: SendMailOptions) => {
     params.replyTo = replyTo;
   }
 
-  if (config.isDevelopment) {
+  if (!config.isProduction) {
     logger.info(`Would send e-mail with params`, { params });
     return null;
   }

@@ -2,6 +2,376 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.1.0](https://github.com/With-the-Ranks/spoke/compare/v10.0.1...v10.1.0) (2026-05-06)
+
+
+### Features
+
+* hide due date in campaigns list ([#166](https://github.com/With-the-Ranks/spoke/issues/166)) ([d5d661a](https://github.com/With-the-Ranks/spoke/commit/d5d661a831a946c4a06cc8f8fc6f1b4ee69c466b))
+
+
+### Bug Fixes
+
+* **v10 ui:** tweaks from prod feedback ([#162](https://github.com/With-the-Ranks/spoke/issues/162)) ([68588af](https://github.com/With-the-Ranks/spoke/commit/68588afbd6352653ee89c3fc5c3de044e066b5cd))
+* avoid mutating frozen Apollo cache array in TexterTodoList ([#160](https://github.com/With-the-Ranks/spoke/issues/160)) ([265ed77](https://github.com/With-the-Ranks/spoke/commit/265ed773de034d2d6f594103c347a9cf49431945))
+* clear campaign teams when teamIds is empty array ([#161](https://github.com/With-the-Ranks/spoke/issues/161)) ([e4ecb05](https://github.com/With-the-Ranks/spoke/commit/e4ecb050f0ef2ba3c5f76b626151b375f93d5700))
+
+
+### Backend Changes
+
+* update code style for components using textarea dom queries ([#165](https://github.com/With-the-Ranks/spoke/issues/165)) ([0716ef3](https://github.com/With-the-Ranks/spoke/commit/0716ef378a9e25f3241aa9aa0aa2252924fa42ca))
+
+### [10.0.1](https://github.com/With-the-Ranks/spoke/compare/v10.0.0...v10.0.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* correct multiLine -> multiline prop for MUI v4 in ContactActionDialog ([#164](https://github.com/With-the-Ranks/spoke/issues/164)) ([5c181c2](https://github.com/With-the-Ranks/spoke/commit/5c181c226461151239de607dc21a699ed7e86aa6))
+
+## [10.0.0](https://github.com/With-the-Ranks/spoke/compare/v9.2.1...v10.0.0) (2026-05-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* visual refresh (phase 1 - 6) (#147)
+
+### Features
+
+* visual refresh (phase 1 - 6) ([#147](https://github.com/With-the-Ranks/spoke/issues/147)) ([8034d07](https://github.com/With-the-Ranks/spoke/commit/8034d073185845cd041bdee054a32daa949fc6ac))
+
+### [9.2.1](https://github.com/With-the-Ranks/spoke/compare/v9.2.0...v9.2.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* **message-review:** check for empty name filter ([#153](https://github.com/With-the-Ranks/spoke/issues/153)) ([acfa19c](https://github.com/With-the-Ranks/spoke/commit/acfa19c7124a68995a097da1f0b966c1f029b616))
+* **staging:** match expected organization uuid format ([#154](https://github.com/With-the-Ranks/spoke/issues/154)) ([70c3228](https://github.com/With-the-Ranks/spoke/commit/70c3228c4fe9be005912bdec12bebf52d270139e))
+* update dev-deploy.yml so Docker deploys branch instead of main ([#152](https://github.com/With-the-Ranks/spoke/issues/152)) ([98ce815](https://github.com/With-the-Ranks/spoke/commit/98ce8150fef20eb190aa04b24dde86218adf6531))
+
+
+### Backend Changes
+
+* remove obsolete Claudia Deploy and nyc entries from .gitignore ([#144](https://github.com/With-the-Ranks/spoke/issues/144)) ([9200df4](https://github.com/With-the-Ranks/spoke/commit/9200df4fb95b2261e26f56aa23225ff48562645a))
+
+## [9.2.0](https://github.com/With-the-Ranks/spoke/compare/v9.1.0...v9.2.0) (2026-04-24)
+
+
+### Features
+
+* add staging seed data and on-demand workflow ([#130](https://github.com/With-the-Ranks/spoke/issues/130)) ([6d871a7](https://github.com/With-the-Ranks/spoke/commit/6d871a733fbe23940111765146d559827c5c8126))
+* store the name of the uploaded CSV & render for user ([#91](https://github.com/With-the-Ranks/spoke/issues/91)) ([9fbf157](https://github.com/With-the-Ranks/spoke/commit/9fbf1577acbf957fadde48e2e8ede9c6ead75238))
+
+
+### Bug Fixes
+
+* add messaging service to staging seed data ([#140](https://github.com/With-the-Ranks/spoke/issues/140)) ([c5d67aa](https://github.com/With-the-Ranks/spoke/commit/c5d67aad41002b30aea86ea93f3b62ed2b5e25cd))
+* **gh:** use wtr urls in package json ([#90](https://github.com/With-the-Ranks/spoke/issues/90)) ([5186569](https://github.com/With-the-Ranks/spoke/commit/5186569f93df697f994715f507c83a761370c6ec))
+* **message-review:** stop query on initial load ([#101](https://github.com/With-the-Ranks/spoke/issues/101)) ([90d293e](https://github.com/With-the-Ranks/spoke/commit/90d293e025c98027316cf3424736273a968575dd))
+
+
+### Backend Changes
+
+* remove remaining rewired references ([#100](https://github.com/With-the-Ranks/spoke/issues/100)) ([eb18af5](https://github.com/With-the-Ranks/spoke/commit/eb18af5547f7f6cefcbc34c79eb69949148a0640))
+* update OrganizationSettings to use MUI4 ([#104](https://github.com/With-the-Ranks/spoke/issues/104)) ([810cfe4](https://github.com/With-the-Ranks/spoke/commit/810cfe493617dca99fde661307560ae27b1f0780))
+
+## [9.1.0](https://github.com/With-the-Ranks/spoke/compare/v9.0.7...v9.1.0) (2026-01-15)
+
+
+### Features
+
+* **telnyx:** add mobiles only error code ([#89](https://github.com/With-the-Ranks/spoke/issues/89)) ([5200dd0](https://github.com/With-the-Ranks/spoke/commit/5200dd0aeb023a2e7bdc48bfd4d2f77fd77c9184))
+
+### [9.0.7](https://github.com/With-the-Ranks/spoke/compare/v9.0.6...v9.0.7) (2025-09-22)
+
+
+### Bug Fixes
+
+* **assemble-numbers:** delete failing test file ([#85](https://github.com/With-the-Ranks/spoke/issues/85)) ([a30ea1e](https://github.com/With-the-Ranks/spoke/commit/a30ea1eb990553406c9d8cb80bf13e13a888668c))
+
+### [9.0.6](https://github.com/With-the-Ranks/spoke/compare/v9.0.5...v9.0.6) (2025-09-22)
+
+
+### Bug Fixes
+
+* **assemble-numbers:** disable failing test suite ([#84](https://github.com/With-the-Ranks/spoke/issues/84)) ([8c312e0](https://github.com/With-the-Ranks/spoke/commit/8c312e09e48ec14c3fd488d4397e9258b764d088))
+
+### [9.0.5](https://github.com/With-the-Ranks/spoke/compare/v9.0.4...v9.0.5) (2025-09-22)
+
+
+### Bug Fixes
+
+* **send-message:** don't await ([#83](https://github.com/With-the-Ranks/spoke/issues/83)) ([1f2720d](https://github.com/With-the-Ranks/spoke/commit/1f2720d93a7589eff43d68890896df6bddfda5b3))
+
+### [9.0.4](https://github.com/With-the-Ranks/spoke/compare/v9.0.3...v9.0.4) (2025-09-22)
+
+
+### Bug Fixes
+
+* **autosending:** only use active initial script ([#81](https://github.com/With-the-Ranks/spoke/issues/81)) ([98c0c79](https://github.com/With-the-Ranks/spoke/commit/98c0c79211d65f98ec14e2a093f2c10727ed5a01))
+* **campaign-variable:** pass input types for updates ([#82](https://github.com/With-the-Ranks/spoke/issues/82)) ([0346b31](https://github.com/With-the-Ranks/spoke/commit/0346b31c33784441b06e295e7161c07dbef3e688))
+
+
+### Backend Changes
+
+* lint for arrow functions ([#26](https://github.com/With-the-Ranks/spoke/issues/26)) ([af5e9c6](https://github.com/With-the-Ranks/spoke/commit/af5e9c6eb43ed703244b469cdb804e9ef54fe88f))
+* remove dynamic assignment ([#79](https://github.com/With-the-Ranks/spoke/issues/79)) ([84e2df0](https://github.com/With-the-Ranks/spoke/commit/84e2df0c23cbf55941ed4ad25fb96a6ab0992431))
+
+### [9.0.3](https://github.com/With-the-Ranks/spoke/compare/v9.0.2...v9.0.3) (2025-09-12)
+
+
+### Bug Fixes
+
+* **texter:** hide send first texts when none left ([#80](https://github.com/With-the-Ranks/spoke/issues/80)) ([f2c333e](https://github.com/With-the-Ranks/spoke/commit/f2c333e1f07e23cba8a689da6804516783e4b789))
+* **texter:** render badge buttons ([#78](https://github.com/With-the-Ranks/spoke/issues/78)) ([f8137f5](https://github.com/With-the-Ranks/spoke/commit/f8137f572d3037adc9272d0348f1239bb7a3af94))
+
+### [9.0.2](https://github.com/With-the-Ranks/spoke/compare/v9.0.2-rc.0...v9.0.2) (2025-09-11)
+
+
+### Bug Fixes
+
+* **jest:** remove datadog ([#19](https://github.com/With-the-Ranks/spoke/issues/19)) ([23315fe](https://github.com/With-the-Ranks/spoke/commit/23315fedd4978d34a88b4dc20a0555fd253f4d4d))
+* **message review:** apply script for canned responses ([#17](https://github.com/With-the-Ranks/spoke/issues/17)) ([af9a61f](https://github.com/With-the-Ranks/spoke/commit/af9a61fcbb56c5bf11d464f09e086ed275f43ba4))
+* skip commiting empty changes to tags ([#16](https://github.com/With-the-Ranks/spoke/issues/16)) ([83c12ce](https://github.com/With-the-Ranks/spoke/commit/83c12cec597ce87fc3b0f3bc14dac88bf5e34119))
+
+
+### Backend Changes
+
+* replace spoke chip with mui chip ([#27](https://github.com/With-the-Ranks/spoke/issues/27)) ([9717599](https://github.com/With-the-Ranks/spoke/commit/9717599b3bf8878943646ee8001e924d0335248d))
+* **types:** sort declarations alphabetically ([#23](https://github.com/With-the-Ranks/spoke/issues/23)) ([c605655](https://github.com/With-the-Ranks/spoke/commit/c605655a97169123a8b3130902a5c0711f04cb06))
+* remove console logs ([#21](https://github.com/With-the-Ranks/spoke/issues/21)) ([2a6a1cb](https://github.com/With-the-Ranks/spoke/commit/2a6a1cb6af6eb2c07e3345d9092fadb98d2f4566))
+* remove deprecated bulk sending implementation ([#62](https://github.com/With-the-Ranks/spoke/issues/62)) ([c3bd65d](https://github.com/With-the-Ranks/spoke/commit/c3bd65d6607db0a914c8cfbeafec117f6a3614b9))
+* **campaign:** simplify subtypes ([#15](https://github.com/With-the-Ranks/spoke/issues/15)) ([a695f67](https://github.com/With-the-Ranks/spoke/commit/a695f67f74015e4fc113d8036a1537f921e86920))
+* **message review:** fetch updated contact instead of using state ([#18](https://github.com/With-the-Ranks/spoke/issues/18)) ([62fb313](https://github.com/With-the-Ranks/spoke/commit/62fb3135515877cd30c67d01c769f5f5874cd47d))
+
+### [9.0.2-rc.0](https://github.com/With-the-Ranks/spoke/compare/v9.0.1...v9.0.2-rc.0) (2025-03-25)
+
+
+### Bug Fixes
+
+* **mms:** skip file validation ([#66](https://github.com/With-the-Ranks/spoke/issues/66)) ([35ee5a2](https://github.com/With-the-Ranks/spoke/commit/35ee5a2e32f75d972fb4ed47268e584937cc2f16))
+
+
+### Backend Changes
+
+* **gh:** update ci workflow ([#67](https://github.com/With-the-Ranks/spoke/issues/67)) ([6ad9771](https://github.com/With-the-Ranks/spoke/commit/6ad97711bc0e644272586b22b3e769281a36db0d))
+
+### [9.0.1](https://github.com/With-the-Ranks/spoke/compare/v9.0.0...v9.0.1) (2024-12-02)
+
+
+### Bug Fixes
+
+* fix loading of archived campaigns ([#61](https://github.com/With-the-Ranks/spoke/issues/61)) ([da7df71](https://github.com/With-the-Ranks/spoke/commit/da7df71f84225c52d1f81858e3c4d22ce9bc6d60))
+* remove new query parameter when create new campaign ([#59](https://github.com/With-the-Ranks/spoke/issues/59)) ([07abb4b](https://github.com/With-the-Ranks/spoke/commit/07abb4b0f2d24ac7a684b63c7cf54166c0c8e7c6))
+
+## [9.0.0](https://github.com/With-the-Ranks/spoke/compare/v8.1.6-rc.0...v9.0.0) (2024-10-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to v20 LTS (#38)
+* **node:** update 16.14 -> 18.16 (#37)
+
+### Bug Fixes
+
+* **autoassign:** narrow custom escalation teams to requested org ([#55](https://github.com/With-the-Ranks/spoke/issues/55)) ([6da1195](https://github.com/With-the-Ranks/spoke/commit/6da1195f5e0884008439ac9a6cef348fc0a987d9))
+
+
+### build
+
+* upgrade to v20 LTS ([#38](https://github.com/With-the-Ranks/spoke/issues/38)) ([b1d2ff1](https://github.com/With-the-Ranks/spoke/commit/b1d2ff157ff2e95f523689047053c26bf99d9a9e))
+
+
+### Backend Changes
+
+* lint json files ([#53](https://github.com/With-the-Ranks/spoke/issues/53)) ([ca74b00](https://github.com/With-the-Ranks/spoke/commit/ca74b008e956a43f761153db8b9461c5522c17ad))
+* **node:** update 16.14 -> 18.16 ([#37](https://github.com/With-the-Ranks/spoke/issues/37)) ([28a793f](https://github.com/With-the-Ranks/spoke/commit/28a793f4448197f3e90de4b68759ea24e0fb8b9f))
+
+### [8.1.6-rc.0](https://github.com/With-the-Ranks/spoke/compare/v8.1.5...v8.1.6-rc.0) (2024-09-23)
+
+### [8.1.5](https://github.com/With-the-Ranks/spoke/compare/v8.1.4-rc.1...v8.1.5) (2024-09-19)
+
+
+### Bug Fixes
+
+* **column mapping:** remove create as from custom field value ([#5](https://github.com/With-the-Ranks/spoke/issues/5)) ([13730d5](https://github.com/With-the-Ranks/spoke/commit/13730d576b8e262e7947a851844b99c3739606e8))
+* **send-message:** await service method ([#7](https://github.com/With-the-Ranks/spoke/issues/7)) ([dc4421d](https://github.com/With-the-Ranks/spoke/commit/dc4421d997b76bb86b02d3526b9e1ceed317262d))
+* only mark contact as messaged after initial ([#42](https://github.com/With-the-Ranks/spoke/issues/42)) ([c16398e](https://github.com/With-the-Ranks/spoke/commit/c16398ed45a580101265b93fd3017f83a50d3851))
+
+
+### Backend Changes
+
+* **campaign-operations:** use codegen, typescript, react fcs ([#43](https://github.com/With-the-Ranks/spoke/issues/43)) ([9c760df](https://github.com/With-the-Ranks/spoke/commit/9c760df845ab836f17beb298a1f9a24ed22a0389))
+* **email:** use with the ranks info ([#13](https://github.com/With-the-Ranks/spoke/issues/13)) ([b1ea23d](https://github.com/With-the-Ranks/spoke/commit/b1ea23de40453cf72c46ffe9955039050e2cd646))
+* **export-campaign:** extract payload types ([#44](https://github.com/With-the-Ranks/spoke/issues/44)) ([5df2d21](https://github.com/With-the-Ranks/spoke/commit/5df2d217e56f91670542839f5ed481c6558866ea))
+* **second-pass:** implement as task ([#46](https://github.com/With-the-Ranks/spoke/issues/46)) ([d575a0b](https://github.com/With-the-Ranks/spoke/commit/d575a0beee71a82e1b8ccc7407c70f291b9c07db))
+* **user menu:** rename teams to organizations ([#11](https://github.com/With-the-Ranks/spoke/issues/11)) ([66cd60c](https://github.com/With-the-Ranks/spoke/commit/66cd60cbcca24a39816a51a2ce47f2d9094aa398))
+* remove bernie sms references ([#8](https://github.com/With-the-Ranks/spoke/issues/8)) ([241960c](https://github.com/With-the-Ranks/spoke/commit/241960c7505bbcf4687f73211aa31a609a385205))
+
+### [8.1.4-rc.1](https://github.com/With-the-Ranks/spoke/compare/v8.1.4-rc.0...v8.1.4-rc.1) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** use name of materialized cte ([#40](https://github.com/With-the-Ranks/spoke/issues/40)) ([6b2cafd](https://github.com/With-the-Ranks/spoke/commit/6b2cafdcded8535481b00cc3fe4d9555d6771fd1))
+
+### [8.1.4-rc.0](https://github.com/With-the-Ranks/spoke/compare/v8.1.3...v8.1.4-rc.0) (2024-08-07)
+
+
+### Bug Fixes
+
+* **exports:** materialize campaign contacts ([#39](https://github.com/With-the-Ranks/spoke/issues/39)) ([909db41](https://github.com/With-the-Ranks/spoke/commit/909db41f1e24a16e307db6b773835c6f39fec140))
+
+### [8.1.3](https://github.com/With-the-Ranks/spoke/compare/v8.1.2...v8.1.3) (2024-07-24)
+
+
+### Backend Changes
+
+* remove rewired notices ([#12](https://github.com/With-the-Ranks/spoke/issues/12)) ([42c731e](https://github.com/With-the-Ranks/spoke/commit/42c731ecce18a10124cbb905eeabaf3e93888c70))
+* update links to documentation in codebase ([#30](https://github.com/With-the-Ranks/spoke/issues/30)) ([67642a5](https://github.com/With-the-Ranks/spoke/commit/67642a554c2e0b5c100883107088017fcc249a1f))
+
+### [8.1.2](https://github.com/With-the-Ranks/spoke/compare/v8.1.1...v8.1.2) (2024-05-11)
+
+
+### Bug Fixes
+
+* use wtr mms doc link ([#29](https://github.com/With-the-Ranks/spoke/issues/29)) ([0703ced](https://github.com/With-the-Ranks/spoke/commit/0703ced3c1165c11a2fee908fc3eaded89b18e3c))
+
+### [8.1.1](https://github.com/With-the-Ranks/spoke/compare/v8.1.0...v8.1.1) (2024-04-27)
+
+## [8.1.0](https://github.com/With-the-Ranks/spoke/compare/v8.0.1...v8.1.0) (2024-04-23)
+
+
+### Features
+
+* hide inactive orgs on select org screen ([#25](https://github.com/With-the-Ranks/spoke/issues/25)) ([94b2491](https://github.com/With-the-Ranks/spoke/commit/94b249132702555928bda016a2c0cfc46f142df8))
+
+
+### Backend Changes
+
+* **knex:** upgrade to v2.5.1 ([#24](https://github.com/With-the-Ranks/spoke/issues/24)) ([1138cdc](https://github.com/With-the-Ranks/spoke/commit/1138cdc337a8b91a4fda85cbb5d2883ff0aaef79))
+
+### [8.0.1](https://github.com/With-the-Ranks/spoke/compare/v8.0.0...v8.0.1) (2024-02-15)
+
+
+### Bug Fixes
+
+* **mms:** get feature for max sms segment length ([#4](https://github.com/With-the-Ranks/spoke/issues/4)) ([f19b366](https://github.com/With-the-Ranks/spoke/commit/f19b366e2c83a742409756d6544644fed5dd274c))
+
+## [8.0.0](https://github.com/With-the-Ranks/spoke/compare/v7.3.0...v8.0.0) (2024-02-15)
+
+
+### Features
+
+* support sending mms without media ([#2](https://github.com/With-the-Ranks/spoke/issues/2)) ([3db7d25](https://github.com/With-the-Ranks/spoke/commit/3db7d25474601b087895be04aa2edc92d00bbb13))
+
+## [7.3.0](https://github.com/politics-rewired/spoke/compare/v7.2.0...v7.3.0) (2023-12-10)
+
+
+### Features
+
+* add generic title/content notice type ([#1677](https://github.com/politics-rewired/spoke/issues/1677)) ([adb168d](https://github.com/politics-rewired/spoke/commit/adb168d4036c4f086f6dbb54b4eacd1886bd5a5a))
+* use title/content notice type with envvar for rewired shutdown ([#1678](https://github.com/politics-rewired/spoke/issues/1678)) ([decedcc](https://github.com/politics-rewired/spoke/commit/decedcc394b77f4056f28ec2681e6047cc024a55))
+
+
+### Bug Fixes
+
+* handle spoke-portal being unreachable ([#1675](https://github.com/politics-rewired/spoke/issues/1675)) ([757b872](https://github.com/politics-rewired/spoke/commit/757b872d67255ce79235b36d0fa8a3e01593fba1))
+
+## [7.2.0](https://github.com/politics-rewired/spoke/compare/v7.2.0-rc.0...v7.2.0) (2023-11-14)
+
+
+### Features
+
+* add shutdown notification ([#1674](https://github.com/politics-rewired/spoke/issues/1674)) ([7f33625](https://github.com/politics-rewired/spoke/commit/7f33625203bb2067def7147ba3fb78f28839b215))
+
+## [7.2.0-rc.0](https://github.com/politics-rewired/spoke/compare/v7.1.0...v7.2.0-rc.0) (2023-09-12)
+
+
+### Features
+
+* view messaging service name on campaign details page for orgs with multiple msg services ([#1623](https://github.com/politics-rewired/spoke/issues/1623)) ([652b80c](https://github.com/politics-rewired/spoke/commit/652b80c1056093320feb8df00dccbb777d15130f))
+* **start-campaign-button:** warn before starting campaign without survey responses ([#1616](https://github.com/politics-rewired/spoke/issues/1616)) ([9bf1c57](https://github.com/politics-rewired/spoke/commit/9bf1c57d8905f10c7238e4b97c465ebcdbe6829a))
+* indicate new campaign id(s) from template ([#1629](https://github.com/politics-rewired/spoke/issues/1629)) ([0af2c75](https://github.com/politics-rewired/spoke/commit/0af2c75614c80a1208d0b3e1be049cfa377e6335))
+* **campaign-interaction-steps:** add save button to top of section ([#1610](https://github.com/politics-rewired/spoke/issues/1610)) ([0d035af](https://github.com/politics-rewired/spoke/commit/0d035af8130419392fe2055cede716a1e7d79aec))
+* **emails:** add email template with wrapper ([#1588](https://github.com/politics-rewired/spoke/issues/1588)) ([94fc8fa](https://github.com/politics-rewired/spoke/commit/94fc8fa18fbc7b43853cfb34c5c451efbd16cba7))
+
+
+### Bug Fixes
+
+* take campaign to edit link for create from template ([#1673](https://github.com/politics-rewired/spoke/issues/1673)) ([81ec582](https://github.com/politics-rewired/spoke/commit/81ec582b64aaef2638fba8f13cb94e0f38712714))
+* **update-dump:** add cap add flag ([#1668](https://github.com/politics-rewired/spoke/issues/1668)) ([46ddcb1](https://github.com/politics-rewired/spoke/commit/46ddcb129c3ed6f70eb467b75125e0444c5c83be))
+* create campaign speed dial open/close behavior ([#1627](https://github.com/politics-rewired/spoke/issues/1627)) ([d8428e3](https://github.com/politics-rewired/spoke/commit/d8428e3d06c69a2dd059fe48fb903bc8fd784716))
+* link toll free pricing ([#1653](https://github.com/politics-rewired/spoke/issues/1653)) ([37efeac](https://github.com/politics-rewired/spoke/commit/37efeac5efcce053ba0bf50f3e563450f9c58e80))
+* **users:** set preferred notification frequency on signup ([#1630](https://github.com/politics-rewired/spoke/issues/1630)) ([740e865](https://github.com/politics-rewired/spoke/commit/740e8659504f3708fa95061ccf3e7684f71493b5))
+
+
+### Backend Changes
+
+* **telco errors:** add 4785 error code ([#1667](https://github.com/politics-rewired/spoke/issues/1667)) ([053ea74](https://github.com/politics-rewired/spoke/commit/053ea748043e62d39c19a9f13ba71a0b6a52cc13))
+* add docker-compose instructions for local postgres ([#1599](https://github.com/politics-rewired/spoke/issues/1599)) ([fdc0793](https://github.com/politics-rewired/spoke/commit/fdc0793d17210bb4b91eaae8ae0bd8ca0c1c6f55))
+* run update schema dump ([#1666](https://github.com/politics-rewired/spoke/issues/1666)) ([68fb0fa](https://github.com/politics-rewired/spoke/commit/68fb0fa39a1267e7c51188f290fbc8418c7e0b1e))
+
+## [7.1.0](https://github.com/politics-rewired/spoke/compare/v7.0.0...v7.1.0) (2023-08-02)
+
+
+### Features
+
+* **10dlc:** add additional notices ([#1645](https://github.com/politics-rewired/spoke/issues/1645)) ([602e5d5](https://github.com/politics-rewired/spoke/commit/602e5d5bf523750d58995d55a7cf3a9405963224))
+
+
+### Bug Fixes
+
+* **canned responses:** default to alphabetical sorting ([#1647](https://github.com/politics-rewired/spoke/issues/1647)) ([7d53908](https://github.com/politics-rewired/spoke/commit/7d53908ceef1cba4bc8197a5171d0cc124e00a30))
+* **canned responses:** handle canned response moving up in the list ([#1646](https://github.com/politics-rewired/spoke/issues/1646)) ([0b9d2de](https://github.com/politics-rewired/spoke/commit/0b9d2de6d25ddc70878c3d7e8d24ee5614e177dc))
+* **csv mapping:** add autocomplete label ([#1649](https://github.com/politics-rewired/spoke/issues/1649)) ([480d078](https://github.com/politics-rewired/spoke/commit/480d078d2c97ab7e37f63ebaa78d577d25b7bc97))
+* **csv mapping:** rerender on file upload ([#1650](https://github.com/politics-rewired/spoke/issues/1650)) ([2c372ce](https://github.com/politics-rewired/spoke/commit/2c372ce00a2c45b2c87af53649959c629ea35d7b))
+
+
+### Backend Changes
+
+* **canned responses:** update form types ([#1648](https://github.com/politics-rewired/spoke/issues/1648)) ([b7238f0](https://github.com/politics-rewired/spoke/commit/b7238f0f14818cdafcbacce564544f74a110e373))
+* Add changelog for missing 6.1.3 release ([#1590](https://github.com/politics-rewired/spoke/issues/1590)) ([15a8122](https://github.com/politics-rewired/spoke/commit/15a8122800cc4f72012c2eb9030b6924af2297a4))
+
+## [7.0.0](https://github.com/politics-rewired/spoke/compare/v7.0.0-rc.1...v7.0.0) (2023-07-26)
+
+
+### Backend Changes
+
+* **csv mapping:** update required headers copy ([#1644](https://github.com/politics-rewired/spoke/issues/1644)) ([69a07ef](https://github.com/politics-rewired/spoke/commit/69a07efac9750b71164a0494d2b52463e13f3c23))
+
+## [7.0.0-rc.1](https://github.com/politics-rewired/spoke/compare/v7.0.0-rc.0...v7.0.0-rc.1) (2023-07-25)
+
+
+### Bug Fixes
+
+* **copy campaign:** copy display order for canned responses ([#1643](https://github.com/politics-rewired/spoke/issues/1643)) ([0cd4643](https://github.com/politics-rewired/spoke/commit/0cd46435567c789dca3cf4ebee0c6951a2519b60))
+
+## [7.0.0-rc.0](https://github.com/politics-rewired/spoke/compare/v6.4.0...v7.0.0-rc.0) (2023-07-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* allow uploading arbitrary csvs (#1540)
+
+### Features
+
+* add apollo graphql armor ([#1535](https://github.com/politics-rewired/spoke/issues/1535)) ([36a79c9](https://github.com/politics-rewired/spoke/commit/36a79c95547a816b7b97fabed79ce48758833b65))
+* **canned responses:** allow reordering display order ([#1551](https://github.com/politics-rewired/spoke/issues/1551)) ([9312d5f](https://github.com/politics-rewired/spoke/commit/9312d5f178226a39c95ca47fa3f017f271e40a51))
+* **canned responses:** clarify instructional copy ([#1571](https://github.com/politics-rewired/spoke/issues/1571)) ([862a354](https://github.com/politics-rewired/spoke/commit/862a35450fd280c882690b13880ae3d3f63da20d))
+* allow uploading arbitrary csvs ([#1540](https://github.com/politics-rewired/spoke/issues/1540)) ([9266776](https://github.com/politics-rewired/spoke/commit/926677621cbead5856032e93351cad0b7e3e410f))
+
+
+### Bug Fixes
+
+* **messaging services:** add org id to fakeservice sid ([#1607](https://github.com/politics-rewired/spoke/issues/1607)) ([3cee1d8](https://github.com/politics-rewired/spoke/commit/3cee1d82323a6131ca7251a5a0224d963dfe33b9))
+
+
+### Backend Changes
+
+* use more accurate variable naming ([#1576](https://github.com/politics-rewired/spoke/issues/1576)) ([21c7138](https://github.com/politics-rewired/spoke/commit/21c71386866de9f06516207c1dc1fb86c3834b8a))
+* **notification frequency:** update default to DAILY ([#1585](https://github.com/politics-rewired/spoke/issues/1585)) ([e76ade3](https://github.com/politics-rewired/spoke/commit/e76ade34444337d18e1aee56bc063dbcd702bf28))
+* **telco errors:** update with latest known descriptions ([#1635](https://github.com/politics-rewired/spoke/issues/1635)) ([e3b9e78](https://github.com/politics-rewired/spoke/commit/e3b9e7886f530c3c92101503f46a0c9f773b8916))
+
 ## [6.4.0](https://github.com/politics-rewired/spoke/compare/v6.4.0-rc.0...v6.4.0) (2023-07-04)
 
 ## [6.4.0-rc.0](https://github.com/politics-rewired/spoke/compare/v6.3.3...v6.4.0-rc.0) (2023-06-28)
@@ -104,6 +474,13 @@ All notable changes to this project will be documented in this file. See [standa
 * replace useless map with copy-on-destructure ([#1574](https://github.com/politics-rewired/spoke/issues/1574)) ([d13a4e7](https://github.com/politics-rewired/spoke/commit/d13a4e7ba51db400b095588ce5ede5c685bf6e23))
 * **knex:** resolve to v.2.3.0 ([#1539](https://github.com/politics-rewired/spoke/issues/1539)) ([4c68e7e](https://github.com/politics-rewired/spoke/commit/4c68e7ee46752af583d935a2d082078e8747d82d))
 * **message response:** convert to functional component ([#1541](https://github.com/politics-rewired/spoke/issues/1541)) ([b8b68dd](https://github.com/politics-rewired/spoke/commit/b8b68dd7f080114cf2a0babbe467e5f788c83d3b))
+
+### [6.1.3](https://github.com/politics-rewired/spoke/compare/v6.1.2...v6.1.3) (2023-04-21)
+
+
+### Bug Fixes
+
+* van configuration reading the wrong query ([3935821](https://github.com/politics-rewired/spoke/commit/3935821290124c3d28a5842ef439ce8a2ed8445c))
 
 ### [6.1.2](https://github.com/politics-rewired/spoke/compare/v6.1.1...v6.1.2) (2023-02-27)
 

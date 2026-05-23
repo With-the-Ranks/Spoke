@@ -1,10 +1,13 @@
 export const schema = `
-  type Register10DlcBrandNotice {
+  type TitleContentNotice {
     id: ID!
-    tcrBrandRegistrationUrl: String
+    title: String!
+    avatarIcon: String!
+    avatarColor: String!
+    markdownContent: String!
   }
 
-  union Notice = Register10DlcBrandNotice
+  union Notice = TitleContentNotice
 
   type NoticeEdge {
     cursor: Cursor!

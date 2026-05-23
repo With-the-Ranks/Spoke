@@ -44,7 +44,7 @@ const externalLinks = config.NO_EXTERNAL_LINKS
   ? ""
   : `<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.auth0.com/js/lock/11.0.1/lock.min.js"></script>`;
 
 const rollbarScript = config.ROLLBAR_ACCESS_TOKEN
@@ -82,16 +82,10 @@ const indexHtml = `
     <style>
       /* CSS declarations go here */
       body {
-        font-family: 'Karla', sans-serif;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-
+        font-family: 'Inter', sans-serif;
         padding: 0;
         margin: 0;
-        height: 100%;
+        min-height: 100vh;
         font-size: 14px;
       }
 

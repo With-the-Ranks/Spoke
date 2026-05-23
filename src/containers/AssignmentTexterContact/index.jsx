@@ -43,7 +43,6 @@ import { applyScript } from "../../lib/scripts";
 import { isContactNowWithinCampaignHours } from "../../lib/timezones";
 import ApplyTagDialog from "./components/ApplyTagDialog";
 import AssignmentTexterSurveys from "./components/AssignmentTexterSurveys";
-import BulkSendButton from "./components/BulkSendButton";
 import ContactActionDialog from "./components/ContactActionDialog";
 import MessageList from "./components/MessageList";
 import MessageTextField from "./components/MessageTextField";
@@ -230,10 +229,6 @@ export class AssignmentTexterContact extends React.Component {
     }
   };
 
-  setDisabled = (disabled = true) => {
-    this.setState({ disabled });
-  };
-
   getAvailableInteractionSteps = (questionResponses) => {
     const allInteractionSteps = this.props.campaign.interactionSteps;
     const availableSteps = [];
@@ -275,17 +270,14 @@ export class AssignmentTexterContact extends React.Component {
 
   getMessageTextFromScript = (script) => {
     const { campaign, contact, texter } = this.props;
-
-    const campaignVariables = campaign.campaignVariables.edges.map(
-      ({ node }) => node
-    );
+    const { customFields, campaignVariables } = campaign;
 
     return script
       ? applyScript({
           contact,
           texter,
           script,
-          customFields: campaign.customFields,
+          customFields,
           campaignVariables
         })
       : "";
@@ -333,8 +325,8 @@ export class AssignmentTexterContact extends React.Component {
   createMessageToContact = (text) => {
     const { texter, campaign, assignment } = this.props;
     const { contact } = this.props;
-    const campaignVariableIds = campaign.campaignVariables.edges.map(
-      ({ node: { id } }) => id
+    const campaignVariableIds = campaign.campaignVariables.map(
+      (campaignVariable) => campaignVariable.id
     );
 
     return {
@@ -447,31 +439,35 @@ export class AssignmentTexterContact extends React.Component {
     this.setState({ dialogType: TexterDialogType.OptOut });
   };
 
-  handleApplyTags = (addedTags, removedTags, callback) => {
-    this.tagContact(addedTags, removedTags);
+  handleApplyTags = (addedContactTags, removedContactTags, callback) => {
+    this.tagContact(addedContactTags, removedContactTags);
 
     if (callback) {
       this.setState(
-        { addedTags, removedTags, isTagEditorOpen: false },
+        {
+          addedTags: addedContactTags,
+          removedTags: removedContactTags,
+          isTagEditorOpen: false
+        },
         callback
       );
     } else {
       this.setState({
-        addedTags,
-        removedTags,
+        addedTags: addedContactTags,
+        removedTags: removedContactTags,
         isTagEditorOpen: false
       });
     }
 
-    if (!callback && addedTags.length > 0) {
-      const mostImportantTag = sortBy(addedTags, "id")[0];
+    if (!callback && addedContactTags.length > 0) {
+      const mostImportantTag = sortBy(addedContactTags, "id")[0];
       const tagMessageText = mostImportantTag.tag.onApplyScript;
       if (tagMessageText !== "") this.handleChangeScript(tagMessageText);
     }
   };
 
-  handleApplyTagsAndMoveOn = (addedTags, removedTags) => {
-    this.handleApplyTags(addedTags, removedTags, async () => {
+  handleApplyTagsAndMoveOn = (addedContactTags, removedContactTags) => {
+    this.handleApplyTags(addedContactTags, removedContactTags, async () => {
       const { contact } = this.props;
       const payload = this.gatherSurveyChanges();
       await this.props.sendMessage(contact.id, payload);
@@ -479,11 +475,11 @@ export class AssignmentTexterContact extends React.Component {
   };
 
   // run mutation with added and removed tags
-  tagContact = (addedTags, removedTags) => {
+  tagContact = (addedContactTags, removedContactTags) => {
     const { contact } = this.props;
     const tag = {
-      addedTagIds: addedTags.map((t) => t.tag.id),
-      removedTagIds: removedTags.map((t) => t.tag.id)
+      addedTagIds: addedContactTags.map((t) => t.tag.id),
+      removedTagIds: removedContactTags.map((t) => t.tag.id)
     };
 
     this.props.addTagToContact(contact.id, tag);
@@ -540,11 +536,6 @@ export class AssignmentTexterContact extends React.Component {
 
   skipContact = () => {
     this.props.onFinishContact();
-  };
-
-  bulkSendMessages = async (assignmentId) => {
-    await this.props.mutations.bulkSendMessages(assignmentId);
-    this.props.refreshData();
   };
 
   handleMessageFormChange = ({ messageText }) => {
@@ -653,7 +644,6 @@ export class AssignmentTexterContact extends React.Component {
       tags,
       assignment,
       navigationToolbarChildren,
-      onFinishContact,
       theme
     } = this.props;
     const { userCannedResponses, campaignCannedResponses } = assignment;
@@ -677,18 +667,6 @@ export class AssignmentTexterContact extends React.Component {
                 }
                 disabled={this.state.disabled}
               />
-              {window.NOT_IN_USA &&
-              window.ALLOW_SEND_ALL &&
-              window.BULK_SEND_CHUNK_SIZE ? (
-                <BulkSendButton
-                  assignment={assignment}
-                  onFinishContact={onFinishContact}
-                  bulkSendMessages={this.bulkSendMessages}
-                  setDisabled={this.setDisabled}
-                />
-              ) : (
-                ""
-              )}
               <div style={{ float: "right", marginLeft: 20 }}>
                 {navigationToolbarChildren}
               </div>

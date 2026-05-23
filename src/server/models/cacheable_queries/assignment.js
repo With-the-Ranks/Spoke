@@ -1,4 +1,4 @@
-export async function hasAssignment(_userId, _assignmentId) {}
+export const hasAssignment = async (_userId, _assignmentId) => {};
 
 export const assignmentCache = {
   clear: async (_id) => {},

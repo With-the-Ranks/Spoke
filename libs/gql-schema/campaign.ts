@@ -68,6 +68,11 @@ export const schema = `
     INCLUDES_NOT_ACTIVE_TARGETS
   }
 
+  type CsvColumnMapping {
+    column: String!
+    remap: String!
+  }
+
   type Campaign {
     id: ID!
     organization: Organization!
@@ -94,14 +99,13 @@ export const schema = `
     stats: CampaignStats,
     pendingJobs(jobTypes: [String]): [JobRequest]!
     datawarehouseAvailable: Boolean
-    useDynamicAssignment: Boolean
     introHtml: String
     primaryColor: String
     logoImageUrl: String
     editors: String
     teams: [Team!]!
     campaignGroups: CampaignGroupPage
-    campaignVariables: CampaignVariablePage!
+    campaignVariables: [CampaignVariable!]!
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean!
@@ -118,6 +122,9 @@ export const schema = `
     autosendStatus: String!
     messagingServiceSid: String
     autosendLimit: Int
+    columnMapping: [CsvColumnMapping!]
+    messagingService: MessagingService
+    contactsFilename: String
   }
 
   type CampaignEdge {
@@ -156,6 +163,11 @@ export const schema = `
     ignoreAfterDate: Date!
   }
 
+  input CsvColumnMappingInput {
+    column: String!
+    remap: String!
+  }
+
   input CampaignInput {
     title: String
     description: String
@@ -164,8 +176,7 @@ export const schema = `
     primaryColor: String
     introHtml: String
     externalSystemId: String
-    useDynamicAssignment: Boolean
-    contacts: [CampaignContactInput]
+    contacts: [CampaignContactInput!]
     contactsFile: Upload
     externalListId: String
     filterOutLandlines: Boolean
@@ -178,7 +189,7 @@ export const schema = `
     campaignVariables: [CampaignVariableInput!]
     texters: TexterInput
     interactionSteps: InteractionStepInput
-    cannedResponses: [CannedResponseInput]
+    cannedResponses: [CannedResponseInput!]
     textingHoursStart: Int
     textingHoursEnd: Int
     isAutoassignEnabled: Boolean
@@ -186,6 +197,7 @@ export const schema = `
     repliesStaleAfter: Int
     messagingServiceSid: String
     autosendLimit: Int
+    columnMapping: [CsvColumnMappingInput!]
   }
 `;
 export default schema;

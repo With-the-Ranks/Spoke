@@ -15,7 +15,7 @@ export const sortByCreatedAt = (is) => {
 // Sort by newest first
 export const sortByNewest = flow(sortBy(sortByCreatedAt), reverse);
 
-export function findParent(interactionStep, allInteractionSteps, isModel) {
+export const findParent = (interactionStep, allInteractionSteps, isModel) => {
   let parent = null;
   allInteractionSteps.forEach((step) => {
     if (isModel) {
@@ -40,13 +40,13 @@ export function findParent(interactionStep, allInteractionSteps, isModel) {
     }
   });
   return parent;
-}
+};
 
-export function getInteractionPath(
+export const getInteractionPath = (
   interactionStep,
   allInteractionSteps,
   isModel
-) {
+) => {
   const path = [];
   let parent = findParent(interactionStep, allInteractionSteps, isModel);
   while (parent !== null) {
@@ -54,9 +54,9 @@ export function getInteractionPath(
     parent = findParent(parent, allInteractionSteps, isModel);
   }
   return path;
-}
+};
 
-export function interactionStepForId(id, interactionSteps) {
+export const interactionStepForId = (id, interactionSteps) => {
   let interactionStep = null;
   interactionSteps.forEach((step) => {
     if (step.id === id) {
@@ -64,9 +64,9 @@ export function interactionStepForId(id, interactionSteps) {
     }
   });
   return interactionStep;
-}
+};
 
-export function getChildren(interactionStep, allInteractionSteps, isModel) {
+export const getChildren = (interactionStep, allInteractionSteps, isModel) => {
   const children = [];
   allInteractionSteps.forEach((step) => {
     const path = getInteractionPath(step, allInteractionSteps, isModel);
@@ -77,9 +77,9 @@ export function getChildren(interactionStep, allInteractionSteps, isModel) {
     });
   });
   return children;
-}
+};
 
-export function getInteractionTree(allInteractionSteps, isModel) {
+export const getInteractionTree = (allInteractionSteps, isModel) => {
   const pathLengthHash = {};
   allInteractionSteps.forEach((step) => {
     const path = getInteractionPath(step, allInteractionSteps, isModel);
@@ -87,17 +87,16 @@ export function getInteractionTree(allInteractionSteps, isModel) {
     pathLengthHash[path.length].push({ interactionStep: step, path });
   });
   return pathLengthHash;
-}
+};
 
-export function getTopMostParent(interactionSteps, isModel) {
-  return sortByNewest(interactionSteps).find((step) =>
+export const getTopMostParent = (interactionSteps, isModel) =>
+  sortByNewest(interactionSteps).find((step) =>
     isModel
       ? step.parent_interaction_id === null
       : step.parentInteractionId === null
   );
-}
 
-export function makeTree(interactionSteps, id = null, indexed = null) {
+export const makeTree = (interactionSteps, id = null, indexed = null) => {
   const indexedById =
     indexed ||
     flow(
@@ -115,4 +114,4 @@ export function makeTree(interactionSteps, id = null, indexed = null) {
       map((c) => makeTree(interactionSteps, c.id, indexedById))
     )(interactionSteps)
   };
-}
+};

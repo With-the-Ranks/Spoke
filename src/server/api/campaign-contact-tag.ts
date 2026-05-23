@@ -1,5 +1,4 @@
 import { r } from "../models";
-import { sqlResolvers } from "./lib/utils";
 import type { TagRecord, UserRecord } from "./types";
 
 interface CampaignContactTagRecord {
@@ -15,7 +14,6 @@ interface CampaignContactTagRecordPreloaded extends CampaignContactTagRecord {
 
 export const resolvers = {
   CampaignContactTag: {
-    ...sqlResolvers(["createdAt", "updatedAt"]),
     tag: async (cct: CampaignContactTagRecordPreloaded) =>
       cct.tag ? cct.tag : r.reader("tag").where({ id: cct.tag_id }).first(),
     tagger: async (cct: CampaignContactTagRecordPreloaded) =>

@@ -29,10 +29,11 @@ interface UploadResultsProps {
   contactsCount: number;
   customFields: string[];
   pendingJob?: PendingJobType;
+  contactsFilename: string | null;
 }
 
 export const UploadResults: React.FC<UploadResultsProps> = (props) => {
-  const { contactsCount, customFields, pendingJob } = props;
+  const { contactsCount, customFields, pendingJob, contactsFilename } = props;
   const [open, setOpen] = useState(false);
 
   const classes = useStyles();
@@ -43,7 +44,9 @@ export const UploadResults: React.FC<UploadResultsProps> = (props) => {
 
   return (
     <List>
-      {contactsCount > 0 && <ListSubheader>Uploaded</ListSubheader>}
+      {contactsCount > 0 && (
+        <ListSubheader>Uploaded {contactsFilename}</ListSubheader>
+      )}
       {contactsCount > 0 && (
         <ListItem {...dataTest("uploadedContacts")}>
           <ListItemIcon>

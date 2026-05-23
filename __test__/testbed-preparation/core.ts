@@ -11,6 +11,7 @@ import type { Organization } from "../../src/api/organization";
 import { UserRoleType } from "../../src/api/organization-membership";
 import type { User } from "../../src/api/user";
 import { DateTime } from "../../src/lib/datetime";
+import { symmetricEncrypt } from "../../src/server/api/lib/crypto";
 import type {
   AssignmentRecord,
   CampaignContactRecord,
@@ -165,7 +166,6 @@ export const createCampaign = async (
         is_approved,
         is_started,
         is_archived,
-        use_dynamic_assignment,
         logo_image_url,
         intro_html,
         primary_color,
@@ -180,7 +180,7 @@ export const createCampaign = async (
         external_system_id,
         autosend_status,
         autosend_user_id
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       returning *
     `,
       [
@@ -190,7 +190,6 @@ export const createCampaign = async (
         options.isApproved ?? false,
         options.isStarted ?? true,
         options.isArchived ?? false,
-        false,
         null,
         null,
         null,
@@ -224,7 +223,6 @@ export const createTemplate = async (
         is_approved,
         is_started,
         is_archived,
-        use_dynamic_assignment,
         logo_image_url,
         intro_html,
         primary_color,
@@ -240,14 +238,13 @@ export const createTemplate = async (
         autosend_status,
         autosend_user_id,
         is_template
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       returning *
     `,
       [
         options.organizationId,
         options.title ?? faker.company.companyName(),
         options.description ?? faker.lorem.sentence(),
-        false,
         false,
         false,
         false,
@@ -387,8 +384,14 @@ export const createMessage = async (
     )
     .then(({ rows: [message] }) => message);
 
+const isOrganizationRecord = (
+  organization: OrganizationRecord | CreateOrganizationOptions | undefined
+): organization is OrganizationRecord => {
+  return organization !== undefined && "id" in organization;
+};
+
 export interface CreateCompleteCampaignOptions {
-  organization?: CreateOrganizationOptions;
+  organization?: OrganizationRecord | CreateOrganizationOptions;
   campaign?: Omit<CreateCampaignOptions, "organizationId">;
   texters?: number | CreateTexterOptions[];
   contacts?: number | Omit<CreateCampaignContactOptions, "campaignId">[];
@@ -398,10 +401,11 @@ export const createCompleteCampaign = async (
   client: PoolClient,
   options: CreateCompleteCampaignOptions
 ) => {
-  const organization = await createOrganization(
-    client,
-    options.organization ?? {}
-  );
+  const optOrg = options.organization;
+
+  const organization = isOrganizationRecord(optOrg)
+    ? optOrg
+    : await createOrganization(client, optOrg ?? {});
 
   const campaign = await createCampaign(client, {
     ...(options.campaign ?? {}),
@@ -457,7 +461,7 @@ returning *;
       faker.random.uuid(),
       options.organizationId,
       faker.random.alphaNumeric(15),
-      faker.random.alphaNumeric(15),
+      symmetricEncrypt(faker.random.alphaNumeric(15)),
       "assemble-numbers",
       faker.name.firstName(),
       options.active
@@ -524,3 +528,24 @@ export const createQuestionResponse = async (
       [options.value, options.campaignContactId, options.interactionStepId]
     )
     .then(({ rows: [questionResponse] }) => questionResponse);
+
+export const assignContacts = async (
+  client: PoolClient,
+  assignmentId: number,
+  campaignId: number,
+  count: number
+) => {
+  await client.query(
+    `
+          update campaign_contact
+          set assignment_id = $1
+          where id in (
+            select id from campaign_contact
+            where campaign_id = $2
+              and assignment_id is null
+            limit $3
+          )
+        `,
+    [assignmentId, campaignId, count]
+  );
+};

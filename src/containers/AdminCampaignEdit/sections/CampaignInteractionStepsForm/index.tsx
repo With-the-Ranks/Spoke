@@ -1,23 +1,21 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
-import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
-import type { CampaignVariablePage } from "@spoke/spoke-codegen";
+import Grid from "@material-ui/core/Grid";
+import type { Action, Campaign, CampaignVariable } from "@spoke/spoke-codegen";
 import produce from "immer";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useState } from "react";
 import { compose } from "recompose";
 
-import type { Campaign } from "../../../../api/campaign";
 import type {
   InteractionStep,
   InteractionStepWithChildren
 } from "../../../../api/interaction-step";
-import type { Action } from "../../../../api/types";
 import { readClipboardText, writeClipboardText } from "../../../../client/lib";
 import ScriptPreviewButton from "../../../../components/ScriptPreviewButton";
 import { dataTest } from "../../../../lib/attributes";
@@ -72,7 +70,7 @@ interface HocProps {
       "id" | "isStarted" | "customFields" | "externalSystem"
     > & {
       interactionSteps: InteractionStepWithLocalState[];
-      campaignVariables: CampaignVariablePage;
+      campaignVariables: CampaignVariable[];
     };
   };
   availableActions: {
@@ -279,18 +277,16 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
       campaign: {
         customFields,
         invalidScriptFields,
-        campaignVariables: { edges: campaignVariableEdges },
+        campaignVariables,
         externalSystem
       } = {
         customFields: [],
-        campaignVariables: { edges: [] },
+        campaignVariables: [],
         externalSystem: null
       }
     },
     availableActions: { availableActions }
   } = props;
-
-  const campaignVariables = campaignVariableEdges.map(({ node }) => node);
 
   const {
     interactionSteps,
@@ -321,6 +317,7 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
   const isSaveDisabled =
     isWorking || hasEmptyScripts || (!isNew && !hasPendingChanges);
   const finalSaveLabel = isWorking ? "Working..." : saveLabel;
+  const upperSaveLabel = isWorking ? "Working..." : "Save";
 
   const tree = makeTree(interactionSteps);
   const finalFree: InteractionStepWithChildren = isEqual(tree, {
@@ -389,9 +386,22 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
         title="What do you want to discuss?"
         subtitle="You can add scripts and questions and your texters can indicate responses from your contacts. For example, you might want to collect RSVPs to an event or find out whether to follow up about a different volunteer activity."
       />
-      <Box m={2}>
-        <ScriptPreviewButton campaignId={campaignId} />
-      </Box>
+      <Grid container style={{ padding: "8px" }} justifyContent="space-between">
+        <Grid item xs={4}>
+          <ScriptPreviewButton campaignId={campaignId} />
+        </Grid>
+        <Grid item xs={1}>
+          <Button
+            {...dataTest("interactionSubmit", true)}
+            variant="contained"
+            color="primary"
+            disabled={isSaveDisabled}
+            onClick={handleSave}
+          >
+            {upperSaveLabel}
+          </Button>
+        </Grid>
+      </Grid>
       {renderInvalidScriptFields()}
       <InteractionStepCard
         interactionStep={finalFree}

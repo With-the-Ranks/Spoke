@@ -21,10 +21,10 @@ export const getUserById = async ({ id }: { id: string | number }) => {
   return userAuth;
 };
 
-export async function userLoggedIn(
+export const userLoggedIn = async (
   val: string | number,
   field: "id" | "auth0_id" = "id"
-) {
+) => {
   const memoizer = await MemoizeHelper.getMemoizer();
   const memoizedGetUserById = memoizer.memoize(getUserById, cacheOpts.User);
   const memoizedgetUserByAuth0Id = memoizer.memoize(
@@ -40,13 +40,13 @@ export async function userLoggedIn(
       : null;
 
   return result?.is_suspended === true ? null : result;
-}
+};
 
-export async function currentEditors(
+export const currentEditors = async (
   redis: RedisClient,
   campaign: CampaignRecord,
   user: UserRecord
-) {
+) => {
   // Add user ID in case of duplicate admin names
   const displayName = `${user.id}~${user.first_name} ${user.last_name}`;
 
@@ -75,4 +75,4 @@ export async function currentEditors(
       return editor[0].split("~")[1];
     })
     .join(", ");
-}
+};

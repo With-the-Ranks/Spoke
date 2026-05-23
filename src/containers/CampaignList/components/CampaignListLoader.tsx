@@ -10,16 +10,17 @@ import React from "react";
 import type { CampaignDetailsForExport } from "../../../components/ExportMultipleCampaignDataDialog";
 import LoadingIndicator from "../../../components/LoadingIndicator";
 import { useAuthzContext } from "../../AuthzProvider";
+import type { CampaignOperationsProps } from "../utils";
 import { isCampaignGroupsPermissionError } from "../utils";
 import CampaignList from "./CampaignList";
-import type { CampaignOperations } from "./CampaignListMenu";
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   pageSize: number;
   campaignsFilter: CampaignsFilter;
   isAdmin: boolean;
   campaignDetailsForExport: CampaignDetailsForExport[];
+  selectForExport: (details: CampaignDetailsForExport) => void;
 }
 
 const CampaignListLoader: React.FC<Props> = (props) => {

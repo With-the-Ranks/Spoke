@@ -7,7 +7,7 @@ import { r } from "../models";
 import { addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue } from "./assignment";
 import { buildCampaignQuery } from "./campaign";
 
-async function getConversationsJoinsAndWhereClause(
+const getConversationsJoinsAndWhereClause = async (
   queryParam,
   organizationId,
   campaignsFilter,
@@ -15,7 +15,7 @@ async function getConversationsJoinsAndWhereClause(
   tagsFilter,
   contactsFilter,
   contactNameFilter
-) {
+) => {
   let query = queryParam
     .from("campaign")
     .join("campaign_contact", "campaign.id", "campaign_contact.campaign_id")
@@ -158,7 +158,7 @@ async function getConversationsJoinsAndWhereClause(
   }
 
   return { query };
-}
+};
 
 /*
 This is necessary because the SQL query that provides the data for this resolver
@@ -167,17 +167,16 @@ alias the column names to make them unique.  This function creates a copy of the
 results, replacing keys in the fields map with the original column name, so the
 results can be consumed by downstream resolvers.
  */
-function mapQueryFieldsToResolverFields(queryResult, fieldsMap) {
-  return _.mapKeys(queryResult, (value, key) => {
+const mapQueryFieldsToResolverFields = (queryResult, fieldsMap) =>
+  _.mapKeys(queryResult, (value, key) => {
     const newKey = fieldsMap[key];
     if (newKey) {
       return newKey;
     }
     return key;
   });
-}
 
-export async function getConversations(
+export const getConversations = async (
   cursor,
   organizationId,
   campaignsFilter,
@@ -185,7 +184,7 @@ export async function getConversations(
   tagsFilter,
   contactsFilter,
   contactNameFilter
-) {
+) => {
   /* Query #1 == get campaign_contact.id for all the conversations matching
    * the criteria with offset and limit. */
   let offsetLimitQuery = r.reader.select("campaign_contact.id as cc_id");
@@ -227,6 +226,7 @@ export async function getConversations(
     "campaign_contact.first_name as cc_first_name",
     "campaign_contact.last_name as cc_last_name",
     "campaign_contact.cell",
+    "campaign_contact.custom_fields",
     "campaign_contact.message_status",
     "campaign_contact.is_opted_out",
     "campaign_contact.updated_at",
@@ -350,16 +350,16 @@ export async function getConversations(
     conversations,
     pageInfo
   };
-}
+};
 
-export async function getCampaignIdMessageIdsAndCampaignIdContactIdsMaps(
+export const getCampaignIdMessageIdsAndCampaignIdContactIdsMaps = async (
   organizationId,
   campaignsFilter,
   assignmentsFilter,
   tagsFilter,
   contactsFilter,
   contactNameFilter
-) {
+) => {
   let query = r.reader.select(
     "campaign_contact.id as cc_id",
     "campaign.id as cmp_id",
@@ -417,16 +417,16 @@ export async function getCampaignIdMessageIdsAndCampaignIdContactIdsMaps(
     campaignIdContactIdsMap,
     campaignIdMessagesIdsMap
   };
-}
+};
 
-export async function getCampaignIdMessageIdsAndCampaignIdContactIdsMapsChunked(
+export const getCampaignIdMessageIdsAndCampaignIdContactIdsMapsChunked = async (
   organizationId,
   campaignsFilter,
   assignmentsFilter,
   tagsFilter,
   contactsFilter,
   contactNameFilter
-) {
+) => {
   let query = r.reader.select(
     "campaign_contact.id as cc_id",
     "campaign.id as cmp_id",
@@ -468,7 +468,7 @@ export async function getCampaignIdMessageIdsAndCampaignIdContactIdsMapsChunked(
     }
   });
   return Object.entries(result);
-}
+};
 
 export const reassignContacts = async (campaignContactIds, newTexterId) => {
   const result = await r.knex.transaction(async (trx) => {
@@ -524,11 +524,11 @@ export const reassignContacts = async (campaignContactIds, newTexterId) => {
   return result;
 };
 
-export async function reassignConversations(
+export const reassignConversations = async (
   campaignIdContactIdsMap,
   campaignIdMessagesIdsMap,
   newTexterUserId
-) {
+) => {
   // ensure existence of assignments
   const campaignIdAssignmentIdMap = new Map();
   for (const [campaignId, _ignore] of campaignIdContactIdsMap) {
@@ -585,7 +585,7 @@ export async function reassignConversations(
   );
 
   return returnCampaignIdAssignmentIds;
-}
+};
 
 export const resolvers = {
   PaginatedConversations: {

@@ -22,7 +22,7 @@ const DOMAIN_REGEX = new RegExp(
 
 const db = knex(knexConfig);
 
-async function markDomainUnhealthy(domain: string) {
+const markDomainUnhealthy = async (domain: string) => {
   // Check if domain is already marked unhealthy
   const existingDomain = await db("unhealthy_link_domain")
     .select("id")
@@ -38,9 +38,9 @@ async function markDomainUnhealthy(domain: string) {
 
   logger.warn(`Marking ${domain} as unhealthy.`);
   await db("unhealthy_link_domain").insert({ domain });
-}
+};
 
-async function firstMessageSentAt() {
+const firstMessageSentAt = async () => {
   const firstMessage = await db("message")
     .select("created_at")
     .orderBy("created_at", "asc")
@@ -48,14 +48,14 @@ async function firstMessageSentAt() {
     .first();
 
   return firstMessage ? firstMessage.created_at : firstMessage;
-}
+};
 
-function extractDomain(text: string) {
+const extractDomain = (text: string) => {
   const matches = text.match(DOMAIN_REGEX);
   return matches ? matches[0] : null;
-}
+};
 
-function extractPath(text: string, domain: string | null) {
+const extractPath = (text: string, domain: string | null) => {
   if (!domain) return null;
 
   try {
@@ -71,9 +71,9 @@ function extractPath(text: string, domain: string | null) {
   } catch (ex) {
     return null;
   }
-}
+};
 
-async function chunkedMain(): Promise<"Done"> {
+const chunkedMain = async (): Promise<"Done"> => {
   const results = await db.raw(`
     select (to_char(period_ends_at, 'YYYY-MM-DD') || 'T' || to_char(period_ends_at, 'HH24:MI:SSZ')) as period_ends_at
     from deliverability_report
@@ -167,7 +167,7 @@ async function chunkedMain(): Promise<"Done"> {
   const insertResult = await db("deliverability_report").insert(rows);
   logger.verbose("Successfully inserted with value: ", insertResult);
   return chunkedMain();
-}
+};
 
 const deliverabilityReducer = (accumulator, messageGroup) => {
   let [sent, delivered] = accumulator;
@@ -177,7 +177,7 @@ const deliverabilityReducer = (accumulator, messageGroup) => {
   return [sent, delivered];
 };
 
-async function slidingWindowMain() {
+const slidingWindowMain = async () => {
   const { rows: messages } = await db.raw(
     `
     select
@@ -257,11 +257,9 @@ async function slidingWindowMain() {
   //   .whereRaw(`created_at < CURRENT_TIMESTAMP - INTERVAL '?? second'`, [COOL_DOWN_PERIOD_SECONDS])
 
   return "Done";
-}
+};
 
-async function main() {
-  return Promise.all([chunkedMain(), slidingWindowMain()]);
-}
+const main = async () => Promise.all([chunkedMain(), slidingWindowMain()]);
 
 main()
   .then((result) => {

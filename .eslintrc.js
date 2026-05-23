@@ -7,7 +7,13 @@ module.exports = {
       jsx: true
     }
   },
-  plugins: ["@typescript-eslint", "simple-import-sort", "import"],
+  plugins: [
+    "@typescript-eslint",
+    "import",
+    "json",
+    "prefer-arrow-functions",
+    "simple-import-sort"
+  ],
   extends: [
     "eslint:recommended",
     "airbnb",
@@ -49,6 +55,8 @@ module.exports = {
     "prettier/prettier": ["error", {}, { usePrettierrc: true }],
     "jsx-a11y/href-no-hash": ["off"],
     "react/jsx-filename-extension": ["warn", { extensions: [".jsx", ".tsx"] }],
+    "no-console": ["error", { allow: ["error", "warn"] }],
+    "prefer-arrow-functions/prefer-arrow-functions": "error",
     "max-len": [
       "warn",
       {
@@ -135,6 +143,11 @@ module.exports = {
         ],
         patterns: [
           {
+            group: ["src/*"],
+            message: "Please use relative path imports instead",
+            allowTypeImports: false
+          },
+          {
             group: ["**/gql-schema/*"],
             message: "Please use @spoke/spoke-codegen instead",
             allowTypeImports: false
@@ -198,6 +211,7 @@ module.exports = {
         ]
       }
     ],
+    "json/*": ["error"],
 
     // Rules to get linting to pass
     camelcase: ["off", { properties: "never" }],
@@ -205,7 +219,6 @@ module.exports = {
     "@typescript-eslint/no-var-requires": ["off"],
     "@typescript-eslint/no-explicit-any": ["off"],
     "import/order": ["off"],
-    "no-console": ["off"],
     "prefer-promise-reject-errors": ["off"],
     "no-restricted-syntax": ["off"],
     "consistent-return": ["off"],
@@ -253,6 +266,13 @@ module.exports = {
             ]
           }
         ]
+      }
+    },
+    {
+      // stick with knex style
+      files: ["migrations/*"],
+      rules: {
+        "prefer-arrow-functions/prefer-arrow-functions": "off"
       }
     }
   ]

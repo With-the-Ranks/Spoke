@@ -7,7 +7,6 @@ const { r } = thinky;
 // based on assignments or texter actions
 // GET campaign-<campaignId>
 //   archived
-//   useDynamicAssignment
 //   organization: {}
 //   customFields
 //   interactionSteps

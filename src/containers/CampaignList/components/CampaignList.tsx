@@ -5,14 +5,15 @@ import React from "react";
 
 import Empty from "../../../components/Empty";
 import type { CampaignDetailsForExport } from "../../../components/ExportMultipleCampaignDataDialog";
-import type { CampaignOperations } from "./CampaignListMenu";
+import type { CampaignOperationsProps } from "../utils";
 import CampaignListRow from "./CampaignListRow";
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   campaigns: CampaignListEntryFragment[];
   isAdmin: boolean;
   campaignDetailsForExport: CampaignDetailsForExport[];
+  selectForExport: (details: CampaignDetailsForExport) => void;
 }
 
 export const CampaignList: React.FC<Props> = (props) => {

@@ -19,6 +19,7 @@ fragment ConversationInfo on Conversation {
     firstName
     lastName
     cell
+    customFields
     messageStatus
     messages {
       ...ConversationMessage
@@ -73,6 +74,17 @@ query GetConversationsForMessageReview(
     }
     conversations {
       ...ConversationInfo
+    }
+  }
+}
+
+query GetMessageReviewContactUpdates($campaignContactId: String!) {
+  contact (id: $campaignContactId) {
+    messages {
+      ...ConversationMessage
+    }
+    optOut {
+      cell
     }
   }
 }

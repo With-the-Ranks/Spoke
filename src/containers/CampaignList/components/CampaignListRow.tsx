@@ -9,14 +9,13 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 
 import type { CampaignDetailsForExport } from "../../../components/ExportMultipleCampaignDataDialog";
-import { dataTest } from "../../../lib/attributes";
+import type { CampaignOperationsProps } from "../utils";
 import { makeCampaignHeaderTags } from "../utils";
 import CampaignDetails from "./CampaignDetails";
 import CampaignHeader from "./CampaignHeader";
-import type { CampaignOperations } from "./CampaignListMenu";
 import CampaignListMenu from "./CampaignListMenu";
 
-interface Props extends CampaignOperations {
+interface Props extends CampaignOperationsProps {
   organizationId: string;
   isAdmin: boolean;
   campaign: CampaignListEntryFragment;
@@ -63,18 +62,18 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     isStarted ? "" : "/edit"
   }`;
 
-  // satisfy typescript (boolean | null | undefined possible for these vars)
   const isAutoAssignEligible = !!(
     isStarted &&
     !isArchived &&
     isAutoassignEnabled
   );
+
   return (
     <Card
       variant="outlined"
       style={{ marginBottom: 16, ...(isArchived && { opacity: 0.6 }) }}
     >
-      <ListItem {...dataTest("campaignRow")} alignItems="flex-start">
+      <ListItem alignItems="flex-start">
         <ListItemIcon>
           <Checkbox
             edge="start"

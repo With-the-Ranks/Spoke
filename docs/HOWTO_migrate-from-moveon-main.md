@@ -1,6 +1,6 @@
 # How to Migrate from MoveOnOrg/Spoke
 
-The Politics Rewired fork of Spoke has many differences from [MoveOnOrg/Spoke](https://www.github.com/MoveOnOrg/Spoke). These include feature additions as well as database schema changes that must be reconciled.
+This Politics Rewired derived fork of Spoke has many differences from [MoveOnOrg/Spoke](https://www.github.com/MoveOnOrg/Spoke). These include feature additions as well as database schema changes that must be reconciled.
 
 ## Changes
 

@@ -15,11 +15,11 @@ const AUTOJOIN_URL = SHOULD_AUTOJOIN_NEW_USER
   ? `${BASE_URL}/${AUTOJOIN_ORG_UUID}/join`
   : "";
 
-export function redirectPostSignIn(
+export const redirectPostSignIn = (
   req: Request,
   res: Response,
   isNewUser: boolean
-) {
+) => {
   const redirectDestionation = !req.query.state
     ? SHOULD_AUTOJOIN_NEW_USER && isNewUser
       ? AUTOJOIN_URL
@@ -29,9 +29,9 @@ export function redirectPostSignIn(
     : "/";
 
   return res.redirect(redirectDestionation);
-}
+};
 
-export async function handleSuspendedUser(req: Request, res: Response) {
+export const handleSuspendedUser = async (req: Request, res: Response) => {
   await new Promise<void>((resolve, reject) => {
     req.session.destroy((err) => {
       if (err) return reject(err);
@@ -41,7 +41,7 @@ export async function handleSuspendedUser(req: Request, res: Response) {
   return res
     .status(400)
     .send({ success: false, message: new SuspendedUserError().message });
-}
+};
 
 export const passportCallback = (
   req: Request,

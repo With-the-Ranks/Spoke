@@ -11,12 +11,13 @@ import { currentEditors } from "../models/cacheable_queries";
 import { accessRequired } from "./errors";
 import { getDeliverabilityStats, invalidScriptFields } from "./lib/campaign";
 import { symmetricEncrypt } from "./lib/crypto";
+import { getMessagingServiceById } from "./lib/message-sending";
 import { formatPage } from "./lib/pagination";
 import { sqlResolvers } from "./lib/utils";
 import { getOrgFeature } from "./organization-settings";
 import { getUsers } from "./user";
 
-export function addCampaignsFilterToQuery(queryParam, campaignsFilter) {
+export const addCampaignsFilterToQuery = (queryParam, campaignsFilter) => {
   let query = queryParam;
 
   if (campaignsFilter) {
@@ -52,14 +53,14 @@ export function addCampaignsFilterToQuery(queryParam, campaignsFilter) {
     }
   }
   return query;
-}
+};
 
-export function buildCampaignQuery(
+export const buildCampaignQuery = (
   queryParam,
   organizationId,
   campaignsFilter,
   addFromClause = true
-) {
+) => {
   let query = queryParam;
 
   if (addFromClause) {
@@ -70,7 +71,7 @@ export function buildCampaignQuery(
   query = addCampaignsFilterToQuery(query, campaignsFilter);
 
   return query;
-}
+};
 
 const doGetCampaigns = async ({ organizationId, cursor, campaignsFilter }) => {
   let campaignsQuery = buildCampaignQuery(
@@ -108,13 +109,13 @@ const doGetCampaigns = async ({ organizationId, cursor, campaignsFilter }) => {
   return campaignsQuery;
 };
 
-export async function getCampaigns(organizationId, cursor, campaignsFilter) {
+export const getCampaigns = async (organizationId, cursor, campaignsFilter) => {
   const memoizer = await MemoizeHelper.getMemoizer();
   const memoizedCampaigns = MemoizeHelper.hasBucketConfigured(Buckets.Advanced)
     ? memoizer.memoize(doGetCampaigns, cacheOpts.CampaignsList)
     : doGetCampaigns;
   return memoizedCampaigns({ organizationId, cursor, campaignsFilter });
-}
+};
 
 const getCampaignOrganization = async ({ campaignId }) => {
   const campaign = await r
@@ -445,7 +446,7 @@ export const resolvers = {
         .then(([{ count }]) => parseInt(count, 10) === 0)
   },
   CampaignsReturn: {
-    __resolveType(obj, _context, _) {
+    __resolveType: (obj, _context, _) => {
       if (Array.isArray(obj)) {
         return "CampaignsList";
       }
@@ -478,8 +479,6 @@ export const resolvers = {
       "description",
       "isStarted",
       "isArchived",
-      // TODO: re-enable once dynamic assignment is fixed (#548)
-      // "useDynamicAssignment",
       "introHtml",
       "primaryColor",
       "logoImageUrl",
@@ -489,7 +488,8 @@ export const resolvers = {
       "createdAt",
       "landlinesFiltered",
       "messagingServiceSid",
-      "autosendLimit"
+      "autosendLimit",
+      "columnMapping"
     ]),
     isApproved: (campaign) =>
       isNil(campaign.is_approved) ? false : campaign.is_approved,
@@ -498,7 +498,6 @@ export const resolvers = {
     timezone: (campaign) => parseIanaZone(campaign.timezone),
     readiness: (campaign) => campaign,
     repliesStaleAfter: (campaign) => campaign.replies_stale_after_minutes,
-    useDynamicAssignment: (_) => false,
     isAssignmentLimitedToTeams: (campaign) =>
       campaign.limit_assignment_to_teams,
     dueBy: (campaign) =>
@@ -578,6 +577,14 @@ export const resolvers = {
           .where({ campaign_id: campaign.id })
           .whereRaw(`archived = ${campaign.is_archived}`) // partial index friendly
       ),
+    contactsFilename: async (campaign) => {
+      const row = await r
+        .reader("campaign_contact_upload")
+        .where({ campaign_id: campaign.id })
+        .select("contacts_filename")
+        .first();
+      return row?.contacts_filename ?? null;
+    },
     hasUnassignedContacts: async (campaign) => {
       if (config.BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS) {
         return false;
@@ -797,7 +804,7 @@ export const resolvers = {
     },
     campaignGroups: async (campaign, { after, first }, { user }) => {
       const organizationId = parseInt(campaign.organization_id, 10);
-      await accessRequired(user, organizationId, "ADMIN");
+      await accessRequired(user, organizationId, UserRoleType.ADMIN);
 
       const query = r
         .reader("campaign_group")
@@ -811,17 +818,15 @@ export const resolvers = {
       const result = await formatPage(query, { after, first });
       return result;
     },
-    campaignVariables: async (campaign, { after, first }, { user }) => {
+    campaignVariables: async (campaign, _, { user }) => {
       const organizationId = parseInt(campaign.organization_id, 10);
       await accessRequired(user, organizationId, UserRoleType.TEXTER);
 
-      const query = r
+      return r
         .reader("campaign_variable")
         .where({ campaign_id: campaign.id })
         .whereNull("deleted_at")
         .select("*");
-      const result = await formatPage(query, { after, first });
-      return result;
     },
     autosendStatus: async (campaign) => {
       const {
@@ -842,6 +847,25 @@ export const resolvers = {
         [campaign.id]
       );
       return autosend_status;
+    },
+    messagingService: async (campaign, _, { user }) => {
+      const {
+        organization_id: orgId,
+        messaging_service_sid: msgServiceId
+      } = campaign;
+
+      if (!msgServiceId) {
+        return null;
+      }
+
+      try {
+        await accessRequired(user, orgId, UserRoleType.ADMIN, true);
+      } catch {
+        return null;
+      }
+
+      const messagingService = await getMessagingServiceById(msgServiceId);
+      return messagingService;
     }
   }
 };

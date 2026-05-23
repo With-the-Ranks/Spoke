@@ -7,17 +7,17 @@ import {
 
 describe("stringIsAValidUrl", () => {
   test("recognizes valid URL", () => {
-    expect(stringIsAValidUrl("https://www.politicsrewired.com")).toBe(true);
+    expect(stringIsAValidUrl("https://www.withtheranks.com")).toBe(true);
   });
 
   test("recognizes valid URL with query string", () => {
     expect(
-      stringIsAValidUrl("https://www.politicsrewired.com?foo=bar&bar=baz")
+      stringIsAValidUrl("https://www.withtheranks.com?foo=bar&bar=baz")
     ).toBe(true);
   });
 
   test("rejects invalid URL without scheme", () => {
-    expect(stringIsAValidUrl("www.politicsrewired.com")).toBe(false);
+    expect(stringIsAValidUrl("www.withtheranks.com")).toBe(false);
   });
 
   test("rejects invalid URL", () => {

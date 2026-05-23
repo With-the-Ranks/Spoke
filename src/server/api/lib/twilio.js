@@ -88,7 +88,7 @@ const textIncludingMms = (text, serviceMessages) => {
   return text;
 };
 
-async function convertMessagePartsToMessage(messageParts) {
+const convertMessagePartsToMessage = async (messageParts) => {
   const firstPart = messageParts[0];
   const userNumber = firstPart.user_number;
   const contactNumber = firstPart.contact_number;
@@ -120,9 +120,9 @@ async function convertMessagePartsToMessage(messageParts) {
       send_status: "DELIVERED"
     }
   );
-}
+};
 
-async function findNewCell(messagingSericeSid) {
+const findNewCell = async (messagingSericeSid) => {
   const twilio = await twilioClient(messagingSericeSid);
   return new Promise((resolve, reject) => {
     twilio.availablePhoneNumbers("US").local.list({}, (err, data) => {
@@ -133,9 +133,9 @@ async function findNewCell(messagingSericeSid) {
       }
     });
   });
-}
+};
 
-async function rentNewCell(messagingSericeSid) {
+const rentNewCell = async (messagingSericeSid) => {
   const twilio = await twilioClient(messagingSericeSid);
   const newCell = await findNewCell();
 
@@ -163,9 +163,9 @@ async function rentNewCell(messagingSericeSid) {
   }
 
   throw new Error("Did not find any cell");
-}
+};
 
-async function sendMessage(message, organizationId, trx = r.knex) {
+const sendMessage = async (message, organizationId, trx = r.knex) => {
   const service = await getContactMessagingService(
     message.campaign_contact_id,
     organizationId
@@ -293,7 +293,7 @@ async function sendMessage(message, organizationId, trx = r.knex) {
       }
     });
   });
-}
+};
 
 // Get appropriate Spoke message status from Twilio status
 const getMessageStatus = (twilioStatus) => {
@@ -344,7 +344,7 @@ export const processDeliveryReportBody = async (client, reportBody) => {
   );
 };
 
-async function handleIncomingMessage(message) {
+const handleIncomingMessage = async (message) => {
   if (
     !Object.prototype.hasOwnProperty.call(message, "From") ||
     !Object.prototype.hasOwnProperty.call(message, "To") ||
@@ -379,7 +379,7 @@ async function handleIncomingMessage(message) {
       await saveNewIncomingMessage(finalMessage);
     }
   }
-}
+};
 
 export default {
   syncMessagePartProcessing: config.JOBS_SAME_PROCESS,

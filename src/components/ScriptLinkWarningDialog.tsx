@@ -32,7 +32,7 @@ const DialogContentWrapper = (props: ContentProps) => {
       <p>
         Be sure to read our advice{" "}
         <a
-          href="https://docs.spokerewired.com/article/113-sending-links"
+          href="https://withtheranks.com/docs/spoke/for-spoke-admins/sending-links/"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -57,7 +57,7 @@ const DialogContentWrapper = (props: ContentProps) => {
         If you need to insert a short link into your message, be sure to read
         the docs{" "}
         <a
-          href="https://docs.spokerewired.com/article/113-sending-links"
+          href="https://withtheranks.com/docs/spoke/for-spoke-admins/sending-links/"
           target="_blank"
           rel="noopener noreferrer"
         >

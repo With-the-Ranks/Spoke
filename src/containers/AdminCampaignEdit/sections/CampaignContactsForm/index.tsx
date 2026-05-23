@@ -14,6 +14,8 @@ import type {
   RequiredComponentProps
 } from "../../components/SectionWrapper";
 import { asSection } from "../../components/SectionWrapper";
+import type { ColumnMapping } from "./components/ConfigureColumnMappingDialog";
+import ConfigureColumnMappingDialog from "./components/ConfigureColumnMappingDialog";
 import ContactsSqlForm from "./components/ContactsSqlForm";
 import CSVForm from "./components/CSVForm";
 import ExternalSystemsSource from "./components/ExternalSystemsSource";
@@ -36,6 +38,7 @@ interface ContactsValues {
   contactsFile: File | null;
   filterOutLandlines: boolean;
   excludeCampaignIds: string[];
+  contactsFilename: string | null;
 }
 
 interface ContactsCampaign {
@@ -44,6 +47,7 @@ interface ContactsCampaign {
   contactsCount: number;
   externalSystem: { id: string } | null;
   datawarehouseAvailable: boolean;
+  contactsFilename: string | null;
 }
 
 interface ContactsOrganization {
@@ -80,10 +84,12 @@ interface ContactsState {
   contactsFile: File | null;
   externalListId: string | null;
   filterOutLandlines: boolean;
+  columnMapping: Array<ColumnMapping>;
 
   // UI
   source: ContactSourceType;
   isWorking: boolean;
+  configureMappingOpen: boolean;
 }
 
 class CampaignContactsForm extends React.Component<
@@ -100,7 +106,9 @@ class CampaignContactsForm extends React.Component<
     contactsSql: null,
     contactsFile: null,
     externalListId: null,
-    filterOutLandlines: false
+    filterOutLandlines: false,
+    configureMappingOpen: false,
+    columnMapping: []
   };
 
   constructor(props: ContactsInnerProps) {
@@ -114,7 +122,10 @@ class CampaignContactsForm extends React.Component<
     this.setState({ contactsSql });
 
   handleOnContactsFileChange = (contactsFile?: File) =>
-    this.setState({ contactsFile: contactsFile || null });
+    this.setState({
+      contactsFile: contactsFile || null,
+      configureMappingOpen: true
+    });
 
   handleOnExternalListChange = (externalListId: string) =>
     this.setState({ externalListId });
@@ -122,13 +133,26 @@ class CampaignContactsForm extends React.Component<
   handleOnChangeExcludedCamapignIds = (selectedCampaignIds: string[]) =>
     this.setState({ selectedCampaignIds });
 
+  handleClickConfigureMapping = () =>
+    this.setState({ configureMappingOpen: true });
+
+  handleCloseConfigureMapping = () =>
+    this.setState({ configureMappingOpen: false });
+
+  handleSaveConfigureMapping = (columnMapping: Array<ColumnMapping>) =>
+    this.setState({
+      columnMapping,
+      configureMappingOpen: false
+    });
+
   handleOnSubmit = async () => {
     const {
       contactsSql,
       contactsFile,
       externalListId,
       filterOutLandlines,
-      selectedCampaignIds
+      selectedCampaignIds,
+      columnMapping
     } = this.state;
 
     this.setState({ isWorking: true });
@@ -138,7 +162,8 @@ class CampaignContactsForm extends React.Component<
         contactsFile,
         externalListId,
         filterOutLandlines,
-        excludeCampaignIds: selectedCampaignIds
+        excludeCampaignIds: selectedCampaignIds,
+        columnMapping
       };
       const response = await this.props.mutations.editCampaign(campaignInput);
       if (response.errors) throw response.errors[0];
@@ -209,7 +234,8 @@ class CampaignContactsForm extends React.Component<
       selectedCampaignIds,
       contactsSql,
       contactsFile,
-      externalListId
+      externalListId,
+      columnMapping
     } = this.state;
     const {
       campaignId,
@@ -222,7 +248,8 @@ class CampaignContactsForm extends React.Component<
     const {
       customFields,
       contactsCount,
-      externalSystem
+      externalSystem,
+      contactsFilename
     } = campaignData.campaign;
 
     const {
@@ -234,7 +261,10 @@ class CampaignContactsForm extends React.Component<
     );
 
     const isSaveDisabled =
-      isWorking || (!isNew && !contactsFile && !contactsSql && !externalListId);
+      isWorking ||
+      (!isNew && !contactsFile && !contactsSql && !externalListId) ||
+      (columnMapping === undefined && contactsFile);
+
     const finalSaveLabel = isWorking ? "Working..." : saveLabel;
 
     const sourceOptions = this.getSourceOptions();
@@ -283,6 +313,17 @@ class CampaignContactsForm extends React.Component<
           />
         )}
         {source === ContactSourceType.CSV && (
+          <Button
+            style={{ marginTop: 10 }}
+            variant="contained"
+            color="primary"
+            disabled={contactsFile === null}
+            onClick={this.handleClickConfigureMapping}
+          >
+            Configure Column Mapping
+          </Button>
+        )}
+        {source === ContactSourceType.CSV && (
           <SelectExcludeCampaigns
             allOtherCampaigns={allOtherCampaigns}
             selectedCampaignIds={selectedCampaignIds}
@@ -293,6 +334,7 @@ class CampaignContactsForm extends React.Component<
           contactsCount={contactsCount}
           customFields={customFields}
           pendingJob={pendingJob}
+          contactsFilename={contactsFilename}
         />
         <br />
         <Button
@@ -302,6 +344,12 @@ class CampaignContactsForm extends React.Component<
         >
           {finalSaveLabel}
         </Button>
+        <ConfigureColumnMappingDialog
+          contactsFile={contactsFile}
+          open={this.state.configureMappingOpen}
+          onClose={this.handleCloseConfigureMapping}
+          onSave={this.handleSaveConfigureMapping}
+        />
       </div>
     );
   }
@@ -319,6 +367,11 @@ const queries = {
             id
           }
           datawarehouseAvailable
+          columnMapping {
+            column
+            remap
+          }
+          contactsFilename
         }
       }
     `,
@@ -375,6 +428,7 @@ const mutations = {
             id
             contacts
           }
+          contactsFilename
         }
       }
     `,

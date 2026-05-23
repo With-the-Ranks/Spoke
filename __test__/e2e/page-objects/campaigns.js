@@ -28,7 +28,6 @@ export const campaigns = {
     },
     texters: {
       section: By.css('[data-test=texters]'),
-      useDynamicAssignment: By.css('[data-test=useDynamicAssignment]'),
       joinUrl: By.css('[data-test=joinUrl]'),
       addAll: By.css('[data-test=addAll]'),
       autoSplit: By.css('[data-test=autoSplit]'),

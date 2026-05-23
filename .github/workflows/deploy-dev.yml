@@ -1,0 +1,71 @@
+name: Deploy to Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+
+env:
+  GCP_REGION: us-west1
+  GAR_REGISTRY: us-west1-docker.pkg.dev/spoke-407503/spoke/core
+  GKE_CLUSTER: spoke-cluster
+  GKE_LOCATION: us-west1-a
+  DEV_NAMESPACE: spoke-staging
+  DEV_DEPLOYMENT: dev-spoke
+  WIF_PROVIDER: projects/630731592917/locations/global/workloadIdentityPools/github-actions/providers/github
+  WIF_SERVICE_ACCOUNT: spoke-ci@spoke-407503.iam.gserviceaccount.com
+
+jobs:
+  deploy-dev:
+    name: Deploy to Dev
+    concurrency:
+      group: dev-deploy
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Get short SHA
+        id: build-metadata
+        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/gcp-auth
+        with:
+          wif_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          region: ${{ env.GCP_REGION }}
+
+      - uses: ./.github/actions/docker-build-push
+        with:
+          registry: ${{ env.GAR_REGISTRY }}
+          context: .
+          tags: |
+            dev-latest
+            dev-${{ steps.build-metadata.outputs.sha_short }}
+          spoke_version: dev-${{ steps.build-metadata.outputs.sha_short }}
+          cache_scope: dev
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_LOCATION }}
+
+      - name: Restart dev deployment
+        run: |
+          if kubectl get deployment ${{ env.DEV_DEPLOYMENT }} -n ${{ env.DEV_NAMESPACE }} &>/dev/null; then
+            kubectl rollout restart deployment/${{ env.DEV_DEPLOYMENT }} -n ${{ env.DEV_NAMESPACE }}
+            kubectl rollout status deployment/${{ env.DEV_DEPLOYMENT }} -n ${{ env.DEV_NAMESPACE }} --timeout=5m
+          else
+            echo "Dev deployment not found — skipping restart"
+          fi

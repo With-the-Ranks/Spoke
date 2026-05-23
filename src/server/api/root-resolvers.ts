@@ -2,7 +2,7 @@ import { ForbiddenError } from "apollo-server-errors";
 import _ from "lodash";
 
 import { config } from "../../config";
-import { VALID_CONTENT_TYPES, withTempDownload } from "../../lib/utils";
+import { withTempDownload } from "../../lib/utils";
 import {
   getInstanceNotifications,
   getOrgLevelNotifications
@@ -14,7 +14,6 @@ import { queryCampaignOverlaps } from "./campaign-overlap";
 import { getConversations } from "./conversations";
 import { accessRequired, authRequired, superAdminRequired } from "./errors";
 import { getStepsToUpdate } from "./lib/bulk-script-editor";
-import { getFileType } from "./lib/file-type";
 import { formatPage } from "./lib/pagination";
 import { getUsers, getUsersById } from "./user";
 
@@ -526,10 +525,13 @@ const rootResolvers = {
       });
     },
     isValidAttachment: async (_root, { fileUrl }, _context) => {
-      const handler = async (filePath) => {
-        const fileType = await getFileType(filePath);
+      // 2025-03-25: @npcz/magic is throwing an uncatachable exception
+      // skip file type validation for now
+      const handler = async (_filePath: string) => {
+        return true;
+        // const fileType = await getFileType(filePath);
 
-        return VALID_CONTENT_TYPES.includes(fileType);
+        // return VALID_CONTENT_TYPES.includes(fileType);
       };
       return withTempDownload(fileUrl, handler);
     }

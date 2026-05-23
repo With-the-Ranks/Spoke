@@ -69,12 +69,7 @@ export const campaigns = {
         await wait.andType(driver, form.texters.texterAssignmentByText(campaign.texter.given_name), campaign.texters.contactLength)
         // Validate Assignment
         expect(await wait.andGetValue(driver, form.texters.texterAssignmentByText(campaign.admin.given_name))).toBe('0')
-      } else {
-        // Dynamically Assign
-        await wait.andClick(driver, form.texters.useDynamicAssignment, { elementIsVisible: false, waitAfterVisible: 2000 })
-        // Store the invite (join) URL into a global for future use.
-        global.e2e.joinUrl = await wait.andGetValue(driver, form.texters.joinUrl)
-      }
+      } 
       // Save
       await wait.andClick(driver, form.save)
       // This should switch to the Interactions section

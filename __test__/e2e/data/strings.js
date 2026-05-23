@@ -171,7 +171,6 @@ const campaigns = {
     admin: users.admin0,
     texter: users.texter0,
     existingTexter: true,
-    dynamicAssignment: false,
     basics: {
       title: 'Test C Campaign Title',
       title_copied: 'COPY - Test C Campaign Title',
@@ -186,7 +185,6 @@ const campaigns = {
     name: 'editCampaign',
     admin: users.admin1,
     existingTexter: false,
-    dynamicAssignment: true,
     basics: {
       title: 'Test E Campaign Title',
       title_changed: 'Test E Campaign Title Changed',

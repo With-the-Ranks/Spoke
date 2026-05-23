@@ -12,15 +12,15 @@ describe("script utilities", () => {
   });
 
   it("converts uppercase words to title case", () => {
-    expect(titleCase("SPOKE REWIRED")).toEqual("Spoke Rewired");
+    expect(titleCase("SPOKE")).toEqual("Spoke");
   });
   it("converts lowercase words to title case", () => {
-    expect(titleCase("spoke rewired")).toEqual("Spoke Rewired");
+    expect(titleCase("spoke")).toEqual("Spoke");
   });
   it("converts mixed-case words to title case", () => {
-    expect(titleCase("sPoKe ReWirEd")).toEqual("Spoke Rewired");
+    expect(titleCase("sPoKe")).toEqual("Spoke");
   });
   it("ignores hyphens", () => {
-    expect(titleCase("spoke-rewired")).toEqual("Spoke-rewired");
+    expect(titleCase("spoke-wtr")).toEqual("Spoke-wtr");
   });
 });

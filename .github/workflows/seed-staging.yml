@@ -1,0 +1,35 @@
+name: Seed Staging Database
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed-staging:
+    runs-on: ubuntu-latest
+    name: Seed Staging Database
+    environment: staging
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/gcp-auth
+        with:
+          wif_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+          region: ${{ vars.GCP_REGION }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ vars.GKE_CLUSTER }}
+          location: ${{ vars.GKE_LOCATION }}
+
+      - name: Run staging seed
+        run: |
+          kubectl exec deployment/${{ vars.STAGING_DEPLOYMENT }} \
+            -n ${{ vars.STAGING_NAMESPACE }} \
+            -- yarn knex seed:run --specific=staging.js

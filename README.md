@@ -1,12 +1,14 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/politics-rewired/Spoke) ![CircleCI](https://img.shields.io/circleci/build/github/politics-rewired/Spoke)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/With-the-Ranks/Spoke) ![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/With-the-Ranks/Spoke/ci-cd.yml)
 
 # Spoke
 
 Spoke is an open source text-distribution tool for organizations to mobilize supporters and members into action. Spoke allows you to upload phone numbers, customize scripts and assign volunteers to communicate with supporters while allowing organizations to manage the process.
 
-Spoke was created by Saikat Chakrabarti and Sheena Pakanati, and is now maintained by MoveOn.org at https://github.com/MoveOnOrg/Spoke.
+Spoke was created by Saikat Chakrabarti and Sheena Pakanati, and the original repository was most recently maintained by Progressive Coders Network at https://github.com/ProgressiveCoders/Spoke
 
-This repository is a branch of MoveOn/Spoke created by Politics Rewired, a small campaign tech consultancy created in 2019.
+From 2019-2023, Politics Rewired, a small campaign tech consultancy, maintained the most recent upstream repository https://github.com/politics-rewired/spoke
+
+This repository is a branch of ProgressiveCoders/Spoke (formerly MoveOn/Spoke) and politics-rewired/spoke, now maintained by With the Ranks, a worker-owned technology cooperative.
 
 Due to a desire to develop more quickly, we did not maintain compatibility with MoveOn/Spoke, which means although this repository will be
 a useful source of ideas, it may more work than is worth it to merge it back into MoveOn/Spoke, although we welcome any efforts towards
@@ -18,17 +20,23 @@ that goal. See [`HOWTO_migrate-from-moveon-main.md`](./docs/HOWTO_migrate-from-m
 
 Runtimes and package managers:
 
-- Node (^16.14)
+- Node (^20.16)
 - Yarn (>= 1.19.1)
 
 External services:
 
 - Postgres (>= 11)
-  - [Install](https://postgresql.org/download) and [start](https://www.postgresql.org/docs/current/server-start.html) documentation
+
+Recommended:
+
+- Docker, for running Postgres as a container
+  - [install documentation](https://docs.docker.com/engine/install/)
 
 ### Setting up a development environment
 
-Install Node and Yarn. We recommend using the [asdf version manager](https://github.com/asdf-vm/asdf).
+#### Install Node and Yarn
+
+We recommend using the [asdf version manager](https://github.com/asdf-vm/asdf).
 
 ```sh
 # Example using `asdf` (https://github.com/asdf-vm/asdf)
@@ -42,21 +50,66 @@ You can also install the prereqs manually:
 - [Node install documentation](https://nodejs.dev/learn/how-to-install-nodejs)
 - [Yarn install documentation](https://classic.yarnpkg.com/en/docs/install)
 
-Clone the repo:
+#### Install and run a Postgres server
+
+If you have Docker installed, we recommend using Postgres as a container.
+
+Spoke Rewired comes with a `postgres` container in `docker-compose.yml`, which you can start with the following command:
 
 ```sh
-git clone git@github.com:politics-rewired/Spoke.git
+# Run in the foreground, so you can watch logs and stop with Ctrl-C
+docker compose up postgres
+
+# Run in the background so you can use the terminal for other things
+docker compose up postgres -d
+
+# (if you have an older version of Docker installed, you may have to run
+# "docker-compose" with a hyphen instead of "docker compose" with a space)
+```
+
+The `postgres` container will automatically start up a server with the following configuration:
+
+- connection string (for `DATABASE_URL`): `postgres://spoke:spoke@localhost:15432/spokedev`
+- port: 15432
+- default database: `spokedev`
+- user: `spoke`
+- password: `spoke`
+
+To stop all containers, including Postgres, run:
+
+```sh
+docker compose down
+```
+
+To delete all container data, including the Postgres database, and stop all containers, run:
+
+```sh
+docker compose down -v
+```
+
+After the database container is taken down, you can run the `up` commands above to restart it. For more information, see [the Docker Compose reference documentation](https://docs.docker.com/compose/reference/).
+
+You can also install and run a Postgres server manually without Docker:
+
+- Postgres [Install](https://postgresql.org/download) and [start](https://www.postgresql.org/docs/current/server-start.html) documentation
+
+#### Clone the repo
+
+```sh
+git clone git@github.com:With-the-Ranks/Spoke.git
 cd Spoke
 git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-Install Node dependencies:
+#### Install Node dependencies
 
 ```sh
 yarn install
 ```
 
-Copy the example environment. You will need to update the database connection
+#### Copy the example environment
+
+You will need to update the database connection
 string: it should contain the correct host, port, and username/password
 credentials to your development Postgres server.
 
@@ -68,38 +121,30 @@ vi .env
 # DATABASE_URL=postgres://spoke:spoke@localhost:5432/spokedev
 ```
 
-Create the `spokedev` database (if it doesn't yet exist)
+#### Create the `spokedev` database (if it doesn't yet exist)
 
 ```sh
 psql -c "create database spokedev;"
 ```
 
-Run the migrations:
+#### Run the migrations
 
 ```sh
 yarn migrate:worker
 yarn knex migrate:latest
 ```
 
-Run codegen:
+#### Run codegen
 
 ```sh
 yarn codegen
 ```
 
-Run in development mode:
+#### Start the Spoke application in develpoment mode
 
 ```sh
 yarn dev
 ```
-
-If you plan to build container images locally for use in production you may want to set the default architecture by adding the following to your shell config (e.g. `~/.bash_profile`):
-
-```sh
-export DOCKER_DEFAULT_PLATFORM=linux/amd64
-```
-
-or pass `--platform=linux/amd64` to all `docker buildx` commands.
 
 ### SMS
 
@@ -125,6 +170,12 @@ The knex migrations need to be run any time a new release has made changes to th
 
 ```sh
 yarn knex migrate:latest
+```
+
+To create a new knex migration, run
+
+```sh
+yarn knex migrate:make my-migration
 ```
 
 ### Next Steps
@@ -167,6 +218,16 @@ yarn release --prerelease
 # or the pre-release type
 yarn release --prerelease alpha
 ```
+
+## Building container images locally
+
+If you plan to build container images locally for use in production you may want to set the default architecture by adding the following to your shell config (e.g. `~/.bash_profile`):
+
+```sh
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+or pass `--platform=linux/amd64` to all `docker buildx` commands.
 
 ## Deploying
 

@@ -9,7 +9,6 @@ export { getFormattedPhoneNumber, getDisplayPhoneNumber };
 export {
   getFormattedZip,
   zipToTimeZone,
-  findZipRanges,
   getCommonZipRanges
 } from "./zip-format";
 export { DstHelper } from "./dst-helper";

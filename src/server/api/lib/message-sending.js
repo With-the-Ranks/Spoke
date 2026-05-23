@@ -333,11 +333,11 @@ export const messageComponents = (messageText) => {
     - first one was much easier to plan, so going with that one
  */
 
-export async function getCampaignContactAndAssignmentForIncomingMessage({
+export const getCampaignContactAndAssignmentForIncomingMessage = async ({
   contactNumber,
   _service,
   messaging_service_sid
-}) {
+}) => {
   const { rows } = await r.reader.raw(
     `
     with chosen_organization as (
@@ -372,9 +372,9 @@ export async function getCampaignContactAndAssignmentForIncomingMessage({
   );
 
   return rows[0];
-}
+};
 
-export async function saveNewIncomingMessage(messageInstance) {
+export const saveNewIncomingMessage = async (messageInstance) => {
   const [newMessage] = await r
     .knex("message")
     .insert(messageInstance)
@@ -426,7 +426,7 @@ export async function saveNewIncomingMessage(messageInstance) {
   }
 
   await updateQuery;
-}
+};
 
 /**
  * Safely append a new service response to an existing service_response value.

@@ -14,10 +14,10 @@ import type {
 } from "@spoke/spoke-codegen";
 import { useGetConversationsForMessageReviewQuery } from "@spoke/spoke-codegen";
 import React, { useEffect } from "react";
-import { DateTime } from "src/lib/datetime";
 import { NumberParam, useQueryParam, withDefault } from "use-query-params";
 
 import LoadingIndicator from "../../../../components/LoadingIndicator";
+import { DateTime } from "../../../../lib/datetime";
 import { MESSAGE_STATUSES } from "../IncomingMessageFilter";
 import ConversationPreviewModal from "./ConversationPreviewModal";
 
@@ -43,10 +43,10 @@ const prepareDataTableData = (conversationsData: Array<any>) =>
     updatedAt: contact.updatedAt
   }));
 
-function prepareSelectedRowsData(
+const prepareSelectedRowsData = (
   conversations: Array<any>,
   rowsSelected: Array<any>
-) {
+) => {
   const selectedData = rowsSelected.map((selectedIndex: number) => {
     const conversation = conversations[selectedIndex];
     return {
@@ -59,7 +59,7 @@ function prepareSelectedRowsData(
   });
 
   return [rowsSelected, selectedData];
-}
+};
 
 interface IncomingMessageListProps {
   organizationId: string;

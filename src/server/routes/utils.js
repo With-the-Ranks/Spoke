@@ -10,10 +10,10 @@ const router = express.Router();
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance();
 const PNF = googleLibPhoneNumber.PhoneNumberFormat;
 
-function normalize(rawNumber) {
+const normalize = (rawNumber) => {
   const number = phoneUtil.parseAndKeepRawInput(rawNumber, "US");
   return phoneUtil.format(number, PNF.E164);
-}
+};
 
 router.post("/remove-number-from-campaign", async (req, res) => {
   if (!req.query.secret || req.query.secret !== config.CONTACT_REMOVAL_SECRET)

@@ -3,7 +3,7 @@ import knexConfig from "../../server/knex";
 
 const db = require("knex")(knexConfig);
 
-async function main() {
+const main = async () => {
   const oneHourAgo = new Date();
   const oneWeekAgo = new Date();
   oneHourAgo.setHours(oneHourAgo.getHours() - 1);
@@ -32,7 +32,7 @@ async function main() {
     .whereIn("id", campaignContactIdsToRelease);
 
   return `Released ${updateResult} unsent initials that had stayed untouched for the last hour`;
-}
+};
 
 main()
   .then((result) => {

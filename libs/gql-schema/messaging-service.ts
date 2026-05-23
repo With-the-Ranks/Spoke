@@ -9,7 +9,6 @@ export const schema = `
     messagingServiceSid: String!
     serviceType: MessagingServiceType!
     updatedAt: String!
-    tcrBrandRegistrationLink: String
     name: String
     active: Boolean!
     isDefault: Boolean

@@ -81,7 +81,6 @@ export const EditCampaignFragment = gql`
     contactsCount
     datawarehouseAvailable
     customFields
-    useDynamicAssignment
     logoImageUrl
     introHtml
     primaryColor
@@ -96,6 +95,10 @@ export const EditCampaignFragment = gql`
     }
     messagingServiceSid
     editors
+    columnMapping {
+      column
+      remap
+    }
     readiness {
       basics
       textingHours
@@ -107,6 +110,7 @@ export const EditCampaignFragment = gql`
       interactions
       texters
     }
+    contactsFilename
   }
 `;
 

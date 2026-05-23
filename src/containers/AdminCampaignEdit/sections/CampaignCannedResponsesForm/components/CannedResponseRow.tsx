@@ -1,10 +1,9 @@
 import IconButton from "@material-ui/core/IconButton";
 import CreateIcon from "@material-ui/icons/Create";
 import DeleteIcon from "@material-ui/icons/Delete";
-import type { CampaignVariable } from "@spoke/spoke-codegen";
+import type { CampaignVariable, CannedResponse } from "@spoke/spoke-codegen";
 import React from "react";
 
-import type { CannedResponse } from "../../../../../api/canned-response";
 import { LargeListItem } from "../../../../../components/LargeList";
 import { tokensToElems } from "../../../../../components/ScriptOptionBlock";
 import { dataTest } from "../../../../../lib/attributes";
@@ -13,7 +12,7 @@ import { scriptToTokens } from "../../../../../lib/scripts";
 interface Props {
   cannedResponse: CannedResponse;
   customFields: string[];
-  campaignVariables: Omit<CampaignVariable, "createdAt" | "updatedAt">[];
+  campaignVariables: CampaignVariable[];
   onDelete(): void;
   onToggleResponseEditor(): void;
 }
@@ -47,7 +46,8 @@ export const CannedResponseRow: React.FC<Props> = ({
 
   return (
     <LargeListItem
-      {...dataTest("cannedResponse")}
+      {...dataTest("cannedResponse", false)}
+      draggable
       key={cannedResponse.id}
       primaryText={cannedResponse.title}
       secondaryText={elems}

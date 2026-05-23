@@ -20,6 +20,7 @@ interface InnerProps {
 
 // For addInputTypes workaround, see: https://github.com/jquense/react-formal/issues/167#issuecomment-525040912
 // For named function, see: https://github.com/yannickcr/eslint-plugin-react/pull/2399
+// eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
 const SpokeFormField = React.forwardRef<unknown, Props>(function Component(
   { children, as, ...props },
   ref
