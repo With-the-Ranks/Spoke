@@ -1,5 +1,4 @@
-import { Divider, Typography } from "@material-ui/core";
-import Chip from "@material-ui/core/Chip";
+import { Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
@@ -8,12 +7,46 @@ import React from "react";
 const useStyles = makeStyles({
   wrapper: {
     display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center"
+    flexDirection: "column",
+    gap: 8
   },
-  chip: {
-    margin: "4px",
-    padding: "4px"
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8
+  },
+  campaignId: {
+    color: "#666666"
+  },
+  statusGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: 8
+  },
+  statusCell: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    padding: "4px 8px",
+    borderRadius: 4
+  },
+  statusCellSuccess: {
+    backgroundColor: "#DFF0DF"
+  },
+  statusCellError: {
+    backgroundColor: "#FFF2E9"
+  },
+  iconSuccess: {
+    color: "#4caf50",
+    flexShrink: 0
+  },
+  iconError: {
+    color: "#FF781D",
+    flexShrink: 0
+  },
+  statusLabel: {
+    fontSize: "0.8rem",
+    lineHeight: 1.2
   }
 });
 
@@ -36,47 +69,37 @@ const CampaignHeader: React.FC<CampaignHeaderProps> = ({
   const classes = useStyles();
   return (
     <div className={classes.wrapper}>
-      <Typography variant="h6" style={{ margin: "4px" }}>
-        {campaignTitle}
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        style={{ marginLeft: "8px", color: "#666666" }}
-      >
-        ID: {campaignId}
-      </Typography>
-      <Divider
-        orientation="vertical"
-        flexItem
-        style={{ margin: "4px 8px 4px 8px" }}
-      />
-      {tags.map((tag) => {
-        // display check or alert icon
-        const Icon =
-          tag.status === "success" ? (
-            <CheckCircleIcon fontSize="small" style={{ color: "#4caf50" }} />
-          ) : (
-            <ErrorIcon fontSize="small" style={{ color: "#FF781D" }} />
+      <div className={classes.titleRow}>
+        <Typography variant="h6">{campaignTitle}</Typography>
+        <Typography variant="subtitle1" className={classes.campaignId}>
+          ID: {campaignId}
+        </Typography>
+      </div>
+      <div className={classes.statusGrid}>
+        {tags.map((tag) => {
+          const isSuccess = tag.status === "success";
+          return (
+            <div
+              key={tag.title}
+              className={`${classes.statusCell} ${
+                isSuccess ? classes.statusCellSuccess : classes.statusCellError
+              }`}
+            >
+              {isSuccess ? (
+                <CheckCircleIcon
+                  fontSize="small"
+                  className={classes.iconSuccess}
+                />
+              ) : (
+                <ErrorIcon fontSize="small" className={classes.iconError} />
+              )}
+              <Typography className={classes.statusLabel}>
+                {tag.title}
+              </Typography>
+            </div>
           );
-        // display green or orange background
-        const backgroundColor =
-          tag.status === "success"
-            ? {
-                backgroundColor: "#DFF0DF"
-              }
-            : {
-                backgroundColor: "#FFF2E9"
-              };
-        return (
-          <Chip
-            key={tag.title}
-            label={tag.title}
-            icon={Icon}
-            className={classes.chip}
-            style={backgroundColor}
-          />
-        );
-      })}
+        })}
+      </div>
     </div>
   );
 };

@@ -163,58 +163,26 @@ export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
   hasUnsentInitialMessages,
   hasUnhandledMessages
 }) => {
-  const tags = [];
-
-  // display 'Started' or 'Not Started' first
-  if (isStarted) {
-    tags.push({
-      title: "Started",
-      status: "success"
-    });
-  } else {
-    tags.push({
-      title: "Not Started",
-      status: "alert"
-    });
-  }
-
-  if (hasUnassignedContacts) {
-    tags.push({
-      title: "Unassigned Contacts",
-      status: "alert"
-    });
-  } else {
-    tags.push({
-      title: "All Contacts Assigned",
-      status: "success"
-    });
-  }
-
-  if (isStarted) {
-    const tag = hasUnsentInitialMessages
-      ? {
-          title: "Unsent Initial Messages",
-          status: "alert"
-        }
-      : {
-          title: "All Initials Sent",
-          status: "success"
-        };
-    tags.push(tag);
-  }
-
-  if (isStarted && hasUnhandledMessages) {
-    const tag = hasUnhandledMessages
-      ? {
-          title: "Unhandled Replies",
-          status: "alert"
-        }
-      : {
-          title: "All Replies Handled",
-          status: "success"
-        };
-    tags.push(tag);
-  }
-
-  return tags;
+  return [
+    {
+      title: isStarted ? "Started" : "Not Started",
+      status: isStarted ? "success" : "alert"
+    },
+    {
+      title: hasUnassignedContacts
+        ? "Unassigned Contacts"
+        : "All Contacts Assigned",
+      status: hasUnassignedContacts ? "alert" : "success"
+    },
+    {
+      title: hasUnsentInitialMessages
+        ? "Unsent Initial Messages"
+        : "All Initials Sent",
+      status: hasUnsentInitialMessages ? "alert" : "success"
+    },
+    {
+      title: hasUnhandledMessages ? "Unhandled Replies" : "All Replies Handled",
+      status: hasUnhandledMessages ? "alert" : "success"
+    }
+  ];
 };
