@@ -235,6 +235,9 @@ const Navigation: React.FC<Props> = (props) => {
     if (active) setOpenGroup(active.name);
   }, [location.pathname]);
 
+  const getGroupBadgeCount = (group: NavigationGroup) =>
+    group.items.reduce((sum, item) => sum + (item.badge?.count ?? 0), 0);
+
   const renderSection = (section: NavigationSection, indented = false) => {
     const active = isActive(section);
     const IconComponent = navigationIconMap[section.path];
@@ -314,6 +317,7 @@ const Navigation: React.FC<Props> = (props) => {
             groups.map((group) => {
               const groupActive = isGroupActive(group);
               const isOpen = openGroup === group.name;
+              const groupBadgeCount = getGroupBadgeCount(group);
 
               return (
                 <div key={group.name}>
@@ -329,6 +333,13 @@ const Navigation: React.FC<Props> = (props) => {
                       primary={group.name}
                       className={classes.groupHeaderText}
                     />
+                    {!isOpen && groupBadgeCount > 0 && (
+                      <Avatar
+                        className={clsx(classes.badge, classes.actionableBadge)}
+                      >
+                        {groupBadgeCount}
+                      </Avatar>
+                    )}
                     <ExpandMoreIcon
                       fontSize="small"
                       className={clsx(classes.expandIcon, {
