@@ -89,7 +89,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
       onClick={() => history.push(campaignUrl)}
     >
       <ListItem alignItems="flex-start">
-        <ListItemIcon>
+        <ListItemIcon onClick={(e) => e.stopPropagation()}>
           <Checkbox
             edge="start"
             checked={isCampaignSelected}
@@ -106,7 +106,6 @@ export const CampaignListRow: React.FC<Props> = (props) => {
               campaignTitle={campaign.title}
               campaignId={campaign.id}
               tags={headerTags}
-              onClick={() => history.push(campaignUrl)}
             />
           }
           secondary={
@@ -123,7 +122,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
           secondaryTypographyProps={{ color: "textPrimary" }}
         />
         {isAdmin && (
-          <ListItemSecondaryAction>
+          <ListItemSecondaryAction onClick={(e) => e.stopPropagation()}>
             <CampaignListMenu
               campaign={campaign}
               startOperation={props.startOperation}
