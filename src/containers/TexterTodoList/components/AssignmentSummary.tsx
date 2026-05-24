@@ -109,7 +109,7 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
     introHtml
   } = assignment.campaign;
 
-  const subtitle = `${description}}`;
+  const subtitle = `${description}`;
 
   const classes = useStyles();
 
