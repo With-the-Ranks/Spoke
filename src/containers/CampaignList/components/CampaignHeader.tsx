@@ -1,10 +1,11 @@
 import { Divider, Typography } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
+import { makeStyles } from "@material-ui/core/styles";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
 import React from "react";
 
-const inlineStyles = {
+const useStyles = makeStyles({
   wrapper: {
     display: "flex",
     flexWrap: "wrap",
@@ -14,7 +15,7 @@ const inlineStyles = {
     margin: "4px",
     padding: "4px"
   }
-};
+});
 
 export type Tag = {
   title: string;
@@ -25,22 +26,17 @@ interface CampaignHeaderProps {
   campaignTitle: string;
   campaignId: string;
   tags: Tag[];
-  onClick: () => void;
 }
 
 const CampaignHeader: React.FC<CampaignHeaderProps> = ({
   campaignTitle,
   campaignId,
-  tags,
-  onClick
+  tags
 }) => {
+  const classes = useStyles();
   return (
-    <div style={inlineStyles.wrapper}>
-      <Typography
-        variant="h6"
-        onClick={onClick}
-        style={{ margin: "4px", cursor: "pointer" }}
-      >
+    <div className={classes.wrapper}>
+      <Typography variant="h6" style={{ margin: "4px" }}>
         {campaignTitle}
       </Typography>
       <Typography
@@ -76,7 +72,8 @@ const CampaignHeader: React.FC<CampaignHeaderProps> = ({
             key={tag.title}
             label={tag.title}
             icon={Icon}
-            style={{ ...inlineStyles.chip, ...backgroundColor }}
+            className={classes.chip}
+            style={backgroundColor}
           />
         );
       })}
