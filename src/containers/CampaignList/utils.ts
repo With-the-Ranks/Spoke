@@ -168,16 +168,18 @@ export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
       title: isStarted ? "Started" : "Not Started",
       status: isStarted ? "success" : "alert"
     },
+    ...(window.ENABLE_AUTOSENDING
+      ? []
+      : [
+          {
+            title: hasUnassignedContacts
+              ? "Unassigned Contacts"
+              : "All Contacts Assigned",
+            status: hasUnassignedContacts ? "alert" : "success"
+          }
+        ]),
     {
-      title: hasUnassignedContacts
-        ? "Unassigned Contacts"
-        : "All Contacts Assigned",
-      status: hasUnassignedContacts ? "alert" : "success"
-    },
-    {
-      title: hasUnsentInitialMessages
-        ? "Unsent Initial Messages"
-        : "All Initials Sent",
+      title: hasUnsentInitialMessages ? "Unsent Initials" : "All Initials Sent",
       status: hasUnsentInitialMessages ? "alert" : "success"
     },
     {
