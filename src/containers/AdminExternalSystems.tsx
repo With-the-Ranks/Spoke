@@ -20,6 +20,7 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import CreateIcon from "@material-ui/icons/Create";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import type { ExternalSystem, ExternalSystemInput } from "@spoke/spoke-codegen";
+import { ExternalSystemType, VanOperationMode } from "@spoke/spoke-codegen";
 import type { History } from "history";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
@@ -28,7 +29,7 @@ import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
-import { ExternalSystemType, VanOperationMode } from "../api/external-system";
+import type { RelayPaginatedResponse } from "../api/pagination";
 import { DateTime } from "../lib/datetime";
 import type { MutationMap, QueryMap } from "../network/types";
 import theme from "../styles/theme";
@@ -36,8 +37,8 @@ import { loadData } from "./hoc/with-operations";
 
 const EXTERNAL_SYSTEM_OPTS: [string, string][] = [["Votebuilder", "VAN"]];
 const OPERATION_MODE_OPTS: [string, string][] = [
-  ["Voterfile", VanOperationMode.VOTERFILE],
-  ["MyCampaign", VanOperationMode.MYCAMPAIGN]
+  ["Voterfile", VanOperationMode.Voterfile],
+  ["MyCampaign", VanOperationMode.Mycampaign]
 ];
 
 interface Props {
@@ -73,10 +74,10 @@ class AdminExternalSystems extends Component<Props, State> {
     editingExternalSystem: undefined,
     externalSystem: {
       name: "",
-      type: ExternalSystemType.VAN,
+      type: ExternalSystemType.Van,
       username: "",
       apiKey: "",
-      operationMode: VanOperationMode.VOTERFILE
+      operationMode: VanOperationMode.Voterfile
     },
     syncInitiatedForId: undefined,
     error: undefined
@@ -117,10 +118,10 @@ class AdminExternalSystems extends Component<Props, State> {
       editingExternalSystem: undefined,
       externalSystem: {
         name: "",
-        type: ExternalSystemType.VAN,
+        type: ExternalSystemType.Van,
         username: "",
         apiKey: "",
-        operationMode: VanOperationMode.VOTERFILE
+        operationMode: VanOperationMode.Voterfile
       }
     });
 
