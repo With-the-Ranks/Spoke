@@ -7,7 +7,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Fab from "@material-ui/core/Fab";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 import Paper from "@material-ui/core/Paper";
+import Select from "@material-ui/core/Select";
 import Snackbar from "@material-ui/core/Snackbar";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -15,6 +19,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import CreateIcon from "@material-ui/icons/Create";
@@ -22,9 +27,6 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import type { ExternalSystem, ExternalSystemInput } from "@spoke/spoke-codegen";
 import { ExternalSystemType, VanOperationMode } from "@spoke/spoke-codegen";
 import type { History } from "history";
-import MenuItem from "material-ui/MenuItem";
-import SelectField from "material-ui/SelectField";
-import TextField from "material-ui/TextField";
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
@@ -40,6 +42,17 @@ const OPERATION_MODE_OPTS: [string, string][] = [
   ["Voterfile", VanOperationMode.Voterfile],
   ["MyCampaign", VanOperationMode.Mycampaign]
 ];
+
+const externalSystemTypeValues = new Set<string>(
+  Object.values(ExternalSystemType)
+);
+const vanOperationModeValues = new Set<string>(Object.values(VanOperationMode));
+
+const isExternalSystemType = (value: unknown): value is ExternalSystemType =>
+  typeof value === "string" && externalSystemTypeValues.has(value);
+
+const isVanOperationMode = (value: unknown): value is VanOperationMode =>
+  typeof value === "string" && vanOperationModeValues.has(value);
 
 interface Props {
   match: any;
@@ -144,21 +157,31 @@ class AdminExternalSystems extends Component<Props, State> {
   };
 
   editExternalSystemProp = (prop: keyof ExternalSystemInput) => (
-    _: unknown,
-    newVal: string
+    event: React.ChangeEvent<HTMLInputElement>
   ) =>
     this.setState((prevState) => ({
-      externalSystem: { ...prevState.externalSystem, ...{ [prop]: newVal } }
+      externalSystem: {
+        ...prevState.externalSystem,
+        [prop]: event.target.value
+      }
     }));
 
+  handleSelectSystemType = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const { value } = event.target;
+    if (!isExternalSystemType(value)) return;
+    this.setState({
+      externalSystem: { ...this.state.externalSystem, type: value }
+    });
+  };
+
   handleSelectOperationMode = (
-    _event: any,
-    _index: number,
-    newOperationMode: VanOperationMode
+    event: React.ChangeEvent<{ value: unknown }>
   ) => {
+    const { value } = event.target;
+    if (!isVanOperationMode(value)) return;
     const { externalSystem } = this.state;
     this.setState({
-      externalSystem: { ...externalSystem, operationMode: newOperationMode }
+      externalSystem: { ...externalSystem, operationMode: value }
     });
   };
 
@@ -283,22 +306,35 @@ class AdminExternalSystems extends Component<Props, State> {
               value={name}
               onChange={this.editExternalSystemProp("name")}
             />
-            <SelectField floatingLabelText="System Type" value={type} fullWidth>
-              {EXTERNAL_SYSTEM_OPTS.map(([display, val]) => (
-                <MenuItem key={val} value={val} primaryText={display} />
-              ))}
-            </SelectField>
-            {type === "VAN" && (
-              <SelectField
-                floatingLabelText="VAN Operation Mode"
-                fullWidth
-                value={operationMode}
-                onChange={this.handleSelectOperationMode}
+            <FormControl fullWidth variant="outlined" size="small">
+              <InputLabel shrink>System Type</InputLabel>
+              <Select
+                value={type}
+                label="System Type"
+                onChange={this.handleSelectSystemType}
               >
-                {OPERATION_MODE_OPTS.map(([display, val]) => (
-                  <MenuItem key={val} value={val} primaryText={display} />
+                {EXTERNAL_SYSTEM_OPTS.map(([display, val]) => (
+                  <MenuItem key={val} value={val}>
+                    {display}
+                  </MenuItem>
                 ))}
-              </SelectField>
+              </Select>
+            </FormControl>
+            {type === "VAN" && (
+              <FormControl fullWidth variant="outlined" size="small">
+                <InputLabel shrink>VAN Operation Mode</InputLabel>
+                <Select
+                  value={operationMode}
+                  label="VAN Operation Mode"
+                  onChange={this.handleSelectOperationMode}
+                >
+                  {OPERATION_MODE_OPTS.map(([display, val]) => (
+                    <MenuItem key={val} value={val}>
+                      {display}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             )}
             <TextField
               name="username"
