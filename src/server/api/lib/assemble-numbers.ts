@@ -8,6 +8,7 @@ import { getMessageType } from "../../../lib/scripts";
 import { stringIsAValidUrl } from "../../../lib/utils";
 import logger from "../../../logger";
 import { makeNumbersClient } from "../../lib/assemble-numbers";
+import { smsSendTotal } from "../../metrics";
 import { r } from "../../models";
 import { errToObj } from "../../utils";
 import { getOrgFeature } from "../organization-settings";
@@ -223,9 +224,11 @@ export const sendMessage = async (
         service_response: JSON.stringify([result])
       })
       .where({ id: spokeMessageId });
+    smsSendTotal.inc({ status: "success", provider: "switchboard" });
   } catch (exc) {
     // TODO - distinguish different failures modes (HTTP failure vs. HTTP 200 with GraphQL errors)
 
+    smsSendTotal.inc({ status: "error", provider: "switchboard" });
     logger.error("Error sending message with Assemble Numbers: ", {
       ...errToObj(exc),
       messageInput
