@@ -15,6 +15,9 @@ interface Window {
   BASE_URL: string;
   ENABLE_TROLLBOT: boolean;
 
+  CHATWOOT_WEBSITE_TOKEN?: string;
+  CHATWOOT_BASE_URL?: string;
+
   AuthService: any;
 }
 
