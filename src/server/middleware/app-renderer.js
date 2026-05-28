@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import { clientConfig, config } from "../../config";
+import { r } from "../models";
 
 // -----------------------------------------
 // Asset Map
@@ -74,6 +75,19 @@ const chatwootScript =
   `
     : "";
 
+const shouldShowChatwoot = async (user) => {
+  if (!chatwootScript || !user) return false;
+  if (user.is_superadmin === true) return true;
+
+  const membership = await r
+    .reader("user_organization")
+    .where({ user_id: user.id })
+    .whereIn("role", ["ADMIN", "OWNER"])
+    .first("id");
+
+  return Boolean(membership);
+};
+
 const rollbarScript = config.ROLLBAR_ACCESS_TOKEN
   ? `
     <script>
@@ -139,6 +153,13 @@ const indexHtml = `
 // Middleware
 // -----------------------------------------
 
-const appRenderer = async (req, res) => res.send(indexHtml);
+const appRenderer = async (req, res, next) => {
+  try {
+    const showChatwoot = await shouldShowChatwoot(req.user);
+    res.send(showChatwoot ? indexHtml : indexHtml.replace(chatwootScript, ""));
+  } catch (err) {
+    next(err);
+  }
+};
 
 export default appRenderer;
