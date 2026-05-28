@@ -717,6 +717,18 @@ const validators = {
     default: "no-version",
     isClient: true
   }),
+  TELNYX_API_KEY: str({
+    desc: "Telnyx API key for WebRTC calling.",
+    default: undefined
+  }),
+  TELNYX_SIP_USERNAME: str({
+    desc: "Telnyx SIP credential username for WebRTC calling.",
+    default: undefined
+  }),
+  TELNYX_SIP_PASSWORD: str({
+    desc: "Telnyx SIP credential password for WebRTC calling.",
+    default: undefined
+  }),
   SWITCHBOARD_BASE_URL: url({
     desc: "Custom base URL for Switchboard client.",
     default: undefined

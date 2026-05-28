@@ -26,6 +26,7 @@ import TeamEditorDetail from "./containers/AdminTeamEditor/components/TeamEditor
 import AdminTemplateCampaigns from "./containers/AdminTemplateCampaigns";
 import AdminTrollAlarms from "./containers/AdminTrollAlarms";
 import { AuthzProvider } from "./containers/AuthzProvider";
+import CallTodoList from "./containers/CallTodoList";
 import CreateOrganization from "./containers/CreateOrganization";
 import DashboardLoader from "./containers/DashboardLoader";
 import Home from "./containers/Home";
@@ -420,6 +421,10 @@ const AppRoutes = () => (
     <AuthenticatedRoute path="/admin" component={AdminRoutes} />
     <AuthenticatedRoute path="/superadmin" component={SuperAdminRoutes} />
     <AuthenticatedRoute path="/app" component={TexterRoutes} />
+    <AuthenticatedRoute
+      path="/call/:organizationId/todos"
+      component={CallTodoList}
+    />
     <AuthenticatedRoute
       path="/invite/:inviteId"
       component={CreateOrganization}

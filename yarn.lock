@@ -5433,6 +5433,14 @@
   dependencies:
     "@passport-next/passport-strategy" "1.x.x"
 
+"@peermetrics/webrtc-stats@^5.7.1":
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/@peermetrics/webrtc-stats/-/webrtc-stats-5.9.0.tgz#cb6a2f32e2bc4d5abe0977f3635ecd83ed09e7ad"
+  integrity sha512-eQYGGdj+H4MUEuwbccy9bxRV3uAqPM5+Say9PSx/alrtv5ccmKCqGfLbqXrRJ/qThZvjZNBna5K/YnCWoaTQBw==
+  dependencies:
+    events "^3.3.0"
+    uuid "^8.3.2"
+
 "@pmmmwh/react-refresh-webpack-plugin@0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.4.2.tgz#1f9741e0bde9790a0e13272082ed7272a083620d"
@@ -5842,6 +5850,15 @@
   integrity sha512-PyRA9sm1Yayuj5OIoJ1hGt2YISX45w9WcFbh6ddT0Z/0yaFxOtGLInr4jUfU1EAFVs0Yfyfev4RNwBlUaHdlDQ==
   dependencies:
     defer-to-connect "^2.0.0"
+
+"@telnyx/webrtc@^2.27.1":
+  version "2.27.1"
+  resolved "https://registry.yarnpkg.com/@telnyx/webrtc/-/webrtc-2.27.1.tgz#2ee16fc40ca9edb6ac4783a5829d7e26349537a6"
+  integrity sha512-fjsMTX/srcskv2O5s2tqXVzRHu8QuBDiF8igtpKi9E2yxD+A5hjD/42GjIfUTl65kIW50K2ZL3eI6Za6Sq2+Fw==
+  dependencies:
+    "@peermetrics/webrtc-stats" "^5.7.1"
+    loglevel "^1.6.8"
+    uuid "^7.0.3"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -27607,7 +27624,12 @@ uuid@^3.1.0, uuid@^3.3.2, uuid@^3.4.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-uuid@^8.0.0, uuid@^8.3.0:
+uuid@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
+  integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
+
+uuid@^8.0.0, uuid@^8.3.0, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==

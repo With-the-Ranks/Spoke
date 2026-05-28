@@ -22,6 +22,7 @@ import {
   nexmoRouter,
   previewRouter,
   settingsRouter,
+  telnyxRouter,
   twilioRouter,
   utilsRouter
 } from "./routes";
@@ -105,6 +106,7 @@ export const createApp = async () => {
   app.use(nexmoRouter);
   app.use(twilioRouter);
   app.use(assembleRouter);
+  app.use(telnyxRouter);
   app.use(utilsRouter);
   app.use(previewRouter);
   app.use(settingsRouter);
