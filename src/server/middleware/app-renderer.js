@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import { clientConfig, config } from "../../config";
+import { r } from "../models";
 
 // -----------------------------------------
 // Asset Map
@@ -46,6 +47,46 @@ const externalLinks = config.NO_EXTERNAL_LINKS
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.auth0.com/js/lock/11.0.1/lock.min.js"></script>`;
+
+const chatwootBase = config.CHATWOOT_BASE_URL
+  ? String(config.CHATWOOT_BASE_URL).replace(/\/$/, "")
+  : "";
+const chatwootScript =
+  config.CHATWOOT_WEBSITE_TOKEN && chatwootBase
+    ? `
+    <script>
+      (function (d, t) {
+        var BASE_URL = ${JSON.stringify(chatwootBase)};
+        var TOKEN = ${JSON.stringify(config.CHATWOOT_WEBSITE_TOKEN)};
+        window.chatwootSettings = { hideMessageBubble: false };
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = BASE_URL + "/packs/js/sdk.js";
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+        g.onload = function () {
+          window.chatwootSDK.run({
+            websiteToken: TOKEN,
+            baseUrl: BASE_URL
+          });
+        };
+      })(document, "script");
+    </script>
+  `
+    : "";
+
+const shouldShowChatwoot = async (user) => {
+  if (!chatwootScript || !user) return false;
+  if (user.is_superadmin === true) return true;
+
+  const membership = await r
+    .reader("user_organization")
+    .where({ user_id: user.id })
+    .whereIn("role", ["ADMIN", "OWNER"])
+    .first("id");
+
+  return Boolean(membership);
+};
 
 const rollbarScript = config.ROLLBAR_ACCESS_TOKEN
   ? `
@@ -99,6 +140,7 @@ const indexHtml = `
       ${windowVars.join("      \n")}
     </script>
     ${rollbarScript}
+    ${chatwootScript}
   </head>
   <body>
     <div id="mount"></div>
@@ -111,6 +153,13 @@ const indexHtml = `
 // Middleware
 // -----------------------------------------
 
-const appRenderer = async (req, res) => res.send(indexHtml);
+const appRenderer = async (req, res, next) => {
+  try {
+    const showChatwoot = await shouldShowChatwoot(req.user);
+    res.send(showChatwoot ? indexHtml : indexHtml.replace(chatwootScript, ""));
+  } catch (err) {
+    next(err);
+  }
+};
 
 export default appRenderer;

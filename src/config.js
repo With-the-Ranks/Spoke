@@ -186,6 +186,19 @@ const validators = {
     desc: "The key prefix to use for memoredis memoization (memoredis)",
     default: undefined
   }),
+  CHATWOOT_BASE_URL: url({
+    desc:
+      "Optional Chatwoot website widget. Base URL of your Chatwoot install (no trailing slash). When set together with CHATWOOT_WEBSITE_TOKEN, the server injects the widget in the HTML shell (see app-renderer). README: Support widget (Chatwoot).",
+    example: "https://app.chatwoot.com",
+    default: undefined,
+    isClient: true
+  }),
+  CHATWOOT_WEBSITE_TOKEN: str({
+    desc:
+      "Optional Chatwoot website widget. Website inbox token (Chatwoot Settings → Inboxes → Website). Must be set with CHATWOOT_BASE_URL to enable the launcher.",
+    default: undefined,
+    isClient: true
+  }),
   CAMPAIGN_ID: num({
     desc:
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
