@@ -1,6 +1,7 @@
 import Chip from "@material-ui/core/Chip";
 import { blue } from "@material-ui/core/colors";
 import Divider from "@material-ui/core/Divider";
+import { makeStyles } from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
 import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined";
 import LocalOfferOutlinedIcon from "@material-ui/icons/LocalOfferOutlined";
@@ -13,7 +14,7 @@ import type {
 } from "@spoke/spoke-codegen";
 import React from "react";
 
-const inlineStyles = {
+const useStyles = makeStyles({
   wrapper: {
     display: "flex",
     whiteSpace: "pre-wrap",
@@ -24,7 +25,7 @@ const inlineStyles = {
     padding: "4px",
     color: "#666666"
   }
-};
+});
 
 interface CampaignDetailsProps {
   id: string;
@@ -44,21 +45,20 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({
   teams,
   campaignGroups
 }) => {
-  // display van configuration and auto assign eligible tags in divided section
-  const showExtraTags = externalSystem || isAutoAssignEligible;
+  const classes = useStyles();
 
   const showCampaignGroupsTags =
     campaignGroups?.edges && campaignGroups.edges?.length > 0;
 
   return (
     <>
-      <div style={inlineStyles.wrapper}>
+      <div className={classes.wrapper}>
         {creatorName ? (
           <Tooltip title="Created by">
             <Chip
               icon={<PersonOutlineRoundedIcon fontSize="small" />}
               label={creatorName}
-              style={inlineStyles.chip}
+              className={classes.chip}
               variant="outlined"
             />
           </Tooltip>
@@ -70,7 +70,7 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({
               label={teams
                 .map((team: Record<string, unknown>) => team.title)
                 .join(", ")}
-              style={inlineStyles.chip}
+              className={classes.chip}
               variant="outlined"
             />
           </Tooltip>
@@ -82,15 +82,15 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({
               label={campaignGroups.edges
                 .map(({ node }: { node: Record<string, unknown> }) => node.name)
                 .join(", ")}
-              style={inlineStyles.chip}
+              className={classes.chip}
               variant="outlined"
             />
           </Tooltip>
         ) : null}
       </div>
-      <div style={inlineStyles.chip}>
+      <div className={classes.chip}>
         <Tooltip title="Description" placement="bottom-start">
-          <div style={inlineStyles.wrapper}>
+          <div className={classes.wrapper}>
             <DescriptionOutlinedIcon
               fontSize="small"
               style={{ marginRight: "4px" }}
@@ -108,14 +108,15 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({
               <Chip
                 icon={<LocalOfferOutlinedIcon fontSize="small" />}
                 label="Auto-Assign Eligible"
-                style={inlineStyles.chip}
+                className={classes.chip}
               />
             ) : null}
             {externalSystem ? (
               <Chip
                 icon={<LocalOfferOutlinedIcon fontSize="small" />}
                 label={`${externalSystem.type}: ${externalSystem.name}`}
-                style={{ ...inlineStyles.chip, backgroundColor: blue[300] }}
+                className={classes.chip}
+                style={{ backgroundColor: blue[300] }}
               />
             ) : null}
           </div>
