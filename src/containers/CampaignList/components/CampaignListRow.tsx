@@ -60,9 +60,15 @@ export const CampaignListRow: React.FC<Props> = (props) => {
 
   const creatorName = campaign.creator ? campaign.creator.displayName : null;
 
+  const isAutoAssignEligible = !!(
+    isStarted &&
+    !isArchived &&
+    isAutoassignEnabled
+  );
+
   const headerTags = makeCampaignHeaderTags({
     isStarted,
-    hasUnassignedContacts,
+    isAutoAssignEligible,
     hasUnsentInitialMessages,
     hasUnhandledMessages
   });
@@ -75,12 +81,6 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   const campaignUrl = `/admin/${organizationId}/campaigns/${campaign.id}${
     isStarted ? "" : "/edit"
   }`;
-
-  const isAutoAssignEligible = !!(
-    isStarted &&
-    !isArchived &&
-    isAutoassignEnabled
-  );
 
   return (
     <Card
@@ -113,10 +113,10 @@ export const CampaignListRow: React.FC<Props> = (props) => {
               id={campaign.id}
               description={campaign.description}
               creatorName={creatorName}
+              hasUnassignedContacts={hasUnassignedContacts}
               teams={teams}
               campaignGroups={campaignGroups}
               externalSystem={externalSystem}
-              isAutoAssignEligible={isAutoAssignEligible}
             />
           }
           secondaryTypographyProps={{ color: "textPrimary" }}

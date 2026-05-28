@@ -31,7 +31,7 @@ interface CampaignDetailsProps {
   id: string;
   description: string;
   creatorName: string | null;
-  isAutoAssignEligible: boolean;
+  hasUnassignedContacts: boolean | null | undefined;
   teams: CampaignListEntryFragment["teams"];
   campaignGroups: CampaignListEntryFragment["campaignGroups"];
   externalSystem: Pick<ExternalSystem, "name" | "type"> | null | undefined;
@@ -40,13 +40,15 @@ interface CampaignDetailsProps {
 const CampaignDetails: React.FC<CampaignDetailsProps> = ({
   description,
   creatorName,
+  hasUnassignedContacts,
   externalSystem,
-  isAutoAssignEligible,
   teams,
   campaignGroups
 }) => {
   const classes = useStyles();
 
+  const showExtraTags =
+    (!window.ENABLE_AUTOSENDING && hasUnassignedContacts) || externalSystem;
   const showCampaignGroupsTags =
     campaignGroups?.edges && campaignGroups.edges?.length > 0;
 
@@ -104,10 +106,10 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({
           <Divider component="li" />
 
           <div style={{ marginTop: "8px" }}>
-            {isAutoAssignEligible ? (
+            {hasUnassignedContacts ? (
               <Chip
                 icon={<LocalOfferOutlinedIcon fontSize="small" />}
-                label="Auto-Assign Eligible"
+                label="Unassigned Contacts"
                 className={classes.chip}
               />
             ) : null}

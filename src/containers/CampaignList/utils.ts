@@ -152,14 +152,14 @@ export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
 
 type MakeCampaignTagsFn = (props: {
   isStarted: boolean | null | undefined;
-  hasUnassignedContacts: boolean | null | undefined;
+  isAutoAssignEligible: boolean;
   hasUnsentInitialMessages: boolean | null | undefined;
   hasUnhandledMessages: boolean | null | undefined;
 }) => Tag[];
 
 export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
   isStarted,
-  hasUnassignedContacts,
+  isAutoAssignEligible,
   hasUnsentInitialMessages,
   hasUnhandledMessages
 }) => {
@@ -168,16 +168,6 @@ export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
       title: isStarted ? "Started" : "Not Started",
       status: isStarted ? "success" : "alert"
     },
-    ...(window.ENABLE_AUTOSENDING
-      ? []
-      : [
-          {
-            title: hasUnassignedContacts
-              ? "Unassigned Contacts"
-              : "All Contacts Assigned",
-            status: hasUnassignedContacts ? "alert" : "success"
-          }
-        ]),
     {
       title: hasUnsentInitialMessages ? "Unsent Initials" : "All Initials Sent",
       status: hasUnsentInitialMessages ? "alert" : "success"
@@ -185,6 +175,10 @@ export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
     {
       title: hasUnhandledMessages ? "Unhandled Replies" : "All Replies Handled",
       status: hasUnhandledMessages ? "alert" : "success"
+    },
+    {
+      title: isAutoAssignEligible ? "Autoassign" : "No Autoassign",
+      status: isAutoAssignEligible ? "success" : "alert"
     }
   ];
 };
