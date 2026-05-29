@@ -55,10 +55,10 @@ const chatwootScript =
   config.CHATWOOT_WEBSITE_TOKEN && chatwootBase
     ? `
     <script>
+      window.chatwootSettings = { hideMessageBubble: true };
       (function (d, t) {
         var BASE_URL = ${JSON.stringify(chatwootBase)};
         var TOKEN = ${JSON.stringify(config.CHATWOOT_WEBSITE_TOKEN)};
-        window.chatwootSettings = { hideMessageBubble: false };
         var g = d.createElement(t),
           s = d.getElementsByTagName(t)[0];
         g.src = BASE_URL + "/packs/js/sdk.js";
