@@ -467,6 +467,25 @@ const validators = {
     desc: "Whether to expose the /metrics endpoint for Prometheus scraping.",
     default: true
   }),
+  OTEL_ENABLED: bool({
+    desc: "Whether to enable OpenTelemetry distributed tracing.",
+    default: false
+  }),
+  OTEL_EXPORTER_OTLP_ENDPOINT: str({
+    desc:
+      "OTLP HTTP endpoint for trace export (e.g. Grafana Cloud Tempo push URL).",
+    example: "https://tempo-prod.grafana.net/tempo",
+    default: undefined
+  }),
+  OTEL_SERVICE_NAME: str({
+    desc: "Service name attached to every trace span.",
+    default: "spoke"
+  }),
+  OTEL_SAMPLE_RATE: num({
+    desc:
+      "Fraction of traces to sample (0.0–1.0). Use a low value in production.",
+    default: 0.1
+  }),
   MODE: str({
     desc: "Server mode",
     choices: Object.values(ServerMode),
