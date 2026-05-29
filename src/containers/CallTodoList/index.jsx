@@ -38,7 +38,6 @@ const useCallTimer = (active) => {
 const CallTodoList = () => {
   const [status, setStatus] = useState(STATUS.CONNECTING);
   const [destination, setDestination] = useState("");
-  const [callerId, setCallerId] = useState("");
   const [muted, setMuted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const clientRef = useRef(null);
@@ -113,7 +112,7 @@ const CallTodoList = () => {
     setStatus(STATUS.CALLING);
     const call = clientRef.current.newCall({
       destinationNumber: destination.trim(),
-      callerNumber: callerId.trim() || undefined,
+      callerNumber: "+16318575651",
       audio: true,
       video: false
     });
@@ -163,26 +162,15 @@ const CallTodoList = () => {
       )}
 
       {(isDialable || isInCall) && (
-        <>
-          <TextField
-            label="Your caller ID"
-            value={callerId}
-            onChange={(e) => setCallerId(e.target.value)}
-            disabled={isInCall}
-            placeholder="+12125551234"
-            fullWidth
-            style={{ marginBottom: 12 }}
-          />
-          <TextField
-            label="Dial number"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            disabled={isInCall}
-            placeholder="+12125551234"
-            fullWidth
-            style={{ marginBottom: 16 }}
-          />
-        </>
+        <TextField
+          label="Dial number"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          disabled={isInCall}
+          placeholder="+12125551234"
+          fullWidth
+          style={{ marginBottom: 16 }}
+        />
       )}
 
       {status === STATUS.ACTIVE && (
