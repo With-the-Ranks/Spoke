@@ -3,13 +3,13 @@
 # Routing logic:
 #   severity=critical  →  opsgenie-critical  (pages on-call)
 #   severity=warning   →  slack-warnings     (Slack only)
-#   everything else    →  grafana-default-email (Grafana built-in fallback)
+#   everything else    →  slack-warnings (fallback for unmatched alerts)
 
 apiVersion: 1
 
 policies:
   - orgId: 1
-    receiver: grafana-default-email
+    receiver: slack-warnings
     group_by: [alertname, environment]
     group_wait: 30s
     group_interval: 5m

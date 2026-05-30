@@ -57,6 +57,8 @@ groups:
                   type: query
         noDataState: NoData
         execErrState: Error
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
         for: 5m
         labels:
           severity: critical
@@ -114,6 +116,8 @@ groups:
                   type: query
         noDataState: NoData
         execErrState: Error
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
         for: 10m
         labels:
           severity: warning
@@ -174,6 +178,8 @@ groups:
                   type: query
         noDataState: NoData
         execErrState: Error
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
         for: 5m
         labels:
           severity: critical
@@ -231,6 +237,8 @@ groups:
                   type: query
         noDataState: NoData
         execErrState: Error
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
         for: 5m
         labels:
           severity: critical
@@ -291,6 +299,8 @@ groups:
                   type: query
         noDataState: NoData
         execErrState: Error
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
         for: 10m
         labels:
           severity: warning

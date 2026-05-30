@@ -85,13 +85,20 @@ if [ "$SLACK_WEBHOOK_URL" = "REPLACE_ME" ]; then
   echo "   ⚠  SLACK_WEBHOOK_URL not set — slack-warnings will be scaffolded with a placeholder"
 fi
 
-# Delete existing contact points with the same name before re-creating to
-# make this script idempotent. Errors are ignored (404 = doesn't exist yet).
-for uid in opsgenie-critical-recv slack-warnings-recv; do
-  grafana_curl DELETE "$BASE/api/v1/provisioning/contact-points/$uid" 2>/dev/null || true
-done
+# Upsert a contact point: PUT to update if it exists, POST to create if not.
+upsert_contact_point() {
+  local uid="$1"
+  local body="$2"
+  local name="$3"
+  if ! grafana_curl PUT "$BASE/api/v1/provisioning/contact-points/$uid" \
+      -d "$body" > /dev/null 2>&1; then
+    grafana_curl POST "$BASE/api/v1/provisioning/contact-points" \
+      -d "$body" > /dev/null
+  fi
+  echo "   ✓ $name"
+}
 
-grafana_curl POST "$BASE/api/v1/provisioning/contact-points" -d "$(cat <<JSON
+upsert_contact_point "opsgenie-critical-recv" "$(cat <<JSON
 {
   "name": "opsgenie-critical",
   "type": "opsgenie",
@@ -107,10 +114,9 @@ grafana_curl POST "$BASE/api/v1/provisioning/contact-points" -d "$(cat <<JSON
   }
 }
 JSON
-)" > /dev/null
-echo "   ✓ opsgenie-critical"
+)" "opsgenie-critical"
 
-grafana_curl POST "$BASE/api/v1/provisioning/contact-points" -d "$(cat <<JSON
+upsert_contact_point "slack-warnings-recv" "$(cat <<JSON
 {
   "name": "slack-warnings",
   "type": "slack",
@@ -126,8 +132,7 @@ grafana_curl POST "$BASE/api/v1/provisioning/contact-points" -d "$(cat <<JSON
   }
 }
 JSON
-)" > /dev/null
-echo "   ✓ slack-warnings"
+)" "slack-warnings"
 
 # ---------------------------------------------------------------------------
 # 4. Notification policy
@@ -136,7 +141,7 @@ echo "→ Applying notification policy..."
 
 grafana_curl PUT "$BASE/api/v1/provisioning/policies" -d "$(cat <<'JSON'
 {
-  "receiver": "grafana-default-email",
+  "receiver": "slack-warnings",
   "group_by": ["alertname", "environment"],
   "group_wait": "30s",
   "group_interval": "5m",
@@ -176,8 +181,21 @@ rule() {
   # Usage: rule <group-name> <JSON-body>
   local group="$1"
   local body="$2"
-  grafana_curl POST "$BASE/api/ruler/grafana/api/v1/rules/$FOLDER_UID" \
-    -d "$body" > /dev/null
+  local http_status response
+  # Capture body + status without --fail so we can surface the API error.
+  response=$(curl --silent \
+    -X POST \
+    -H "$AUTH" \
+    -H "Content-Type: application/json" \
+    -w "\n%{http_code}" \
+    "$BASE/api/ruler/grafana/api/v1/rules/$FOLDER_UID" \
+    -d "$body")
+  http_status=$(echo "$response" | tail -n1)
+  if [ "$http_status" -ge 400 ]; then
+    echo "   ✗ $group → HTTP $http_status"
+    echo "$response" | sed '$d'
+    return 1
+  fi
   echo "   ✓ $group"
 }
 
@@ -194,12 +212,7 @@ rule "spoke-http" "$(cat <<JSON
         "condition": "B",
         "no_data_state": "NoData",
         "exec_err_state": "Error",
-        "for": "5m",
-        "labels": {"severity": "critical", "team": "eng"},
-        "annotations": {
-          "summary": "HTTP 5xx error rate above 5%",
-          "description": "The HTTP 5xx error rate is {{ \$value | humanizePercentage }} over the last 5 minutes. Investigate application logs and recent deployments."
-        },
+        "missing_series_evals_to_resolve": 1,
         "data": [
           {
             "refId": "A",
@@ -231,6 +244,13 @@ rule "spoke-http" "$(cat <<JSON
             }
           }
         ]
+      },
+      "for": "5m",
+      "keep_firing_for": "0s",
+      "labels": {"severity": "critical", "team": "eng"},
+      "annotations": {
+        "summary": "HTTP 5xx error rate above 5%",
+        "description": "The HTTP 5xx error rate is {{ \$value | humanizePercentage }} over the last 5 minutes. Investigate application logs and recent deployments."
       }
     }
   ]
@@ -251,12 +271,7 @@ rule "spoke-graphql" "$(cat <<JSON
         "condition": "B",
         "no_data_state": "NoData",
         "exec_err_state": "Error",
-        "for": "10m",
-        "labels": {"severity": "warning", "team": "eng"},
-        "annotations": {
-          "summary": "GraphQL P95 latency above 2 s",
-          "description": "The 95th-percentile GraphQL response time is {{ \$value | humanizeDuration }} over the last 5 minutes. Check slow resolvers and database query times."
-        },
+        "missing_series_evals_to_resolve": 1,
         "data": [
           {
             "refId": "A",
@@ -288,6 +303,13 @@ rule "spoke-graphql" "$(cat <<JSON
             }
           }
         ]
+      },
+      "for": "10m",
+      "keep_firing_for": "0s",
+      "labels": {"severity": "warning", "team": "eng"},
+      "annotations": {
+        "summary": "GraphQL P95 latency above 2 s",
+        "description": "The 95th-percentile GraphQL response time is {{ \$value | humanizeDuration }} over the last 5 minutes. Check slow resolvers and database query times."
       }
     }
   ]
@@ -308,12 +330,7 @@ rule "spoke-sms" "$(cat <<JSON
         "condition": "B",
         "no_data_state": "NoData",
         "exec_err_state": "Error",
-        "for": "5m",
-        "labels": {"severity": "critical", "team": "eng"},
-        "annotations": {
-          "summary": "SMS send error rate above 10%",
-          "description": "{{ \$value | humanizePercentage }} of SMS sends are failing over the last 5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound webhook logs."
-        },
+        "missing_series_evals_to_resolve": 1,
         "data": [
           {
             "refId": "A",
@@ -345,6 +362,13 @@ rule "spoke-sms" "$(cat <<JSON
             }
           }
         ]
+      },
+      "for": "5m",
+      "keep_firing_for": "0s",
+      "labels": {"severity": "critical", "team": "eng"},
+      "annotations": {
+        "summary": "SMS send error rate above 10%",
+        "description": "{{ \$value | humanizePercentage }} of SMS sends are failing over the last 5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound webhook logs."
       }
     }
   ]
@@ -365,12 +389,7 @@ rule "spoke-worker" "$(cat <<JSON
         "condition": "B",
         "no_data_state": "NoData",
         "exec_err_state": "Error",
-        "for": "5m",
-        "labels": {"severity": "critical", "team": "eng"},
-        "annotations": {
-          "summary": "Graphile Worker task failures detected",
-          "description": "Task \"{{ \$labels.task_identifier }}\" has failed {{ \$value }} time(s) in the last 5 minutes. Check worker logs and the graphile_worker.jobs table for error details."
-        },
+        "missing_series_evals_to_resolve": 1,
         "data": [
           {
             "refId": "A",
@@ -402,6 +421,13 @@ rule "spoke-worker" "$(cat <<JSON
             }
           }
         ]
+      },
+      "for": "5m",
+      "keep_firing_for": "0s",
+      "labels": {"severity": "critical", "team": "eng"},
+      "annotations": {
+        "summary": "Graphile Worker task failures detected",
+        "description": "Task \"{{ \$labels.task_identifier }}\" has failed {{ \$value }} time(s) in the last 5 minutes. Check worker logs and the graphile_worker.jobs table for error details."
       }
     }
   ]
@@ -422,12 +448,7 @@ rule "spoke-database" "$(cat <<JSON
         "condition": "B",
         "no_data_state": "NoData",
         "exec_err_state": "Error",
-        "for": "10m",
-        "labels": {"severity": "warning", "team": "eng"},
-        "annotations": {
-          "summary": "DB connection pool above 80% utilized",
-          "description": "The {{ \$labels.db }} Postgres connection pool is {{ \$value | humanizePercentage }} utilized for the last 10 minutes. Consider increasing DB_MAX_POOL or investigating long-running queries."
-        },
+        "missing_series_evals_to_resolve": 1,
         "data": [
           {
             "refId": "A",
@@ -459,6 +480,13 @@ rule "spoke-database" "$(cat <<JSON
             }
           }
         ]
+      },
+      "for": "10m",
+      "keep_firing_for": "0s",
+      "labels": {"severity": "warning", "team": "eng"},
+      "annotations": {
+        "summary": "DB connection pool above 80% utilized",
+        "description": "The {{ \$labels.db }} Postgres connection pool is {{ \$value | humanizePercentage }} utilized for the last 10 minutes. Consider increasing DB_MAX_POOL or investigating long-running queries."
       }
     }
   ]
