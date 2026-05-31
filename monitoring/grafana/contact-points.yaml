@@ -3,25 +3,25 @@
 # These are scaffolded. Before running apply.sh, set the required environment
 # variables (see apply.sh for the full list) so tokens are never committed.
 #
-# OpsGenie:  https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/pagerduty/
-# Slack:     https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/slack/
+# Grafana OnCall: Create a "Grafana Alerting" integration in OnCall
+#                 (Alerts & IRM → OnCall → Integrations → New integration)
+#                 and copy the webhook URL it generates into ONCALL_WEBHOOK_URL.
+#                 Docs: https://grafana.com/docs/oncall/latest/integrations/grafana-alerting/
+# Slack:          https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/slack/
 
 apiVersion: 1
 
 contactPoints:
-  # Critical alerts — pages on-call via OpsGenie
+  # Critical alerts — pages on-call via Grafana OnCall
   - orgId: 1
-    name: opsgenie-critical
+    name: oncall-critical
     receivers:
-      - uid: opsgenie-critical-recv
-        type: opsgenie
+      - uid: oncall-critical-recv
+        type: webhook
         settings:
-          apiKey: "${OPSGENIE_API_KEY}"
-          apiUrl: "https://api.opsgenie.com/v2/alerts"
-          message: "[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }} — Spoke"
-          description: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"
-          priority: P1
-          tags: "spoke,{{ .GroupLabels.severity }}"
+          url: "${ONCALL_WEBHOOK_URL}"
+          httpMethod: POST
+          maxAlerts: 0
         disableResolveMessage: false
 
   # Warning alerts — posts to Slack channel
@@ -37,4 +37,4 @@ contactPoints:
           icon_emoji: ":grafana:"
           title: "[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}"
           text: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"
-        disableResolveMessage: false
+        disableResolveMessage: true

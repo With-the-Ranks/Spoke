@@ -66,7 +66,7 @@ groups:
         annotations:
           summary: "HTTP 5xx error rate above 5%"
           description: >
-            The HTTP 5xx error rate is {{ $value | humanizePercentage }} over the last
+            The HTTP 5xx error rate is {{ $values.A.Value | humanizePercentage }} over the last
             5 minutes. Investigate application logs and recent deployments.
 
   # ---------------------------------------------------------------------------
@@ -83,7 +83,7 @@ groups:
         data:
           - refId: A
             relativeTimeRange:
-              from: 600
+              from: 300
               to: 0
             datasourceUid: __PROMETHEUS_DS_UID__
             model:
@@ -96,7 +96,7 @@ groups:
               refId: A
           - refId: B
             relativeTimeRange:
-              from: 600
+              from: 300
               to: 0
             datasourceUid: "-100"
             model:
@@ -118,14 +118,14 @@ groups:
         execErrState: Error
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
-        for: 10m
+        for: 5m
         labels:
-          severity: warning
+          severity: critical
           team: eng
         annotations:
           summary: "GraphQL P95 latency above 2 s"
           description: >
-            The 95th-percentile GraphQL response time is {{ $value | humanizeDuration }}
+            The 95th-percentile GraphQL response time is {{ $values.A.Value | humanizeDuration }}
             over the last 5 minutes. Check slow resolvers and database query times.
 
   # ---------------------------------------------------------------------------
@@ -168,7 +168,7 @@ groups:
               conditions:
                 - evaluator:
                     type: gt
-                    params: [0.10]
+                    params: [0.05]
                   operator:
                     type: and
                   query:
@@ -185,9 +185,9 @@ groups:
           severity: critical
           team: eng
         annotations:
-          summary: "SMS send error rate above 10%"
+          summary: "SMS send error rate above 5%"
           description: >
-            {{ $value | humanizePercentage }} of SMS sends are failing over the last
+            {{ $values.A.Value | humanizePercentage }} of SMS sends are failing over the last
             5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound
             webhook logs.
 
@@ -211,7 +211,7 @@ groups:
             model:
               expr: >
                 sum by (task_identifier) (
-                  increase(worker_task_total{status="failure"}[5m])
+                  increase(worker_task_total{status="error"}[5m])
                 )
               instant: true
               refId: A
@@ -235,18 +235,18 @@ groups:
                   reducer:
                     type: last
                   type: query
-        noDataState: NoData
-        execErrState: Error
+        noDataState: OK
+        execErrState: OK
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
         for: 5m
         labels:
-          severity: critical
+          severity: warning
           team: eng
         annotations:
           summary: "Graphile Worker task failures detected"
           description: >
-            Task "{{ $labels.task_identifier }}" has failed {{ $value }} time(s) in the
+            Task "{{ $labels.task_identifier }}" has failed {{ $values.A.Value }} time(s) in the
             last 5 minutes. Check worker logs and the graphile_worker.jobs table for
             error details.
 
@@ -264,7 +264,7 @@ groups:
         data:
           - refId: A
             relativeTimeRange:
-              from: 600
+              from: 300
               to: 0
             datasourceUid: __PROMETHEUS_DS_UID__
             model:
@@ -279,7 +279,7 @@ groups:
               refId: A
           - refId: B
             relativeTimeRange:
-              from: 600
+              from: 300
               to: 0
             datasourceUid: "-100"
             model:
@@ -301,13 +301,13 @@ groups:
         execErrState: Error
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
-        for: 10m
+        for: 5m
         labels:
-          severity: warning
+          severity: critical
           team: eng
         annotations:
           summary: "DB connection pool above 80% utilized"
           description: >
-            The {{ $labels.db }} Postgres connection pool is {{ $value | humanizePercentage }}
-            utilized for the last 10 minutes. Consider increasing DB_MAX_POOL or
+            The {{ $labels.db }} Postgres connection pool is {{ $values.A.Value | humanizePercentage }}
+            utilized for the last 5 minutes. Consider increasing DB_MAX_POOL or
             investigating long-running queries.

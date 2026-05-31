@@ -1,8 +1,8 @@
 # Grafana alerting provisioning — notification routing policy
 #
 # Routing logic:
-#   severity=critical  →  opsgenie-critical  (pages on-call)
-#   severity=warning   →  slack-warnings     (Slack only)
+#   severity=critical  →  oncall-critical  (pages on-call via Grafana OnCall)
+#   severity=warning   →  slack-warnings   (Slack only)
 #   everything else    →  slack-warnings (fallback for unmatched alerts)
 
 apiVersion: 1
@@ -15,7 +15,7 @@ policies:
     group_interval: 5m
     repeat_interval: 4h
     routes:
-      - receiver: opsgenie-critical
+      - receiver: oncall-critical
         matchers:
           - severity = critical
         group_wait: 10s

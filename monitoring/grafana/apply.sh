@@ -7,13 +7,14 @@
 #   GRAFANA_SA_TOKEN     Service account token with Admin role
 #
 # For contact points to work, also set:
-#   OPSGENIE_API_KEY     OpsGenie API key for the Spoke integration
+#   ONCALL_WEBHOOK_URL   Grafana OnCall integration webhook URL (create a
+#                        "Grafana Alerting" integration in OnCall to get this)
 #   SLACK_WEBHOOK_URL    Incoming webhook URL for #alerts-spoke
 #
 # Usage:
 #   export GRAFANA_URL=https://yourstack.grafana.net
 #   export GRAFANA_SA_TOKEN=glsa_xxxxxxxxxxxx
-#   export OPSGENIE_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+#   export ONCALL_WEBHOOK_URL=https://oncall-prod-us-central-0.grafana.net/oncall/integrations/v1/grafana/...
 #   export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 #   bash monitoring/grafana/apply.sh
 
@@ -75,11 +76,11 @@ echo "   Prometheus datasource UID: $PROMETHEUS_DS_UID"
 # ---------------------------------------------------------------------------
 echo "→ Applying contact points..."
 
-OPSGENIE_API_KEY="${OPSGENIE_API_KEY:-REPLACE_ME}"
+ONCALL_WEBHOOK_URL="${ONCALL_WEBHOOK_URL:-REPLACE_ME}"
 SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-REPLACE_ME}"
 
-if [ "$OPSGENIE_API_KEY" = "REPLACE_ME" ]; then
-  echo "   ⚠  OPSGENIE_API_KEY not set — opsgenie-critical will be scaffolded with a placeholder"
+if [ "$ONCALL_WEBHOOK_URL" = "REPLACE_ME" ]; then
+  echo "   ⚠  ONCALL_WEBHOOK_URL not set — oncall-critical will be scaffolded with a placeholder"
 fi
 if [ "$SLACK_WEBHOOK_URL" = "REPLACE_ME" ]; then
   echo "   ⚠  SLACK_WEBHOOK_URL not set — slack-warnings will be scaffolded with a placeholder"
@@ -98,30 +99,27 @@ upsert_contact_point() {
   echo "   ✓ $name"
 }
 
-upsert_contact_point "opsgenie-critical-recv" "$(cat <<JSON
+upsert_contact_point "oncall-critical-recv" "$(cat <<JSON
 {
-  "name": "opsgenie-critical",
-  "type": "opsgenie",
-  "uid": "opsgenie-critical-recv",
+  "name": "oncall-critical",
+  "type": "webhook",
+  "uid": "oncall-critical-recv",
   "disableResolveMessage": false,
   "settings": {
-    "apiKey": "${OPSGENIE_API_KEY}",
-    "apiUrl": "https://api.opsgenie.com/v2/alerts",
-    "message": "[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }} — Spoke",
-    "description": "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}",
-    "priority": "P1",
-    "tags": "spoke,{{ .GroupLabels.severity }}"
+    "url": "${ONCALL_WEBHOOK_URL}",
+    "httpMethod": "POST",
+    "maxAlerts": 0
   }
 }
 JSON
-)" "opsgenie-critical"
+)" "oncall-critical"
 
 upsert_contact_point "slack-warnings-recv" "$(cat <<JSON
 {
   "name": "slack-warnings",
   "type": "slack",
   "uid": "slack-warnings-recv",
-  "disableResolveMessage": false,
+  "disableResolveMessage": true,
   "settings": {
     "url": "${SLACK_WEBHOOK_URL}",
     "channel": "#alerts-spoke",
@@ -148,7 +146,7 @@ grafana_curl PUT "$BASE/api/v1/provisioning/policies" -d "$(cat <<'JSON'
   "repeat_interval": "4h",
   "routes": [
     {
-      "receiver": "opsgenie-critical",
+      "receiver": "oncall-critical",
       "matchers": ["severity = critical"],
       "group_wait": "10s",
       "group_interval": "1m",
@@ -250,7 +248,7 @@ rule "spoke-http" "$(cat <<JSON
       "labels": {"severity": "critical", "team": "eng"},
       "annotations": {
         "summary": "HTTP 5xx error rate above 5%",
-        "description": "The HTTP 5xx error rate is {{ \$value | humanizePercentage }} over the last 5 minutes. Investigate application logs and recent deployments."
+        "description": "The HTTP 5xx error rate is {{ \$values.A.Value | humanizePercentage }} over the last 5 minutes. Investigate application logs and recent deployments."
       }
     }
   ]
@@ -275,7 +273,7 @@ rule "spoke-graphql" "$(cat <<JSON
         "data": [
           {
             "refId": "A",
-            "relativeTimeRange": {"from": 600, "to": 0},
+            "relativeTimeRange": {"from": 300, "to": 0},
             "datasourceUid": "$PROMETHEUS_DS_UID",
             "model": {
               "expr": "histogram_quantile(0.95, sum(rate(graphql_request_duration_seconds_bucket[5m])) by (le))",
@@ -285,7 +283,7 @@ rule "spoke-graphql" "$(cat <<JSON
           },
           {
             "refId": "B",
-            "relativeTimeRange": {"from": 600, "to": 0},
+            "relativeTimeRange": {"from": 300, "to": 0},
             "datasourceUid": "-100",
             "model": {
               "type": "threshold",
@@ -304,12 +302,12 @@ rule "spoke-graphql" "$(cat <<JSON
           }
         ]
       },
-      "for": "10m",
+      "for": "5m",
       "keep_firing_for": "0s",
-      "labels": {"severity": "warning", "team": "eng"},
+      "labels": {"severity": "critical", "team": "eng"},
       "annotations": {
         "summary": "GraphQL P95 latency above 2 s",
-        "description": "The 95th-percentile GraphQL response time is {{ \$value | humanizeDuration }} over the last 5 minutes. Check slow resolvers and database query times."
+        "description": "The 95th-percentile GraphQL response time is {{ \$values.A.Value | humanizeDuration }} over the last 5 minutes. Check slow resolvers and database query times."
       }
     }
   ]
@@ -352,7 +350,7 @@ rule "spoke-sms" "$(cat <<JSON
               "expression": "A",
               "conditions": [
                 {
-                  "evaluator": {"type": "gt", "params": [0.10]},
+                  "evaluator": {"type": "gt", "params": [0.05]},
                   "operator": {"type": "and"},
                   "query": {"params": ["A"]},
                   "reducer": {"type": "last"},
@@ -367,8 +365,8 @@ rule "spoke-sms" "$(cat <<JSON
       "keep_firing_for": "0s",
       "labels": {"severity": "critical", "team": "eng"},
       "annotations": {
-        "summary": "SMS send error rate above 10%",
-        "description": "{{ \$value | humanizePercentage }} of SMS sends are failing over the last 5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound webhook logs."
+        "summary": "SMS send error rate above 5%",
+        "description": "{{ \$values.A.Value | humanizePercentage }} of SMS sends are failing over the last 5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound webhook logs."
       }
     }
   ]
@@ -387,8 +385,8 @@ rule "spoke-worker" "$(cat <<JSON
         "uid": "spoke-worker-fail",
         "title": "Graphile Worker Task Failures",
         "condition": "B",
-        "no_data_state": "NoData",
-        "exec_err_state": "Error",
+        "no_data_state": "OK",
+        "exec_err_state": "OK",
         "missing_series_evals_to_resolve": 1,
         "data": [
           {
@@ -396,7 +394,7 @@ rule "spoke-worker" "$(cat <<JSON
             "relativeTimeRange": {"from": 300, "to": 0},
             "datasourceUid": "$PROMETHEUS_DS_UID",
             "model": {
-              "expr": "sum by (task_identifier) (increase(worker_task_total{status=\"failure\"}[5m]))",
+              "expr": "sum by (task_identifier) (increase(worker_task_total{status=\"error\"}[5m]))",
               "instant": true,
               "refId": "A"
             }
@@ -424,10 +422,10 @@ rule "spoke-worker" "$(cat <<JSON
       },
       "for": "5m",
       "keep_firing_for": "0s",
-      "labels": {"severity": "critical", "team": "eng"},
+      "labels": {"severity": "warning", "team": "eng"},
       "annotations": {
         "summary": "Graphile Worker task failures detected",
-        "description": "Task \"{{ \$labels.task_identifier }}\" has failed {{ \$value }} time(s) in the last 5 minutes. Check worker logs and the graphile_worker.jobs table for error details."
+        "description": "Task \"{{ \$labels.task_identifier }}\" has failed {{ \$values.A.Value }} time(s) in the last 5 minutes. Check worker logs and the graphile_worker.jobs table for error details."
       }
     }
   ]
@@ -452,7 +450,7 @@ rule "spoke-database" "$(cat <<JSON
         "data": [
           {
             "refId": "A",
-            "relativeTimeRange": {"from": 600, "to": 0},
+            "relativeTimeRange": {"from": 300, "to": 0},
             "datasourceUid": "$PROMETHEUS_DS_UID",
             "model": {
               "expr": "sum by (db) (db_pool_connections{state=\"active\"}) / (sum by (db) (db_pool_connections{state=\"active\"}) + sum by (db) (db_pool_connections{state=\"idle\"}))",
@@ -462,7 +460,7 @@ rule "spoke-database" "$(cat <<JSON
           },
           {
             "refId": "B",
-            "relativeTimeRange": {"from": 600, "to": 0},
+            "relativeTimeRange": {"from": 300, "to": 0},
             "datasourceUid": "-100",
             "model": {
               "type": "threshold",
@@ -481,12 +479,12 @@ rule "spoke-database" "$(cat <<JSON
           }
         ]
       },
-      "for": "10m",
+      "for": "5m",
       "keep_firing_for": "0s",
-      "labels": {"severity": "warning", "team": "eng"},
+      "labels": {"severity": "critical", "team": "eng"},
       "annotations": {
         "summary": "DB connection pool above 80% utilized",
-        "description": "The {{ \$labels.db }} Postgres connection pool is {{ \$value | humanizePercentage }} utilized for the last 10 minutes. Consider increasing DB_MAX_POOL or investigating long-running queries."
+        "description": "The {{ \$labels.db }} Postgres connection pool is {{ \$values.A.Value | humanizePercentage }} utilized for the last 5 minutes. Consider increasing DB_MAX_POOL or investigating long-running queries."
       }
     }
   ]
