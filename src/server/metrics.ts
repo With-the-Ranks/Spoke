@@ -143,7 +143,7 @@ export const instrumentKnex = (
   // tarn.js (Knex's pool) doesn't emit events, so poll every 15 s.
   // .unref() prevents the interval from keeping the process alive.
   setInterval(() => {
-    const { pool } = knexInstance.client as any;
+    const { pool } = knexInstance.client;
     if (pool) {
       dbPoolConnections.set({ db: label, state: "active" }, pool.numUsed());
       dbPoolConnections.set({ db: label, state: "idle" }, pool.numFree());
