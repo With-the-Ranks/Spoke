@@ -1,6 +1,20 @@
 const winston = require("winston");
+const { trace } = require("@opentelemetry/api");
 
 const { config } = require("./config");
+
+// Stamps traceId + spanId onto every log entry when there is an active OTEL span.
+// When OTEL is disabled the global tracer is a no-op and getActiveSpan() returns
+// undefined, so this is always safe to include.
+const traceContextFormat = winston.format((info) => {
+  const span = trace.getActiveSpan();
+  if (span?.isRecording()) {
+    const { traceId, spanId } = span.spanContext();
+    info.traceId = traceId;
+    info.spanId = spanId;
+  }
+  return info;
+})();
 
 // Winston configuration
 const logger = winston.createLogger({
@@ -9,6 +23,7 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       level: config.LOG_LEVEL,
       format: winston.format.combine(
+        traceContextFormat,
         winston.format.timestamp(),
         winston.format.json()
       )
