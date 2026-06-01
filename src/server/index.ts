@@ -1,3 +1,5 @@
+import "./tracing"; // must be first — patches express, pg, http before they load
+
 import type { Knex } from "knex";
 import { createLightship } from "lightship";
 import cron from "node-cron";
