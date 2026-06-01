@@ -24,10 +24,11 @@ interface Props {
   organizationId: string;
   campaign: any;
   contact: any;
+  onScriptSelected?: (script: string) => void;
 }
 
 const SurveyColumn: React.FC<Props> = (props) => {
-  const { campaign, contact, organizationId } = props;
+  const { campaign, contact, organizationId, onScriptSelected } = props;
 
   const [isWorking, setIsWorking] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
@@ -67,7 +68,11 @@ const SurveyColumn: React.FC<Props> = (props) => {
   return (
     <div style={styles.container}>
       <ShowTags tags={formattedTags} />
-      <ManageSurveyResponses contact={contact} campaign={campaign} />
+      <ManageSurveyResponses
+        contact={contact}
+        campaign={campaign}
+        onScriptSelected={onScriptSelected}
+      />
       <div style={styles.spacer} />
       <div style={{ display: "flex" }}>
         <div style={styles.spacer} />

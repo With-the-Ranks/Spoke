@@ -6,6 +6,7 @@ import { config } from "../../config";
 import logger from "../../logger";
 import { contextForRequest } from "../contexts";
 import { botClient } from "../lib/slack";
+import { authAttemptsTotal } from "../metrics";
 import type { SpokeRequest } from "../types";
 import { errToObj } from "../utils";
 import type { PassportCallback, UserWithStatus } from "./util";
@@ -88,10 +89,12 @@ export const setupSlackPassport = () => {
           .where({ auth0_id: slackUser.id })
           .first();
         if (spokeUser) {
+          authAttemptsTotal.inc({ strategy: "slack", status: "success" });
           return done(null, spokeUser);
         }
       } catch (err: any) {
         logger.error("Slack login error: could not find existing user: ", err);
+        authAttemptsTotal.inc({ strategy: "slack", status: "failure" });
         return done(err);
       }
 
@@ -103,10 +106,12 @@ export const setupSlackPassport = () => {
             .where({ email: slackUser.email })
             .returning("*");
           if (spokeUser) {
+            authAttemptsTotal.inc({ strategy: "slack", status: "success" });
             return done(null, spokeUser);
           }
         } catch (err: any) {
           logger.error("Error converting existing Slack user: ", err);
+          authAttemptsTotal.inc({ strategy: "slack", status: "failure" });
           return done(err);
         }
       }
@@ -131,9 +136,11 @@ export const setupSlackPassport = () => {
             logger.error("Slack login error: could not insert new user: ", err);
             throw err;
           });
+        authAttemptsTotal.inc({ strategy: "slack", status: "success" });
         return done(null, spokeUser);
       } catch (err: any) {
         logger.error("Error creating new Slack user: ", err);
+        authAttemptsTotal.inc({ strategy: "slack", status: "failure" });
         return done(err);
       }
     }

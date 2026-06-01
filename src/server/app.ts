@@ -9,6 +9,7 @@ import basicAuth from "express-basic-auth";
 import expressSession from "express-session";
 
 import { config } from "../config";
+import correlationId from "../lib/correlation-id";
 import requestLogging from "../lib/request-logging";
 import logger from "../logger";
 import { fulfillPendingRequestFor } from "./api/assignment";
@@ -66,9 +67,9 @@ export const createApp = async () => {
     next();
   });
 
-  if (config.LOG_LEVEL === "verbose" || config.LOG_LEVEL === "debug") {
-    app.use(requestLogging);
-  }
+  // Assign a correlation ID to every request before anything else logs
+  app.use(correlationId);
+  app.use(requestLogging);
 
   // Send version to client
   if (config.SPOKE_VERSION) {

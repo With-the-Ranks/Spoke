@@ -182,6 +182,13 @@ yarn knex migrate:make my-migration
 
 All configuration environment variables are documented in [config.js](./src/config.js).
 
+### Support widget (Chatwoot)
+
+When `CHATWOOT_BASE_URL` and `CHATWOOT_WEBSITE_TOKEN` are set, the server injects Chatwoot’s script in the HTML shell (see [`src/server/middleware/app-renderer.js`](src/server/middleware/app-renderer.js)).
+
+1. Create a **Website** inbox in [Chatwoot](https://www.chatwoot.com/) (cloud or self-hosted).
+2. Set `CHATWOOT_BASE_URL` and `CHATWOOT_WEBSITE_TOKEN` in your environment (see [config.js](./src/config.js)).
+
 You can also find developer documentation and guides in the [docs](./docs) directory.
 
 ## Contributing

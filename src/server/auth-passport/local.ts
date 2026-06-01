@@ -11,6 +11,7 @@ import localAuthHelpers, {
   LocalAuthError
 } from "../local-auth-helpers";
 import sendEmail from "../mail";
+import { authAttemptsTotal } from "../metrics";
 import { r } from "../models";
 import type { SpokeRequest } from "../types";
 import type { PassportCallback, UserWithStatus } from "./util";
@@ -61,8 +62,10 @@ export const setupLocalAuthPassport = () => {
         if (authType === "signup") {
           user.isNew = true;
         }
+        authAttemptsTotal.inc({ strategy: "local", status: "success" });
         return done(null, user);
       } catch (error: any) {
+        authAttemptsTotal.inc({ strategy: "local", status: "failure" });
         return done(error);
       }
     }

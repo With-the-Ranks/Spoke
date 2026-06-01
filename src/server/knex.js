@@ -1,5 +1,5 @@
 const { config } = require("../config");
-const logger = require("../logger");
+const logger = require("../logger").default;
 
 // Define a Knex connection. Currently, this is used only to instantiate the
 // rethink-knex-adapter's connection. In the future, if the adapter is

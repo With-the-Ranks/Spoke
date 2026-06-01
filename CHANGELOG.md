@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.2.0](https://github.com/With-the-Ranks/spoke/compare/v10.1.0...v10.2.0) (2026-05-28)
+
+
+### Features
+
+* **message-review:** insert script when survey selected ([#179](https://github.com/With-the-Ranks/spoke/issues/179)) ([94dcec0](https://github.com/With-the-Ranks/spoke/commit/94dcec0811b17f5f52ea3846a563a9d71e9fbbbc))
+* add Chatwoot support widget ([#170](https://github.com/With-the-Ranks/spoke/issues/170)) ([91c7152](https://github.com/With-the-Ranks/spoke/commit/91c7152196d7464ce30e0092fc826fcc7869020e))
+
+
+### Bug Fixes
+
+* **campaign-preview:** remove text align justify style ([#173](https://github.com/With-the-Ranks/spoke/issues/173)) ([35cee18](https://github.com/With-the-Ranks/spoke/commit/35cee1881aec3ff30c6cb9ca9eab0293a6104626))
+* **campaign-preview:** scope collapse/expand toggle to chevron only ([#174](https://github.com/With-the-Ranks/spoke/issues/174)) ([f631a02](https://github.com/With-the-Ranks/spoke/commit/f631a02e426fe6b0a0873f48b6a6c101ae86abf1))
+* center login form ([#172](https://github.com/With-the-Ranks/spoke/issues/172)) ([a0a0ae3](https://github.com/With-the-Ranks/spoke/commit/a0a0ae3a592c50a5765338ff6607492ad403f2ad))
+* **van:** use mui v4 components for setup dialog ([#185](https://github.com/With-the-Ranks/spoke/issues/185)) ([91fe906](https://github.com/With-the-Ranks/spoke/commit/91fe906a6729cb57d7c1ef2b21718f4e7b37d62c))
+
 ## [10.1.0](https://github.com/With-the-Ranks/spoke/compare/v10.0.1...v10.1.0) (2026-05-06)
 
 

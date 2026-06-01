@@ -106,12 +106,20 @@ const layouts: LayoutStyles = {
   }
 };
 
+/** Extra bottom inset when Chatwoot launcher is enabled (window vars from app shell). */
+const chatwootFabBottomOffset =
+  typeof window !== "undefined" &&
+  window.CHATWOOT_WEBSITE_TOKEN &&
+  window.CHATWOOT_BASE_URL
+    ? 80
+    : 0;
+
 const components: ComponentStyles = {
   floatingButton: {
     margin: 0,
     top: "auto",
     right: 20,
-    bottom: 20,
+    bottom: 20 + chatwootFabBottomOffset,
     left: "auto",
     position: "fixed"
   },

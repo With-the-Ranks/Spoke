@@ -1,0 +1,313 @@
+# Grafana alerting provisioning — Spoke alert rules
+#
+# Format: Grafana v1 provisioning (https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/)
+#
+# This file is the human-readable source of truth for all Spoke alert rules.
+# Use apply.sh to push these rules to Grafana Cloud via the HTTP API.
+#
+# Datasource: replace __PROMETHEUS_DS_UID__ with the UID of your GMP Prometheus
+# datasource in Grafana Cloud (apply.sh fetches this automatically).
+
+apiVersion: 1
+
+groups:
+  # ---------------------------------------------------------------------------
+  # HTTP
+  # ---------------------------------------------------------------------------
+  - orgId: 1
+    name: spoke-http
+    folder: Spoke
+    interval: 1m
+    rules:
+      - uid: spoke-http-5xx
+        title: "HTTP 5xx Error Rate High"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __PROMETHEUS_DS_UID__
+            model:
+              expr: >
+                sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+                /
+                sum(rate(http_requests_total[5m]))
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.05]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                  type: query
+        noDataState: OK
+        execErrState: OK
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
+        for: 5m
+        labels:
+          severity: critical
+          team: eng
+        annotations:
+          summary: "HTTP 5xx error rate above 5%"
+          description: >
+            The HTTP 5xx error rate is {{ $values.A.Value | humanizePercentage }} over the last
+            5 minutes. Investigate application logs and recent deployments.
+
+  # ---------------------------------------------------------------------------
+  # GraphQL
+  # ---------------------------------------------------------------------------
+  - orgId: 1
+    name: spoke-graphql
+    folder: Spoke
+    interval: 1m
+    rules:
+      - uid: spoke-gql-latency
+        title: "GraphQL P95 Latency High"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __PROMETHEUS_DS_UID__
+            model:
+              expr: >
+                histogram_quantile(
+                  0.95,
+                  sum(rate(graphql_request_duration_seconds_bucket[5m])) by (le)
+                )
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [2]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                  type: query
+        noDataState: OK
+        execErrState: OK
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
+        for: 5m
+        labels:
+          severity: critical
+          team: eng
+        annotations:
+          summary: "GraphQL P95 latency above 2 s"
+          description: >
+            The 95th-percentile GraphQL response time is {{ $values.A.Value | humanizeDuration }}
+            over the last 5 minutes. Check slow resolvers and database query times.
+
+  # ---------------------------------------------------------------------------
+  # SMS
+  # ---------------------------------------------------------------------------
+  - orgId: 1
+    name: spoke-sms
+    folder: Spoke
+    interval: 1m
+    rules:
+      - uid: spoke-sms-errors
+        title: "SMS Send Error Rate High"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __PROMETHEUS_DS_UID__
+            model:
+              # Only fire when there is meaningful send volume (> 1 msg/min)
+              # to avoid spurious alerts during quiet periods.
+              expr: >
+                (
+                  sum(rate(spoke_sms_send_total{status="error"}[5m]))
+                  /
+                  sum(rate(spoke_sms_send_total[5m]))
+                ) and sum(rate(spoke_sms_send_total[5m])) > 0.016
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.05]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                  type: query
+        noDataState: OK
+        execErrState: OK
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
+        for: 5m
+        labels:
+          severity: critical
+          team: eng
+        annotations:
+          summary: "SMS send error rate above 5%"
+          description: >
+            {{ $values.A.Value | humanizePercentage }} of SMS sends are failing over the last
+            5 minutes. Check the Switchboard/Twilio/Nexmo status page and outbound
+            webhook logs.
+
+  # ---------------------------------------------------------------------------
+  # Worker
+  # ---------------------------------------------------------------------------
+  - orgId: 1
+    name: spoke-worker
+    folder: Spoke
+    interval: 1m
+    rules:
+      - uid: spoke-worker-fail
+        title: "Graphile Worker Task Failures"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __PROMETHEUS_DS_UID__
+            model:
+              expr: >
+                sum by (task_identifier) (
+                  increase(worker_task_total{status="error"}[5m])
+                )
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                  type: query
+        noDataState: OK
+        execErrState: OK
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
+        for: 5m
+        labels:
+          severity: warning
+          team: eng
+        annotations:
+          summary: "Graphile Worker task failures detected"
+          description: >
+            Task "{{ $labels.task_identifier }}" has failed {{ $values.A.Value }} time(s) in the
+            last 5 minutes. Check worker logs and the graphile_worker.jobs table for
+            error details.
+
+  # ---------------------------------------------------------------------------
+  # Database
+  # ---------------------------------------------------------------------------
+  - orgId: 1
+    name: spoke-database
+    folder: Spoke
+    interval: 1m
+    rules:
+      - uid: spoke-db-pool
+        title: "DB Connection Pool Saturation High"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __PROMETHEUS_DS_UID__
+            model:
+              expr: >
+                sum by (db) (db_pool_connections{state="active"})
+                /
+                (
+                  sum by (db) (db_pool_connections{state="active"})
+                  + sum by (db) (db_pool_connections{state="idle"})
+                )
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.80]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                  type: query
+        noDataState: OK
+        execErrState: OK
+        missingSeriesEvalsToResolve: 1
+        keepFiringFor: 0s
+        for: 5m
+        labels:
+          severity: critical
+          team: eng
+        annotations:
+          summary: "DB connection pool above 80% utilized"
+          description: >
+            The {{ $labels.db }} Postgres connection pool is {{ $values.A.Value | humanizePercentage }}
+            utilized for the last 5 minutes. Consider increasing DB_MAX_POOL or
+            investigating long-running queries.
