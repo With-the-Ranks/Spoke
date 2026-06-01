@@ -467,6 +467,11 @@ const validators = {
     desc: "Whether to expose the /metrics endpoint for Prometheus scraping.",
     default: true
   }),
+  DEPLOY_ENVIRONMENT: str({
+    desc:
+      "Deployment environment label for metrics, logs, and traces (e.g. 'production', 'staging'). Independent of NODE_ENV — staging deployments run with NODE_ENV=production but DEPLOY_ENVIRONMENT=staging so observability can distinguish them.",
+    default: "development"
+  }),
   OTEL_ENABLED: bool({
     desc: "Whether to enable OpenTelemetry distributed tracing.",
     default: false

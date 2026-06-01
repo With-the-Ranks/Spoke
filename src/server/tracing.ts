@@ -9,7 +9,7 @@ const {
   OTEL_EXPORTER_OTLP_ENDPOINT,
   OTEL_SERVICE_NAME = "spoke",
   OTEL_SAMPLE_RATE = "0.1",
-  NODE_ENV = "development"
+  DEPLOY_ENVIRONMENT = "development"
 } = process.env;
 
 if (OTEL_ENABLED === "true") {
@@ -40,7 +40,7 @@ if (OTEL_ENABLED === "true") {
   // OTEL_RESOURCE_ATTRIBUTES lets us attach environment without importing
   // @opentelemetry/semantic-conventions — the SDK reads this env var natively.
   if (!process.env.OTEL_RESOURCE_ATTRIBUTES) {
-    process.env.OTEL_RESOURCE_ATTRIBUTES = `deployment.environment=${NODE_ENV}`;
+    process.env.OTEL_RESOURCE_ATTRIBUTES = `deployment.environment=${DEPLOY_ENVIRONMENT}`;
   }
 
   sdk.start();
