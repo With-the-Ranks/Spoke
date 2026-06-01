@@ -1,6 +1,15 @@
 import { randomUUID } from "crypto";
 import type { NextFunction, Request, Response } from "express";
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Locals {
+      requestId: string | undefined;
+    }
+  }
+}
+
 const REQUEST_ID_HEADER = "X-Request-Id";
 
 /**
@@ -16,9 +25,8 @@ const REQUEST_ID_HEADER = "X-Request-Id";
  * can correlate requests in their own logs.
  */
 const correlationId = (req: Request, res: Response, next: NextFunction) => {
-  const requestId =
-    (req.headers[REQUEST_ID_HEADER.toLowerCase()] as string | undefined) ??
-    randomUUID();
+  const headerId = req.headers[REQUEST_ID_HEADER.toLowerCase()];
+  const requestId = typeof headerId === "string" ? headerId : randomUUID();
 
   res.locals.requestId = requestId;
   res.setHeader(REQUEST_ID_HEADER, requestId);
