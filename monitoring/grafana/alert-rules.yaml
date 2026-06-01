@@ -55,8 +55,8 @@ groups:
                   reducer:
                     type: last
                   type: query
-        noDataState: NoData
-        execErrState: Error
+        noDataState: OK
+        execErrState: OK
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
         for: 5m
@@ -114,8 +114,8 @@ groups:
                   reducer:
                     type: last
                   type: query
-        noDataState: NoData
-        execErrState: Error
+        noDataState: OK
+        execErrState: OK
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
         for: 5m
@@ -176,8 +176,8 @@ groups:
                   reducer:
                     type: last
                   type: query
-        noDataState: NoData
-        execErrState: Error
+        noDataState: OK
+        execErrState: OK
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
         for: 5m
@@ -297,8 +297,8 @@ groups:
                   reducer:
                     type: last
                   type: query
-        noDataState: NoData
-        execErrState: Error
+        noDataState: OK
+        execErrState: OK
         missingSeriesEvalsToResolve: 1
         keepFiringFor: 0s
         for: 5m

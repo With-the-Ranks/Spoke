@@ -208,8 +208,8 @@ rule "spoke-http" "$(cat <<JSON
         "uid": "spoke-http-5xx",
         "title": "HTTP 5xx Error Rate High",
         "condition": "B",
-        "no_data_state": "NoData",
-        "exec_err_state": "Error",
+        "no_data_state": "OK",
+        "exec_err_state": "OK",
         "missing_series_evals_to_resolve": 1,
         "data": [
           {
@@ -267,8 +267,8 @@ rule "spoke-graphql" "$(cat <<JSON
         "uid": "spoke-gql-latency",
         "title": "GraphQL P95 Latency High",
         "condition": "B",
-        "no_data_state": "NoData",
-        "exec_err_state": "Error",
+        "no_data_state": "OK",
+        "exec_err_state": "OK",
         "missing_series_evals_to_resolve": 1,
         "data": [
           {
@@ -326,8 +326,8 @@ rule "spoke-sms" "$(cat <<JSON
         "uid": "spoke-sms-errors",
         "title": "SMS Send Error Rate High",
         "condition": "B",
-        "no_data_state": "NoData",
-        "exec_err_state": "Error",
+        "no_data_state": "OK",
+        "exec_err_state": "OK",
         "missing_series_evals_to_resolve": 1,
         "data": [
           {
@@ -444,8 +444,8 @@ rule "spoke-database" "$(cat <<JSON
         "uid": "spoke-db-pool",
         "title": "DB Connection Pool Saturation High",
         "condition": "B",
-        "no_data_state": "NoData",
-        "exec_err_state": "Error",
+        "no_data_state": "OK",
+        "exec_err_state": "OK",
         "missing_series_evals_to_resolve": 1,
         "data": [
           {
