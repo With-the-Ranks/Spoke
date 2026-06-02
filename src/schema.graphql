@@ -574,6 +574,9 @@ input CampaignsFilter {
   listSize: Int
   pageSize: Int
   campaignTitle: String
+  hasUnsentInitialMessages: Boolean
+  hasUnhandledMessages: Boolean
+  hasUnassignedContacts: Boolean
 }
 
 type CampaignStats {

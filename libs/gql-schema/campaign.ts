@@ -7,6 +7,9 @@ export const schema = `
     listSize: Int
     pageSize: Int
     campaignTitle: String
+    hasUnsentInitialMessages: Boolean
+    hasUnhandledMessages: Boolean
+    hasUnassignedContacts: Boolean
   }
 
   type CampaignStats {

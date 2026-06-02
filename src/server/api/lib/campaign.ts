@@ -58,7 +58,11 @@ export const doGetCampaigns: DoGetCampaigns = async (
     organizationId,
     campaignId,
     isArchived,
-    campaignTitle
+    isStarted,
+    campaignTitle,
+    hasUnsentInitialMessages,
+    hasUnhandledMessages,
+    hasUnassignedContacts
   } = options;
 
   const query = r.reader("campaign").select("*");
@@ -76,10 +80,80 @@ export const doGetCampaigns: DoGetCampaigns = async (
     query.where({ is_archived: isArchived });
   }
 
+  if (!isNil(isStarted)) {
+    query.where({ is_started: isStarted });
+  }
+
   if (campaignTitle) {
     query.whereRaw(`concat("id", ': ', "title") ilike ?`, [
       `%${campaignTitle}%`
     ]);
+  }
+
+  if (!isNil(hasUnsentInitialMessages)) {
+    const existsMethod = hasUnsentInitialMessages
+      ? "whereExists"
+      : "whereNotExists";
+    query[existsMethod](
+      r
+        .reader("campaign_contact")
+        .select(r.reader.raw("1"))
+        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
+        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
+        .where({ message_status: "needsMessage", is_opted_out: false })
+        .limit(1)
+    );
+  }
+
+  if (!isNil(hasUnhandledMessages)) {
+    const existsMethod = hasUnhandledMessages
+      ? "whereExists"
+      : "whereNotExists";
+    query[existsMethod](
+      r
+        .reader("campaign_contact")
+        .select(r.reader.raw("1"))
+        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
+        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
+        .where({ message_status: "needsResponse", is_opted_out: false })
+        .whereNotExists(
+          r
+            .reader("campaign_contact_tag")
+            .join("tag", "campaign_contact_tag.tag_id", "tag.id")
+            .select(r.reader.raw("1"))
+            .whereRaw(
+              '"campaign_contact_tag"."campaign_contact_id" = "campaign_contact"."id"'
+            )
+            .whereRaw("lower(tag.title) = 'escalated'")
+        )
+        .limit(1)
+    );
+  }
+
+  if (!isNil(hasUnassignedContacts)) {
+    const existsMethod = hasUnassignedContacts
+      ? "whereExists"
+      : "whereNotExists";
+    query[existsMethod](
+      r
+        .reader("campaign_contact")
+        .select(r.reader.raw("1"))
+        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
+        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
+        .whereNull("campaign_contact.assignment_id")
+        .where({ is_opted_out: false })
+        .whereNotExists(
+          r
+            .reader("campaign_contact_tag")
+            .join("tag", "campaign_contact_tag.tag_id", "tag.id")
+            .select(r.reader.raw("1"))
+            .whereRaw(
+              '"campaign_contact_tag"."campaign_contact_id" = "campaign_contact"."id"'
+            )
+            .where({ "tag.is_assignable": false })
+        )
+        .limit(1)
+    );
   }
 
   const pagerOptions = { first, after };
