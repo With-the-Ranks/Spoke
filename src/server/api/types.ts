@@ -126,6 +126,7 @@ export interface CampaignRecord {
   messaging_service_sid: string | null;
   column_mapping: string | null;
   contacts_filename: string | null;
+  type: "sms" | "call";
 }
 
 export interface CampaignVariableRecord {
