@@ -3,6 +3,7 @@ import Nexmo from "nexmo";
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
 import logger from "../../../logger";
+import { smsSendTotal } from "../../metrics";
 import { r } from "../../models";
 // eslint-disable-next-line import/named
 import { appendServiceResponse, getLastMessage } from "./message-sending";
@@ -128,6 +129,7 @@ const sendMessage = async (message, trx = r.knex) => {
         messageToSave.service = "nexmo";
 
         if (hasError) {
+          smsSendTotal.inc({ status: "error", provider: "nexmo" });
           if (messageToSave.service_messages.length >= MAX_SEND_ATTEMPTS) {
             messageToSave.send_status = "ERROR";
           }
@@ -144,6 +146,7 @@ const sendMessage = async (message, trx = r.knex) => {
               )
             );
         } else {
+          smsSendTotal.inc({ status: "success", provider: "nexmo" });
           const { id: messageId, ...messagePayload } = message;
           trx("message")
             .update({ ...messagePayload, send_status: "SENT" })

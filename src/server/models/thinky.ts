@@ -7,6 +7,7 @@ import dumbThinky from "rethink-knex-adapter";
 
 import { config } from "../../config";
 import knexConfig from "../knex";
+import { instrumentKnex } from "../metrics";
 
 export interface RethinkQuery {
   k: Knex;
@@ -61,6 +62,13 @@ thinkyConn.r.parseCount = async <T>(query: Knex.QueryBuilder | T[]) => {
 
   throw new Error("Multiple columns returned by the query!");
 };
+
+if (config.METRICS_ENABLED) {
+  instrumentKnex(thinkyConn.r.knex, "primary");
+  if (knexConfig.useReader) {
+    instrumentKnex(thinkyConn.r.reader as Knex, "reader");
+  }
+}
 
 if (config.REDIS_URL) {
   thinkyConn.r.redis = redis.createClient({ url: config.REDIS_URL });

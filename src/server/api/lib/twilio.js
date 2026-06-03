@@ -5,6 +5,7 @@ import { config } from "../../../config";
 import { DateTime } from "../../../lib/datetime";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
 import logger from "../../../logger";
+import { smsSendTotal } from "../../metrics";
 import { r } from "../../models";
 import { MessagingServiceType } from "../types";
 import { symmetricDecrypt } from "./crypto";
@@ -259,6 +260,7 @@ const sendMessage = async (message, organizationId, trx = r.knex) => {
       }
 
       if (hasError) {
+        smsSendTotal.inc({ status: "error", provider: "twilio" });
         const SENT_STRING = '"status"'; // will appear in responses
         if (
           messageToSave.service_response.split(SENT_STRING).length >=
@@ -279,6 +281,7 @@ const sendMessage = async (message, organizationId, trx = r.knex) => {
             )
           );
       } else {
+        smsSendTotal.inc({ status: "success", provider: "twilio" });
         const { id: messageId, ...updatePayload } = messageToSave;
         trx("message")
           .update({

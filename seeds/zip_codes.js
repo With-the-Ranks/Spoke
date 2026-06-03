@@ -2,13 +2,10 @@ const fs = require("fs");
 const Papa = require("papaparse");
 
 let zipToTimeZone;
-let logger;
 try {
   ({ zipToTimeZone } = require("../src/lib/zip-format"));
-  logger = require("../src/logger");
 } catch {
   ({ zipToTimeZone } = require(`${__dirname}/../build/src/lib/zip-format`));
-  logger = require(`${__dirname}/../build/src/logger`);
 }
 
 const fetchZipCodes = () => {
@@ -19,7 +16,7 @@ const fetchZipCodes = () => {
     throw new Error("Failed to seed zip codes");
   }
 
-  logger.info(`Parsed a CSV with ${data.length} zip codes`);
+  console.log(`Parsed a CSV with ${data.length} zip codes`);
   const zipCodes = data.filter(row => !zipToTimeZone(row.zip)).map(row => ({
     zip: row.zip,
     city: row.city,
@@ -30,7 +27,7 @@ const fetchZipCodes = () => {
     longitude: Number(row.longitude)
   }));
 
-  logger.info(`${zipCodes.length} ZIP CODES`);
+  console.log(`${zipCodes.length} ZIP CODES`);
   return zipCodes;
 };
 
@@ -39,13 +36,14 @@ exports.seed = (knex, Promise) => {
 
   return checkHasZipCodes().then(hasZipCodes => {
     if (hasZipCodes) {
-      return logger.info("Zip codes have already been seeded. Skipping.");
+      console.log("Zip codes have already been seeded. Skipping.");
+      return;
     }
 
     const zipCodes = fetchZipCodes();
     return knex
       .batchInsert("zip_code", zipCodes)
-      .then(() => logger.info("Finished seeding"))
-      .catch(err => logger.error("Error seeding: ", err));
+      .then(() => console.log("Finished seeding"))
+      .catch(err => console.error("Error seeding: ", err));
   });
 };

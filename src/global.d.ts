@@ -16,6 +16,9 @@ interface Window {
   ENABLE_TROLLBOT: boolean;
   ENABLE_AUTOSENDING: boolean;
 
+  CHATWOOT_WEBSITE_TOKEN?: string;
+  CHATWOOT_BASE_URL?: string;
+
   AuthService: any;
 }
 
