@@ -4,6 +4,7 @@ import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import React from "react";
 
 import Empty from "../../../components/Empty";
+import type { CampaignDetailsForExport } from "../../../components/ExportMultipleCampaignDataDialog";
 import type { CampaignOperationsProps } from "../utils";
 import CampaignListRow from "./CampaignListRow";
 
@@ -11,6 +12,8 @@ interface Props extends CampaignOperationsProps {
   organizationId: string;
   campaigns: CampaignListEntryFragment[];
   isAdmin: boolean;
+  campaignDetailsForExport: CampaignDetailsForExport[];
+  selectForExport: (details: CampaignDetailsForExport) => void;
 }
 
 export const CampaignList: React.FC<Props> = (props) => {
@@ -29,6 +32,8 @@ export const CampaignList: React.FC<Props> = (props) => {
           startOperation={props.startOperation}
           archiveCampaign={props.archiveCampaign}
           unarchiveCampaign={props.unarchiveCampaign}
+          selectForExport={props.selectForExport}
+          campaignDetailsForExport={props.campaignDetailsForExport}
         />
       ))}
     </List>

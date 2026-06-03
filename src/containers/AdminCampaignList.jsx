@@ -27,6 +27,8 @@ import { compose } from "recompose";
 
 import BadgePlusIcon from "../components/BadgePlusIcon";
 import CreateCampaignFromTemplateDialog from "../components/CreateCampaignFromTemplateDialog";
+import ExportCampaignDataSnackbar from "../components/ExportCampaignDataSnackbar";
+import ExportMultipleCampaignDataDialog from "../components/ExportMultipleCampaignDataDialog";
 import LoadingIndicator from "../components/LoadingIndicator";
 import theme from "../styles/theme";
 import { withAuthzContext } from "./AuthzProvider";
@@ -39,6 +41,10 @@ const styles = {
     alignItems: "baseline",
     justifyContent: "space-between",
     padding: 5
+  },
+  filterWrapper: {
+    display: "flex",
+    alignIems: "baseline"
   }
 };
 
@@ -75,19 +81,22 @@ class AdminCampaignList extends React.Component {
     this.state = {
       speedDialOpen: false,
       createFromTemplateOpen: false,
-      // created from template state
       showCreatedFromTemplateSnackbar: false,
       createdFromTemplateIds: [],
       createdFromTemplateTitle: "",
-      // end created from template state
       isCreating: false,
       campaignsFilter: {
-        isArchived: false
+        isArchived: false,
+        campaignTitle: ""
       },
       releasingInProgress: false,
       releasingAllReplies: false,
       releaseAllRepliesError: undefined,
-      releaseAllRepliesResult: undefined
+      releaseAllRepliesResult: undefined,
+      campaignDetailsForExport: [],
+      showExportModal: false,
+      showExportSnackbar: false,
+      exportErrorMessage: null
     };
   }
 
@@ -113,10 +122,22 @@ class AdminCampaignList extends React.Component {
     history.push(`/admin/${organizationId}/campaigns/${campaignId}/edit`);
   };
 
-  handleFilterChange = (event, index, value) => {
+  handleFilterChangeCurrentOrArchived = (_event, _index, value) => {
+    const { campaignTitle } = this.state.campaignsFilter;
     this.setState({
       campaignsFilter: {
-        isArchived: value
+        isArchived: value,
+        campaignTitle
+      }
+    });
+  };
+
+  handleFilterCampaignTitle = (campaignTitle) => {
+    const { isArchived } = this.state.campaignsFilter;
+    this.setState({
+      campaignsFilter: {
+        isArchived,
+        campaignTitle
       }
     });
   };
@@ -224,11 +245,41 @@ class AdminCampaignList extends React.Component {
       });
   };
 
-  renderFilters() {
+  // handle selecting and de-selecting campaigns via CampaignListMenu
+  handleSelectForExport = (incomingCampaign) => {
+    const { campaignDetailsForExport: currentDetails } = this.state;
+    const currentIds = currentDetails.map((campaign) => campaign.id);
+    const isDeSelecting = currentIds.includes(incomingCampaign.id);
+    if (isDeSelecting) {
+      const filteredCampaigns = currentDetails.filter(
+        (campaign) => campaign.id !== incomingCampaign.id
+      );
+      return this.setState({ campaignDetailsForExport: filteredCampaigns });
+    }
+    return this.setState({
+      campaignDetailsForExport: currentDetails.concat(incomingCampaign)
+    });
+  };
+
+  handleClickExportButton = () => {
+    this.setState({
+      showExportModal: true
+    });
+  };
+
+  handleErrorCampaignExport = (exportErrorMessage) => {
+    this.setState({
+      exportErrorMessage,
+      showExportModal: false,
+      showExportSnackbar: true
+    });
+  };
+
+  renderCurrentCampaignFilter() {
     return (
       <DropDownMenu
         value={this.state.campaignsFilter.isArchived}
-        onChange={this.handleFilterChange}
+        onChange={this.handleFilterChangeCurrentOrArchived}
       >
         <MenuItem value={false} primaryText="Current" />
         <MenuItem value primaryText="Archived" />
@@ -241,6 +292,10 @@ class AdminCampaignList extends React.Component {
       campaignsFilter,
       releasingAllReplies,
       releasingInProgress,
+      campaignDetailsForExport,
+      showExportModal,
+      showExportSnackbar,
+      exportErrorMessage,
       releaseAllRepliesResult,
       releaseAllRepliesError,
       createFromTemplateOpen,
@@ -258,7 +313,9 @@ class AdminCampaignList extends React.Component {
     return (
       <div>
         <div style={styles.flexContainer}>
-          {this.renderFilters()}
+          <div style={styles.filterWrapper}>
+            {this.renderCurrentCampaignFilter()}
+          </div>
           <Button
             variant="contained"
             color="primary"
@@ -361,6 +418,10 @@ class AdminCampaignList extends React.Component {
             campaignsFilter={campaignsFilter}
             pageSize={DEFAULT_PAGE_SIZE}
             isAdmin={isAdmin}
+            campaignDetailsForExport={campaignDetailsForExport}
+            filterByCampaignTitle={this.handleFilterCampaignTitle}
+            selectForExport={this.handleSelectForExport}
+            handleClickExportButton={this.handleClickExportButton}
           />
         )}
 
@@ -433,6 +494,34 @@ class AdminCampaignList extends React.Component {
           open={createFromTemplateOpen}
           onClose={this.handleCreateTemplateDialogClose}
           onCreateTemplateCompleted={this.handleCreateTemplateCompleted}
+        />
+        <ExportMultipleCampaignDataDialog
+          campaignDetailsForExport={campaignDetailsForExport}
+          open={showExportModal}
+          onClose={() =>
+            this.setState({
+              showExportModal: false,
+              campaignDetailsForExport: []
+            })
+          }
+          onError={this.handleErrorCampaignExport}
+          onComplete={() =>
+            this.setState({
+              campaignDetailsForExport: [],
+              showExportModal: false,
+              showExportSnackbar: true
+            })
+          }
+        />
+        <ExportCampaignDataSnackbar
+          open={showExportSnackbar}
+          errorMessage={exportErrorMessage}
+          onClose={() => {
+            this.setState({
+              showExportSnackbar: false,
+              exportErrorMessage: null
+            });
+          }}
         />
         <Snackbar
           open={showCreatedFromTemplateSnackbar}

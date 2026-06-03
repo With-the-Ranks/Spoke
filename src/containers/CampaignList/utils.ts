@@ -3,6 +3,8 @@ import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import type { GraphQLError } from "graphql";
 import type { MouseEventHandler } from "react";
 
+import type { Tag } from "./components/CampaignHeader";
+
 export interface OperationDefinition {
   title: (campaign: CampaignListEntryFragment) => string;
   body: (campaign?: CampaignListEntryFragment) => string;
@@ -146,4 +148,37 @@ export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
     gqlError.path[gqlError.path.length - 1] === "campaignGroups" &&
     gqlError.extensions.code === "FORBIDDEN"
   );
+};
+
+type MakeCampaignTagsFn = (props: {
+  isStarted: boolean | null | undefined;
+  isAutoAssignEligible: boolean;
+  hasUnsentInitialMessages: boolean | null | undefined;
+  hasUnhandledMessages: boolean | null | undefined;
+}) => Tag[];
+
+export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
+  isStarted,
+  isAutoAssignEligible,
+  hasUnsentInitialMessages,
+  hasUnhandledMessages
+}) => {
+  return [
+    {
+      title: isStarted ? "Started" : "Not Started",
+      status: isStarted ? "success" : "alert"
+    },
+    {
+      title: hasUnsentInitialMessages ? "Unsent Initials" : "All Initials Sent",
+      status: hasUnsentInitialMessages ? "alert" : "success"
+    },
+    {
+      title: hasUnhandledMessages ? "Unhandled Replies" : "All Replies Handled",
+      status: hasUnhandledMessages ? "alert" : "success"
+    },
+    {
+      title: isAutoAssignEligible ? "Autoassign" : "No Autoassign",
+      status: isAutoAssignEligible ? "success" : "alert"
+    }
+  ];
 };

@@ -13,7 +13,9 @@ import {
 import type { GraphQLError } from "graphql";
 import React, { useState } from "react";
 
+import type { CampaignDetailsForExport } from "../../components/ExportMultipleCampaignDataDialog";
 import AssignmentHUD from "./components/AssignmentHUD";
+import CampaignListHeader from "./components/CampaignListHeader";
 import CampaignListLoader from "./components/CampaignListLoader";
 import { OperationDialog } from "./components/OperationDialog";
 import type { Operation } from "./utils";
@@ -32,8 +34,12 @@ import {
 export interface CampaignListProps {
   organizationId: string;
   pageSize: number;
-  campaignsFilter: { isArchived: boolean };
+  campaignsFilter: { isArchived: boolean; campaignTitle?: string };
   isAdmin: boolean;
+  campaignDetailsForExport: CampaignDetailsForExport[];
+  selectForExport: (details: CampaignDetailsForExport) => void;
+  filterByCampaignTitle: (title: string) => void;
+  handleClickExportButton: () => void;
 }
 
 export const CampaignList: React.FC<CampaignListProps> = (props) => {
@@ -176,7 +182,16 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
     setInProgress(newInProgress);
   };
 
-  const { organizationId, pageSize, campaignsFilter, isAdmin } = props;
+  const {
+    organizationId,
+    pageSize,
+    campaignsFilter,
+    isAdmin,
+    campaignDetailsForExport,
+    selectForExport,
+    filterByCampaignTitle,
+    handleClickExportButton
+  } = props;
   const { data } = useGetAdminAssignmentTargetsQuery({
     variables: { organizationId }
   });
@@ -197,6 +212,11 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         />
       )}
       <AssignmentHUD assignmentTargets={targets} />
+      <CampaignListHeader
+        campaignDetailsForExport={campaignDetailsForExport}
+        filterByCampaignTitle={filterByCampaignTitle}
+        onClick={handleClickExportButton}
+      />
       <CampaignListLoader
         organizationId={organizationId}
         campaignsFilter={campaignsFilter}
@@ -205,6 +225,8 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         startOperation={start}
         archiveCampaign={archiveCampaign}
         unarchiveCampaign={unarchiveCampaign}
+        selectForExport={selectForExport}
+        campaignDetailsForExport={campaignDetailsForExport}
       />
     </div>
   );

@@ -29,6 +29,7 @@ import { cacheableData, r } from "../models";
 import { getUserById } from "../models/cacheable_queries";
 import { Notifications, sendUserNotification } from "../notifications";
 import { addExportCampaign } from "../tasks/chunk-tasks/export-campaign";
+import { addExportMultipleCampaigns } from "../tasks/chunk-tasks/export-multiple-campaigns";
 import { addMarkSecondPass } from "../tasks/chunk-tasks/mark-second-pass";
 import { addExportForVan } from "../tasks/export-for-van";
 import { TASK_IDENTIFIER as exportOptOutsIdentifier } from "../tasks/export-opt-outs";
@@ -331,6 +332,23 @@ const rootMutations = {
           requesterId: user.id
         });
       }
+    },
+
+    exportCampaigns: async (_root, { options }, { user, loaders }) => {
+      const { campaignIds, spokeOptions } = options;
+
+      if (!spokeOptions) {
+        throw new Error("Input must include valid spokeOptions when exporting");
+      }
+      const campaignId = campaignIds[0];
+      const campaign = await loaders.campaign.load(campaignId);
+      const organizationId = campaign.organization_id;
+      await accessRequired(user, organizationId, "ADMIN");
+      return addExportMultipleCampaigns({
+        campaignIds,
+        requesterId: user.id,
+        spokeOptions
+      });
     },
 
     editOrganizationMembership: async (

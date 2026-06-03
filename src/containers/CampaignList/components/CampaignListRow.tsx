@@ -1,29 +1,29 @@
-import Avatar from "@material-ui/core/Avatar";
-import Chip from "@material-ui/core/Chip";
-import blue from "@material-ui/core/colors/blue";
+import { Card } from "@material-ui/core";
+import Checkbox from "@material-ui/core/Checkbox";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import WarningIcon from "@material-ui/icons/Warning";
+import { makeStyles } from "@material-ui/core/styles";
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
+import clsx from "clsx";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
-import { dataTest } from "../../../lib/attributes";
+import type { CampaignDetailsForExport } from "../../../components/ExportMultipleCampaignDataDialog";
 import type { CampaignOperationsProps } from "../utils";
+import { makeCampaignHeaderTags } from "../utils";
+import CampaignDetails from "./CampaignDetails";
+import CampaignHeader from "./CampaignHeader";
 import CampaignListMenu from "./CampaignListMenu";
 
 const useStyles = makeStyles({
-  chipWrapper: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center"
+  card: {
+    marginBottom: 16,
+    cursor: "pointer"
   },
-  chip: { margin: "4px" },
-  secondaryText: {
-    whiteSpace: "pre-wrap"
+  archivedCard: {
+    opacity: 0.6
   }
 });
 
@@ -31,14 +31,19 @@ interface Props extends CampaignOperationsProps {
   organizationId: string;
   isAdmin: boolean;
   campaign: CampaignListEntryFragment;
+  campaignDetailsForExport: CampaignDetailsForExport[];
+  selectForExport: (details: CampaignDetailsForExport) => void;
 }
 
 export const CampaignListRow: React.FC<Props> = (props) => {
-  const theme = useTheme();
   const history = useHistory();
-  const styles = useStyles();
-
-  const { organizationId, isAdmin, campaign } = props;
+  const {
+    organizationId,
+    isAdmin,
+    campaign,
+    campaignDetailsForExport,
+    selectForExport
+  } = props;
   const {
     isStarted,
     isArchived,
@@ -51,86 +56,26 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     externalSystem
   } = campaign;
 
-  let listItemStyle: React.CSSProperties = {};
-  let leftIcon;
-  if (isArchived) {
-    listItemStyle = {
-      opacity: 0.6
-    };
-  } else if (!isStarted || hasUnassignedContacts) {
-    listItemStyle = {
-      color: theme.palette.warning.dark
-    };
-    leftIcon = <WarningIcon />;
-  } else if (hasUnsentInitialMessages) {
-    listItemStyle = {
-      color: theme.palette.info.dark
-    };
-  } else {
-    listItemStyle = {
-      color: theme.palette.success.dark
-    };
-  }
+  const classes = useStyles();
+
   const creatorName = campaign.creator ? campaign.creator.displayName : null;
-  let tags = [];
 
-  if (externalSystem) {
-    const title = `${externalSystem.type}: ${externalSystem.name}`;
-    tags.push({ title, backgroundColor: blue[300] });
-  }
-
-  if (!isStarted) {
-    tags.push({ title: "Not started" });
-  }
-
-  if (hasUnassignedContacts) {
-    tags.push({ title: "Unassigned contacts" });
-  }
-
-  if (isStarted && hasUnsentInitialMessages) {
-    tags.push({ title: "Unsent initial messages" });
-  }
-
-  if (isStarted && hasUnhandledMessages) {
-    tags.push({ title: "Unhandled replies" });
-  }
-
-  if (isStarted && !isArchived && isAutoassignEnabled) {
-    tags.push({ title: "Autoassign eligible" });
-  }
-
-  tags = tags.concat(teams.map(({ title }) => ({ title })));
-  if (campaignGroups) {
-    tags = tags.concat(
-      campaignGroups.edges.map(({ node }) => ({ title: node.name }))
-    );
-  }
-
-  const primaryText = (
-    <div className={styles.chipWrapper}>
-      {campaign.title}
-      {tags.map((tag) => (
-        <Chip
-          key={tag.title}
-          label={tag.title}
-          className={styles.chip}
-          style={{
-            backgroundColor: tag.backgroundColor
-          }}
-        />
-      ))}
-    </div>
+  const isAutoAssignEligible = !!(
+    isStarted &&
+    !isArchived &&
+    isAutoassignEnabled
   );
-  const secondaryText = (
-    <span className={styles.secondaryText}>
-      <span>
-        Campaign ID: {campaign.id}
-        <br />
-        {campaign.description}
-        {creatorName ? <span> &mdash; Created by {creatorName}</span> : null}
-        <br />
-      </span>
-    </span>
+
+  const headerTags = makeCampaignHeaderTags({
+    isStarted,
+    isAutoAssignEligible,
+    hasUnsentInitialMessages,
+    hasUnhandledMessages
+  });
+
+  const isCampaignSelected = !!campaignDetailsForExport.find(
+    (selectedCampaign: CampaignDetailsForExport) =>
+      selectedCampaign.id === campaign.id
   );
 
   const campaignUrl = `/admin/${organizationId}/campaigns/${campaign.id}${
@@ -138,32 +83,56 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   }`;
 
   return (
-    <ListItem
-      {...dataTest("campaignRow", false)}
-      style={listItemStyle}
+    <Card
+      variant="outlined"
+      className={clsx(classes.card, isArchived && classes.archivedCard)}
       onClick={() => history.push(campaignUrl)}
     >
-      {leftIcon && (
-        <ListItemAvatar>
-          <Avatar>{leftIcon}</Avatar>
-        </ListItemAvatar>
-      )}
-      <ListItemText
-        primary={primaryText}
-        secondary={secondaryText}
-        secondaryTypographyProps={{ color: "textPrimary" }}
-      />
-      {isAdmin && (
-        <ListItemSecondaryAction>
-          <CampaignListMenu
-            campaign={campaign}
-            startOperation={props.startOperation}
-            archiveCampaign={props.archiveCampaign}
-            unarchiveCampaign={props.unarchiveCampaign}
+      <ListItem alignItems="flex-start">
+        <ListItemIcon onClick={(e) => e.stopPropagation()}>
+          <Checkbox
+            edge="start"
+            checked={isCampaignSelected}
+            tabIndex={-1}
+            disableRipple
+            onClick={() =>
+              selectForExport({ id: campaign.id, title: campaign.title })
+            }
           />
-        </ListItemSecondaryAction>
-      )}
-    </ListItem>
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <CampaignHeader
+              campaignTitle={campaign.title}
+              campaignId={campaign.id}
+              tags={headerTags}
+            />
+          }
+          secondary={
+            <CampaignDetails
+              id={campaign.id}
+              description={campaign.description}
+              creatorName={creatorName}
+              hasUnassignedContacts={hasUnassignedContacts}
+              teams={teams}
+              campaignGroups={campaignGroups}
+              externalSystem={externalSystem}
+            />
+          }
+          secondaryTypographyProps={{ color: "textPrimary" }}
+        />
+        {isAdmin && (
+          <ListItemSecondaryAction onClick={(e) => e.stopPropagation()}>
+            <CampaignListMenu
+              campaign={campaign}
+              startOperation={props.startOperation}
+              archiveCampaign={props.archiveCampaign}
+              unarchiveCampaign={props.unarchiveCampaign}
+            />
+          </ListItemSecondaryAction>
+        )}
+      </ListItem>
+    </Card>
   );
 };
 

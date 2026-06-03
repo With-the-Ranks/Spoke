@@ -217,6 +217,11 @@ const rootSchema = `
     vanOptions: ExportForVanInput
   }
 
+    input MultipleCampaignExportInput {
+    campaignIds: [String!]!
+    spokeOptions: ExportForSpokeInput!
+  }
+
   input QuestionResponseSyncConfigInput {
     id: String!
   }
@@ -289,6 +294,7 @@ const rootSchema = `
     copyCampaign(id: String!): Campaign
     copyCampaigns(sourceCampaignId: String!, quantity: Int!, targetOrgId: String): [Campaign!]!
     exportCampaign(options: CampaignExportInput!): JobRequest
+    exportCampaigns(options: MultipleCampaignExportInput!): [JobRequest]
     createCannedResponse(cannedResponse:CannedResponseInput!): CannedResponse
     createOrganization(name: String!, userId: String!, inviteId: String!): Organization
     editOrganization(id: String! input: EditOrganizationInput!): Organization!

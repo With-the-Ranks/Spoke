@@ -1,6 +1,7 @@
 import { config } from "../../config";
 import logger from "../../logger";
 import gsJson from "./gs-json";
+import local from "./local";
 import s3 from "./s3";
 import type { StorageBackend } from "./types";
 
@@ -13,14 +14,21 @@ const validS3Config =
 const validGcpHmacConfig = config.EXPORT_DRIVER === "gs" && validAwsCredentials;
 const validGcpConfig =
   config.EXPORT_DRIVER === "gs-json" && valudGcpCredentials;
+const validLocalConfig = config.EXPORT_DRIVER === "local";
 
 const exporters: { [key: string]: StorageBackend } = {
   s3,
-  "gs-json": gsJson
+  "gs-json": gsJson,
+  local
 };
 
 export const uploadToCloud = async (key: string, payload: string) => {
-  if (!validS3Config && !validGcpHmacConfig && !validGcpConfig) {
+  if (
+    !validS3Config &&
+    !validGcpHmacConfig &&
+    !validGcpConfig &&
+    !validLocalConfig
+  ) {
     logger.debug(`Would have saved ${key} to cloud storage`);
     throw new Error("Invalid cloud storage configuration!");
   }
@@ -34,7 +42,12 @@ export const uploadToCloud = async (key: string, payload: string) => {
 };
 
 export const getUploadStream = async (key: string) => {
-  if (!validS3Config && !validGcpHmacConfig && !validGcpConfig) {
+  if (
+    !validS3Config &&
+    !validGcpHmacConfig &&
+    !validGcpConfig &&
+    !validLocalConfig
+  ) {
     logger.debug(`Would have saved ${key} to cloud storage`);
     throw new Error("Invalid cloud storage configuration!");
   }

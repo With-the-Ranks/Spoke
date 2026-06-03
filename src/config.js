@@ -395,7 +395,7 @@ const validators = {
   }),
   EXPORT_DRIVER: str({
     desc: "Which cloud storage driver to use for exports.",
-    choices: ["s3", "gs-json"], // eventually add support for GCP w/ HMAC interoperability: ["gs"]
+    choices: ["s3", "gs-json", "local"], // eventually add support for GCP w/ HMAC interoperability: ["gs"]
     default: "s3"
   }),
   EXPORT_CAMPAIGN_CHUNK_SIZE: num({
