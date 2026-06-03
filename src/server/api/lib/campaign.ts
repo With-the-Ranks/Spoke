@@ -522,7 +522,8 @@ export const editCampaign = async (
     timezone,
     externalSystemId,
     messagingServiceSid,
-    columnMapping
+    columnMapping,
+    campaignType
   } = campaign;
 
   const organizationId = origCampaignRecord.organization_id;
@@ -541,7 +542,10 @@ export const editCampaign = async (
     replies_stale_after_minutes: repliesStaleAfter, // this is null to unset it - it must be null, not undefined
     timezone: timezone ? parseIanaZone(timezone) : undefined,
     external_system_id: externalSystemId,
-    messaging_service_sid: messagingServiceSid ?? undefined
+    messaging_service_sid: messagingServiceSid ?? undefined,
+    type: campaignType
+      ? (campaignType.toLowerCase() as "sms" | "call")
+      : undefined
   };
 
   Object.keys(campaignUpdates).forEach((key) => {
