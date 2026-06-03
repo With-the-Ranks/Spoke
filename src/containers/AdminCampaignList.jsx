@@ -314,9 +314,6 @@ class AdminCampaignList extends React.Component {
       <div>
         <div style={styles.flexContainer}>
           <div style={styles.filterWrapper}>
-            <Typography variant="h4" style={{ padding: "4px" }}>
-              Campaigns
-            </Typography>
             {this.renderCurrentCampaignFilter()}
           </div>
           <Button

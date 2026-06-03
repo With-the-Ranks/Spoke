@@ -4,7 +4,9 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
+import { makeStyles } from "@material-ui/core/styles";
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
+import clsx from "clsx";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
@@ -14,6 +16,16 @@ import { makeCampaignHeaderTags } from "../utils";
 import CampaignDetails from "./CampaignDetails";
 import CampaignHeader from "./CampaignHeader";
 import CampaignListMenu from "./CampaignListMenu";
+
+const useStyles = makeStyles({
+  card: {
+    marginBottom: 16,
+    cursor: "pointer"
+  },
+  archivedCard: {
+    opacity: 0.6
+  }
+});
 
 interface Props extends CampaignOperationsProps {
   organizationId: string;
@@ -44,11 +56,19 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     externalSystem
   } = campaign;
 
+  const classes = useStyles();
+
   const creatorName = campaign.creator ? campaign.creator.displayName : null;
+
+  const isAutoAssignEligible = !!(
+    isStarted &&
+    !isArchived &&
+    isAutoassignEnabled
+  );
 
   const headerTags = makeCampaignHeaderTags({
     isStarted,
-    hasUnassignedContacts,
+    isAutoAssignEligible,
     hasUnsentInitialMessages,
     hasUnhandledMessages
   });
@@ -62,19 +82,14 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     isStarted ? "" : "/edit"
   }`;
 
-  const isAutoAssignEligible = !!(
-    isStarted &&
-    !isArchived &&
-    isAutoassignEnabled
-  );
-
   return (
     <Card
       variant="outlined"
-      style={{ marginBottom: 16, ...(isArchived && { opacity: 0.6 }) }}
+      className={clsx(classes.card, isArchived && classes.archivedCard)}
+      onClick={() => history.push(campaignUrl)}
     >
       <ListItem alignItems="flex-start">
-        <ListItemIcon>
+        <ListItemIcon onClick={(e) => e.stopPropagation()}>
           <Checkbox
             edge="start"
             checked={isCampaignSelected}
@@ -91,7 +106,6 @@ export const CampaignListRow: React.FC<Props> = (props) => {
               campaignTitle={campaign.title}
               campaignId={campaign.id}
               tags={headerTags}
-              onClick={() => history.push(campaignUrl)}
             />
           }
           secondary={
@@ -99,16 +113,16 @@ export const CampaignListRow: React.FC<Props> = (props) => {
               id={campaign.id}
               description={campaign.description}
               creatorName={creatorName}
+              hasUnassignedContacts={hasUnassignedContacts}
               teams={teams}
               campaignGroups={campaignGroups}
               externalSystem={externalSystem}
-              isAutoAssignEligible={isAutoAssignEligible}
             />
           }
           secondaryTypographyProps={{ color: "textPrimary" }}
         />
         {isAdmin && (
-          <ListItemSecondaryAction>
+          <ListItemSecondaryAction onClick={(e) => e.stopPropagation()}>
             <CampaignListMenu
               campaign={campaign}
               startOperation={props.startOperation}

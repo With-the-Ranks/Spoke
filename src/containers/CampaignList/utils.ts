@@ -152,69 +152,33 @@ export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
 
 type MakeCampaignTagsFn = (props: {
   isStarted: boolean | null | undefined;
-  hasUnassignedContacts: boolean | null | undefined;
+  isAutoAssignEligible: boolean;
   hasUnsentInitialMessages: boolean | null | undefined;
   hasUnhandledMessages: boolean | null | undefined;
 }) => Tag[];
 
 export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
   isStarted,
-  hasUnassignedContacts,
+  isAutoAssignEligible,
   hasUnsentInitialMessages,
   hasUnhandledMessages
 }) => {
-  const tags = [];
-
-  // display 'Started' or 'Not Started' first
-  if (isStarted) {
-    tags.push({
-      title: "Started",
-      status: "success"
-    });
-  } else {
-    tags.push({
-      title: "Not Started",
-      status: "alert"
-    });
-  }
-
-  if (hasUnassignedContacts) {
-    tags.push({
-      title: "Unassigned Contacts",
-      status: "alert"
-    });
-  } else {
-    tags.push({
-      title: "All Contacts Assigned",
-      status: "success"
-    });
-  }
-
-  if (isStarted) {
-    const tag = hasUnsentInitialMessages
-      ? {
-          title: "Unsent Initial Messages",
-          status: "alert"
-        }
-      : {
-          title: "All Initials Sent",
-          status: "success"
-        };
-    tags.push(tag);
-  }
-
-  if (isStarted && hasUnhandledMessages) {
-    const tag = hasUnhandledMessages
-      ? {
-          title: "Unhandled Replies",
-          status: "alert"
-        }
-      : {
-          title: "All Replies Handled",
-          status: "success"
-        };
-    tags.push(tag);
-  }
-
-  return tags;
+  return [
+    {
+      title: isStarted ? "Started" : "Not Started",
+      status: isStarted ? "success" : "alert"
+    },
+    {
+      title: hasUnsentInitialMessages ? "Unsent Initials" : "All Initials Sent",
+      status: hasUnsentInitialMessages ? "alert" : "success"
+    },
+    {
+      title: hasUnhandledMessages ? "Unhandled Replies" : "All Replies Handled",
+      status: hasUnhandledMessages ? "alert" : "success"
+    },
+    {
+      title: isAutoAssignEligible ? "Autoassign" : "No Autoassign",
+      status: isAutoAssignEligible ? "success" : "alert"
+    }
+  ];
 };
