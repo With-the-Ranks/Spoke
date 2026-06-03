@@ -190,8 +190,8 @@ class CampaignTextingHoursForm extends React.Component<
       <div>
         <GSForm schema={formSchema} value={value} onChange={this.handleChange}>
           <CampaignFormSectionHeading
-            title="Texting hours for campaign"
-            subtitle="Please configure texting hours for each campaign, noting the time zone of the individuals in the list you are uploading."
+            title="Contact hours for campaign"
+            subtitle="Please configure contact hours for each campaign, noting the time zone of the individuals in the list you are uploading."
           />
 
           {this.addAutocompleteFormField(
@@ -283,7 +283,7 @@ const mutations = {
 
 export default compose<AutoassignInnerProps, RequiredComponentProps>(
   asSection({
-    title: "Texting Hours",
+    title: "Contact Hours",
     readinessName: "textingHours",
     jobQueueNames: [],
     expandAfterCampaignStarts: true,

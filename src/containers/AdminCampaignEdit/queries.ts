@@ -101,6 +101,7 @@ export const EditCampaignFragment = gql`
     }
     readiness {
       basics
+      campaignType
       textingHours
       integration
       contacts
@@ -111,6 +112,7 @@ export const EditCampaignFragment = gql`
       texters
     }
     contactsFilename
+    campaignType
   }
 `;
 
