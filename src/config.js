@@ -186,6 +186,19 @@ const validators = {
     desc: "The key prefix to use for memoredis memoization (memoredis)",
     default: undefined
   }),
+  CHATWOOT_BASE_URL: url({
+    desc:
+      "Optional Chatwoot website widget. Base URL of your Chatwoot install (no trailing slash). When set together with CHATWOOT_WEBSITE_TOKEN, the server injects the widget in the HTML shell (see app-renderer). README: Support widget (Chatwoot).",
+    example: "https://app.chatwoot.com",
+    default: undefined,
+    isClient: true
+  }),
+  CHATWOOT_WEBSITE_TOKEN: str({
+    desc:
+      "Optional Chatwoot website widget. Website inbox token (Chatwoot Settings → Inboxes → Website). Must be set with CHATWOOT_BASE_URL to enable the launcher.",
+    default: undefined,
+    isClient: true
+  }),
   CAMPAIGN_ID: num({
     desc:
       "Campaign ID used by dev-tools/export-query.js to identify which campaign should be exported.",
@@ -462,6 +475,34 @@ const validators = {
       "The maximum size for a message that a texter can send. When you send a SMS message over 160 characters the message will be split, so you might want to set this as 160 or less if you have a high SMS-only target demographic.",
     default: 99999,
     isClient: true
+  }),
+  METRICS_ENABLED: bool({
+    desc: "Whether to expose the /metrics endpoint for Prometheus scraping.",
+    default: true
+  }),
+  DEPLOY_ENVIRONMENT: str({
+    desc:
+      "Deployment environment label for metrics, logs, and traces (e.g. 'production', 'staging'). Independent of NODE_ENV — staging deployments run with NODE_ENV=production but DEPLOY_ENVIRONMENT=staging so observability can distinguish them.",
+    default: "development"
+  }),
+  OTEL_ENABLED: bool({
+    desc: "Whether to enable OpenTelemetry distributed tracing.",
+    default: false
+  }),
+  OTEL_EXPORTER_OTLP_ENDPOINT: str({
+    desc:
+      "OTLP HTTP endpoint for trace export (e.g. Grafana Cloud Tempo push URL).",
+    example: "https://tempo-prod.grafana.net/tempo",
+    default: undefined
+  }),
+  OTEL_SERVICE_NAME: str({
+    desc: "Service name attached to every trace span.",
+    default: "spoke"
+  }),
+  OTEL_SAMPLE_RATE: num({
+    desc:
+      "Fraction of traces to sample (0.0–1.0). Use a low value in production.",
+    default: 0.1
   }),
   MODE: str({
     desc: "Server mode",

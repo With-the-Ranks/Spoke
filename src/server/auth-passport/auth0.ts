@@ -6,6 +6,7 @@ import { config } from "../../config";
 import logger from "../../logger";
 import { capitalizeWord } from "../api/lib/utils";
 import { contextForRequest } from "../contexts";
+import { authAttemptsTotal } from "../metrics";
 import type { SpokeRequest } from "../types";
 import type { PassportCallback, UserWithStatus } from "./util";
 import { passportCallback } from "./util";
@@ -31,6 +32,7 @@ export const setupAuth0Passport = () => {
     ) => {
       const auth0Id = auth0User.id ?? auth0User._json.sub;
       if (!auth0Id) {
+        authAttemptsTotal.inc({ strategy: "auth0", status: "failure" });
         return done(new Error("Null user in Auth0 login callback"));
       }
 
@@ -43,10 +45,12 @@ export const setupAuth0Passport = () => {
           .where({ auth0_id: auth0Id })
           .first();
         if (spokeUser) {
+          authAttemptsTotal.inc({ strategy: "auth0", status: "success" });
           return done(null, spokeUser);
         }
       } catch (err: any) {
         logger.error("Auth0 login error: could not find existing user: ", err);
+        authAttemptsTotal.inc({ strategy: "auth0", status: "failure" });
         return done(err);
       }
 
@@ -69,9 +73,11 @@ export const setupAuth0Passport = () => {
           .insert(userData)
           .returning("*")
           .then(([user]) => ({ ...user, isNew: true }));
+        authAttemptsTotal.inc({ strategy: "auth0", status: "success" });
         return done(null, spokeUser);
       } catch (err: any) {
         logger.error("Error creating new Auth0 user: ", err);
+        authAttemptsTotal.inc({ strategy: "auth0", status: "failure" });
         return done(err);
       }
     }

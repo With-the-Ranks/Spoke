@@ -66,6 +66,8 @@ const UserMenu: React.FC<Props> = (props) => {
       history.push(`/superadmin/people`);
     } else if (value === "docs") {
       window.open("https://withtheranks.com/docs/spoke/", "_blank");
+    } else if (value === "liveSupport") {
+      window.$chatwoot?.toggle("open");
     }
   };
 
@@ -137,6 +139,14 @@ const UserMenu: React.FC<Props> = (props) => {
             <OpenInNewIcon />
           </ListItemSecondaryAction>
         </MenuItem>
+        {window.CHATWOOT_WEBSITE_TOKEN && window.CHATWOOT_BASE_URL && (
+          <MenuItem
+            {...dataTest("liveSupport")}
+            onClick={onNavigateFactory("liveSupport")}
+          >
+            Live Support
+          </MenuItem>
+        )}
         <Divider />
         <MenuItem
           {...dataTest("userMenuLogOut")}

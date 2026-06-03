@@ -15,4 +15,6 @@ export interface SpokeContext {
 export interface SpokeRequestContext extends SpokeContext {
   user: any;
   loaders: any;
+  /** Correlation ID for the current HTTP request, set by the correlationId middleware. */
+  requestId: string | undefined;
 }

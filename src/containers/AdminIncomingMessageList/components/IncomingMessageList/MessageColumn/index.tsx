@@ -1,19 +1,11 @@
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
-import {
-  useGetCampaignVariablesLazyQuery,
-  useGetCurrentUserProfileLazyQuery,
-  useGetMessageReviewContactUpdatesQuery
-} from "@spoke/spoke-codegen";
+import { useGetMessageReviewContactUpdatesQuery } from "@spoke/spoke-codegen";
 import isNil from "lodash/isNil";
 import React, { useCallback, useState } from "react";
 
 import CannedResponseMenu from "../../../../../components/CannedResponseMenu";
-import {
-  applyScript,
-  customFieldsJsonStringToArray
-} from "../../../../../lib/scripts";
 import MessageList from "./MessageList";
 import MessageOptOut from "./MessageOptOut";
 import MessageResponse from "./MessageResponse";
@@ -31,13 +23,21 @@ type ClickButtonHandler = React.MouseEventHandler<HTMLButtonElement>;
 interface Props {
   organizationId: string;
   conversation: ConversationInfoFragment;
+  messageText: string;
+  onMessageTextChange: (text: string) => void;
+  onScriptSelected: (script: string) => void;
 }
 
 const MessageColumn: React.FC<Props> = (props) => {
-  const { organizationId, conversation } = props;
-  const { contact, campaign } = conversation;
+  const {
+    organizationId,
+    conversation,
+    messageText,
+    onMessageTextChange,
+    onScriptSelected
+  } = props;
+  const { contact } = conversation;
 
-  const [messageText, setMessageText] = useState("");
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const { data: updatedContactData } = useGetMessageReviewContactUpdatesQuery({
@@ -48,9 +48,6 @@ const MessageColumn: React.FC<Props> = (props) => {
   const messages = updatedContact?.messages ?? contact.messages;
   const isOptedOut = !isNil(updatedContact?.optOut?.cell);
 
-  const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
-  const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
-
   const handleOpenCannedResponse: ClickButtonHandler = useCallback(
     (event) => {
       setAnchorEl(event.currentTarget);
@@ -58,37 +55,12 @@ const MessageColumn: React.FC<Props> = (props) => {
     [setAnchorEl]
   );
 
-  const setScriptMessageText = async (script: string) => {
-    const customFields = customFieldsJsonStringToArray(contact.customFields);
-
-    const { data: cvData } = await getCampaignVariables({
-      variables: {
-        campaignId: campaign.id
-      }
-    });
-    const campaignVariables = cvData?.campaign?.campaignVariables ?? [];
-
-    const { data: userData } = await getCurrentUserProfile();
-    const texter = userData?.currentUser;
-
-    if (texter) {
-      const appliedScript = applyScript({
-        script,
-        contact,
-        customFields,
-        campaignVariables,
-        texter
-      });
-      setMessageText(appliedScript);
-    }
-  };
-
   const handleScriptSelected = useCallback(
     (script: string) => {
       setAnchorEl(null);
-      setScriptMessageText(script);
+      onScriptSelected(script);
     },
-    [setAnchorEl]
+    [setAnchorEl, onScriptSelected]
   );
 
   const handleRequestClose = useCallback(() => setAnchorEl(null), [
@@ -104,7 +76,7 @@ const MessageColumn: React.FC<Props> = (props) => {
           <MessageResponse
             value={messageText}
             conversation={conversation}
-            onChange={setMessageText}
+            onChange={onMessageTextChange}
           />
         )}
         <Grid container spacing={2} justify="flex-end">

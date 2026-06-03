@@ -2,6 +2,74 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.4.0](https://github.com/With-the-Ranks/spoke/compare/v10.2.0...v10.4.0) (2026-06-02)
+
+
+### Features
+
+* **observability:** add Phase 1 Prometheus metrics instrumentation ([#171](https://github.com/With-the-Ranks/spoke/issues/171)) ([794a28b](https://github.com/With-the-Ranks/spoke/commit/794a28b4b42bee63a54ac0c0b26c74240fbd752c)), closes [#180](https://github.com/With-the-Ranks/spoke/issues/180) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#189](https://github.com/With-the-Ranks/spoke/issues/189) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#190](https://github.com/With-the-Ranks/spoke/issues/190) [#191](https://github.com/With-the-Ranks/spoke/issues/191)
+
+
+### Bug Fixes
+
+* update seeds to not use logging library ([#192](https://github.com/With-the-Ranks/spoke/issues/192)) ([4076e6d](https://github.com/With-the-Ranks/spoke/commit/4076e6d36c642c6cf926bf70d418139e0237d588))
+* **chat:** rearrange Live Support chat position ([#188](https://github.com/With-the-Ranks/spoke/issues/188)) ([63049c0](https://github.com/With-the-Ranks/spoke/commit/63049c0d4948b4d5baf0e6e285869da38c7f2d6e))
+
+## [10.3.0](https://github.com/With-the-Ranks/spoke/compare/v10.2.0...v10.3.0) (2026-06-02)
+
+
+### Features
+
+* **observability:** add Phase 1 Prometheus metrics instrumentation ([#171](https://github.com/With-the-Ranks/spoke/issues/171)) ([794a28b](https://github.com/With-the-Ranks/spoke/commit/794a28b4b42bee63a54ac0c0b26c74240fbd752c)), closes [#180](https://github.com/With-the-Ranks/spoke/issues/180) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#189](https://github.com/With-the-Ranks/spoke/issues/189) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#190](https://github.com/With-the-Ranks/spoke/issues/190) [#191](https://github.com/With-the-Ranks/spoke/issues/191)
+
+
+### Bug Fixes
+
+* update seeds to not use logging library ([#192](https://github.com/With-the-Ranks/spoke/issues/192)) ([4076e6d](https://github.com/With-the-Ranks/spoke/commit/4076e6d36c642c6cf926bf70d418139e0237d588))
+* **chat:** rearrange Live Support chat position ([#188](https://github.com/With-the-Ranks/spoke/issues/188)) ([63049c0](https://github.com/With-the-Ranks/spoke/commit/63049c0d4948b4d5baf0e6e285869da38c7f2d6e))
+
+## [10.3.0-rc.1](https://github.com/With-the-Ranks/spoke/compare/v10.2.0...v10.3.0-rc.1) (2026-06-02)
+
+
+### Features
+
+* **observability:** add Phase 1 Prometheus metrics instrumentation ([#171](https://github.com/With-the-Ranks/spoke/issues/171)) ([794a28b](https://github.com/With-the-Ranks/spoke/commit/794a28b4b42bee63a54ac0c0b26c74240fbd752c)), closes [#180](https://github.com/With-the-Ranks/spoke/issues/180) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#189](https://github.com/With-the-Ranks/spoke/issues/189) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#190](https://github.com/With-the-Ranks/spoke/issues/190) [#191](https://github.com/With-the-Ranks/spoke/issues/191)
+
+
+### Bug Fixes
+
+* update seeds to not use logging library ([#192](https://github.com/With-the-Ranks/spoke/issues/192)) ([4076e6d](https://github.com/With-the-Ranks/spoke/commit/4076e6d36c642c6cf926bf70d418139e0237d588))
+* **chat:** rearrange Live Support chat position ([#188](https://github.com/With-the-Ranks/spoke/issues/188)) ([63049c0](https://github.com/With-the-Ranks/spoke/commit/63049c0d4948b4d5baf0e6e285869da38c7f2d6e))
+
+## [10.3.0-rc.0](https://github.com/With-the-Ranks/spoke/compare/v10.2.0...v10.3.0-rc.0) (2026-06-02)
+
+
+### Features
+
+* **observability:** add Phase 1 Prometheus metrics instrumentation ([#171](https://github.com/With-the-Ranks/spoke/issues/171)) ([794a28b](https://github.com/With-the-Ranks/spoke/commit/794a28b4b42bee63a54ac0c0b26c74240fbd752c)), closes [#180](https://github.com/With-the-Ranks/spoke/issues/180) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#189](https://github.com/With-the-Ranks/spoke/issues/189) [#109](https://github.com/With-the-Ranks/spoke/issues/109) [#190](https://github.com/With-the-Ranks/spoke/issues/190) [#191](https://github.com/With-the-Ranks/spoke/issues/191)
+
+
+### Bug Fixes
+
+* update seeds to not use logging library ([#192](https://github.com/With-the-Ranks/spoke/issues/192)) ([4076e6d](https://github.com/With-the-Ranks/spoke/commit/4076e6d36c642c6cf926bf70d418139e0237d588))
+* **chat:** rearrange Live Support chat position ([#188](https://github.com/With-the-Ranks/spoke/issues/188)) ([63049c0](https://github.com/With-the-Ranks/spoke/commit/63049c0d4948b4d5baf0e6e285869da38c7f2d6e))
+
+## [10.2.0](https://github.com/With-the-Ranks/spoke/compare/v10.1.0...v10.2.0) (2026-05-28)
+
+
+### Features
+
+* **message-review:** insert script when survey selected ([#179](https://github.com/With-the-Ranks/spoke/issues/179)) ([94dcec0](https://github.com/With-the-Ranks/spoke/commit/94dcec0811b17f5f52ea3846a563a9d71e9fbbbc))
+* add Chatwoot support widget ([#170](https://github.com/With-the-Ranks/spoke/issues/170)) ([91c7152](https://github.com/With-the-Ranks/spoke/commit/91c7152196d7464ce30e0092fc826fcc7869020e))
+
+
+### Bug Fixes
+
+* **campaign-preview:** remove text align justify style ([#173](https://github.com/With-the-Ranks/spoke/issues/173)) ([35cee18](https://github.com/With-the-Ranks/spoke/commit/35cee1881aec3ff30c6cb9ca9eab0293a6104626))
+* **campaign-preview:** scope collapse/expand toggle to chevron only ([#174](https://github.com/With-the-Ranks/spoke/issues/174)) ([f631a02](https://github.com/With-the-Ranks/spoke/commit/f631a02e426fe6b0a0873f48b6a6c101ae86abf1))
+* center login form ([#172](https://github.com/With-the-Ranks/spoke/issues/172)) ([a0a0ae3](https://github.com/With-the-Ranks/spoke/commit/a0a0ae3a592c50a5765338ff6607492ad403f2ad))
+* **van:** use mui v4 components for setup dialog ([#185](https://github.com/With-the-Ranks/spoke/issues/185)) ([91fe906](https://github.com/With-the-Ranks/spoke/commit/91fe906a6729cb57d7c1ef2b21718f4e7b37d62c))
+
 ## [10.1.0](https://github.com/With-the-Ranks/spoke/compare/v10.0.1...v10.1.0) (2026-05-06)
 
 

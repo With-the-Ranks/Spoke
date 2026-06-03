@@ -1,12 +1,18 @@
 import type { Runner as Scheduler, ScheduleConfig } from "graphile-scheduler";
 import { run as runScheduler } from "graphile-scheduler";
-import type { LogFunctionFactory, Runner, TaskList } from "graphile-worker";
+import type {
+  LogFunctionFactory,
+  Runner,
+  Task,
+  TaskList
+} from "graphile-worker";
 import { Logger, run } from "graphile-worker";
 
 import { config } from "../config";
 import { sleep } from "../lib";
 import logger from "../logger";
 import pgPool from "./db";
+import { workerTaskDuration, workerTaskTotal } from "./metrics";
 import {
   assignTexters,
   TASK_IDENTIFIER as assignTextersIdentifier
@@ -67,6 +73,43 @@ import { wrapProgressTask, wrapProgressTaskList } from "./tasks/utils";
 const logFactory: LogFunctionFactory = (scope) => (level, message, meta) =>
   logger.log({ level, message, ...meta, ...scope });
 
+const withMetrics = (taskIdentifier: string, task: Task): Task => async (
+  payload,
+  helpers
+) => {
+  const startNs = process.hrtime.bigint();
+  const logCtx = { task: taskIdentifier, jobId: helpers.job.id };
+
+  try {
+    await task(payload, helpers);
+    const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
+    workerTaskDuration.observe(
+      { task_identifier: taskIdentifier, status: "success" },
+      durationSeconds
+    );
+    workerTaskTotal.inc({ task_identifier: taskIdentifier, status: "success" });
+    logger.info("Worker task completed", {
+      ...logCtx,
+      elapsedMs: durationSeconds * 1000,
+      attempt: helpers.job.attempts
+    });
+  } catch (err) {
+    const durationSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
+    workerTaskDuration.observe(
+      { task_identifier: taskIdentifier, status: "error" },
+      durationSeconds
+    );
+    workerTaskTotal.inc({ task_identifier: taskIdentifier, status: "error" });
+    logger.warn("Worker task failed", {
+      ...logCtx,
+      elapsedMs: durationSeconds * 1000,
+      attempt: helpers.job.attempts,
+      maxAttempts: helpers.job.max_attempts
+    });
+    throw err;
+  }
+};
+
 const graphileLogger = new Logger(logFactory);
 
 let worker: Runner | undefined;
@@ -118,9 +161,13 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
   if (!workerSemaphore) {
     workerSemaphore = true;
 
+    const instrumentedTaskList: TaskList = Object.fromEntries(
+      Object.entries(taskList).map(([id, task]) => [id, withMetrics(id, task)])
+    );
+
     worker = await run({
       pgPool,
-      taskList,
+      taskList: instrumentedTaskList,
       concurrency: config.WORKER_CONCURRENCY,
       logger: graphileLogger,
       // Signals are handled by Terminus

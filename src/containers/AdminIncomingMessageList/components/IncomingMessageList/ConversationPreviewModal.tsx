@@ -7,9 +7,17 @@ import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import ChevronRight from "@material-ui/icons/ChevronRight";
 import CloseIcon from "@material-ui/icons/Close";
 import type { ConversationInfoFragment } from "@spoke/spoke-codegen";
+import {
+  useGetCampaignVariablesLazyQuery,
+  useGetCurrentUserProfileLazyQuery
+} from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
-import React from "react";
+import React, { useState } from "react";
 
+import {
+  applyScript,
+  customFieldsJsonStringToArray
+} from "../../../../lib/scripts";
 import MessageColumn from "./MessageColumn";
 import SurveyColumn from "./SurveyColumn";
 
@@ -34,23 +42,59 @@ interface ConversationPreviewBodyProps {
 const ConversationPreviewBody: React.FC<ConversationPreviewBodyProps> = ({
   conversation,
   organizationId
-}) => (
-  <div className={css(columnStyles.container)}>
-    <div className={css(columnStyles.column)}>
-      <MessageColumn
-        conversation={conversation}
-        organizationId={organizationId}
-      />
+}) => {
+  const { contact, campaign } = conversation;
+  const [messageText, setMessageText] = useState("");
+
+  const [getCampaignVariables] = useGetCampaignVariablesLazyQuery();
+  const [getCurrentUserProfile] = useGetCurrentUserProfileLazyQuery();
+
+  const setScriptMessageText = async (script: string) => {
+    const customFields = customFieldsJsonStringToArray(contact.customFields);
+
+    const { data: cvData } = await getCampaignVariables({
+      variables: { campaignId: campaign.id }
+    });
+    const campaignVariables = cvData?.campaign?.campaignVariables ?? [];
+
+    const { data: userData } = await getCurrentUserProfile();
+    const texter = userData?.currentUser;
+
+    if (texter) {
+      setMessageText(
+        applyScript({
+          script,
+          contact,
+          customFields,
+          campaignVariables,
+          texter
+        })
+      );
+    }
+  };
+
+  return (
+    <div className={css(columnStyles.container)}>
+      <div className={css(columnStyles.column)}>
+        <MessageColumn
+          conversation={conversation}
+          organizationId={organizationId}
+          messageText={messageText}
+          onMessageTextChange={setMessageText}
+          onScriptSelected={setScriptMessageText}
+        />
+      </div>
+      <div className={css(columnStyles.column)}>
+        <SurveyColumn
+          contact={conversation.contact}
+          campaign={conversation.campaign}
+          organizationId={organizationId}
+          onScriptSelected={setScriptMessageText}
+        />
+      </div>
     </div>
-    <div className={css(columnStyles.column)}>
-      <SurveyColumn
-        contact={conversation.contact}
-        campaign={conversation.campaign}
-        organizationId={organizationId}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 interface ConversationPreviewModalProps {
   organizationId: string;

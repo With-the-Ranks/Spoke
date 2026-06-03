@@ -1,3 +1,4 @@
+import { smsSendTotal } from "../../metrics";
 import { r } from "../../models";
 // eslint-disable-next-line import/named
 import { getLastMessage } from "./message-sending";
@@ -6,8 +7,9 @@ import { getLastMessage } from "./message-sending";
 // that end up just in the db appropriately and then using sendReply() graphql
 // queries for the reception (rather than a real service)
 
-const sendMessage = async (message, _organizationId, _trx) =>
-  r
+const sendMessage = async (message, _organizationId, _trx) => {
+  smsSendTotal.inc({ status: "success", provider: "fakeservice" });
+  return r
     .knex("message")
     .update({
       send_status: "SENT",
@@ -15,6 +17,7 @@ const sendMessage = async (message, _organizationId, _trx) =>
       sent_at: r.knex.fn.now()
     })
     .where({ id: message.id });
+};
 
 // None of the rest of this is even used for fake-service
 // but *would* be used if it was actually an outside service.

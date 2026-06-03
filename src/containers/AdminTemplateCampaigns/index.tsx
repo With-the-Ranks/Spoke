@@ -11,6 +11,7 @@ import {
 import React, { useCallback } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
+import spokeTheme from "../../styles/theme";
 import TemplateCampaignRow from "./components/TemplateCampaignRow";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,11 +19,6 @@ const useStyles = makeStyles((theme) => ({
     "& > *": {
       margin: theme.spacing(1)
     }
-  },
-  fab: {
-    position: "absolute",
-    bottom: theme.spacing(2),
-    right: theme.spacing(2)
   }
 }));
 
@@ -105,7 +101,7 @@ export const AdminTemplateCampaigns: React.FC = () => {
       </div>
       <Fab
         color="primary"
-        className={classes.fab}
+        style={spokeTheme.components.floatingButton}
         aria-label="add"
         disabled={createTemplateLoading}
         onClick={handleClickCreateTemplate}
