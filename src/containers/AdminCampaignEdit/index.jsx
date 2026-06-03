@@ -55,6 +55,7 @@ import CampaignOverlapManager from "./sections/CampaignOverlapManager";
 import CampaignTeamsForm from "./sections/CampaignTeamsForm";
 import CampaignTextersForm from "./sections/CampaignTextersForm";
 import CampaignTextingHoursForm from "./sections/CampaignTextingHoursForm";
+import CampaignTypeForm from "./sections/CampaignTypeForm";
 import CampaignVariablesForm from "./sections/CampaignVariablesForm";
 
 class AdminCampaignEdit extends React.Component {
@@ -299,7 +300,21 @@ class AdminCampaignEdit extends React.Component {
   };
 
   sections = () => {
+    const isCallCampaign =
+      this.state.campaignFormValues.campaignType === "CALL";
+
     const sections = [
+      {
+        title: "Campaign Type",
+        content: CampaignTypeForm,
+        isStandalone: true,
+        showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced],
+        keys: ["campaignType"],
+        checkCompleted: () => true,
+        blocksStarting: false,
+        expandAfterCampaignStarts: true,
+        expandableBySuperVolunteers: false
+      },
       {
         title: "Basics",
         content: CampaignBasicsForm,
@@ -351,11 +366,12 @@ class AdminCampaignEdit extends React.Component {
         expandAfterCampaignStarts: false,
         expandableBySuperVolunteers: false,
         exclude:
+          isCallCampaign ||
           this.props.organizationData?.organization?.messagingServices?.edges
             ?.length <= 1
       },
       {
-        title: "Texting Hours",
+        title: "Contact Hours",
         content: CampaignTextingHoursForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
@@ -448,8 +464,9 @@ class AdminCampaignEdit extends React.Component {
         expandAfterCampaignStarts: false,
         extraProps: {},
         exclude:
-          this.props.organizationData.organization &&
-          !this.props.organizationData.organization.numbersApiKey
+          isCallCampaign ||
+          (this.props.organizationData.organization &&
+            !this.props.organizationData.organization.numbersApiKey)
       },
       {
         title: "Contact Overlap Management",

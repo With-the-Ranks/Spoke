@@ -301,6 +301,7 @@ const makeQueries = (jobTypes: string[]) => ({
           readiness {
             id
             basics
+            campaignType
             messagingService
             textingHours
             integration

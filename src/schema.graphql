@@ -566,6 +566,11 @@ type OrganizationMembershipPage {
 
 
 
+enum CampaignType {
+  SMS
+  CALL
+}
+
 input CampaignsFilter {
   isArchived: Boolean
   isStarted: Boolean
@@ -619,6 +624,7 @@ type JobRequest {
 type CampaignReadiness {
   id: ID!
   basics: Boolean!
+  campaignType: Boolean!
   messagingService: Boolean!
   textingHours: Boolean!
   integration: Boolean!
@@ -695,6 +701,7 @@ type Campaign {
   columnMapping: [CsvColumnMapping!]
   messagingService: MessagingService
   contactsFilename: String
+  campaignType: CampaignType!
 }
 
 type CampaignEdge {
@@ -768,6 +775,7 @@ input CampaignInput {
   messagingServiceSid: String
   autosendLimit: Int
   columnMapping: [CsvColumnMappingInput!]
+  campaignType: CampaignType
 }
 
 
