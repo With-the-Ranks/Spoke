@@ -81,7 +81,7 @@ const TexterAssignmentSummary: React.FC<Props> = (props) => {
               name="autoSplit"
             />
           }
-          label="Split remaining unsent messages"
+          label="Split remaining unassigned contacts"
         />
       </div>
     </div>
