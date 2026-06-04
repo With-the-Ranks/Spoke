@@ -18,8 +18,6 @@ import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import { Toggle } from "material-ui";
-import DropDownMenu from "material-ui/DropDownMenu";
-import { MenuItem } from "material-ui/Menu";
 import PropTypes from "prop-types";
 import React from "react";
 import { withRouter } from "react-router-dom";
@@ -41,10 +39,6 @@ const styles = {
     alignItems: "baseline",
     justifyContent: "space-between",
     padding: 5
-  },
-  filterWrapper: {
-    display: "flex",
-    alignIems: "baseline"
   }
 };
 
@@ -87,6 +81,10 @@ class AdminCampaignList extends React.Component {
       isCreating: false,
       campaignsFilter: {
         isArchived: false,
+        isStarted: undefined,
+        hasUnsentInitialMessages: undefined,
+        hasUnhandledMessages: undefined,
+        hasUnassignedContacts: undefined,
         campaignTitle: ""
       },
       releasingInProgress: false,
@@ -122,21 +120,21 @@ class AdminCampaignList extends React.Component {
     history.push(`/admin/${organizationId}/campaigns/${campaignId}/edit`);
   };
 
-  handleFilterChangeCurrentOrArchived = (_event, _index, value) => {
-    const { campaignTitle } = this.state.campaignsFilter;
+  handleChipToggle = (field, activeValue, inactiveValue) => {
+    const { campaignsFilter } = this.state;
+    const isActive = campaignsFilter[field] === activeValue;
     this.setState({
       campaignsFilter: {
-        isArchived: value,
-        campaignTitle
+        ...campaignsFilter,
+        [field]: isActive ? inactiveValue : activeValue
       }
     });
   };
 
   handleFilterCampaignTitle = (campaignTitle) => {
-    const { isArchived } = this.state.campaignsFilter;
     this.setState({
       campaignsFilter: {
-        isArchived,
+        ...this.state.campaignsFilter,
         campaignTitle
       }
     });
@@ -275,18 +273,6 @@ class AdminCampaignList extends React.Component {
     });
   };
 
-  renderCurrentCampaignFilter() {
-    return (
-      <DropDownMenu
-        value={this.state.campaignsFilter.isArchived}
-        onChange={this.handleFilterChangeCurrentOrArchived}
-      >
-        <MenuItem value={false} primaryText="Current" />
-        <MenuItem value primaryText="Archived" />
-      </DropDownMenu>
-    );
-  }
-
   render() {
     const {
       campaignsFilter,
@@ -313,9 +299,6 @@ class AdminCampaignList extends React.Component {
     return (
       <div>
         <div style={styles.flexContainer}>
-          <div style={styles.filterWrapper}>
-            {this.renderCurrentCampaignFilter()}
-          </div>
           <Button
             variant="contained"
             color="primary"
@@ -420,6 +403,7 @@ class AdminCampaignList extends React.Component {
             isAdmin={isAdmin}
             campaignDetailsForExport={campaignDetailsForExport}
             filterByCampaignTitle={this.handleFilterCampaignTitle}
+            onChipToggle={this.handleChipToggle}
             selectForExport={this.handleSelectForExport}
             handleClickExportButton={this.handleClickExportButton}
           />

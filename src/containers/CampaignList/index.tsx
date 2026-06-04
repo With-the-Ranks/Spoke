@@ -34,11 +34,16 @@ import {
 export interface CampaignListProps {
   organizationId: string;
   pageSize: number;
-  campaignsFilter: { isArchived: boolean; campaignTitle?: string };
+  campaignsFilter: Record<string, unknown>;
   isAdmin: boolean;
   campaignDetailsForExport: CampaignDetailsForExport[];
   selectForExport: (details: CampaignDetailsForExport) => void;
   filterByCampaignTitle: (title: string) => void;
+  onChipToggle: (
+    field: string,
+    activeValue: unknown,
+    inactiveValue: unknown
+  ) => void;
   handleClickExportButton: () => void;
 }
 
@@ -190,6 +195,7 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
     campaignDetailsForExport,
     selectForExport,
     filterByCampaignTitle,
+    onChipToggle,
     handleClickExportButton
   } = props;
   const { data } = useGetAdminAssignmentTargetsQuery({
@@ -214,7 +220,9 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
       <AssignmentHUD assignmentTargets={targets} />
       <CampaignListHeader
         campaignDetailsForExport={campaignDetailsForExport}
+        campaignsFilter={campaignsFilter}
         filterByCampaignTitle={filterByCampaignTitle}
+        onChipToggle={onChipToggle}
         onClick={handleClickExportButton}
       />
       <CampaignListLoader
