@@ -51,8 +51,8 @@ const DEBOUNCE_INTERVAL = 500;
 interface FilterChip {
   label: string;
   field: string;
-  activeValue: unknown;
-  inactiveValue: unknown;
+  activeValue: boolean;
+  inactiveValue: boolean | undefined;
 }
 
 interface FilterGroup {
