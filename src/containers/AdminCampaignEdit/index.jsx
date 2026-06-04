@@ -512,7 +512,7 @@ class AdminCampaignEdit extends React.Component {
         }
       },
       {
-        title: "Texters",
+        title: "Volunteers",
         content: CampaignTextersForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
@@ -614,7 +614,7 @@ class AdminCampaignEdit extends React.Component {
           (job) =>
             job.jobType === "upload_contacts" || job.jobType === "contact_sql"
         );
-      } else if (section.title === "Texters") {
+      } else if (section.title === "Volunteers") {
         [relatedJob] = pendingJobs.filter(
           (job) => job.jobType === "assign_texters"
         );
