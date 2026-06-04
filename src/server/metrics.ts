@@ -10,7 +10,10 @@ import {
 import { config } from "../config";
 
 export const registry = new Registry();
-registry.setDefaultLabels({ environment: config.DEPLOY_ENVIRONMENT });
+registry.setDefaultLabels({
+  environment: config.DEPLOY_ENVIRONMENT,
+  hostname: new URL(config.BASE_URL).hostname
+});
 
 // Collect Node.js runtime metrics (CPU, memory, event loop lag, GC, etc.)
 collectDefaultMetrics({ register: registry });
