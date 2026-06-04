@@ -210,12 +210,12 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
   return (
     <>
       <CampaignFormSectionHeading
-        title="Who should send the texts?"
+        title="Who should contact people?"
         subtitle={
           isOverdue && (
             <span style={{ color: red[600] }}>
               This campaign is overdue! Please change the due date before
-              editing Texters
+              editing Volunteers
             </span>
           )
         }
@@ -313,7 +313,7 @@ const mutations: MutationMap<InnerProps> = {
 
 export default compose<InnerProps, RequiredComponentProps>(
   asSection({
-    title: "Texters",
+    title: "Volunteers",
     readinessName: "texters",
     jobQueueNames: JOB_QUEUE_NAMES,
     expandAfterCampaignStarts: true,
