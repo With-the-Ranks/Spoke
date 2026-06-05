@@ -9,7 +9,13 @@ import MemoizeHelper, { Buckets, cacheOpts } from "../memoredis";
 import { cacheableData, r } from "../models";
 import { currentEditors } from "../models/cacheable_queries";
 import { accessRequired } from "./errors";
-import { getDeliverabilityStats, invalidScriptFields } from "./lib/campaign";
+import {
+  buildHasUnassignedContactsSubquery,
+  buildHasUnhandledRepliesSubquery,
+  buildHasUnsentInitialsSubquery,
+  getDeliverabilityStats,
+  invalidScriptFields
+} from "./lib/campaign";
 import { symmetricEncrypt } from "./lib/crypto";
 import { getMessagingServiceById } from "./lib/message-sending";
 import { formatPage } from "./lib/pagination";
@@ -123,6 +129,20 @@ const getCampaignOrganization = async ({ campaignId }) => {
     .where({ id: campaignId })
     .first("organization_id");
   return campaign.organization_id;
+};
+
+const checkCampaignContactsExist = async (campaign, buildSubquery) => {
+  if (
+    config.HIDE_CAMPAIGN_STATE_VARS_ON_ARCHIVED_CAMPAIGNS &&
+    campaign.is_archived
+  )
+    return false;
+
+  const { rows } = await r.reader.raw("SELECT EXISTS(?) as exists", [
+    buildSubquery(campaign.id).whereRaw(`archived = ${campaign.is_archived}`) // partial index friendly
+  ]);
+
+  return rows[0].exists;
 };
 
 export const resolvers = {
@@ -586,124 +606,16 @@ export const resolvers = {
       return row?.contacts_filename ?? null;
     },
     hasUnassignedContacts: async (campaign) => {
-      if (config.BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS) {
-        return false;
-      }
-
-      if (
-        config.HIDE_CAMPAIGN_STATE_VARS_ON_ARCHIVED_CAMPAIGNS &&
-        campaign.is_archived
-      ) {
-        return false;
-      }
-
-      const getHasUnassignedContacts = async ({ campaignId, archived }) => {
-        // SQL injection for archived = to enable use of partial index
-        const { rows } = await r.reader.raw(
-          `
-            select exists (
-              select 1
-              from campaign_contact
-              where
-                campaign_id = ?
-                and assignment_id is null
-                and archived = ${archived}
-                and not exists (
-                  select 1
-                  from campaign_contact_tag
-                  join tag on campaign_contact_tag.tag_id = tag.id
-                  where tag.is_assignable = false
-                    and campaign_contact_tag.campaign_contact_id = campaign_contact.id
-                )
-                and is_opted_out = false
-            ) as contact_exists
-          `,
-          [campaignId]
-        );
-
-        return rows[0] && rows[0].contact_exists;
-      };
-
-      return getHasUnassignedContacts({
-        campaignId: campaign.id,
-        archived: campaign.is_archived
-      });
+      if (config.BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS) return false;
+      return checkCampaignContactsExist(
+        campaign,
+        buildHasUnassignedContactsSubquery
+      );
     },
-    hasUnsentInitialMessages: async (campaign) => {
-      if (
-        config.HIDE_CAMPAIGN_STATE_VARS_ON_ARCHIVED_CAMPAIGNS &&
-        campaign.is_archived
-      ) {
-        return false;
-      }
-
-      const getHasUnsentInitialMessages = async ({ campaignId, archived }) => {
-        const contacts = await r
-          .reader("campaign_contact")
-          .select("id")
-          .where({
-            campaign_id: campaignId,
-            message_status: "needsMessage",
-            is_opted_out: false
-          })
-          .whereRaw(`archived = ${archived}`) // partial index friendly
-          .limit(1);
-        return contacts.length > 0;
-      };
-
-      return getHasUnsentInitialMessages({
-        campaignId: campaign.id,
-        archived: campaign.is_archived
-      });
-    },
-    hasUnhandledMessages: async (campaign) => {
-      if (
-        config.HIDE_CAMPAIGN_STATE_VARS_ON_ARCHIVED_CAMPAIGNS &&
-        campaign.is_archived
-      ) {
-        return false;
-      }
-
-      const getHasUnhandledMessages = async ({
-        campaignId,
-        archived,
-        organizationId
-      }) => {
-        let contactsQuery = r
-          .reader("campaign_contact")
-          .pluck("campaign_contact.id")
-          .where({
-            "campaign_contact.campaign_id": campaignId,
-            message_status: "needsResponse",
-            is_opted_out: false
-          })
-          .whereRaw(`archived = ${archived}`) // partial index friendly
-          .limit(1);
-
-        const notAssignableTagSubQuery = r.reader
-          .select("campaign_contact_tag.campaign_contact_id")
-          .from("campaign_contact_tag")
-          .join("tag", "tag.id", "=", "campaign_contact_tag.tag_id")
-          .where({
-            "tag.organization_id": organizationId
-          })
-          .whereRaw("lower(tag.title) = 'escalated'")
-          .whereRaw(
-            "campaign_contact_tag.campaign_contact_id = campaign_contact.id"
-          );
-
-        contactsQuery = contactsQuery.whereNotExists(notAssignableTagSubQuery);
-
-        const contacts = await contactsQuery;
-        return contacts.length > 0;
-      };
-
-      return getHasUnhandledMessages({
-        campaignId: campaign.id,
-        archived: campaign.is_archived,
-        organizationId: campaign.organization_id
-      });
-    },
+    hasUnsentInitialMessages: async (campaign) =>
+      checkCampaignContactsExist(campaign, buildHasUnsentInitialsSubquery),
+    hasUnhandledMessages: async (campaign) =>
+      checkCampaignContactsExist(campaign, buildHasUnhandledRepliesSubquery),
     customFields: async (campaign) =>
       campaign.customFields ||
       cacheableData.campaign.dbCustomFields(campaign.id),
