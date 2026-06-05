@@ -9068,16 +9068,6 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
-assemble-numbers-client@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/assemble-numbers-client/-/assemble-numbers-client-1.2.5.tgz#19e25442030f1aa15d85bbbd5e5b031c8dee6ac6"
-  integrity sha512-BcZli6SczREKQ9dpxE+rnvFhuETI6BhgohZgs6YZ37UBj+kso5JHlyZWIfg/Ku+aRqfWrE9k0i9V0xrd04swMQ==
-  dependencies:
-    lodash "^4.17.21"
-    sha.js "^2.4.11"
-    superagent "^6.1.0"
-    superagent-graphql "^0.1.2"
-
 assert-err@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/assert-err/-/assert-err-1.1.0.tgz#c05062799a1d97d3f5eaa258e3242aab499fc8ef"
@@ -27237,6 +27227,16 @@ swap-case@^2.0.2:
   integrity sha512-kc6S2YS/2yXbtkSMunBtKdah4VFETZ8Oh6ONSmSd9bRxhqTrtARUCBUiWXH3xVPpvR7tz2CSnkuXVE42EcGnMw==
   dependencies:
     tslib "^2.0.3"
+
+switchboard-client@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/switchboard-client/-/switchboard-client-1.4.1.tgz#b66b7a8319da91c47e133834e69c01854b4f3c03"
+  integrity sha512-RzwwCN6suwLTSoa9Dzmsqkt0v+3DkJuS31fbCYAsh8wdCDxIoHdymopu6nki1VhuDvkRDwy5kQbfNTqi4P/Kfg==
+  dependencies:
+    lodash "^4.17.21"
+    sha.js "^2.4.11"
+    superagent "^6.1.0"
+    superagent-graphql "^0.1.2"
 
 symbol-observable@1.2.0, symbol-observable@^1.0.4, symbol-observable@^1.1.0:
   version "1.2.0"

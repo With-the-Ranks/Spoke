@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import type { Knex } from "knex";
 import type { PoolClient } from "pg";
+import type { RoutingClient } from "switchboard-client";
 
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
@@ -34,6 +35,10 @@ export enum NumbersSendStatus {
   DeliveryFailed = "delivery_failed",
   DeliveryUnconfirmed = "delivery_unconfirmed"
 }
+
+export type NumberForDialResult = ReturnType<
+  RoutingClient["getNumberForContact"]
+>;
 
 // client lib does not export this, so we recreate
 interface NumbersOutboundMessagePayload {
@@ -157,6 +162,20 @@ export const deliveryReportValidator: RequestHandlerFactory = () => async (
       .status(403)
       .send("Assemble Request Validation Failed.");
   }
+};
+
+export const getNumberForDial = async (
+  service: MessagingServiceRecord,
+  toNumber: string,
+  contactZipCode?: string
+): NumberForDialResult => {
+  const profileId = service.messaging_service_sid;
+  const numbers = await numbersClient(service);
+  return numbers.routing.getNumberForContact({
+    toNumber,
+    profileId,
+    contactZipCode
+  });
 };
 
 export const sendMessage = async (
