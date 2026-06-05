@@ -156,10 +156,6 @@ const validators = {
     example: "spoke/exports/",
     default: ""
   }),
-  BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS: bool({
-    dec: "Disable use of has unassigned contacts variable",
-    default: false
-  }),
   BASE_URL: url({
     desc:
       "The base URL of the website, without trailing slash, used to construct various URLs.",
