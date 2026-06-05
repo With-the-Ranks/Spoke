@@ -4,6 +4,7 @@ import type {
   CampaignInput,
   CampaignsFilter
 } from "@spoke/spoke-codegen";
+import type { Knex } from "knex";
 import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import isNil from "lodash/isNil";
@@ -49,6 +50,32 @@ type DoGetCampaigns = (
   options: DoGetCampaignsOptions
 ) => Promise<RelayPaginatedResponse<Campaign>>;
 
+const textableContacts = () =>
+  r.reader("campaign_contact").where({ is_opted_out: false });
+
+// When campaignId is omitted the subquery is correlated to the outer campaign row.
+const withCampaignFilter = (q: Knex.QueryBuilder, campaignId?: number) =>
+  campaignId
+    ? q.where({ campaign_id: campaignId })
+    : q.whereRaw("campaign_id = campaign.id");
+
+export const buildHasUnsentInitialsSubquery = (campaignId?: number) => {
+  const contacts = textableContacts().where({ message_status: "needsMessage" });
+  return withCampaignFilter(contacts, campaignId);
+};
+
+export const buildHasUnhandledRepliesSubquery = (campaignId?: number) => {
+  const contacts = textableContacts().where({
+    message_status: "needsResponse"
+  });
+  return withCampaignFilter(contacts, campaignId);
+};
+
+export const buildHasUnassignedContactsSubquery = (campaignId?: number) => {
+  const contacts = textableContacts().whereNull("assignment_id");
+  return withCampaignFilter(contacts, campaignId);
+};
+
 export const doGetCampaigns: DoGetCampaigns = async (
   options: DoGetCampaignsOptions
 ) => {
@@ -90,71 +117,26 @@ export const doGetCampaigns: DoGetCampaigns = async (
     ]);
   }
 
-  if (!isNil(hasUnsentInitialMessages)) {
-    const existsMethod = hasUnsentInitialMessages
-      ? "whereExists"
-      : "whereNotExists";
-    query[existsMethod](
-      r
-        .reader("campaign_contact")
-        .select(r.reader.raw("1"))
-        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
-        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
-        .where({ message_status: "needsMessage", is_opted_out: false })
-        .limit(1)
-    );
-  }
+  const applySubqueryFilter = (
+    filter: boolean | null | undefined,
+    buildSubquery: () => Knex.QueryBuilder
+  ) => {
+    if (isNil(filter)) return;
 
-  if (!isNil(hasUnhandledMessages)) {
-    const existsMethod = hasUnhandledMessages
-      ? "whereExists"
-      : "whereNotExists";
-    query[existsMethod](
-      r
-        .reader("campaign_contact")
-        .select(r.reader.raw("1"))
-        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
-        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
-        .where({ message_status: "needsResponse", is_opted_out: false })
-        .whereNotExists(
-          r
-            .reader("campaign_contact_tag")
-            .join("tag", "campaign_contact_tag.tag_id", "tag.id")
-            .select(r.reader.raw("1"))
-            .whereRaw(
-              '"campaign_contact_tag"."campaign_contact_id" = "campaign_contact"."id"'
-            )
-            .whereRaw("lower(tag.title) = 'escalated'")
-        )
-        .limit(1)
-    );
-  }
+    const subquery = buildSubquery();
+    if (!isNil(isArchived))
+      subquery.whereRaw(`campaign_contact.archived = ${isArchived}`);
 
-  if (!isNil(hasUnassignedContacts)) {
-    const existsMethod = hasUnassignedContacts
-      ? "whereExists"
-      : "whereNotExists";
-    query[existsMethod](
-      r
-        .reader("campaign_contact")
-        .select(r.reader.raw("1"))
-        .whereRaw('"campaign_contact"."campaign_id" = "campaign"."id"')
-        .whereRaw('"campaign_contact"."archived" = "campaign"."is_archived"')
-        .whereNull("campaign_contact.assignment_id")
-        .where({ is_opted_out: false })
-        .whereNotExists(
-          r
-            .reader("campaign_contact_tag")
-            .join("tag", "campaign_contact_tag.tag_id", "tag.id")
-            .select(r.reader.raw("1"))
-            .whereRaw(
-              '"campaign_contact_tag"."campaign_contact_id" = "campaign_contact"."id"'
-            )
-            .where({ "tag.is_assignable": false })
-        )
-        .limit(1)
-    );
-  }
+    if (filter) query.whereExists(subquery);
+    else query.whereNotExists(subquery);
+  };
+
+  applySubqueryFilter(hasUnsentInitialMessages, buildHasUnsentInitialsSubquery);
+  applySubqueryFilter(hasUnhandledMessages, buildHasUnhandledRepliesSubquery);
+  applySubqueryFilter(
+    hasUnassignedContacts,
+    buildHasUnassignedContactsSubquery
+  );
 
   const pagerOptions = { first, after };
   return formatPage(query, pagerOptions);
