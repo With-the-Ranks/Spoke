@@ -605,13 +605,8 @@ export const resolvers = {
         .first();
       return row?.contacts_filename ?? null;
     },
-    hasUnassignedContacts: async (campaign) => {
-      if (config.BAD_BENS_DISABLE_HAS_UNASSIGNED_CONTACTS) return false;
-      return checkCampaignContactsExist(
-        campaign,
-        buildHasUnassignedContactsSubquery
-      );
-    },
+    hasUnassignedContacts: async (campaign) =>
+      checkCampaignContactsExist(campaign, buildHasUnassignedContactsSubquery),
     hasUnsentInitialMessages: async (campaign) =>
       checkCampaignContactsExist(campaign, buildHasUnsentInitialsSubquery),
     hasUnhandledMessages: async (campaign) =>
