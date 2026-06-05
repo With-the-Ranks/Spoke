@@ -1,4 +1,4 @@
-import NumbersClient from "assemble-numbers-client";
+import NumbersClient from "switchboard-client";
 
 import { config } from "../../config";
 
