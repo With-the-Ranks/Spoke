@@ -2,7 +2,8 @@
 import type {
   Campaign,
   CampaignInput,
-  CampaignsFilter
+  CampaignsFilter,
+  CampaignType
 } from "@spoke/spoke-codegen";
 import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
@@ -544,7 +545,7 @@ export const editCampaign = async (
     external_system_id: externalSystemId,
     messaging_service_sid: messagingServiceSid ?? undefined,
     type: campaignType
-      ? (campaignType.toLowerCase() as "sms" | "call")
+      ? (campaignType.toLowerCase() as Lowercase<CampaignType>)
       : undefined
   };
 

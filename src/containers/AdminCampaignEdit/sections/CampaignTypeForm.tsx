@@ -1,186 +1,122 @@
-import type { ApolloQueryResult } from "@apollo/client";
-import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
-import React from "react";
+import PhoneIcon from "@material-ui/icons/Phone";
+import SmsIcon from "@material-ui/icons/Sms";
+import {
+  CampaignType,
+  useEditCampaignTypeMutation,
+  useGetCampaignTypeQuery
+} from "@spoke/spoke-codegen";
+import React, { useState } from "react";
 import { compose } from "recompose";
 
-import { loadData } from "../../hoc/with-operations";
 import CampaignFormSectionHeading from "../components/CampaignFormSectionHeading";
-import type {
-  FullComponentProps,
-  RequiredComponentProps
-} from "../components/SectionWrapper";
+import type { FullComponentProps } from "../components/SectionWrapper";
 import { asSection } from "../components/SectionWrapper";
 
-type CampaignTypeValue = "SMS" | "CALL";
+const CampaignTypeForm: React.FC<FullComponentProps> = (props) => {
+  const { campaignId, saveLabel, onError } = props;
+  const [pendingType, setPendingType] = useState<CampaignType | undefined>(
+    undefined
+  );
+  const [isWorking, setIsWorking] = useState(false);
 
-interface CampaignTypeFormValues {
-  campaignType: CampaignTypeValue;
-}
+  const { data } = useGetCampaignTypeQuery({ variables: { campaignId } });
+  const [editCampaignType] = useEditCampaignTypeMutation();
 
-interface CampaignTypeHocProps {
-  data: {
-    campaign: CampaignTypeFormValues & { id: string; isStarted: boolean };
-  };
-  mutations: {
-    editCampaign(payload: CampaignTypeFormValues): ApolloQueryResult<any>;
-  };
-}
+  const campaign = data?.campaign;
+  const isStarted = campaign?.isStarted ?? false;
+  const hasContacts = (campaign?.contactsCount ?? 0) > 0;
+  // Contacts live in type-specific tables, so the type can't change once they're
+  // uploaded (or the campaign has started).
+  const isLocked = isStarted || hasContacts;
+  const savedType = campaign?.campaignType ?? CampaignType.Sms;
+  const campaignType = pendingType ?? savedType;
 
-interface CampaignTypeInnerProps
-  extends FullComponentProps,
-    CampaignTypeHocProps {}
+  const hasPendingChanges =
+    pendingType !== undefined && pendingType !== savedType;
+  const isSaveDisabled = isWorking || !hasPendingChanges || isLocked;
+  const finalSaveLabel = isWorking ? "Working..." : saveLabel;
 
-interface CampaignTypeState {
-  campaignType?: CampaignTypeValue;
-  isWorking: boolean;
-}
-
-class CampaignTypeForm extends React.Component<
-  CampaignTypeInnerProps,
-  CampaignTypeState
-> {
-  state: CampaignTypeState = {
-    campaignType: undefined,
-    isWorking: false
-  };
-
-  handleChange = (
+  const handleChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
     value: string
-  ) => {
-    this.setState({ campaignType: value as CampaignTypeValue });
-  };
+  ) => setPendingType(value as CampaignType);
 
-  handleSubmit = async () => {
-    const { campaignType } = this.state;
-    const { editCampaign } = this.props.mutations;
-
-    this.setState({ isWorking: true });
+  const handleSubmit = async () => {
+    if (pendingType === undefined) return;
+    setIsWorking(true);
     try {
-      const response = await editCampaign({ campaignType: campaignType! });
+      const response = await editCampaignType({
+        variables: { campaignId, payload: { campaignType: pendingType } }
+      });
       if (response.errors) throw response.errors;
-      this.setState({ campaignType: undefined });
+      setPendingType(undefined);
     } catch (err) {
-      this.props.onError(err.message);
+      onError((err as Error).message);
     } finally {
-      this.setState({ isWorking: false });
+      setIsWorking(false);
     }
   };
 
-  render() {
-    const { isWorking } = this.state;
-    const {
-      data: { campaign },
-      saveLabel
-    } = this.props;
-
-    const campaignType =
-      this.state.campaignType !== undefined
-        ? this.state.campaignType
-        : campaign.campaignType;
-
-    const hasPendingChanges =
-      this.state.campaignType !== undefined &&
-      this.state.campaignType !== campaign.campaignType;
-
-    const isSaveDisabled =
-      isWorking || !hasPendingChanges || campaign.isStarted;
-    const finalSaveLabel = isWorking ? "Working..." : saveLabel;
-
-    return (
-      <div>
-        <CampaignFormSectionHeading
-          title="Campaign type"
-          subtitle="Choose whether this campaign will send SMS messages or make phone calls."
-        />
-        <FormControl component="fieldset" disabled={campaign.isStarted}>
-          <FormLabel component="legend">Type</FormLabel>
-          <RadioGroup
-            name="campaignType"
-            value={campaignType}
-            onChange={this.handleChange}
-            row
-          >
-            <FormControlLabel value="SMS" control={<Radio />} label="SMS" />
-            <FormControlLabel value="CALL" control={<Radio />} label="Call" />
-          </RadioGroup>
-        </FormControl>
-        {campaign.isStarted && (
-          <p style={{ color: "gray", fontSize: 12 }}>
-            Campaign type cannot be changed after the campaign has started.
-          </p>
-        )}
-        <div style={{ marginTop: 16 }}>
-          <Button
-            variant="contained"
-            disabled={isSaveDisabled}
-            onClick={this.handleSubmit}
-          >
-            {finalSaveLabel}
-          </Button>
-        </div>
+  return (
+    <div>
+      <CampaignFormSectionHeading
+        title="Campaign type"
+        subtitle="Choose whether this campaign will send text messages or make phone calls."
+      />
+      <FormControl component="fieldset" disabled={isLocked}>
+        <FormLabel component="legend">Type</FormLabel>
+        <RadioGroup
+          name="campaignType"
+          value={campaignType}
+          onChange={handleChange}
+          row
+        >
+          <FormControlLabel
+            value={CampaignType.Sms}
+            control={<Radio />}
+            label="SMS"
+          />
+          <FormControlLabel
+            value={CampaignType.Call}
+            control={<Radio />}
+            label="Call"
+          />
+        </RadioGroup>
+      </FormControl>
+      {isLocked && (
+        <p style={{ color: "gray", fontSize: 12 }}>
+          {isStarted
+            ? "Campaign type cannot be changed after the campaign has started."
+            : "Campaign type cannot be changed after contacts have been uploaded."}
+        </p>
+      )}
+      <div style={{ marginTop: 16 }}>
+        <Button
+          variant="contained"
+          disabled={isSaveDisabled}
+          onClick={handleSubmit}
+        >
+          {finalSaveLabel}
+        </Button>
       </div>
-    );
-  }
-}
-
-const queries = {
-  data: {
-    query: gql`
-      query getCampaignType($campaignId: String!) {
-        campaign(id: $campaignId) {
-          id
-          isStarted
-          campaignType
-        }
-      }
-    `,
-    options: (ownProps: CampaignTypeInnerProps) => ({
-      variables: {
-        campaignId: ownProps.campaignId
-      }
-    })
-  }
+    </div>
+  );
 };
 
-const mutations = {
-  editCampaign: (ownProps: CampaignTypeInnerProps) => (
-    payload: CampaignTypeFormValues
-  ) => ({
-    mutation: gql`
-      mutation editCampaignType(
-        $campaignId: String!
-        $payload: CampaignInput!
-      ) {
-        editCampaign(id: $campaignId, campaign: $payload) {
-          id
-          campaignType
-        }
-      }
-    `,
-    variables: {
-      campaignId: ownProps.campaignId,
-      payload
-    }
-  })
-};
-
-export default compose<CampaignTypeInnerProps, RequiredComponentProps>(
+export default compose<FullComponentProps, FullComponentProps>(
   asSection({
     title: "Campaign Type",
     readinessName: "campaignType",
     jobQueueNames: [],
-    expandAfterCampaignStarts: true,
-    expandableBySuperVolunteers: false
-  }),
-  loadData({
-    queries,
-    mutations
+    expandAfterCampaignStarts: false,
+    expandableBySuperVolunteers: false,
+    avatarIcon: ({ campaignType }) =>
+      campaignType === CampaignType.Call ? <PhoneIcon /> : <SmsIcon />
   })
 )(CampaignTypeForm);
