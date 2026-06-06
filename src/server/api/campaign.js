@@ -492,7 +492,7 @@ export const resolvers = {
       "autosendLimit",
       "columnMapping"
     ]),
-    campaignType: (campaign) => (campaign.type ?? "sms").toUpperCase(),
+    campaignType: (campaign) => campaign.type.toUpperCase(),
     isApproved: (campaign) =>
       isNil(campaign.is_approved) ? false : campaign.is_approved,
     isTemplate: (campaign) =>
