@@ -122,6 +122,7 @@ interface Props {
   scriptFields: string[];
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
+  isCallCampaign?: boolean;
   maxSmsSegmentLength: number | null;
   onChange: (value: string) => Promise<void> | void;
   receiveFocus?: boolean;
@@ -387,26 +388,29 @@ class ScriptEditor extends React.Component<Props, State> {
           </p>
         )}
         {this.renderCustomFields()}
-        <div>
-          {this.renderAttachmentWarning()}
-          <br />
-          Estimated Segments: {info.msgCount} <br />
-          Characters left in current segment:{" "}
-          {info.msgCount * info.charsPerSegment - info.charCount}
-          <br />
-          Encoding required: {info.encoding} <br />
-          Message Type: {messageType} <br />
-          <br />
-          Not sure what a segment is? Check out the{" "}
-          <a
-            href="https://withtheranks.com/docs/spoke/for-spoke-admins/segments-and-encodings/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            docs here
-          </a>
-          .
-        </div>
+        {/* Segment/character/encoding info is SMS-specific; hide it for calls. */}
+        {!this.props.isCallCampaign && (
+          <div>
+            {this.renderAttachmentWarning()}
+            <br />
+            Estimated Segments: {info.msgCount} <br />
+            Characters left in current segment:{" "}
+            {info.msgCount * info.charsPerSegment - info.charCount}
+            <br />
+            Encoding required: {info.encoding} <br />
+            Message Type: {messageType} <br />
+            <br />
+            Not sure what a segment is? Check out the{" "}
+            <a
+              href="https://withtheranks.com/docs/spoke/for-spoke-admins/segments-and-encodings/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              docs here
+            </a>
+            .
+          </div>
+        )}
       </div>
     );
   }

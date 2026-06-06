@@ -57,6 +57,7 @@ interface Props {
   customFields: string[];
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
+  isCallCampaign: boolean;
   availableActions: any[];
   hasBlockCopied: boolean;
   title?: string;
@@ -78,6 +79,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
     customFields,
     campaignVariables,
     integrationSourced,
+    isCallCampaign,
     availableActions,
     hasBlockCopied,
     title = "Start",
@@ -147,7 +149,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
           subheader={
             parentInteractionId
               ? ""
-              : "Enter a script for your texter along with the question you want the texter be able to answer on behalf of the contact."
+              : "Enter a script for your volunteer along with the question you want the volunteer be able to answer on behalf of the contact."
           }
           action={
             childStepsLength > 0 && (
@@ -242,10 +244,15 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
               name="scriptOptions"
               type="scriptoptions"
               label="Script"
-              hintText="This is what your texters will send to your contacts. E.g. Hi, {firstName}. It's {texterFirstName} here."
+              hintText={
+                isCallCampaign
+                  ? "This is the script your volunteers will read to your contacts. E.g. Hi, {firstName}. It's {texterFirstName} here."
+                  : "This is what your texters will send to your contacts. E.g. Hi, {firstName}. It's {texterFirstName} here."
+              }
               customFields={customFields}
               campaignVariables={campaignVariables}
               isRootStep={isRootStep}
+              isCallCampaign={isCallCampaign}
               integrationSourced={integrationSourced}
               fullWidth
               multiLine
@@ -256,7 +263,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
               name="questionText"
               label="Question"
               fullWidth
-              hintText="A question for texters to answer. E.g. Can this person attend the event?"
+              hintText="A question for volunteers to answer. E.g. Can this person attend the event?"
               disabled={disabled}
             />
           </GSForm>
@@ -297,6 +304,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
                 customFields={customFields}
                 campaignVariables={campaignVariables}
                 integrationSourced={integrationSourced}
+                isCallCampaign={isCallCampaign}
                 availableActions={availableActions}
                 hasBlockCopied={hasBlockCopied}
                 disabled={disabled}
