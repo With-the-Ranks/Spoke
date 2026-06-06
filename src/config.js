@@ -762,6 +762,20 @@ const validators = {
     desc: "Custom base URL for Switchboard client.",
     default: undefined
   }),
+  TELNYX_API_KEY: str({
+    desc: "Telnyx API key for WebRTC calling.",
+    default: undefined
+  }),
+  TELNYX_SIP_USERNAME: str({
+    desc:
+      "Telnyx SIP credential username for WebRTC calling (shared per instance/org).",
+    default: undefined
+  }),
+  TELNYX_SIP_PASSWORD: str({
+    desc:
+      "Telnyx SIP credential password for WebRTC calling (shared per instance/org).",
+    default: undefined
+  }),
   VAN_BASE_URL: url({
     desc:
       "The base url to use when interacting with VAN (may need to change for international use)",
