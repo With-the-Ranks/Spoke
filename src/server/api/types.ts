@@ -325,6 +325,38 @@ export interface TagRecord {
   deleted_at: string;
 }
 
+export interface DialerContactRecord {
+  id: number;
+  campaign_id: number;
+  assignment_id: number | null;
+  external_id: string | null;
+  first_name: string;
+  last_name: string;
+  cell: string;
+  zip: string | null;
+  timezone: string | null;
+  custom_fields: Record<string, unknown>;
+  call_status: string;
+  do_not_call: boolean;
+  attempt_count: number;
+  last_attempted_at: Date | null;
+  archived: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DialerCallRecord {
+  id: number;
+  dialer_campaign_contact_id: number;
+  user_id: number;
+  telnyx_call_control_id: string | null;
+  from_number: string | null;
+  status: string;
+  disposition: string | null;
+  created_at: Date;
+  ended_at: Date | null;
+}
+
 export interface UserRecord {
   id: number;
   auth0_id: string;

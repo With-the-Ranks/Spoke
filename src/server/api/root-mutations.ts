@@ -62,6 +62,12 @@ import {
   markAutosendingPaused,
   unqueueAutosending
 } from "./lib/campaign";
+import {
+  initiateCall,
+  markDialerContactComplete,
+  saveDialerQuestionResponses,
+  updateDialerCall
+} from "./lib/dialer";
 import { getSecondPassCampaign } from "./lib/mark-second-pass";
 import { saveNewIncomingMessage } from "./lib/message-sending";
 import { processNumbers } from "./lib/opt-out";
@@ -3331,6 +3337,73 @@ const rootMutations = {
       });
 
       return true;
+    },
+
+    initiateCall: async (
+      _root,
+      {
+        assignmentId,
+        dialerCampaignContactId
+      }: { assignmentId: string; dialerCampaignContactId: string },
+      { user }: SpokeRequestContext
+    ) => {
+      await assignmentRequired(user, assignmentId);
+      return initiateCall(assignmentId, dialerCampaignContactId, user);
+    },
+
+    updateDialerCall: async (
+      _root,
+      {
+        dialerCallId,
+        status,
+        disposition,
+        telnyxCallControlId
+      }: {
+        dialerCallId: string;
+        status?: string;
+        disposition?: string;
+        telnyxCallControlId?: string;
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return updateDialerCall(dialerCallId, user, {
+        status,
+        disposition,
+        telnyxCallControlId
+      });
+    },
+
+    saveDialerQuestionResponses: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        questionResponses
+      }: {
+        dialerCampaignContactId: string;
+        questionResponses: Array<{ interactionStepId: string; value: string }>;
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return saveDialerQuestionResponses(
+        dialerCampaignContactId,
+        questionResponses,
+        user
+      );
+    },
+
+    markDialerContactComplete: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        callStatus
+      }: { dialerCampaignContactId: string; callStatus: string },
+      { user }: SpokeRequestContext
+    ) => {
+      return markDialerContactComplete(
+        dialerCampaignContactId,
+        callStatus,
+        user
+      );
     }
   }
 };
