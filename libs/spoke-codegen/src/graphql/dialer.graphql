@@ -1,0 +1,115 @@
+fragment DialerContactCore on DialerCampaignContact {
+  id
+  campaignId
+  firstName
+  lastName
+  zip
+  callStatus
+  doNotCall
+  attemptCount
+  lastAttemptedAt
+  customFields
+  questionResponseValues {
+    id
+    interactionStepId
+    question
+    value
+  }
+  tags {
+    id
+    title
+    description
+    confirmationSteps
+    onApplyScript
+    textColor
+    backgroundColor
+    isAssignable
+    isSystem
+  }
+  interactionSteps {
+    id
+    questionText
+    scriptOptions
+    answerOption
+    parentInteractionId
+    isDeleted
+    answerActions
+    question {
+      text
+      answerOptions {
+        value
+        nextInteractionStep {
+          id
+          scriptOptions
+        }
+      }
+    }
+  }
+}
+
+query GetNextDialerContact($assignmentId: String!) {
+  getNextDialerContact(assignmentId: $assignmentId) {
+    ...DialerContactCore
+  }
+}
+
+query GetDialerContact($dialerCampaignContactId: String!) {
+  getDialerContact(dialerCampaignContactId: $dialerCampaignContactId) {
+    ...DialerContactCore
+  }
+}
+
+mutation InitiateCall($assignmentId: String!, $dialerCampaignContactId: String!) {
+  initiateCall(assignmentId: $assignmentId, dialerCampaignContactId: $dialerCampaignContactId) {
+    dialerCallId
+    contactPhone
+    fromNumber
+  }
+}
+
+mutation UpdateDialerCall(
+  $dialerCallId: String!
+  $status: String
+  $disposition: String
+  $telnyxCallControlId: String
+) {
+  updateDialerCall(
+    dialerCallId: $dialerCallId
+    status: $status
+    disposition: $disposition
+    telnyxCallControlId: $telnyxCallControlId
+  ) {
+    id
+    status
+    disposition
+    telnyxCallControlId
+    endedAt
+  }
+}
+
+mutation SaveDialerQuestionResponses(
+  $dialerCampaignContactId: String!
+  $questionResponses: [DialerQuestionResponseInput!]!
+) {
+  saveDialerQuestionResponses(
+    dialerCampaignContactId: $dialerCampaignContactId
+    questionResponses: $questionResponses
+  ) {
+    ...DialerContactCore
+  }
+}
+
+mutation MarkDialerContactComplete(
+  $dialerCampaignContactId: String!
+  $callStatus: String!
+) {
+  markDialerContactComplete(
+    dialerCampaignContactId: $dialerCampaignContactId
+    callStatus: $callStatus
+  ) {
+    id
+    callStatus
+    attemptCount
+    lastAttemptedAt
+  }
+}
