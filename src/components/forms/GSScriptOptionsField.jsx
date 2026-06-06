@@ -79,7 +79,9 @@ class GSScriptOptionsField extends GSFormField {
       getWarningContextForScript(scriptDraft);
 
     // 2022-09-24 - stop as a separate word is best for avoiding spam blocks
+    // Opt-out language is SMS-specific, so skip the warning for call campaigns.
     const warnForOptOutLanguage =
+      !this.props.isCallCampaign &&
       this.props.isRootStep &&
       scriptDraft.length > 0 &&
       !scriptDraft.toLowerCase().includes("stop ");
@@ -127,6 +129,7 @@ class GSScriptOptionsField extends GSFormField {
       campaignVariables,
       value: scriptVersions,
       integrationSourced,
+      isCallCampaign,
       orgSettings
     } = this.props;
     const {
@@ -135,7 +138,10 @@ class GSScriptOptionsField extends GSFormField {
       scriptLinkWarningOpen,
       optOutLanguageWarningOpen
     } = this.state;
-    const scriptFields = allScriptFields(customFields);
+    // {cell} is a texting-only merge field, so omit it for call campaigns.
+    const scriptFields = allScriptFields(customFields).filter(
+      (field) => !isCallCampaign || field !== "cell"
+    );
 
     const draftVersionOccurences = scriptVersions.filter(
       (version) => version === scriptDraft
@@ -188,6 +194,7 @@ class GSScriptOptionsField extends GSFormField {
             scriptFields={scriptFields}
             campaignVariables={campaignVariables}
             integrationSourced={integrationSourced}
+            isCallCampaign={isCallCampaign}
             maxSmsSegmentLength={orgSettings.maxSmsSegmentLength}
             receiveFocus
             expandable
@@ -221,27 +228,31 @@ class GSScriptOptionsField extends GSFormField {
     const {
       customFields,
       campaignVariables,
-      value: scriptVersions
+      value: scriptVersions,
+      isCallCampaign
     } = this.props;
 
-    const canDelete = scriptVersions.length > 1;
+    // A/B script versions are texting-only; call campaigns use a single script.
+    const canDelete = !isCallCampaign && scriptVersions.length > 1;
     const emptyVersionExists =
       scriptVersions.filter((version) => version.trim() === "").length > 0;
 
     return (
       <div>
-        Scripts
-        <Tooltip
-          title="For best deliverability results add a few versions of the script with
-          different wordings. This makes your texts look more natural."
-          placement="right-start"
-        >
-          <InfoIcon fontSize="small" />
-        </Tooltip>
+        {isCallCampaign ? "Script" : "Scripts"}
+        {!isCallCampaign && (
+          <Tooltip
+            title="For best deliverability results add a few versions of the script with
+            different wordings. This makes your texts look more natural."
+            placement="right-start"
+          >
+            <InfoIcon fontSize="small" />
+          </Tooltip>
+        )}
         {scriptVersions.map((scriptVersion, index) => (
           <ScriptOptionBlock
             key={scriptVersion}
-            label={`Script Version ${index + 1}`}
+            label={isCallCampaign ? "Script" : `Script Version ${index + 1}`}
             customFields={customFields}
             campaignVariables={campaignVariables}
             script={scriptVersion}
@@ -249,14 +260,16 @@ class GSScriptOptionsField extends GSFormField {
             onDelete={canDelete && this.createDeleteHandler(scriptVersion)}
           />
         ))}
-        <Button
-          color="primary"
-          endIcon={<CreateIcon />}
-          disabled={emptyVersionExists}
-          onClick={this.handleAddScriptVersion}
-        >
-          Add script version
-        </Button>
+        {!isCallCampaign && (
+          <Button
+            color="primary"
+            endIcon={<CreateIcon />}
+            disabled={emptyVersionExists}
+            onClick={this.handleAddScriptVersion}
+          >
+            Add script version
+          </Button>
+        )}
         {this.renderDialog("script-link")}
         {this.renderDialog("opt-out-language")}
       </div>
@@ -275,6 +288,7 @@ GSScriptOptionsField.propTypes = {
     })
   ).isRequired,
   isRootStep: PropTypes.bool.isRequired,
+  isCallCampaign: PropTypes.bool,
   name: PropTypes.string,
   className: PropTypes.string,
   hintText: PropTypes.string,
