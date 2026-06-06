@@ -13,7 +13,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { withTheme } from "@material-ui/core/styles";
-import { CampaignBuilderMode } from "@spoke/spoke-codegen";
+import { CampaignBuilderMode, CampaignType } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
 import pick from "lodash/pick";
 import PropTypes from "prop-types";
@@ -301,7 +301,7 @@ class AdminCampaignEdit extends React.Component {
 
   sections = () => {
     const isCallCampaign =
-      this.state.campaignFormValues.campaignType === "CALL";
+      this.state.campaignFormValues.campaignType === CampaignType.Call;
 
     const sections = [
       {
@@ -312,7 +312,7 @@ class AdminCampaignEdit extends React.Component {
         keys: ["campaignType"],
         checkCompleted: () => true,
         blocksStarting: false,
-        expandAfterCampaignStarts: true,
+        expandAfterCampaignStarts: false,
         expandableBySuperVolunteers: false
       },
       {
