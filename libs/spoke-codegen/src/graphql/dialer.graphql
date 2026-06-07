@@ -72,17 +72,22 @@ mutation UpdateDialerCall(
   $status: String
   $disposition: String
   $telnyxCallControlId: String
+  $answeredAt: String
+  $endedAt: String
 ) {
   updateDialerCall(
     dialerCallId: $dialerCallId
     status: $status
     disposition: $disposition
     telnyxCallControlId: $telnyxCallControlId
+    answeredAt: $answeredAt
+    endedAt: $endedAt
   ) {
     id
     status
     disposition
     telnyxCallControlId
+    answeredAt
     endedAt
   }
 }
@@ -111,5 +116,17 @@ mutation MarkDialerContactComplete(
     callStatus
     attemptCount
     lastAttemptedAt
+  }
+}
+
+query CallShiftAvailable($organizationId: String!) {
+  callShiftAvailable(organizationId: $organizationId)
+}
+
+mutation RequestCallShift($organizationId: String!) {
+  requestCallShift(organizationId: $organizationId) {
+    assignmentId
+    campaignId
+    count
   }
 }

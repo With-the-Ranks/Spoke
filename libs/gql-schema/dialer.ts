@@ -31,6 +31,7 @@ export const schema = `
     disposition: String
     telnyxCallControlId: String
     createdAt: Date!
+    answeredAt: Date
     endedAt: Date
   }
 
@@ -38,6 +39,12 @@ export const schema = `
     dialerCallId: ID!
     contactPhone: String!
     fromNumber: String!
+  }
+
+  type RequestCallShiftResult {
+    assignmentId: ID
+    campaignId: ID
+    count: Int!
   }
 
   input DialerQuestionResponseInput {

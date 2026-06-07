@@ -63,6 +63,7 @@ import {
   unqueueAutosending
 } from "./lib/campaign";
 import {
+  assignDialerShift,
   initiateCall,
   markDialerContactComplete,
   saveDialerQuestionResponses,
@@ -3351,25 +3352,40 @@ const rootMutations = {
       return initiateCall(assignmentId, dialerCampaignContactId, user);
     },
 
+    requestCallShift: async (
+      _root,
+      { organizationId }: { organizationId: string },
+      { user }: SpokeRequestContext
+    ) => {
+      await accessRequired(user, organizationId, "TEXTER");
+      return assignDialerShift(user, organizationId, config.DIALER_SHIFT_SIZE);
+    },
+
     updateDialerCall: async (
       _root,
       {
         dialerCallId,
         status,
         disposition,
-        telnyxCallControlId
+        telnyxCallControlId,
+        answeredAt,
+        endedAt
       }: {
         dialerCallId: string;
         status?: string;
         disposition?: string;
         telnyxCallControlId?: string;
+        answeredAt?: string;
+        endedAt?: string;
       },
       { user }: SpokeRequestContext
     ) => {
       return updateDialerCall(dialerCallId, user, {
         status,
         disposition,
-        telnyxCallControlId
+        telnyxCallControlId,
+        answeredAt,
+        endedAt
       });
     },
 

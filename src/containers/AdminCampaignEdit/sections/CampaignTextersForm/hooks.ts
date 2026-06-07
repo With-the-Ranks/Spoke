@@ -206,15 +206,18 @@ const stagedTextersReducer: StagedTexterReducer = (state, action) => {
         minNewContacts
       );
 
-      editedTexter.assignment = {
-        ...editedTexter.assignment,
-        needsMessageCount: newContactCount - texterMessagedCount,
-        contactsCount: newContactCount
+      const updatedTexter = {
+        ...editedTexter,
+        assignment: {
+          ...editedTexter.assignment,
+          needsMessageCount: newContactCount - texterMessagedCount,
+          contactsCount: newContactCount
+        }
       };
 
       const newUpsertedTexters = state.upsertedTexters
         .filter(({ id }) => id !== editedTexter.id)
-        .concat([editedTexter]);
+        .concat([updatedTexter]);
 
       return {
         ...state,

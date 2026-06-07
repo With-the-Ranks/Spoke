@@ -1,9 +1,10 @@
 import { makeStyles } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardHeader from "@material-ui/core/CardHeader";
 import Divider from "@material-ui/core/Divider";
-import type { Assignment } from "@spoke/spoke-codegen";
+import type { Assignment, CampaignType } from "@spoke/spoke-codegen";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
@@ -39,6 +40,7 @@ interface Props {
   totalMessagedCount: number;
   pastMessagesCount: number;
   skippedMessagesCount: number;
+  campaignType?: CampaignType;
 }
 
 export const AssignmentSummary: React.FC<Props> = (props) => {
@@ -104,10 +106,13 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
   const {
     title,
     description,
+    campaignType,
     primaryColor = context.theme?.defaultCampaignColor,
     logoImageUrl = context.theme?.defaultCampaignLogo,
     introHtml
-  } = assignment.campaign;
+  } = assignment.campaign as any;
+
+  const isCallCampaign = campaignType === "CALL";
 
   const subtitle = `${description}`;
 
@@ -131,57 +136,73 @@ export const AssignmentSummary: React.FC<Props> = (props) => {
           <div dangerouslySetInnerHTML={{ __html: introHtml || "" }} />
         </div>
         <CardActions className={classes.cardActions}>
-          {renderBadgedButton({
-            dataTestText: "sendFirstTexts",
-            assignment,
-            title: "Send first texts",
-            type: "initial",
-            count: unmessagedCount,
-            primary: true,
-            contactsFilter: "text",
-            hideIfZero: true
-          })}
-          {renderBadgedButton({
-            dataTestText: "sendReplies",
-            assignment,
-            title: "Send replies",
-            type: "reply",
-            count: unrepliedCount,
-            primary: false,
-            disabled: false,
-            contactsFilter: "reply",
-            hideIfZero: true
-          })}
-          {renderBadgedButton({
-            assignment,
-            title: "Past Messages",
-            type: "past",
-            count: pastMessagesCount,
-            primary: false,
-            disabled: false,
-            contactsFilter: "stale",
-            hideIfZero: true
-          })}
-          {renderBadgedButton({
-            assignment,
-            title: "Skipped Messages",
-            type: "past",
-            count: skippedMessagesCount,
-            primary: false,
-            disabled: false,
-            contactsFilter: "skipped",
-            hideIfZero: true
-          })}
-          {renderBadgedButton({
-            assignment,
-            title: "Send later",
-            type: "initial",
-            count: badTimezoneCount,
-            primary: false,
-            disabled: true,
-            contactsFilter: null,
-            hideIfZero: true
-          })}
+          {isCallCampaign ? (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() =>
+                history.push(
+                  `/app/${props.organizationId}/dialer/${assignment.id}`
+                )
+              }
+            >
+              Start Calling
+            </Button>
+          ) : (
+            <>
+              {renderBadgedButton({
+                dataTestText: "sendFirstTexts",
+                assignment,
+                title: "Send first texts",
+                type: "initial",
+                count: unmessagedCount,
+                primary: true,
+                contactsFilter: "text",
+                hideIfZero: true
+              })}
+              {renderBadgedButton({
+                dataTestText: "sendReplies",
+                assignment,
+                title: "Send replies",
+                type: "reply",
+                count: unrepliedCount,
+                primary: false,
+                disabled: false,
+                contactsFilter: "reply",
+                hideIfZero: true
+              })}
+              {renderBadgedButton({
+                assignment,
+                title: "Past Messages",
+                type: "past",
+                count: pastMessagesCount,
+                primary: false,
+                disabled: false,
+                contactsFilter: "stale",
+                hideIfZero: true
+              })}
+              {renderBadgedButton({
+                assignment,
+                title: "Skipped Messages",
+                type: "past",
+                count: skippedMessagesCount,
+                primary: false,
+                disabled: false,
+                contactsFilter: "skipped",
+                hideIfZero: true
+              })}
+              {renderBadgedButton({
+                assignment,
+                title: "Send later",
+                type: "initial",
+                count: badTimezoneCount,
+                primary: false,
+                disabled: true,
+                contactsFilter: null,
+                hideIfZero: true
+              })}
+            </>
+          )}
         </CardActions>
       </Card>
     </div>
