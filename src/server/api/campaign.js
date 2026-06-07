@@ -139,6 +139,17 @@ export const resolvers = {
   },
   CampaignStats: {
     sentMessagesCount: async (campaign) => {
+      // Call campaigns have no messages; the "Sent" card is relabeled "Called"
+      // and shows how many contacts have been called at least once.
+      if (campaign.type === "call") {
+        return r.getCount(
+          r
+            .reader("dialer_campaign_contact")
+            .where({ campaign_id: campaign.id })
+            .where("attempt_count", ">", 0)
+        );
+      }
+
       const getSentMessagesCount = async ({ campaignId }) => {
         return r.parseCount(
           r
@@ -492,7 +503,7 @@ export const resolvers = {
       "autosendLimit",
       "columnMapping"
     ]),
-    campaignType: (campaign) => campaign.type.toUpperCase(),
+    campaignType: (campaign) => (campaign.type ?? "sms").toUpperCase(),
     isApproved: (campaign) =>
       isNil(campaign.is_approved) ? false : campaign.is_approved,
     isTemplate: (campaign) =>
@@ -569,13 +580,21 @@ export const resolvers = {
     },
     contacts: async (campaign) =>
       r
-        .reader("campaign_contact")
+        .reader(
+          campaign.type === "call"
+            ? "dialer_campaign_contact"
+            : "campaign_contact"
+        )
         .where({ campaign_id: campaign.id })
         .whereRaw(`archived = ${campaign.is_archived}`), // partial index friendly
     contactsCount: async (campaign) =>
       r.getCount(
         r
-          .reader("campaign_contact")
+          .reader(
+            campaign.type === "call"
+              ? "dialer_campaign_contact"
+              : "campaign_contact"
+          )
           .where({ campaign_id: campaign.id })
           .whereRaw(`archived = ${campaign.is_archived}`) // partial index friendly
       ),
@@ -708,7 +727,7 @@ export const resolvers = {
     },
     customFields: async (campaign) =>
       campaign.customFields ||
-      cacheableData.campaign.dbCustomFields(campaign.id),
+      cacheableData.campaign.dbCustomFields(campaign.id, campaign.type),
     stats: async (campaign) => campaign,
     editors: async (campaign, _, { user }) => {
       if (r.redis) {

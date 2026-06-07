@@ -19,7 +19,11 @@ import {
   superAdminRequired
 } from "./errors";
 import { getStepsToUpdate } from "./lib/bulk-script-editor";
-import { getDialerContact, getNextDialerContact } from "./lib/dialer";
+import {
+  callShiftsAvailable,
+  getDialerContact,
+  getNextDialerContact
+} from "./lib/dialer";
 import { formatPage } from "./lib/pagination";
 import { getUsers, getUsersById } from "./user";
 
@@ -541,6 +545,15 @@ const rootResolvers = {
       { user }
     ) => {
       return getDialerContact(dialerCampaignContactId, user);
+    },
+
+    callShiftAvailable: async (
+      _root,
+      { organizationId }: { organizationId: string },
+      { user }
+    ) => {
+      await accessRequired(user, organizationId, "TEXTER");
+      return callShiftsAvailable(organizationId);
     },
 
     isValidAttachment: async (_root, { fileUrl }, _context) => {

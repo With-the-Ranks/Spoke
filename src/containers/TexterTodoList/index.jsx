@@ -9,6 +9,7 @@ import { compose } from "recompose";
 import Empty from "../../components/Empty";
 import { loadData } from "../hoc/with-operations";
 import AssignmentSummary from "./components/AssignmentSummary";
+import CallRequest from "./components/CallRequest";
 import TexterRequest from "./components/TexterRequest";
 
 class TexterTodoList extends React.Component {
@@ -52,7 +53,9 @@ class TexterTodoList extends React.Component {
       .slice()
       .sort()
       .map((assignment) => {
+        const isCallCampaign = assignment.campaign.campaignType === "CALL";
         if (
+          isCallCampaign ||
           assignment.unmessagedCount > 0 ||
           assignment.unrepliedCount > 0 ||
           assignment.badTimezoneCount > 0 ||
@@ -104,6 +107,7 @@ class TexterTodoList extends React.Component {
             organizationId={this.props.match.params.organizationId}
           />
         </div>
+        <CallRequest organizationId={this.props.match.params.organizationId} />
         {renderedTodos.length === 0 ? empty : renderedTodos}
 
         <div
@@ -187,6 +191,7 @@ const queries = {
               id
               title
               description
+              campaignType
               hasUnassignedContacts
               introHtml
               primaryColor
