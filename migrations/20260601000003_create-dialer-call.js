@@ -31,7 +31,14 @@ exports.up = function up(knex) {
       .defaultTo("QUEUED");
     table.timestamp("created_at").defaultTo(knex.fn.now()).notNullable();
     table.timestamp("ended_at").nullable();
-    table.index("dialer_campaign_contact_id");
+    // Mirror message's indexes: one for lookups by contact, one for recent-call
+    // queries. The composite (contact_id, status) index also covers the NOT EXISTS
+    // subqueries that filter callable contacts by active/terminal call status.
+    table.index(
+      ["dialer_campaign_contact_id", "status"],
+      "dialer_call_contact_status_idx"
+    );
+    table.index("created_at", "dialer_call_created_at_idx");
   });
 };
 
