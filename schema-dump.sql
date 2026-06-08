@@ -4745,10 +4745,17 @@ CREATE INDEX deliverability_report_url_path_index ON public.deliverability_repor
 
 
 --
--- Name: dialer_call_dialer_campaign_contact_id_index; Type: INDEX; Schema: public; Owner: postgres
+-- Name: dialer_call_contact_status_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX dialer_call_dialer_campaign_contact_id_index ON public.dialer_call USING btree (dialer_campaign_contact_id);
+CREATE INDEX dialer_call_contact_status_idx ON public.dialer_call USING btree (dialer_campaign_contact_id, status);
+
+
+--
+-- Name: dialer_call_created_at_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_call_created_at_idx ON public.dialer_call USING btree (created_at);
 
 
 --
@@ -5760,7 +5767,7 @@ ALTER TABLE ONLY public.dialer_campaign_contact_tag
 --
 
 ALTER TABLE ONLY public.dialer_question_response
-    ADD CONSTRAINT dialer_question_response_dialer_campaign_contact_id_foreign FOREIGN KEY (dialer_campaign_contact_id) REFERENCES public.dialer_campaign_contact(id) ON DELETE CASCADE;
+    ADD CONSTRAINT dialer_question_response_dialer_campaign_contact_id_foreign FOREIGN KEY (dialer_campaign_contact_id) REFERENCES public.dialer_campaign_contact(id);
 
 
 --
@@ -5768,7 +5775,7 @@ ALTER TABLE ONLY public.dialer_question_response
 --
 
 ALTER TABLE ONLY public.dialer_question_response
-    ADD CONSTRAINT dialer_question_response_interaction_step_id_foreign FOREIGN KEY (interaction_step_id) REFERENCES public.interaction_step(id) ON DELETE CASCADE;
+    ADD CONSTRAINT dialer_question_response_interaction_step_id_foreign FOREIGN KEY (interaction_step_id) REFERENCES public.interaction_step(id);
 
 
 --
