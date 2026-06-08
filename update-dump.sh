@@ -1,5 +1,21 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# If yarn isn't usable (not in PATH, or asdf shim broken in non-interactive shell),
+# resolve node/yarn from asdf install paths using the script owner's home directory
+# so this works correctly even when run via sudo.
+if ! yarn --version &>/dev/null; then
+  _owner=$(stat -c '%U' "${BASH_SOURCE[0]}")
+  _owner_home=$(getent passwd "$_owner" | cut -d: -f6)
+  ASDF_INSTALLS="${ASDF_DATA_DIR:-$_owner_home/.asdf}/installs"
+  while IFS=' ' read -r _tool _ver; do
+    [[ "$_tool" == "nodejs" ]] && export PATH="$ASDF_INSTALLS/nodejs/$_ver/bin:$PATH"
+    [[ "$_tool" == "yarn"   ]] && export PATH="$ASDF_INSTALLS/yarn/$_ver/bin:$PATH"
+  done < "$SCRIPT_DIR/.tool-versions"
+fi
+
 PG_HOST_PORT=${1:-"6432"}
 SPOKE_DB="spoke"
 
