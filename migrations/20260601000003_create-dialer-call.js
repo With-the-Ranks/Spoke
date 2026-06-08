@@ -13,8 +13,7 @@ exports.up = function up(knex) {
       .integer("dialer_campaign_contact_id")
       .notNullable()
       .references("id")
-      .inTable("dialer_campaign_contact")
-      .onDelete("CASCADE");
+      .inTable("dialer_campaign_contact");
     table.integer("user_id").notNullable().references("id").inTable("user");
     table.text("telnyx_call_control_id").nullable();
     table.text("from_number").nullable();
@@ -30,7 +29,6 @@ exports.up = function up(knex) {
       ])
       .notNullable()
       .defaultTo("QUEUED");
-    table.text("disposition").nullable();
     table.timestamp("created_at").defaultTo(knex.fn.now()).notNullable();
     table.timestamp("ended_at").nullable();
     table.index("dialer_campaign_contact_id");

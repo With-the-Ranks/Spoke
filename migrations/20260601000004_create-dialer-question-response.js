@@ -33,6 +33,18 @@ exports.up = async function up(knex) {
     create unique index dialer_qr_step_contact_idx
       on dialer_question_response (interaction_step_id, dialer_campaign_contact_id)
       where is_deleted = false;
+
+    create index dialer_qr_interaction_step_id_idx
+      on dialer_question_response (interaction_step_id);
+
+    create index dialer_qr_is_deleted_idx
+      on dialer_question_response (is_deleted);
+
+    create trigger _500_dialer_question_response_updated_at
+      before update
+      on dialer_question_response
+      for each row
+      execute procedure universal_updated_at();
   `);
 };
 
@@ -40,6 +52,9 @@ exports.up = async function up(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function down(knex) {
+exports.down = async function down(knex) {
+  await knex.raw(`
+    drop trigger if exists _500_dialer_question_response_updated_at on dialer_question_response;
+  `);
   return knex.schema.dropTable("dialer_question_response");
 };

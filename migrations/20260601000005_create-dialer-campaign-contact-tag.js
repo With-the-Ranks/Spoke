@@ -6,31 +6,39 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function up(knex) {
-  return knex.schema.createTable("dialer_campaign_contact_tag", (table) => {
+exports.up = async function up(knex) {
+  await knex.schema.createTable("dialer_campaign_contact_tag", (table) => {
     table
       .integer("dialer_campaign_contact_id")
       .notNullable()
       .references("id")
-      .inTable("dialer_campaign_contact")
-      .onDelete("CASCADE");
-    table
-      .integer("tag_id")
-      .notNullable()
-      .references("id")
-      .inTable("all_tag")
-      .onDelete("CASCADE");
+      .inTable("dialer_campaign_contact");
+    table.integer("tag_id").notNullable().references("id").inTable("all_tag");
     table.integer("tagger_id").notNullable().references("id").inTable("user");
     table.timestamp("created_at").defaultTo(knex.fn.now()).notNullable();
     table.timestamp("updated_at").defaultTo(knex.fn.now());
     table.primary(["dialer_campaign_contact_id", "tag_id"]);
   });
+
+  await knex.raw(`
+    create index dialer_campaign_contact_tag_tag_id_idx
+      on dialer_campaign_contact_tag (tag_id);
+
+    create trigger _500_dialer_campaign_contact_tag_updated_at
+      before update
+      on dialer_campaign_contact_tag
+      for each row
+      execute procedure universal_updated_at();
+  `);
 };
 
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function down(knex) {
+exports.down = async function down(knex) {
+  await knex.raw(`
+    drop trigger if exists _500_dialer_campaign_contact_tag_updated_at on dialer_campaign_contact_tag;
+  `);
   return knex.schema.dropTable("dialer_campaign_contact_tag");
 };
