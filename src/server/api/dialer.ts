@@ -9,10 +9,10 @@ export const resolvers = {
     firstName: (c: DialerContactRecord) => c.first_name,
     lastName: (c: DialerContactRecord) => c.last_name,
     zip: (c: DialerContactRecord) => c.zip,
-    callStatus: (c: DialerContactRecord) => c.call_status,
+    callStatus: (c: DialerContactWithData) => c.callStatus,
     doNotCall: (c: DialerContactRecord) => c.do_not_call,
-    attemptCount: (c: DialerContactRecord) => c.attempt_count,
-    lastAttemptedAt: (c: DialerContactRecord) => c.last_attempted_at,
+    attemptCount: (c: DialerContactWithData) => c.attemptCount,
+    lastAttemptedAt: (c: DialerContactWithData) => c.lastAttemptedAt,
     customFields: (c: DialerContactRecord) => c.custom_fields,
     assignment: (
       c: DialerContactRecord,
@@ -35,7 +35,6 @@ export const resolvers = {
       c.dialer_campaign_contact_id,
     status: (c: DialerCallRecord) => c.status,
     fromNumber: (c: DialerCallRecord) => c.from_number,
-    disposition: (c: DialerCallRecord) => c.disposition,
     telnyxCallControlId: (c: DialerCallRecord) => c.telnyx_call_control_id,
     createdAt: (c: DialerCallRecord) => c.created_at,
     endedAt: (c: DialerCallRecord) => c.ended_at

@@ -3366,14 +3366,12 @@ const rootMutations = {
       {
         dialerCallId,
         status,
-        disposition,
         telnyxCallControlId,
         answeredAt,
         endedAt
       }: {
         dialerCallId: string;
         status?: string;
-        disposition?: string;
         telnyxCallControlId?: string;
         answeredAt?: string;
         endedAt?: string;
@@ -3382,7 +3380,6 @@ const rootMutations = {
     ) => {
       return updateDialerCall(dialerCallId, user, {
         status,
-        disposition,
         telnyxCallControlId,
         answeredAt,
         endedAt
