@@ -10,7 +10,19 @@ import type {
 import { getNumberForDial } from "./assemble-numbers";
 import { getMessagingServiceById } from "./message-sending";
 
+const ACTIVE_OR_FINAL_STATUSES = [
+  "QUEUED",
+  "DIALING",
+  "IN_PROGRESS",
+  "COMPLETED",
+  "VOICEMAIL",
+  "ERROR"
+];
+
 export interface DialerContactWithData extends DialerContactRecord {
+  callStatus: string;
+  attemptCount: number;
+  lastAttemptedAt: Date | null;
   interactionSteps: unknown[];
   questionResponseValues: unknown[];
   tags: unknown[];
@@ -19,7 +31,7 @@ export interface DialerContactWithData extends DialerContactRecord {
 export const getContactWithData = async (
   contact: DialerContactRecord
 ): Promise<DialerContactWithData> => {
-  const [questionResponses, tags, interactionSteps] = await Promise.all([
+  const [questionResponses, tags, interactionSteps, calls] = await Promise.all([
     r
       .reader("dialer_question_response")
       .join(
@@ -46,11 +58,18 @@ export const getContactWithData = async (
       .select("tag.*"),
     r
       .reader("interaction_step")
-      .where({ campaign_id: contact.campaign_id, is_deleted: false })
+      .where({ campaign_id: contact.campaign_id, is_deleted: false }),
+    r
+      .reader("dialer_call")
+      .where({ dialer_campaign_contact_id: contact.id })
+      .orderBy("created_at", "desc")
   ]);
 
   return {
     ...contact,
+    callStatus: calls[0]?.status ?? "NOT_ATTEMPTED",
+    attemptCount: calls.length,
+    lastAttemptedAt: calls[0]?.created_at ?? null,
     interactionSteps,
     tags,
     questionResponseValues: questionResponses.map((qr) => ({
@@ -98,7 +117,14 @@ export const getNextDialerContact = async (
       do_not_call: false,
       archived: false
     })
-    .whereIn("call_status", ["not_attempted", "no_answer"])
+    .whereNotExists(function (this: any) {
+      this.select(r.reader.raw(1))
+        .from("dialer_call")
+        .whereRaw(
+          "dialer_call.dialer_campaign_contact_id = dialer_campaign_contact.id"
+        )
+        .whereIn("dialer_call.status", ACTIVE_OR_FINAL_STATUSES);
+    })
     .orderBy("id", "asc")
     .first();
 
@@ -166,6 +192,17 @@ export const initiateCall = async (
     fromNumber = dialResult.fromNumber;
   }
 
+  // Guard against double-clicks: bail if an active call already exists.
+  const activeCall = await r
+    .knex("dialer_call")
+    .where({ dialer_campaign_contact_id: contact.id })
+    .whereIn("status", ["QUEUED", "DIALING", "IN_PROGRESS"])
+    .first("id");
+
+  if (activeCall) {
+    throw new UserInputError("This contact is already being called.");
+  }
+
   const [dialerCall] = (await r
     .knex("dialer_call")
     .insert({
@@ -176,11 +213,6 @@ export const initiateCall = async (
       created_at: new Date()
     })
     .returning("*")) as DialerCallRecord[];
-
-  await r
-    .knex("dialer_campaign_contact")
-    .where({ id: contact.id })
-    .update({ call_status: "in_progress" });
 
   return {
     dialerCallId: dialerCall.id,
@@ -194,7 +226,6 @@ export const updateDialerCall = async (
   user: Pick<UserRecord, "id" | "is_superadmin">,
   updates: {
     status?: string;
-    disposition?: string;
     telnyxCallControlId?: string;
   }
 ): Promise<DialerCallRecord> => {
@@ -210,8 +241,6 @@ export const updateDialerCall = async (
 
   const patch: Record<string, unknown> = {};
   if (updates.status !== undefined) patch.status = updates.status;
-  if (updates.disposition !== undefined)
-    patch.disposition = updates.disposition;
   if (updates.telnyxCallControlId !== undefined)
     patch.telnyx_call_control_id = updates.telnyxCallControlId;
 
@@ -264,15 +293,12 @@ export const markDialerContactComplete = async (
 ): Promise<DialerContactWithData> => {
   const contact = await assertContactAccess(dialerCampaignContactId, user);
 
-  const [updated] = (await r
-    .knex("dialer_campaign_contact")
-    .where({ id: contact.id })
-    .update({
-      call_status: callStatus,
-      attempt_count: r.knex.raw("attempt_count + 1"),
-      last_attempted_at: new Date()
-    })
-    .returning("*")) as DialerContactRecord[];
+  if (callStatus === "do_not_call") {
+    await r
+      .knex("dialer_campaign_contact")
+      .where({ id: contact.id })
+      .update({ do_not_call: true });
+  }
 
-  return getContactWithData(updated);
+  return getContactWithData(contact);
 };

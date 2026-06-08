@@ -3356,19 +3356,16 @@ const rootMutations = {
       {
         dialerCallId,
         status,
-        disposition,
         telnyxCallControlId
       }: {
         dialerCallId: string;
         status?: string;
-        disposition?: string;
         telnyxCallControlId?: string;
       },
       { user }: SpokeRequestContext
     ) => {
       return updateDialerCall(dialerCallId, user, {
         status,
-        disposition,
         telnyxCallControlId
       });
     },
