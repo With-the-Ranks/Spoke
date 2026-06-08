@@ -13,14 +13,12 @@ exports.up = async function up(knex) {
       .integer("dialer_campaign_contact_id")
       .notNullable()
       .references("id")
-      .inTable("dialer_campaign_contact")
-      .onDelete("CASCADE");
+      .inTable("dialer_campaign_contact");
     table
       .integer("interaction_step_id")
       .notNullable()
       .references("id")
-      .inTable("interaction_step")
-      .onDelete("CASCADE");
+      .inTable("interaction_step");
     table.text("value").notNullable();
     table.boolean("is_deleted").notNullable().defaultTo(false);
     table.timestamp("created_at").defaultTo(knex.fn.now()).notNullable();
