@@ -1,7 +1,6 @@
 /**
  * One row per call attempt against a dialer contact. The dialer analogue of the
- * `message` table. from_number records the caller ID used;
- * disposition is the volunteer-recorded outcome.
+ * `message` table. from_number records the caller ID used.
  *
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }

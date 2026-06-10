@@ -7,6 +7,7 @@ import { schema as campaignGroupSchema } from "./campaign-group";
 import { schema as campaignVariableSchema } from "./campaign-variable";
 import { schema as cannedResponseSchema } from "./canned-response";
 import { schema as conversationSchema } from "./conversations";
+import { schema as dialerSchema } from "./dialer";
 import { schema as externalActivistCodeSchema } from "./external-activist-code";
 import { schema as externalListSchema } from "./external-list";
 import { schema as externalResultCodeSchema } from "./external-result-code";
@@ -246,6 +247,9 @@ const rootSchema = `
   type RootQuery {
     currentUser: User
     organization(id:String!, utc:String): Organization
+    getNextDialerContact(assignmentId: String!): DialerCampaignContact
+    getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+    callShiftAvailable(organizationId: String!): Boolean!
     campaign(id:String!): Campaign
     inviteByHash(hash:String!): [Invite]
     contact(id:String!): CampaignContact
@@ -281,6 +285,11 @@ const rootSchema = `
 
   type RootMutation {
     createInvite(invite:InviteInput!): Invite
+    initiateCall(assignmentId: String!, dialerCampaignContactId: String!): InitiateCallResult!
+    updateDialerCall(dialerCallId: String!, status: String, telnyxCallControlId: String, answeredAt: String, endedAt: String): DialerCall!
+    saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
+    markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
+    requestCallShift(organizationId: String!): RequestCallShiftResult!
     createCampaign(campaign:CampaignInput!): Campaign
     createTemplateCampaign(organizationId: String!): Campaign!
     deleteTemplateCampaign(organizationId: String!, campaignId: String!): Boolean!
@@ -425,7 +434,8 @@ export const schema = [
   externalResponseOptionSchema,
   externalActivistCodeSchema,
   externalResultCodeSchema,
-  externalSyncConfigSchema
+  externalSyncConfigSchema,
+  dialerSchema
 ];
 
 export default rootSchema;
