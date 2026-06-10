@@ -4769,7 +4769,14 @@ CREATE INDEX dialer_campaign_contact_assignment_id_idx ON public.dialer_campaign
 -- Name: dialer_campaign_contact_campaign_id_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX dialer_campaign_contact_campaign_id_idx ON public.dialer_campaign_contact USING btree (campaign_id) WHERE (archived = false);
+CREATE INDEX dialer_campaign_contact_campaign_id_idx ON public.dialer_campaign_contact USING btree (campaign_id);
+
+
+--
+-- Name: dialer_campaign_contact_tag_contact_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_tag_contact_idx ON public.dialer_campaign_contact_tag USING btree (dialer_campaign_contact_id);
 
 
 --

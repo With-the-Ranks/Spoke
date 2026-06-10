@@ -21,6 +21,9 @@ exports.up = async function up(knex) {
   });
 
   await knex.raw(`
+    create index dialer_campaign_contact_tag_contact_idx
+      on dialer_campaign_contact_tag (dialer_campaign_contact_id);
+
     create index dialer_campaign_contact_tag_tag_id_idx
       on dialer_campaign_contact_tag (tag_id);
 
@@ -39,6 +42,8 @@ exports.up = async function up(knex) {
 exports.down = async function down(knex) {
   await knex.raw(`
     drop trigger if exists _500_dialer_campaign_contact_tag_updated_at on dialer_campaign_contact_tag;
+    drop index if exists dialer_campaign_contact_tag_contact_idx;
+    drop index if exists dialer_campaign_contact_tag_tag_id_idx;
   `);
   return knex.schema.dropTable("dialer_campaign_contact_tag");
 };
