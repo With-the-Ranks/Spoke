@@ -320,9 +320,54 @@ export const resolvers = {
         (todo) => todo.assignment_id
       );
 
+      // Call campaigns store contacts in dialer_campaign_contact (not
+      // campaign_contact), so the query above never surfaces them. Pull their
+      // assignments in directly; they carry no shadow counts (the dialer UI
+      // works off the contacts claimed into the shift). Only include an
+      // assignment that still has contacts in the volunteer's shift to call
+      // right now, otherwise the todo (and its "Start Calling" button)
+      // shouldn't appear.
+      const callAssignmentIds = await r
+        .reader("assignment")
+        .join("all_campaign", "all_campaign.id", "assignment.campaign_id")
+        .where({
+          "assignment.user_id": user.id,
+          "all_campaign.organization_id": organizationId,
+          "all_campaign.type": "call",
+          "all_campaign.is_started": true,
+          "all_campaign.is_archived": false
+        })
+        .whereExists(function shiftContactsExist() {
+          this.select(r.reader.raw(1))
+            .from("dialer_campaign_contact")
+            // Contacts claimed into this volunteer's shift.
+            .whereRaw("dialer_campaign_contact.assignment_id = assignment.id")
+            .where("dialer_campaign_contact.do_not_call", false)
+            .where("dialer_campaign_contact.archived", false)
+            .whereIn("dialer_campaign_contact.call_status", [
+              "not_attempted",
+              "no_answer"
+            ])
+            // Calling follows the same contact hours as texting: don't surface
+            // the todo when nobody is callable in their timezone right now.
+            .whereRaw(
+              "contact_is_textable_now(coalesce(dialer_campaign_contact.timezone, all_campaign.timezone), all_campaign.texting_hours_start, all_campaign.texting_hours_end, true)"
+            );
+        })
+        .pluck("assignment.id");
+
+      const assignmentIds = [
+        ...new Set([
+          ...Object.keys(shadowCountsByAssignmentId).map((id) =>
+            parseInt(id, 10)
+          ),
+          ...callAssignmentIds
+        ])
+      ];
+
       const assignments = await r
         .reader("assignment")
-        .whereIn("id", Object.keys(shadowCountsByAssignmentId))
+        .whereIn("id", assignmentIds)
         .orderBy("updated_at", "desc");
 
       return assignments.map((a) =>

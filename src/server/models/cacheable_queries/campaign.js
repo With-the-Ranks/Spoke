@@ -21,14 +21,18 @@ const { r } = thinky;
 
 const cacheKey = (id) => `${config.CACHE_PREFIX}campaign-${id}`;
 
-const dbCustomFields = async (id) => {
-  const campaignContact = await r
-    .reader("campaign_contact")
+const dbCustomFields = async (id, type) => {
+  const contact = await r
+    .reader(type === "call" ? "dialer_campaign_contact" : "campaign_contact")
     .where({ campaign_id: id })
     .first("custom_fields");
 
-  if (campaignContact) {
-    const customFields = JSON.parse(campaignContact.custom_fields || "{}");
+  if (contact) {
+    // campaign_contact.custom_fields is text; dialer_campaign_contact's is
+    // jsonb, which knex returns already parsed.
+    const raw = contact.custom_fields;
+    const customFields =
+      typeof raw === "string" ? JSON.parse(raw || "{}") : raw ?? {};
     return Object.keys(customFields);
   }
 
@@ -56,7 +60,7 @@ const loadDeep = async (id) => {
       await clear(id);
       return campaign;
     }
-    campaign.customFields = await dbCustomFields(id);
+    campaign.customFields = await dbCustomFields(id, campaign.type);
     campaign.interactionSteps = await dbInteractionSteps(id);
     // We should only cache organization data
     // if/when we can clear it on organization data changes

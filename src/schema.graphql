@@ -212,6 +212,9 @@ type OptOutByCampaign {
 type RootQuery {
   currentUser: User
   organization(id:String!, utc:String): Organization
+  getNextDialerContact(assignmentId: String!): DialerCampaignContact
+  getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+  callShiftAvailable(organizationId: String!): Boolean!
   campaign(id:String!): Campaign
   inviteByHash(hash:String!): [Invite]
   contact(id:String!): CampaignContact
@@ -247,6 +250,11 @@ input SecondPassInput {
 
 type RootMutation {
   createInvite(invite:InviteInput!): Invite
+  initiateCall(assignmentId: String!, dialerCampaignContactId: String!): InitiateCallResult!
+  updateDialerCall(dialerCallId: String!, status: String, telnyxCallControlId: String, answeredAt: String, endedAt: String): DialerCall!
+  saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
+  markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
+  requestCallShift(organizationId: String!): RequestCallShiftResult!
   createCampaign(campaign:CampaignInput!): Campaign
   createTemplateCampaign(organizationId: String!): Campaign!
   deleteTemplateCampaign(organizationId: String!, campaignId: String!): Boolean!
@@ -1473,4 +1481,58 @@ type ExternalSyncTagConfigEdge {
 type ExternalSyncTagConfigPage {
   edges: [ExternalSyncTagConfigEdge!]!
   pageInfo: RelayPageInfo!
+}
+
+
+
+type DialerCampaignContact {
+  id: ID!
+  campaignId: ID!
+  firstName: String!
+  lastName: String!
+  zip: String
+  callStatus: String!
+  doNotCall: Boolean!
+  attemptCount: Int!
+  lastAttemptedAt: Date
+  customFields: JSON!
+  assignment: Assignment
+  interactionSteps: [InteractionStep!]!
+  questionResponseValues: [DialerQuestionResponseValue!]!
+  tags: [Tag!]!
+}
+
+type DialerQuestionResponseValue {
+  id: ID!
+  interactionStepId: ID!
+  question: String!
+  value: String!
+}
+
+type DialerCall {
+  id: ID!
+  dialerCampaignContactId: ID!
+  status: String!
+  fromNumber: String
+  telnyxCallControlId: String
+  createdAt: Date!
+  answeredAt: Date
+  endedAt: Date
+}
+
+type InitiateCallResult {
+  dialerCallId: ID!
+  contactPhone: String!
+  fromNumber: String!
+}
+
+type RequestCallShiftResult {
+  assignmentId: ID
+  campaignId: ID
+  count: Int!
+}
+
+input DialerQuestionResponseInput {
+  interactionStepId: String!
+  value: String!
 }

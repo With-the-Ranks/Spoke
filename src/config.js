@@ -762,6 +762,26 @@ const validators = {
     desc: "Custom base URL for Switchboard client.",
     default: undefined
   }),
+  TELNYX_API_KEY: str({
+    desc:
+      "Telnyx API key (secret) used server-side to mint short-lived WebRTC access tokens. Never sent to the browser.",
+    default: undefined
+  }),
+  TELNYX_TELEPHONY_CREDENTIAL_ID: str({
+    desc:
+      "ID of a Telnyx telephony credential (tied to a SIP connection) that WebRTC access tokens are minted from.",
+    default: undefined
+  }),
+  TELNYX_DEFAULT_FROM_NUMBER: str({
+    desc:
+      "Caller ID number (E.164) used for dialer calls when not sourcing numbers from a messaging service (e.g. local/fakeservice testing). Must be a number owned by your Telnyx account.",
+    default: undefined
+  }),
+  DIALER_SHIFT_SIZE: num({
+    desc:
+      "Number of contacts assigned to a volunteer per call shift when they request calls.",
+    default: 10
+  }),
   VAN_BASE_URL: url({
     desc:
       "The base url to use when interacting with VAN (may need to change for international use)",
