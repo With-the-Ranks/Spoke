@@ -36,6 +36,11 @@ const cs = new pgp.helpers.ColumnSet(
   }
 );
 
+const dialerCs = new pgp.helpers.ColumnSet(
+  ["campaign_id", "first_name", "last_name", "cell", "zip", "custom_fields"],
+  { table: "dialer_campaign_contact" }
+);
+
 type CampaignContactInsertRow = Pick<
   CampaignContactRecord,
   | "campaign_id"
@@ -139,6 +144,14 @@ export const importContactCsvFromUrl: Task = async (
 
   await helpers.withPgClient(async (client) => {
     const {
+      rows: [campaign]
+    } = await client.query<{ type: string }>(
+      `select type from all_campaign where id = $1`,
+      [campaignId]
+    );
+    const isCallCampaign = campaign?.type === "call";
+
+    const {
       rows: [{ id: jobId }]
     } = await client.query<{ id: string }>(
       `
@@ -163,13 +176,20 @@ export const importContactCsvFromUrl: Task = async (
     );
 
     await withTransaction(client, async (trx) => {
-      await trx.query(
-        `update campaign set external_system_id = null, landlines_filtered = false where id = $1`,
-        [campaignId]
-      );
-      await trx.query(`delete from campaign_contact where campaign_id = $1`, [
-        campaignId
-      ]);
+      if (isCallCampaign) {
+        await trx.query(
+          `delete from dialer_campaign_contact where campaign_id = $1`,
+          [campaignId]
+        );
+      } else {
+        await trx.query(
+          `update campaign set external_system_id = null, landlines_filtered = false where id = $1`,
+          [campaignId]
+        );
+        await trx.query(`delete from campaign_contact where campaign_id = $1`, [
+          campaignId
+        ]);
+      }
 
       const accumulator: CampaignContactInsertRow[] = [];
       for await (const row of csvStream) {
@@ -181,16 +201,30 @@ export const importContactCsvFromUrl: Task = async (
         []
       );
 
-      await insertBatch(trx, validatedData);
-
-      const optOutCount = await deleteOptedOutContacts(trx, campaignId);
+      let optOutCount = 0;
+      if (isCallCampaign) {
+        const dialerRows = validatedData.map((r) => ({
+          campaign_id: r.campaign_id,
+          first_name: r.first_name,
+          last_name: r.last_name,
+          cell: r.cell,
+          zip: r.zip ?? null,
+          custom_fields: r.custom_fields
+        }));
+        if (dialerRows.length > 0) {
+          const query = pgp.helpers.insert(dialerRows, dialerCs);
+          await trx.query(query);
+        }
+      } else {
+        await insertBatch(trx, validatedData);
+        optOutCount = await deleteOptedOutContacts(trx, campaignId);
+      }
 
       const jobMessages = await getContactResultMessage({
         ...validationStats,
         optOutCount
       });
 
-      // Always set a result message to mark the job as complete
       const message =
         jobMessages.length > 0
           ? jobMessages.join("\n")

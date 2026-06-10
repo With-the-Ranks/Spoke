@@ -12,8 +12,18 @@ import { r } from "../models";
 import { getCampaigns } from "./campaign";
 import { queryCampaignOverlaps } from "./campaign-overlap";
 import { getConversations } from "./conversations";
-import { accessRequired, authRequired, superAdminRequired } from "./errors";
+import {
+  accessRequired,
+  assignmentRequired,
+  authRequired,
+  superAdminRequired
+} from "./errors";
 import { getStepsToUpdate } from "./lib/bulk-script-editor";
+import {
+  callShiftsAvailable,
+  getDialerContact,
+  getNextDialerContact
+} from "./lib/dialer";
 import { formatPage } from "./lib/pagination";
 import { getUsers, getUsersById } from "./user";
 
@@ -524,6 +534,28 @@ const rootResolvers = {
         };
       });
     },
+    getNextDialerContact: async (_root, { assignmentId }, { user }) => {
+      await assignmentRequired(user, assignmentId);
+      return getNextDialerContact(assignmentId);
+    },
+
+    getDialerContact: async (
+      _root,
+      { dialerCampaignContactId }: { dialerCampaignContactId: string },
+      { user }
+    ) => {
+      return getDialerContact(dialerCampaignContactId, user);
+    },
+
+    callShiftAvailable: async (
+      _root,
+      { organizationId }: { organizationId: string },
+      { user }
+    ) => {
+      await accessRequired(user, organizationId, "TEXTER");
+      return callShiftsAvailable(organizationId);
+    },
+
     isValidAttachment: async (_root, { fileUrl }, _context) => {
       // 2025-03-25: @npcz/magic is throwing an uncatachable exception
       // skip file type validation for now

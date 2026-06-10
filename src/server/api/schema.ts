@@ -11,6 +11,7 @@ import { resolvers as campaignGroupResolvers } from "./campaign-group";
 import { resolvers as campaignVariableResolvers } from "./campaign-variable";
 import { resolvers as cannedResponseResolvers } from "./canned-response";
 import { resolvers as conversationsResolver } from "./conversations";
+import { resolvers as dialerResolvers } from "./dialer";
 import { resolvers as externalActivistCodeResolvers } from "./external-activist-code";
 import { resolvers as externalListResolvers } from "./external-list";
 import { resolvers as externalResultCodeResolvers } from "./external-result-code";
@@ -76,6 +77,7 @@ export const resolvers = {
   ...{ Upload: GraphQLUpload },
   ...questionResolvers,
   ...conversationsResolver,
+  ...dialerResolvers,
   ...rootMutations
 };
 

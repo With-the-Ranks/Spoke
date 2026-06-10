@@ -5,7 +5,7 @@ export class SendTimeMessagingError extends GraphQLError {}
 
 export class OutsideTextingHoursError extends SendTimeMessagingError {
   constructor() {
-    super("Outside permitted texting time for this recipient");
+    super("Outside permitted contact time for this recipient");
   }
 }
 

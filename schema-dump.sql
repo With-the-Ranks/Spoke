@@ -225,7 +225,6 @@ CREATE TABLE public.all_campaign (
     autosend_limit integer,
     type text DEFAULT 'sms'::text NOT NULL,
     CONSTRAINT all_campaign_type_check CHECK ((type = ANY (ARRAY['sms'::text, 'call'::text]))),
-    CONSTRAINT call_campaigns_no_autoassign CHECK (((type <> 'call'::text) OR (is_autoassign_enabled = false))),
     CONSTRAINT call_campaigns_no_autosend CHECK (((type <> 'call'::text) OR (autosend_status = 'unstarted'::text))),
     CONSTRAINT call_campaigns_no_stale_release CHECK (((type <> 'call'::text) OR (replies_stale_after_minutes IS NULL))),
     CONSTRAINT campaign_autosend_status_check CHECK ((autosend_status = ANY (ARRAY['unstarted'::text, 'sending'::text, 'paused'::text, 'complete'::text])))
@@ -2192,6 +2191,7 @@ CREATE TABLE public.dialer_call (
     status text DEFAULT 'QUEUED'::text NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     ended_at timestamp with time zone,
+    answered_at timestamp with time zone,
     CONSTRAINT dialer_call_status_check CHECK ((status = ANY (ARRAY['QUEUED'::text, 'DIALING'::text, 'IN_PROGRESS'::text, 'COMPLETED'::text, 'NO_ANSWER'::text, 'VOICEMAIL'::text, 'ERROR'::text])))
 );
 
@@ -2238,7 +2238,10 @@ CREATE TABLE public.dialer_campaign_contact (
     do_not_call boolean DEFAULT false NOT NULL,
     archived boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    call_status text DEFAULT 'not_attempted'::text NOT NULL,
+    attempt_count integer DEFAULT 0 NOT NULL,
+    last_attempted_at timestamp with time zone
 );
 
 
@@ -4769,14 +4772,7 @@ CREATE INDEX dialer_campaign_contact_assignment_id_idx ON public.dialer_campaign
 -- Name: dialer_campaign_contact_campaign_id_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX dialer_campaign_contact_campaign_id_idx ON public.dialer_campaign_contact USING btree (campaign_id);
-
-
---
--- Name: dialer_campaign_contact_tag_contact_idx; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX dialer_campaign_contact_tag_contact_idx ON public.dialer_campaign_contact_tag USING btree (dialer_campaign_contact_id);
+CREATE INDEX dialer_campaign_contact_campaign_id_idx ON public.dialer_campaign_contact USING btree (campaign_id) WHERE (archived = false);
 
 
 --
