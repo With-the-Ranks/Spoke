@@ -18,6 +18,7 @@ query getCampaign($campaignId: String!) {
   campaign(id: $campaignId) {
     id
     title
+    campaignType
     dueBy
     isArchived
     isStarted

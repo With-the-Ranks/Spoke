@@ -1183,6 +1183,24 @@ export const resolvers = {
         .reader("campaign")
         .where({ id: assignment.campaign_id })
         .first();
+
+      // Call campaigns store contacts in dialer_campaign_contact, which has no
+      // message_status. Map the form's "needsMessage" filter (not yet handled)
+      // to call_status = 'not_attempted' (not yet called).
+      if (campaign.type === "call") {
+        let query = r
+          .reader("dialer_campaign_contact")
+          .where({
+            campaign_id: campaign.id,
+            assignment_id: assignment.id
+          })
+          .whereRaw(`archived = ${campaign.is_archived}`);
+        if (contactsFilter && contactsFilter.messageStatus === "needsMessage") {
+          query = query.where("call_status", "not_attempted");
+        }
+        return r.getCount(query);
+      }
+
       const organization = await r
         .reader("organization")
         .where({ id: campaign.organization_id })

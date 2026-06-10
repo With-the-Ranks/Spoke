@@ -8,6 +8,7 @@ import CampaignStat from "./CampaignStat";
 
 export const TopLineStats = (props) => {
   const {
+    campaignType,
     contactsCount,
     assignments,
     needsMessageCount,
@@ -16,6 +17,8 @@ export const TopLineStats = (props) => {
     optOutsCount,
     percentUnhandledReplies
   } = props;
+
+  const isCallCampaign = campaignType === "CALL";
 
   const highUnhandledReplyPercent = 25;
   const campaignPercent =
@@ -34,7 +37,7 @@ export const TopLineStats = (props) => {
       </Grid>
       <Grid item xs={2}>
         <CampaignStat
-          title="Texters"
+          title="Volunteers"
           loading={assignments.loading}
           error={assignments.errors && assignments.errors.message}
           count={
@@ -42,20 +45,22 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
+      {!isCallCampaign && (
+        <Grid item xs={2}>
+          <CampaignStat
+            title="Initials To Send"
+            loading={needsMessageCount.loading}
+            error={needsMessageCount.errors && needsMessageCount.errors.message}
+            count={
+              needsMessageCount.campaign &&
+              needsMessageCount.campaign.stats.countNeedsMessageContacts
+            }
+          />
+        </Grid>
+      )}
       <Grid item xs={2}>
         <CampaignStat
-          title="Initials To Send"
-          loading={needsMessageCount.loading}
-          error={needsMessageCount.errors && needsMessageCount.errors.message}
-          count={
-            needsMessageCount.campaign &&
-            needsMessageCount.campaign.stats.countNeedsMessageContacts
-          }
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <CampaignStat
-          title="Sent"
+          title={isCallCampaign ? "Called" : "Sent"}
           loading={sentMessagesCount.loading}
           error={sentMessagesCount.errors && sentMessagesCount.errors.message}
           count={
@@ -64,20 +69,23 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
-      <Grid item xs={2}>
-        <CampaignStat
-          title="Replies"
-          loading={receivedMessagesCount.loading}
-          error={
-            receivedMessagesCount.errors && receivedMessagesCount.errors.message
-          }
-          count={
-            receivedMessagesCount.campaign &&
-            receivedMessagesCount.campaign.stats.receivedMessagesCount
-          }
-          highlight={replyHighlight}
-        />
-      </Grid>
+      {!isCallCampaign && (
+        <Grid item xs={2}>
+          <CampaignStat
+            title="Replies"
+            loading={receivedMessagesCount.loading}
+            error={
+              receivedMessagesCount.errors &&
+              receivedMessagesCount.errors.message
+            }
+            count={
+              receivedMessagesCount.campaign &&
+              receivedMessagesCount.campaign.stats.receivedMessagesCount
+            }
+            highlight={replyHighlight}
+          />
+        </Grid>
+      )}
       <Grid item xs={2}>
         <CampaignStat
           title="Opt-outs"
@@ -93,7 +101,8 @@ export const TopLineStats = (props) => {
 };
 
 TopLineStats.propTypes = {
-  campaignId: PropTypes.string.isRequired
+  campaignId: PropTypes.string.isRequired,
+  campaignType: PropTypes.string
 };
 
 const queries = {

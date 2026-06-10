@@ -398,8 +398,12 @@ export const resolvers = {
     integration: () => true,
     contacts: (campaign) =>
       r
-        .reader("campaign_contact")
-        .select("campaign_contact.id")
+        .reader(
+          campaign.type === "call"
+            ? "dialer_campaign_contact"
+            : "campaign_contact"
+        )
+        .select("id")
         .where({ campaign_id: campaign.id })
         .limit(1)
         .then((records) => records.length > 0),

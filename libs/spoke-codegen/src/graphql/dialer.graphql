@@ -1,0 +1,129 @@
+fragment DialerContactCore on DialerCampaignContact {
+  id
+  campaignId
+  firstName
+  lastName
+  zip
+  callStatus
+  doNotCall
+  attemptCount
+  lastAttemptedAt
+  customFields
+  questionResponseValues {
+    id
+    interactionStepId
+    question
+    value
+  }
+  tags {
+    id
+    title
+    description
+    confirmationSteps
+    onApplyScript
+    textColor
+    backgroundColor
+    isAssignable
+    isSystem
+  }
+  interactionSteps {
+    id
+    questionText
+    scriptOptions
+    answerOption
+    parentInteractionId
+    isDeleted
+    answerActions
+    question {
+      text
+      answerOptions {
+        value
+        nextInteractionStep {
+          id
+          scriptOptions
+        }
+      }
+    }
+  }
+}
+
+query GetNextDialerContact($assignmentId: String!) {
+  getNextDialerContact(assignmentId: $assignmentId) {
+    ...DialerContactCore
+  }
+}
+
+query GetDialerContact($dialerCampaignContactId: String!) {
+  getDialerContact(dialerCampaignContactId: $dialerCampaignContactId) {
+    ...DialerContactCore
+  }
+}
+
+mutation InitiateCall($assignmentId: String!, $dialerCampaignContactId: String!) {
+  initiateCall(assignmentId: $assignmentId, dialerCampaignContactId: $dialerCampaignContactId) {
+    dialerCallId
+    contactPhone
+    fromNumber
+  }
+}
+
+mutation UpdateDialerCall(
+  $dialerCallId: String!
+  $status: String
+  $telnyxCallControlId: String
+  $answeredAt: String
+  $endedAt: String
+) {
+  updateDialerCall(
+    dialerCallId: $dialerCallId
+    status: $status
+    telnyxCallControlId: $telnyxCallControlId
+    answeredAt: $answeredAt
+    endedAt: $endedAt
+  ) {
+    id
+    status
+    telnyxCallControlId
+    answeredAt
+    endedAt
+  }
+}
+
+mutation SaveDialerQuestionResponses(
+  $dialerCampaignContactId: String!
+  $questionResponses: [DialerQuestionResponseInput!]!
+) {
+  saveDialerQuestionResponses(
+    dialerCampaignContactId: $dialerCampaignContactId
+    questionResponses: $questionResponses
+  ) {
+    ...DialerContactCore
+  }
+}
+
+mutation MarkDialerContactComplete(
+  $dialerCampaignContactId: String!
+  $callStatus: String!
+) {
+  markDialerContactComplete(
+    dialerCampaignContactId: $dialerCampaignContactId
+    callStatus: $callStatus
+  ) {
+    id
+    callStatus
+    attemptCount
+    lastAttemptedAt
+  }
+}
+
+query CallShiftAvailable($organizationId: String!) {
+  callShiftAvailable(organizationId: $organizationId)
+}
+
+mutation RequestCallShift($organizationId: String!) {
+  requestCallShift(organizationId: $organizationId) {
+    assignmentId
+    campaignId
+    count
+  }
+}
