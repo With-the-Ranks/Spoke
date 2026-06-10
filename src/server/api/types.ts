@@ -1,3 +1,4 @@
+import type { CampaignType } from "@spoke/spoke-codegen";
 import type { JobHelpers } from "graphile-worker";
 
 export enum ActionType {
@@ -126,6 +127,7 @@ export interface CampaignRecord {
   messaging_service_sid: string | null;
   column_mapping: string | null;
   contacts_filename: string | null;
+  type: Lowercase<CampaignType>;
 }
 
 export interface CampaignVariableRecord {

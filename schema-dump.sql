@@ -223,6 +223,11 @@ CREATE TABLE public.all_campaign (
     is_template boolean DEFAULT false NOT NULL,
     messaging_service_sid text,
     autosend_limit integer,
+    type text DEFAULT 'sms'::text NOT NULL,
+    CONSTRAINT all_campaign_type_check CHECK ((type = ANY (ARRAY['sms'::text, 'call'::text]))),
+    CONSTRAINT call_campaigns_no_autoassign CHECK (((type <> 'call'::text) OR (is_autoassign_enabled = false))),
+    CONSTRAINT call_campaigns_no_autosend CHECK (((type <> 'call'::text) OR (autosend_status = 'unstarted'::text))),
+    CONSTRAINT call_campaigns_no_stale_release CHECK (((type <> 'call'::text) OR (replies_stale_after_minutes IS NULL))),
     CONSTRAINT campaign_autosend_status_check CHECK ((autosend_status = ANY (ARRAY['unstarted'::text, 'sending'::text, 'paused'::text, 'complete'::text])))
 );
 
@@ -290,6 +295,25 @@ CREATE FUNCTION public.cascade_archived_to_campaign_contacts() RETURNS trigger
 
 
 ALTER FUNCTION public.cascade_archived_to_campaign_contacts() OWNER TO postgres;
+
+--
+-- Name: cascade_archived_to_dialer_campaign_contacts(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.cascade_archived_to_dialer_campaign_contacts() RETURNS trigger
+    LANGUAGE plpgsql STRICT
+    SET search_path TO '$user', 'public'
+    AS $$
+    begin
+      update dialer_campaign_contact
+      set archived = NEW.is_archived
+      where campaign_id = NEW.id;
+      return NEW;
+    end;
+    $$;
+
+
+ALTER FUNCTION public.cascade_archived_to_dialer_campaign_contacts() OWNER TO postgres;
 
 --
 -- Name: contact_is_textable_now(text, integer, integer, boolean); Type: FUNCTION; Schema: public; Owner: postgres
@@ -1524,7 +1548,8 @@ CREATE VIEW public.campaign AS
     all_campaign.autosend_status,
     all_campaign.autosend_user_id,
     all_campaign.messaging_service_sid,
-    all_campaign.autosend_limit
+    all_campaign.autosend_limit,
+    all_campaign.type
    FROM public.all_campaign
   WHERE (all_campaign.is_template = false);
 
@@ -2152,6 +2177,147 @@ ALTER TABLE public.deliverability_report_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE public.deliverability_report_id_seq OWNED BY public.deliverability_report.id;
+
+
+--
+-- Name: dialer_call; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dialer_call (
+    id integer NOT NULL,
+    dialer_campaign_contact_id integer NOT NULL,
+    user_id integer NOT NULL,
+    telnyx_call_control_id text,
+    from_number text,
+    status text DEFAULT 'QUEUED'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    ended_at timestamp with time zone,
+    CONSTRAINT dialer_call_status_check CHECK ((status = ANY (ARRAY['QUEUED'::text, 'DIALING'::text, 'IN_PROGRESS'::text, 'COMPLETED'::text, 'NO_ANSWER'::text, 'VOICEMAIL'::text, 'ERROR'::text])))
+);
+
+
+ALTER TABLE public.dialer_call OWNER TO postgres;
+
+--
+-- Name: dialer_call_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.dialer_call_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.dialer_call_id_seq OWNER TO postgres;
+
+--
+-- Name: dialer_call_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.dialer_call_id_seq OWNED BY public.dialer_call.id;
+
+
+--
+-- Name: dialer_campaign_contact; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dialer_campaign_contact (
+    id integer NOT NULL,
+    campaign_id integer NOT NULL,
+    assignment_id integer,
+    external_id text,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    cell text NOT NULL,
+    zip text,
+    timezone text,
+    custom_fields text DEFAULT '{}'::text NOT NULL,
+    do_not_call boolean DEFAULT false NOT NULL,
+    archived boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.dialer_campaign_contact OWNER TO postgres;
+
+--
+-- Name: dialer_campaign_contact_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.dialer_campaign_contact_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.dialer_campaign_contact_id_seq OWNER TO postgres;
+
+--
+-- Name: dialer_campaign_contact_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.dialer_campaign_contact_id_seq OWNED BY public.dialer_campaign_contact.id;
+
+
+--
+-- Name: dialer_campaign_contact_tag; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dialer_campaign_contact_tag (
+    dialer_campaign_contact_id integer NOT NULL,
+    tag_id integer NOT NULL,
+    tagger_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.dialer_campaign_contact_tag OWNER TO postgres;
+
+--
+-- Name: dialer_question_response; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.dialer_question_response (
+    id integer NOT NULL,
+    dialer_campaign_contact_id integer NOT NULL,
+    interaction_step_id integer NOT NULL,
+    value text NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.dialer_question_response OWNER TO postgres;
+
+--
+-- Name: dialer_question_response_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.dialer_question_response_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.dialer_question_response_id_seq OWNER TO postgres;
+
+--
+-- Name: dialer_question_response_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.dialer_question_response_id_seq OWNED BY public.dialer_question_response.id;
 
 
 --
@@ -3556,6 +3722,27 @@ ALTER TABLE ONLY public.deliverability_report ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: dialer_call id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_call ALTER COLUMN id SET DEFAULT nextval('public.dialer_call_id_seq'::regclass);
+
+
+--
+-- Name: dialer_campaign_contact id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact ALTER COLUMN id SET DEFAULT nextval('public.dialer_campaign_contact_id_seq'::regclass);
+
+
+--
+-- Name: dialer_question_response id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_question_response ALTER COLUMN id SET DEFAULT nextval('public.dialer_question_response_id_seq'::regclass);
+
+
+--
 -- Name: filtered_contact id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -3883,6 +4070,46 @@ ALTER TABLE ONLY public.canned_response
 
 ALTER TABLE ONLY public.deliverability_report
     ADD CONSTRAINT deliverability_report_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dialer_call dialer_call_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_call
+    ADD CONSTRAINT dialer_call_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dialer_campaign_contact dialer_campaign_contact_cell_campaign_id_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact
+    ADD CONSTRAINT dialer_campaign_contact_cell_campaign_id_unique UNIQUE (cell, campaign_id);
+
+
+--
+-- Name: dialer_campaign_contact dialer_campaign_contact_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact
+    ADD CONSTRAINT dialer_campaign_contact_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dialer_campaign_contact_tag dialer_campaign_contact_tag_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact_tag
+    ADD CONSTRAINT dialer_campaign_contact_tag_pkey PRIMARY KEY (dialer_campaign_contact_id, tag_id);
+
+
+--
+-- Name: dialer_question_response dialer_question_response_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_question_response
+    ADD CONSTRAINT dialer_question_response_pkey PRIMARY KEY (id);
 
 
 --
@@ -4518,6 +4745,83 @@ CREATE INDEX deliverability_report_url_path_index ON public.deliverability_repor
 
 
 --
+-- Name: dialer_call_contact_status_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_call_contact_status_idx ON public.dialer_call USING btree (dialer_campaign_contact_id, status);
+
+
+--
+-- Name: dialer_call_created_at_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_call_created_at_idx ON public.dialer_call USING btree (created_at);
+
+
+--
+-- Name: dialer_campaign_contact_assignment_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_assignment_id_idx ON public.dialer_campaign_contact USING btree (assignment_id) WHERE (archived = false);
+
+
+--
+-- Name: dialer_campaign_contact_campaign_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_campaign_id_idx ON public.dialer_campaign_contact USING btree (campaign_id);
+
+
+--
+-- Name: dialer_campaign_contact_tag_contact_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_tag_contact_idx ON public.dialer_campaign_contact_tag USING btree (dialer_campaign_contact_id);
+
+
+--
+-- Name: dialer_campaign_contact_tag_tag_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_tag_tag_id_idx ON public.dialer_campaign_contact_tag USING btree (tag_id);
+
+
+--
+-- Name: dialer_campaign_contact_todos_partial_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_campaign_contact_todos_partial_idx ON public.dialer_campaign_contact USING btree (campaign_id, assignment_id, do_not_call) WHERE (archived = false);
+
+
+--
+-- Name: dialer_qr_interaction_step_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_qr_interaction_step_id_idx ON public.dialer_question_response USING btree (interaction_step_id);
+
+
+--
+-- Name: dialer_qr_is_deleted_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_qr_is_deleted_idx ON public.dialer_question_response USING btree (is_deleted);
+
+
+--
+-- Name: dialer_qr_step_contact_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX dialer_qr_step_contact_idx ON public.dialer_question_response USING btree (interaction_step_id, dialer_campaign_contact_id) WHERE (is_deleted = false);
+
+
+--
+-- Name: dialer_question_response_dialer_campaign_contact_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX dialer_question_response_dialer_campaign_contact_id_index ON public.dialer_question_response USING btree (dialer_campaign_contact_id);
+
+
+--
 -- Name: filtered_contact_campaign_id_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -4973,6 +5277,34 @@ CREATE TRIGGER _500_cascade_archived_campaign AFTER UPDATE ON public.all_campaig
 
 
 --
+-- Name: all_campaign _500_cascade_archived_dialer_campaign; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER _500_cascade_archived_dialer_campaign AFTER UPDATE ON public.all_campaign FOR EACH ROW WHEN ((new.is_archived IS DISTINCT FROM old.is_archived)) EXECUTE FUNCTION public.cascade_archived_to_dialer_campaign_contacts();
+
+
+--
+-- Name: dialer_campaign_contact_tag _500_dialer_campaign_contact_tag_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER _500_dialer_campaign_contact_tag_updated_at BEFORE UPDATE ON public.dialer_campaign_contact_tag FOR EACH ROW EXECUTE FUNCTION public.universal_updated_at();
+
+
+--
+-- Name: dialer_campaign_contact _500_dialer_campaign_contact_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER _500_dialer_campaign_contact_updated_at BEFORE UPDATE ON public.dialer_campaign_contact FOR EACH ROW EXECUTE FUNCTION public.universal_updated_at();
+
+
+--
+-- Name: dialer_question_response _500_dialer_question_response_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER _500_dialer_question_response_updated_at BEFORE UPDATE ON public.dialer_question_response FOR EACH ROW EXECUTE FUNCTION public.universal_updated_at();
+
+
+--
 -- Name: external_activist_code _500_external_activist_code_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -5379,6 +5711,78 @@ ALTER TABLE ONLY public.canned_response
 
 ALTER TABLE ONLY public.canned_response
     ADD CONSTRAINT canned_response_user_id_foreign FOREIGN KEY (user_id) REFERENCES public."user"(id);
+
+
+--
+-- Name: dialer_call dialer_call_dialer_campaign_contact_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_call
+    ADD CONSTRAINT dialer_call_dialer_campaign_contact_id_foreign FOREIGN KEY (dialer_campaign_contact_id) REFERENCES public.dialer_campaign_contact(id);
+
+
+--
+-- Name: dialer_call dialer_call_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_call
+    ADD CONSTRAINT dialer_call_user_id_foreign FOREIGN KEY (user_id) REFERENCES public."user"(id);
+
+
+--
+-- Name: dialer_campaign_contact dialer_campaign_contact_assignment_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact
+    ADD CONSTRAINT dialer_campaign_contact_assignment_id_foreign FOREIGN KEY (assignment_id) REFERENCES public.assignment(id);
+
+
+--
+-- Name: dialer_campaign_contact dialer_campaign_contact_campaign_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact
+    ADD CONSTRAINT dialer_campaign_contact_campaign_id_foreign FOREIGN KEY (campaign_id) REFERENCES public.all_campaign(id);
+
+
+--
+-- Name: dialer_campaign_contact_tag dialer_campaign_contact_tag_dialer_campaign_contact_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact_tag
+    ADD CONSTRAINT dialer_campaign_contact_tag_dialer_campaign_contact_id_foreign FOREIGN KEY (dialer_campaign_contact_id) REFERENCES public.dialer_campaign_contact(id);
+
+
+--
+-- Name: dialer_campaign_contact_tag dialer_campaign_contact_tag_tag_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact_tag
+    ADD CONSTRAINT dialer_campaign_contact_tag_tag_id_foreign FOREIGN KEY (tag_id) REFERENCES public.all_tag(id);
+
+
+--
+-- Name: dialer_campaign_contact_tag dialer_campaign_contact_tag_tagger_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_campaign_contact_tag
+    ADD CONSTRAINT dialer_campaign_contact_tag_tagger_id_foreign FOREIGN KEY (tagger_id) REFERENCES public."user"(id);
+
+
+--
+-- Name: dialer_question_response dialer_question_response_dialer_campaign_contact_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_question_response
+    ADD CONSTRAINT dialer_question_response_dialer_campaign_contact_id_foreign FOREIGN KEY (dialer_campaign_contact_id) REFERENCES public.dialer_campaign_contact(id);
+
+
+--
+-- Name: dialer_question_response dialer_question_response_interaction_step_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.dialer_question_response
+    ADD CONSTRAINT dialer_question_response_interaction_step_id_foreign FOREIGN KEY (interaction_step_id) REFERENCES public.interaction_step(id);
 
 
 --

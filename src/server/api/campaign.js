@@ -435,6 +435,7 @@ export const resolvers = {
 
       return hasSteps && !hasIncompleteSteps && invalidFields.length === 0;
     },
+    campaignType: () => true,
     campaignGroups: () => true,
     campaignVariables: (campaign) =>
       r
@@ -491,6 +492,7 @@ export const resolvers = {
       "autosendLimit",
       "columnMapping"
     ]),
+    campaignType: (campaign) => campaign.type.toUpperCase(),
     isApproved: (campaign) =>
       isNil(campaign.is_approved) ? false : campaign.is_approved,
     isTemplate: (campaign) =>
