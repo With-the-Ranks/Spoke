@@ -289,6 +289,7 @@ const rootSchema = `
     updateDialerCall(dialerCallId: String!, status: String, telnyxCallControlId: String, answeredAt: String, endedAt: String): DialerCall!
     saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
     markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
+    tagDialerContact(dialerCampaignContactId: String!, tag: ContactTagActionInput!): DialerCampaignContact!
     requestCallShift(organizationId: String!): RequestCallShiftResult!
     createCampaign(campaign:CampaignInput!): Campaign
     createTemplateCampaign(organizationId: String!): Campaign!

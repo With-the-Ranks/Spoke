@@ -114,6 +114,7 @@ const VolunteerDialer: React.FC = () => {
         key={`${contact!.id}-${fetchKey}`}
         contact={contact!}
         assignmentId={assignmentId}
+        organizationId={organizationId}
         onNextContact={handleNextContact}
       />
     </div>

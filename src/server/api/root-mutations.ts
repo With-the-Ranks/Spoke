@@ -67,6 +67,7 @@ import {
   initiateCall,
   markDialerContactComplete,
   saveDialerQuestionResponses,
+  tagDialerContact,
   updateDialerCall
 } from "./lib/dialer";
 import { getSecondPassCampaign } from "./lib/mark-second-pass";
@@ -3415,6 +3416,25 @@ const rootMutations = {
       return markDialerContactComplete(
         dialerCampaignContactId,
         callStatus,
+        user
+      );
+    },
+
+    tagDialerContact: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        tag
+      }: {
+        dialerCampaignContactId: string;
+        tag: { addedTagIds: string[]; removedTagIds: string[] };
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return tagDialerContact(
+        dialerCampaignContactId,
+        tag.addedTagIds,
+        tag.removedTagIds,
         user
       );
     }

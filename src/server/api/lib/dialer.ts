@@ -461,3 +461,41 @@ export const markDialerContactComplete = async (
 
   return getContactWithData(updated);
 };
+
+// Apply/remove tags on a dialer contact. Mirrors tagConversation for texting,
+// but writes to dialer_campaign_contact_tag (the dialer reuses the shared tag
+// vocabulary). The escalation/auto-message behavior of texting tagging does not
+// apply to calls, so this only adjusts the tag set.
+export const tagDialerContact = async (
+  dialerCampaignContactId: string,
+  addedTagIds: string[],
+  removedTagIds: string[],
+  user: Pick<UserRecord, "id" | "is_superadmin">
+): Promise<DialerContactWithData> => {
+  const contact = await assertContactAccess(dialerCampaignContactId, user);
+
+  if (removedTagIds.length > 0) {
+    await r
+      .knex("dialer_campaign_contact_tag")
+      .where({ dialer_campaign_contact_id: contact.id })
+      .whereIn("tag_id", removedTagIds)
+      .del();
+  }
+
+  if (addedTagIds.length > 0) {
+    await r
+      .knex("dialer_campaign_contact_tag")
+      .insert(
+        addedTagIds.map((tagId) => ({
+          dialer_campaign_contact_id: contact.id,
+          tag_id: parseInt(tagId, 10),
+          tagger_id: user.id
+        }))
+      )
+      // Composite PK (contact, tag): re-applying an existing tag is a no-op.
+      .onConflict(["dialer_campaign_contact_id", "tag_id"])
+      .ignore();
+  }
+
+  return getContactWithData(contact);
+};

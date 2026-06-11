@@ -116,6 +116,29 @@ mutation MarkDialerContactComplete(
   }
 }
 
+mutation TagDialerContact(
+  $dialerCampaignContactId: String!
+  $tag: ContactTagActionInput!
+) {
+  tagDialerContact(
+    dialerCampaignContactId: $dialerCampaignContactId
+    tag: $tag
+  ) {
+    id
+    tags {
+      id
+      title
+      description
+      confirmationSteps
+      onApplyScript
+      textColor
+      backgroundColor
+      isAssignable
+      isSystem
+    }
+  }
+}
+
 query CallShiftAvailable($organizationId: String!) {
   callShiftAvailable(organizationId: $organizationId)
 }

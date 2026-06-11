@@ -1,5 +1,6 @@
 import Button from "@material-ui/core/Button";
 import ButtonBase from "@material-ui/core/ButtonBase";
+import Chip from "@material-ui/core/Chip";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -14,6 +15,7 @@ import {
   useInitiateCallMutation,
   useMarkDialerContactCompleteMutation,
   useSaveDialerQuestionResponsesMutation,
+  useTagDialerContactMutation,
   useUpdateDialerCallMutation
 } from "@spoke/spoke-codegen";
 import sample from "lodash/sample";
@@ -27,8 +29,10 @@ import React, {
 
 import CallControls from "./components/CallControls";
 import CallStatusBar from "./components/CallStatusBar";
+import CannedResponses from "./components/CannedResponses";
 import type { Disposition } from "./components/DispositionForm";
 import DispositionForm from "./components/DispositionForm";
+import TagDialog from "./components/TagDialog";
 import { useTelnyxWebRTC } from "./useTelnyxWebRTC";
 
 type DialerContact = NonNullable<
@@ -39,6 +43,7 @@ type InteractionStep = DialerContact["interactionSteps"][0];
 interface DialerContactProps {
   contact: DialerContact;
   assignmentId: string;
+  organizationId: string;
   onNextContact: () => void;
 }
 
@@ -53,6 +58,16 @@ const useStyles = makeStyles((theme) => ({
   },
   name: {
     fontWeight: 700
+  },
+  tags: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: theme.spacing(0.5),
+    alignItems: "center",
+    marginTop: theme.spacing(1)
+  },
+  tagChip: {
+    fontWeight: 600
   },
   section: {
     marginBottom: theme.spacing(3)
@@ -167,6 +182,7 @@ const dispositionToStatus: Record<Disposition, string> = {
 const DialerContact: React.FC<DialerContactProps> = ({
   contact,
   assignmentId,
+  organizationId,
   onNextContact
 }) => {
   const classes = useStyles();
@@ -190,6 +206,13 @@ const DialerContact: React.FC<DialerContactProps> = ({
     null
   );
   const [showDisposition, setShowDisposition] = useState(false);
+  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
+  // Canned responses the volunteer has pulled into the script this call. Reset
+  // automatically per contact (DialerContact is keyed by contact id).
+  const [insertedResponses, setInsertedResponses] = useState<
+    Array<{ id: number; text: string }>
+  >([]);
+  const insertedResponseIdRef = useRef(0);
 
   // Index the interaction-step tree once per contact.
   const { stepById, childrenByParent, rootStep } = useMemo(() => {
@@ -295,6 +318,7 @@ const DialerContact: React.FC<DialerContactProps> = ({
     markComplete,
     { loading: completing }
   ] = useMarkDialerContactCompleteMutation();
+  const [tagContact, { loading: tagging }] = useTagDialerContactMutation();
 
   // Record the real telephony result + timing on the dialer_call exactly once
   // when the call ends, whether the volunteer hung up or the call ended on its
@@ -356,6 +380,40 @@ const DialerContact: React.FC<DialerContactProps> = ({
       setPath((prev) => [...prev, childId]);
     },
     []
+  );
+
+  // Drop a canned response into the script as a bubble for the volunteer to
+  // read aloud. Stored raw and interpolated at render, like the script bubbles.
+  const handleInsertCannedResponse = useCallback((text: string) => {
+    insertedResponseIdRef.current += 1;
+    setInsertedResponses((prev) => [
+      ...prev,
+      { id: insertedResponseIdRef.current, text }
+    ]);
+  }, []);
+
+  // Click an inserted canned response to undo it (mirrors clicking an answer
+  // bubble to revise it). Removal is trivially reversible — just re-pick it —
+  // so it skips the confirm dialog the answer rewind uses.
+  const handleRemoveCannedResponse = useCallback((id: number) => {
+    setInsertedResponses((prev) => prev.filter((r) => r.id !== id));
+  }, []);
+
+  // Apply the tag changes from the dialog. The mutation returns the contact's
+  // updated tag set, which Apollo merges into the cache so the chips refresh.
+  const handleApplyTags = useCallback(
+    async (addedTagIds: string[], removedTagIds: string[]) => {
+      if (addedTagIds.length > 0 || removedTagIds.length > 0) {
+        await tagContact({
+          variables: {
+            dialerCampaignContactId: contact.id,
+            tag: { addedTagIds, removedTagIds }
+          }
+        });
+      }
+      setIsTagDialogOpen(false);
+    },
+    [contact.id, tagContact]
   );
 
   // Truncate the path back to `index` and clear answers for everything from
@@ -442,6 +500,27 @@ const DialerContact: React.FC<DialerContactProps> = ({
             ZIP: {contact.zip}
           </Typography>
         )}
+        <div className={classes.tags}>
+          {contact.tags.map((tag) => (
+            <Chip
+              key={tag.id}
+              className={classes.tagChip}
+              label={tag.title}
+              size="small"
+              style={{
+                backgroundColor: tag.backgroundColor,
+                color: tag.textColor
+              }}
+            />
+          ))}
+          <Button
+            color="primary"
+            size="small"
+            onClick={() => setIsTagDialogOpen(true)}
+          >
+            Manage Tags
+          </Button>
+        </div>
       </div>
 
       <Divider className={classes.section} />
@@ -471,7 +550,7 @@ const DialerContact: React.FC<DialerContactProps> = ({
         )}
       </div>
 
-      {currentStep && (
+      {(currentStep || insertedResponses.length > 0) && (
         <div className={classes.section}>
           <div className={classes.transcript}>
             {path.map((stepId, index) => {
@@ -501,48 +580,72 @@ const DialerContact: React.FC<DialerContactProps> = ({
                 </React.Fragment>
               );
             })}
+            {insertedResponses.map((inserted) => (
+              <div
+                key={inserted.id}
+                className={`${classes.row} ${classes.rowRight}`}
+              >
+                <ButtonBase
+                  className={`${classes.bubble} ${classes.answerBubble}`}
+                  onClick={() => handleRemoveCannedResponse(inserted.id)}
+                >
+                  <Typography variant="body1">
+                    {interpolate(inserted.text)}
+                  </Typography>
+                </ButtonBase>
+              </div>
+            ))}
           </div>
 
-          {currentAnswers.length > 0 ? (
-            <>
-              {currentQuestion && (
-                <Typography
-                  className={classes.question}
-                  variant="subtitle2"
-                  color="textSecondary"
-                  align="right"
-                  style={{ marginTop: 16 }}
-                >
-                  {currentQuestion}
-                </Typography>
-              )}
-              <div className={classes.answers}>
-                {currentAnswers.map((answer) => (
-                  <Button
-                    key={answer.id}
-                    className={classes.answerButton}
-                    variant="outlined"
-                    color="primary"
-                    onClick={() =>
-                      handleSelectAnswer(
-                        currentStepId,
-                        answer.answerOption ?? "",
-                        answer.id
-                      )
-                    }
+          {currentStep &&
+            (currentAnswers.length > 0 ? (
+              <>
+                {currentQuestion && (
+                  <Typography
+                    className={classes.question}
+                    variant="subtitle2"
+                    color="textSecondary"
+                    align="right"
+                    style={{ marginTop: 16 }}
                   >
-                    {answer.answerOption}
-                  </Button>
-                ))}
-              </div>
-            </>
-          ) : (
-            <Typography className={classes.endNote} variant="body2">
-              End of script.
-            </Typography>
-          )}
+                    {currentQuestion}
+                  </Typography>
+                )}
+                <div className={classes.answers}>
+                  {currentAnswers.map((answer) => (
+                    <Button
+                      key={answer.id}
+                      className={classes.answerButton}
+                      variant="outlined"
+                      color="primary"
+                      onClick={() =>
+                        handleSelectAnswer(
+                          currentStepId,
+                          answer.answerOption ?? "",
+                          answer.id
+                        )
+                      }
+                    >
+                      {answer.answerOption}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Typography className={classes.endNote} variant="body2">
+                End of script.
+              </Typography>
+            ))}
         </div>
       )}
+
+      <div className={classes.section}>
+        <CannedResponses
+          assignmentId={assignmentId}
+          interpolate={interpolate}
+          onSelect={handleInsertCannedResponse}
+        />
+      </div>
 
       <Dialog
         open={pendingRewindIndex !== null}
@@ -569,6 +672,15 @@ const DialerContact: React.FC<DialerContactProps> = ({
           initialDisposition={deriveDisposition(callWasAnswered, callEndCause)}
         />
       )}
+
+      <TagDialog
+        open={isTagDialogOpen}
+        organizationId={organizationId}
+        appliedTags={contact.tags}
+        isSubmitting={tagging}
+        onClose={() => setIsTagDialogOpen(false)}
+        onApply={handleApplyTags}
+      />
     </Paper>
   );
 };
