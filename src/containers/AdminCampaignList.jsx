@@ -6,7 +6,9 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Snackbar from "@material-ui/core/Snackbar";
+import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -17,7 +19,6 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
-import { Toggle } from "material-ui";
 import PropTypes from "prop-types";
 import React from "react";
 import { withRouter } from "react-router-dom";
@@ -91,6 +92,9 @@ class AdminCampaignList extends React.Component {
       releasingAllReplies: false,
       releaseAllRepliesError: undefined,
       releaseAllRepliesResult: undefined,
+      releaseAgeInHours: "1",
+      releaseOnRestricted: false,
+      limitToTextableContacts: true,
       campaignDetailsForExport: [],
       showExportModal: false,
       showExportSnackbar: false,
@@ -177,7 +181,12 @@ class AdminCampaignList extends React.Component {
   };
 
   startReleasingAllReplies = () => {
-    this.setState({ releasingAllReplies: true });
+    this.setState({
+      releasingAllReplies: true,
+      releaseAgeInHours: "1",
+      releaseOnRestricted: false,
+      limitToTextableContacts: true
+    });
   };
 
   handleOnCreateClickFromTemplate = () => {
@@ -211,10 +220,12 @@ class AdminCampaignList extends React.Component {
   };
 
   releaseAllReplies = () => {
-    const ageInHours = parseFloat(this.numberOfHoursToReleaseRef.input.value);
-    const releaseOnRestricted = this.releaseOnRestrictedRef.state.switched;
-    const limitToCurrentlyTextableContacts = this
-      .limitToCurrentlyTextableContactsRef.state.switched;
+    const {
+      releaseAgeInHours,
+      releaseOnRestricted,
+      limitToTextableContacts: limitToCurrentlyTextableContacts
+    } = this.state;
+    const ageInHours = parseFloat(releaseAgeInHours);
 
     this.setState({ releasingInProgress: true });
 
@@ -326,22 +337,29 @@ class AdminCampaignList extends React.Component {
                   to be unassigned?
                   <TextField
                     type="number"
-                    floatingLabelText="Number of Hours"
-                    ref={(el) => {
-                      this.numberOfHoursToReleaseRef = el;
-                    }}
-                    defaultValue={1}
+                    label="Number of Hours"
+                    value={this.state.releaseAgeInHours}
+                    onChange={(event) =>
+                      this.setState({ releaseAgeInHours: event.target.value })
+                    }
                   />
                   <br />
                   <br />
                   Should we release replies on campaigns that are restricted to
                   teams? If unchecked, replies on campaigns restricted to team
                   members will stay assigned to their current texter.
-                  <Toggle
-                    ref={(el) => {
-                      this.releaseOnRestrictedRef = el;
-                    }}
-                    defaultToggled={false}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={this.state.releaseOnRestricted}
+                        onChange={(event) =>
+                          this.setState({
+                            releaseOnRestricted: event.target.checked
+                          })
+                        }
+                      />
+                    }
+                    label="Release on team-restricted campaigns"
                   />
                   <br />
                   <br />
@@ -349,11 +367,18 @@ class AdminCampaignList extends React.Component {
                   contact's timezone? If unchecked, replies will be released for
                   contacts that may not be textable until later today or until
                   tomorrow.
-                  <Toggle
-                    ref={(el) => {
-                      this.limitToCurrentlyTextableContactsRef = el;
-                    }}
-                    defaultToggled
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={this.state.limitToTextableContacts}
+                        onChange={(event) =>
+                          this.setState({
+                            limitToTextableContacts: event.target.checked
+                          })
+                        }
+                      />
+                    }
+                    label="Only release contacts textable now"
                   />
                 </div>
               ) : (

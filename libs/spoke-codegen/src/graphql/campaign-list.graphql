@@ -1,6 +1,7 @@
 fragment CampaignListEntry on Campaign {
   id
   title
+  campaignType
   isStarted
   isApproved
   isArchived
