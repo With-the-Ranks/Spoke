@@ -12,6 +12,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import type { GetNextDialerContactQuery } from "@spoke/spoke-codegen";
 import {
+  useGetCurrentUserProfileQuery,
   useInitiateCallMutation,
   useMarkDialerContactCompleteMutation,
   useSaveDialerQuestionResponsesMutation,
@@ -27,6 +28,7 @@ import React, {
   useState
 } from "react";
 
+import { applyScript, customFieldsJsonStringToArray } from "../../lib/scripts";
 import CallControls from "./components/CallControls";
 import CallStatusBar from "./components/CallStatusBar";
 import CannedResponses from "./components/CannedResponses";
@@ -254,31 +256,43 @@ const DialerContact: React.FC<DialerContactProps> = ({
     return map;
   }, [contact.interactionSteps]);
 
-  // Interpolate {field} tokens from the contact's data.
+  // Current user is the "texter" for {texterFirstName}/{texterLastName} tokens.
+  const { data: profileData } = useGetCurrentUserProfileQuery();
+
+  // Interpolate script tokens using the same engine as the texting view, so
+  // contact fields, {texterFirstName}/{texterLastName}, campaign variables, and
+  // custom fields all resolve consistently.
   const interpolate = useMemo(() => {
-    let custom: Record<string, unknown> = {};
-    try {
-      custom = contact.customFields ? JSON.parse(contact.customFields) : {};
-    } catch {
-      custom = {};
-    }
-    const values: Record<string, string> = {
+    const customFieldsJson = contact.customFields ?? "{}";
+    const scriptContact = {
       firstName: contact.firstName ?? "",
       lastName: contact.lastName ?? "",
+      cell: "",
       zip: contact.zip ?? "",
-      ...Object.fromEntries(
-        Object.entries(custom).map(([key, value]) => [
-          key,
-          value == null ? "" : String(value)
-        ])
-      )
+      customFields: customFieldsJson
+    };
+    const customFields = customFieldsJsonStringToArray(customFieldsJson);
+    const campaignVariables = contact.campaignVariables ?? [];
+    const texter = {
+      firstName: profileData?.currentUser?.firstName ?? "",
+      lastName: profileData?.currentUser?.lastName ?? ""
     };
     return (script: string) =>
-      script.replace(/\{([^}]+)\}/g, (match, field) => {
-        const key = String(field).trim();
-        return key in values ? values[key] : match;
+      applyScript({
+        script,
+        contact: scriptContact,
+        customFields,
+        campaignVariables,
+        texter
       });
-  }, [contact.customFields, contact.firstName, contact.lastName, contact.zip]);
+  }, [
+    contact.customFields,
+    contact.firstName,
+    contact.lastName,
+    contact.zip,
+    contact.campaignVariables,
+    profileData
+  ]);
 
   // responses: interactionStepId -> chosen answer value (for the question on
   // that step). Seed from any previously saved responses.

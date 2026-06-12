@@ -9,6 +9,11 @@ fragment DialerContactCore on DialerCampaignContact {
   attemptCount
   lastAttemptedAt
   customFields
+  campaignVariables {
+    id
+    name
+    value
+  }
   questionResponseValues {
     id
     interactionStepId
