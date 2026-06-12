@@ -51,7 +51,11 @@ const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 720,
     margin: "0 auto",
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
+    // Fill the full width when the dialer layout stacks on mobile.
+    [theme.breakpoints.down("sm")]: {
+      maxWidth: "none"
+    }
   },
   header: {
     marginBottom: theme.spacing(2)
