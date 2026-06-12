@@ -22,6 +22,7 @@ import { getStepsToUpdate } from "./lib/bulk-script-editor";
 import {
   callShiftsAvailable,
   getDialerContact,
+  getDialerContactTextingHistory,
   getNextDialerContact
 } from "./lib/dialer";
 import { formatPage } from "./lib/pagination";
@@ -545,6 +546,14 @@ const rootResolvers = {
       { user }
     ) => {
       return getDialerContact(dialerCampaignContactId, user);
+    },
+
+    dialerContactTextingHistory: async (
+      _root,
+      { dialerCampaignContactId }: { dialerCampaignContactId: string },
+      { user }
+    ) => {
+      return getDialerContactTextingHistory(dialerCampaignContactId, user);
     },
 
     callShiftAvailable: async (

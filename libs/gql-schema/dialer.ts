@@ -23,6 +23,17 @@ export const schema = `
     value: String!
   }
 
+  # A past texting conversation with the same person (matched by phone), shown
+  # as context on the calling screen. One entry per prior campaign_contact.
+  type DialerContactConversation {
+    campaignId: ID!
+    campaignTitle: String!
+    contactId: ID!
+    firstName: String
+    lastName: String
+    messages: [Message!]!
+  }
+
   type DialerCall {
     id: ID!
     dialerCampaignContactId: ID!

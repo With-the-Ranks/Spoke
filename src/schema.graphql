@@ -214,6 +214,7 @@ type RootQuery {
   organization(id:String!, utc:String): Organization
   getNextDialerContact(assignmentId: String!): DialerCampaignContact
   getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+  dialerContactTextingHistory(dialerCampaignContactId: String!): [DialerContactConversation!]!
   callShiftAvailable(organizationId: String!): Boolean!
   campaign(id:String!): Campaign
   inviteByHash(hash:String!): [Invite]
@@ -1508,6 +1509,17 @@ type DialerQuestionResponseValue {
   interactionStepId: ID!
   question: String!
   value: String!
+}
+
+# A past texting conversation with the same person (matched by phone), shown
+# as context on the calling screen. One entry per prior campaign_contact.
+type DialerContactConversation {
+  campaignId: ID!
+  campaignTitle: String!
+  contactId: ID!
+  firstName: String
+  lastName: String
+  messages: [Message!]!
 }
 
 type DialerCall {

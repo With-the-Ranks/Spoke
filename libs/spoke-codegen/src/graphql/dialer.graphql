@@ -59,6 +59,24 @@ query GetDialerContact($dialerCampaignContactId: String!) {
   }
 }
 
+query DialerContactTextingHistory($dialerCampaignContactId: String!) {
+  dialerContactTextingHistory(
+    dialerCampaignContactId: $dialerCampaignContactId
+  ) {
+    contactId
+    campaignId
+    campaignTitle
+    firstName
+    lastName
+    messages {
+      id
+      text
+      isFromContact
+      createdAt
+    }
+  }
+}
+
 mutation InitiateCall($assignmentId: String!, $dialerCampaignContactId: String!) {
   initiateCall(assignmentId: $assignmentId, dialerCampaignContactId: $dialerCampaignContactId) {
     dialerCallId
