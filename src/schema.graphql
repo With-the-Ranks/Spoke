@@ -1502,6 +1502,7 @@ type DialerCampaignContact {
   interactionSteps: [InteractionStep!]!
   questionResponseValues: [DialerQuestionResponseValue!]!
   tags: [Tag!]!
+  campaignVariables: [CampaignVariable!]!
 }
 
 type DialerQuestionResponseValue {

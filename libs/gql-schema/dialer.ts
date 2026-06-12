@@ -14,6 +14,7 @@ export const schema = `
     interactionSteps: [InteractionStep!]!
     questionResponseValues: [DialerQuestionResponseValue!]!
     tags: [Tag!]!
+    campaignVariables: [CampaignVariable!]!
   }
 
   type DialerQuestionResponseValue {

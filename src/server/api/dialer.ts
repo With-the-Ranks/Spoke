@@ -26,7 +26,13 @@ export const resolvers = {
         .where({ campaign_id: c.campaign_id, is_deleted: false }),
     questionResponseValues: (c: DialerContactWithData) =>
       c.questionResponseValues ?? [],
-    tags: (c: DialerContactWithData) => c.tags ?? []
+    tags: (c: DialerContactWithData) => c.tags ?? [],
+    campaignVariables: (c: DialerContactRecord) =>
+      r
+        .reader("campaign_variable")
+        .where({ campaign_id: c.campaign_id })
+        .whereNull("deleted_at")
+        .select("*")
   },
 
   DialerCall: {
