@@ -78,6 +78,7 @@ Spoke is a full-stack SMS texting platform for political campaigns and advocacy 
 - Core entities: organizations, campaigns, users, messages, contacts
 - Background job tables managed by Graphile Worker
 - Supports read replicas via `DATABASE_READER_URL`
+- Current state of schema is stored in `schema-dump.sql` - run update-dump.sh to update after introducing new migrations
 
 ### Configuration System
 
