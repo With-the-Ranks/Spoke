@@ -37,11 +37,13 @@ exports.up = async function up(knex) {
   });
 
   await knex.raw(`
-    -- Partial indexes mirror the campaign_contact pattern: only index live rows.
+    -- Full index on campaign_id: archived contacts are still queried by campaign
+    -- for contact counts and overlap checks.
     create index dialer_campaign_contact_campaign_id_idx
-      on dialer_campaign_contact (campaign_id)
-      where archived = false;
+      on dialer_campaign_contact (campaign_id);
 
+    -- Partial index on assignment_id: only active (non-archived) contacts are
+    -- ever looked up by assignment.
     create index dialer_campaign_contact_assignment_id_idx
       on dialer_campaign_contact (assignment_id)
       where archived = false;

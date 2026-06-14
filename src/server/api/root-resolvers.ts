@@ -20,7 +20,7 @@ import {
 } from "./errors";
 import { getStepsToUpdate } from "./lib/bulk-script-editor";
 import {
-  callShiftsAvailable,
+  callShiftAvailable as callShiftAvailableLib,
   getDialerContact,
   getNextDialerContact
 } from "./lib/dialer";
@@ -553,7 +553,7 @@ const rootResolvers = {
       { user }
     ) => {
       await accessRequired(user, organizationId, "TEXTER");
-      return callShiftsAvailable(organizationId);
+      return callShiftAvailableLib(organizationId);
     },
 
     isValidAttachment: async (_root, { fileUrl }, _context) => {

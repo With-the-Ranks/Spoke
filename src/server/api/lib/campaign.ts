@@ -613,6 +613,17 @@ export const editCampaign = async (
     // origCampaignRecord is authoritative for routing the upload.
     const isCallCampaign = origCampaignRecord.type === "call";
 
+    // Uploading contacts from a CSV invalidates external system configuration
+    // and invalidates filtered landlines. Reset for both campaign types (at
+    // least until filter-landlines is dropped).
+    await r
+      .knex("campaign")
+      .update({
+        external_system_id: null,
+        landlines_filtered: false
+      })
+      .where({ id });
+
     if (isCallCampaign) {
       // Call campaigns store contacts in dialer_campaign_contact and are
       // dialed by volunteers over WebRTC; they never enter the SMS
@@ -624,7 +635,7 @@ export const editCampaign = async (
         last_name: datum.lastName,
         cell: datum.cell,
         external_id: datum.external_id || null,
-        zip: datum.zip || null,
+        zip: datum.zip || "",
         timezone: datum.zip ? zipCodeToTimeZone.lookup(datum.zip) : null,
         custom_fields: JSON.stringify(datum.customFields ?? {})
       }));
@@ -636,16 +647,6 @@ export const editCampaign = async (
         await trx.batchInsert("dialer_campaign_contact", dialerContacts, 1000);
       });
     } else {
-      // Uploading contacts from a CSV invalidates external system configuration
-      // and invalidates filtered landlines
-      await r
-        .knex("campaign")
-        .update({
-          external_system_id: null,
-          landlines_filtered: false
-        })
-        .where({ id });
-
       const contactsToSave = campaign.contacts.map((datum) => {
         const modelData = {
           campaign_id: id,

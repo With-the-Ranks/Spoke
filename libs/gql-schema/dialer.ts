@@ -50,6 +50,13 @@ export const schema = `
     interactionStepId: String!
     value: String!
   }
+
+  input UpdateDialerCallInput {
+    status: String
+    telnyxCallControlId: String
+    answeredAt: String
+    endedAt: String
+  }
 `;
 
 export default schema;

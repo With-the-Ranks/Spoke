@@ -5,6 +5,7 @@ import groupBy from "lodash/groupBy";
 import { UserRoleType } from "../../api/organization-membership";
 import { r } from "../models";
 import { accessRequired } from "./errors";
+import { applyCallableContactFilter } from "./lib/dialer";
 import { formatPage } from "./lib/pagination";
 import { sqlResolvers } from "./lib/utils";
 
@@ -329,30 +330,25 @@ export const resolvers = {
       // shouldn't appear.
       const callAssignmentIds = await r
         .reader("assignment")
-        .join("all_campaign", "all_campaign.id", "assignment.campaign_id")
+        .join("campaign", "campaign.id", "assignment.campaign_id")
         .where({
           "assignment.user_id": user.id,
-          "all_campaign.organization_id": organizationId,
-          "all_campaign.type": "call",
-          "all_campaign.is_started": true,
-          "all_campaign.is_archived": false
+          "campaign.organization_id": organizationId,
+          "campaign.type": "call",
+          "campaign.is_started": true,
+          "campaign.is_archived": false
         })
         .whereExists(function shiftContactsExist() {
           this.select(r.reader.raw(1))
             .from("dialer_campaign_contact")
             // Contacts claimed into this volunteer's shift.
-            .whereRaw("dialer_campaign_contact.assignment_id = assignment.id")
-            .where("dialer_campaign_contact.do_not_call", false)
-            .where("dialer_campaign_contact.archived", false)
-            .whereIn("dialer_campaign_contact.call_status", [
-              "not_attempted",
-              "no_answer"
-            ])
-            // Calling follows the same contact hours as texting: don't surface
-            // the todo when nobody is callable in their timezone right now.
-            .whereRaw(
-              "contact_is_textable_now(coalesce(dialer_campaign_contact.timezone, all_campaign.timezone), all_campaign.texting_hours_start, all_campaign.texting_hours_end, true)"
-            );
+            .whereRaw("dialer_campaign_contact.assignment_id = assignment.id");
+          // Don't surface the todo when nobody in the shift is callable now.
+          applyCallableContactFilter(
+            this,
+            "dialer_campaign_contact",
+            "campaign"
+          );
         })
         .pluck("assignment.id");
 

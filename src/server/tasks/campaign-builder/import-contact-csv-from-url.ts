@@ -146,7 +146,7 @@ export const importContactCsvFromUrl: Task = async (
     const {
       rows: [campaign]
     } = await client.query<{ type: string }>(
-      `select type from all_campaign where id = $1`,
+      `select type from campaign where id = $1`,
       [campaignId]
     );
     const isCallCampaign = campaign?.type === "call";
@@ -176,16 +176,19 @@ export const importContactCsvFromUrl: Task = async (
     );
 
     await withTransaction(client, async (trx) => {
+      // Uploading contacts invalidates external system config and filtered
+      // landlines for both campaign types (at least until filter-landlines
+      // is dropped).
+      await trx.query(
+        `update campaign set external_system_id = null, landlines_filtered = false where id = $1`,
+        [campaignId]
+      );
       if (isCallCampaign) {
         await trx.query(
           `delete from dialer_campaign_contact where campaign_id = $1`,
           [campaignId]
         );
       } else {
-        await trx.query(
-          `update campaign set external_system_id = null, landlines_filtered = false where id = $1`,
-          [campaignId]
-        );
         await trx.query(`delete from campaign_contact where campaign_id = $1`, [
           campaignId
         ]);

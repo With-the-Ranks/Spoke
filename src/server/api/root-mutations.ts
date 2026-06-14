@@ -3365,25 +3365,19 @@ const rootMutations = {
       _root,
       {
         dialerCallId,
-        status,
-        telnyxCallControlId,
-        answeredAt,
-        endedAt
+        input
       }: {
         dialerCallId: string;
-        status?: string;
-        telnyxCallControlId?: string;
-        answeredAt?: string;
-        endedAt?: string;
+        input: {
+          status?: string;
+          telnyxCallControlId?: string;
+          answeredAt?: string;
+          endedAt?: string;
+        };
       },
       { user }: SpokeRequestContext
     ) => {
-      return updateDialerCall(dialerCallId, user, {
-        status,
-        telnyxCallControlId,
-        answeredAt,
-        endedAt
-      });
+      return updateDialerCall(dialerCallId, user, input);
     },
 
     saveDialerQuestionResponses: async (

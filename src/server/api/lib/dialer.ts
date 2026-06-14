@@ -1,4 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-errors";
+import type { Knex } from "knex";
 
 import { config } from "../../../config";
 import { isNowBetween } from "../../../lib/timezones";
@@ -7,24 +8,65 @@ import { OutsideTextingHoursError } from "../../send-message-errors";
 import type {
   DialerCallRecord,
   DialerContactRecord,
+  TagRecord,
   UserRecord
 } from "../types";
 import { getNumberForDial } from "./assemble-numbers";
 import { getMessagingServiceById } from "./message-sending";
 
+// A no-answer contact is served again so volunteers can retry, but only up to
+// this many dials — otherwise we'd call someone who never picks up endlessly.
+export const MAX_DIAL_ATTEMPTS = 3;
+
+// call_status values that still belong in the dial queue. Keep in sync with the
+// literal list in assignDialerShift's FOR UPDATE SKIP LOCKED query (raw SQL
+// can't share this array directly).
+export const CALLABLE_STATUSES = ["not_attempted", "no_answer"];
+
+// The conditions that make a dialer contact callable right now: active, not on
+// the do-not-call list, under the dial-attempt cap, and within the campaign's
+// contact-hours window (same rule as texting). Shared by every query that
+// serves or counts callable contacts so the definition can't drift. Callers
+// add their own assignment_id condition (claimed shift vs. unclaimed pool).
+// `contactAlias` is the dialer_campaign_contact table/alias; `campaignAlias`
+// is a joined/correlated campaign whose timezone + texting-hours columns gate
+// the window.
+export const applyCallableContactFilter = (
+  builder: Knex.QueryBuilder,
+  contactAlias: string,
+  campaignAlias: string
+): Knex.QueryBuilder =>
+  builder
+    .where(`${contactAlias}.do_not_call`, false)
+    .where(`${contactAlias}.archived`, false)
+    .whereIn(`${contactAlias}.call_status`, CALLABLE_STATUSES)
+    .where(`${contactAlias}.attempt_count`, "<", MAX_DIAL_ATTEMPTS)
+    .whereRaw(
+      `contact_is_textable_now(coalesce(${contactAlias}.timezone, ${campaignAlias}.timezone), ${campaignAlias}.texting_hours_start, ${campaignAlias}.texting_hours_end, true)`
+    );
+
+export interface DialerQuestionResponseValue {
+  id: number;
+  interactionStepId: number;
+  question: string;
+  value: string;
+}
+
 export interface DialerContactWithData extends DialerContactRecord {
   callStatus: string;
   attemptCount: number;
   lastAttemptedAt: Date | null;
-  interactionSteps: unknown[];
-  questionResponseValues: unknown[];
-  tags: unknown[];
+  questionResponseValues: DialerQuestionResponseValue[];
+  tags: TagRecord[];
 }
 
 export const getContactWithData = async (
   contact: DialerContactRecord
 ): Promise<DialerContactWithData> => {
-  const [questionResponses, tags, interactionSteps, calls] = await Promise.all([
+  // Interaction steps are campaign-level (identical for every contact), so they
+  // aren't fetched here — the resolver loads them via interactionStepsByCampaign,
+  // which batches and caches per request.
+  const [questionResponses, tags, calls] = await Promise.all([
     r
       .reader("dialer_question_response")
       .join(
@@ -33,14 +75,13 @@ export const getContactWithData = async (
         "istep.id"
       )
       .where({
-        "dialer_question_response.dialer_campaign_contact_id": contact.id,
-        "dialer_question_response.is_deleted": false
+        "dialer_question_response.dialer_campaign_contact_id": contact.id
       })
       .select(
         "dialer_question_response.id",
         "dialer_question_response.interaction_step_id",
         "dialer_question_response.value",
-        "istep.question as istep_question"
+        "istep.question"
       ),
     r
       .reader("dialer_campaign_contact_tag")
@@ -49,9 +90,6 @@ export const getContactWithData = async (
         "dialer_campaign_contact_tag.dialer_campaign_contact_id": contact.id
       })
       .select("tag.*"),
-    r
-      .reader("interaction_step")
-      .where({ campaign_id: contact.campaign_id, is_deleted: false }),
     r
       .reader("dialer_call")
       .where({ dialer_campaign_contact_id: contact.id })
@@ -63,12 +101,11 @@ export const getContactWithData = async (
     callStatus: calls[0]?.status ?? "NOT_ATTEMPTED",
     attemptCount: calls.length,
     lastAttemptedAt: calls[0]?.created_at ?? null,
-    interactionSteps,
     tags,
     questionResponseValues: questionResponses.map((qr) => ({
       id: qr.id,
       interactionStepId: qr.interaction_step_id,
-      question: qr.istep_question,
+      question: qr.question,
       value: qr.value
     }))
   };
@@ -85,11 +122,15 @@ const assertContactAccess = async (
 
   if (!contact) throw new UserInputError("Dialer contact not found.");
 
-  if (!user.is_superadmin && contact.assignment_id) {
-    const assignment = await r
-      .reader("assignment")
-      .where({ id: contact.assignment_id, user_id: user.id })
-      .first();
+  // Regular volunteers may only act on contacts claimed into their own shift
+  // (mirrors texting's assignment check); superadmins can access any contact.
+  if (!user.is_superadmin) {
+    const assignment = contact.assignment_id
+      ? await r
+          .reader("assignment")
+          .where({ id: contact.assignment_id, user_id: user.id })
+          .first()
+      : null;
     if (!assignment) {
       throw new ForbiddenError(
         "You are not authorized to access that contact."
@@ -103,40 +144,21 @@ const assertContactAccess = async (
 export const getNextDialerContact = async (
   assignmentId: string
 ): Promise<DialerContactWithData | null> => {
-  const assignment = await r
-    .reader("assignment")
-    .where({ id: assignmentId })
-    .first("campaign_id");
-
-  if (!assignment) return null;
-
-  const campaign = await r
-    .reader("all_campaign")
-    .where({ id: assignment.campaign_id })
-    .first();
-
-  if (!campaign) return null;
-
-  const contact: DialerContactRecord | undefined = await r
-    .reader("dialer_campaign_contact")
-    // Serve only contacts in this volunteer's claimed shift (assignment),
-    // not the campaign-wide pool — pre-assignment is what prevents two
-    // volunteers from getting the same contact.
-    .where({
-      assignment_id: assignmentId,
-      do_not_call: false,
-      archived: false
-    })
-    .whereIn("call_status", ["not_attempted", "no_answer"])
-    // Only serve contacts callable now under the campaign's contact hours
-    // (same rule as texting).
-    .whereRaw("contact_is_textable_now(coalesce(timezone, ?), ?, ?, true)", [
-      campaign.timezone,
-      campaign.texting_hours_start,
-      campaign.texting_hours_end
-    ])
-    .orderBy("id", "asc")
-    .first();
+  // One query joins through assignment → campaign so the campaign's contact
+  // hours can be applied without separate round-trips.
+  //
+  // Serve only contacts in this volunteer's claimed shift (assignment), not
+  // the campaign-wide pool — pre-assignment is what prevents two volunteers
+  // from getting the same contact.
+  const query = r
+    .reader("dialer_campaign_contact as cc")
+    .join("assignment as a", "a.id", "cc.assignment_id")
+    .join("campaign as c", "c.id", "a.campaign_id")
+    .where("cc.assignment_id", assignmentId);
+  applyCallableContactFilter(query, "cc", "c");
+  const contact: DialerContactRecord | undefined = await query
+    .orderBy("cc.id", "asc")
+    .first("cc.*");
 
   if (!contact) return null;
   return getContactWithData(contact);
@@ -150,29 +172,24 @@ export const getDialerContact = async (
   return getContactWithData(contact);
 };
 
-// Correlated EXISTS condition: the campaign (aliased `all_campaign` in the
-// outer query) has at least one unclaimed, callable-now contact.
-const whereHasUnclaimedCallableContact = (builder: any) => {
+// Correlated EXISTS condition: the campaign (aliased `campaign` in the outer
+// query) has at least one unclaimed, callable-now contact.
+const whereHasUnclaimedCallableContact = (builder: Knex.QueryBuilder) => {
   builder
     .select(r.reader.raw(1))
     .from("dialer_campaign_contact as dcc")
-    .whereRaw("dcc.campaign_id = all_campaign.id")
-    .whereNull("dcc.assignment_id")
-    .where("dcc.do_not_call", false)
-    .where("dcc.archived", false)
-    .whereIn("dcc.call_status", ["not_attempted", "no_answer"])
-    .whereRaw(
-      "contact_is_textable_now(coalesce(dcc.timezone, all_campaign.timezone), all_campaign.texting_hours_start, all_campaign.texting_hours_end, true)"
-    );
+    .whereRaw("dcc.campaign_id = campaign.id")
+    .whereNull("dcc.assignment_id");
+  applyCallableContactFilter(builder, "dcc", "campaign");
 };
 
 // True if the org has any started, autoassign-enabled call campaign with
 // unclaimed contacts callable right now — i.e. a shift can be requested.
-export const callShiftsAvailable = async (
+export const callShiftAvailable = async (
   organizationId: string
 ): Promise<boolean> => {
   const campaign = await r
-    .reader("all_campaign")
+    .reader("campaign")
     .where({
       organization_id: organizationId,
       type: "call",
@@ -201,7 +218,7 @@ export const assignDialerShift = async (
   count: number;
 }> => {
   return parentTrx.transaction(async (trx) => {
-    const campaign = await trx("all_campaign")
+    const campaign = await trx("campaign")
       .where({
         organization_id: organizationId,
         type: "call",
@@ -227,6 +244,9 @@ export const assignDialerShift = async (
         .returning("*");
     }
 
+    // The callable-contact predicate below mirrors applyCallableContactFilter;
+    // it's inlined as raw SQL because FOR UPDATE SKIP LOCKED can't be expressed
+    // through the knex builder. Keep the two in sync.
     const { rows } = await trx.raw(
       `
         with claimed as (
@@ -237,19 +257,21 @@ export const assignDialerShift = async (
             and do_not_call = false
             and archived = false
             and call_status in ('not_attempted', 'no_answer')
+            and attempt_count < ?
             and contact_is_textable_now(coalesce(timezone, ?), ?, ?, true)
           order by id asc
           for update skip locked
           limit ?
         )
         update dialer_campaign_contact as dcc
-        set assignment_id = ?, updated_at = now()
+        set assignment_id = ?
         from claimed
         where dcc.id = claimed.id
         returning dcc.id;
       `,
       [
         campaign.id,
+        MAX_DIAL_ATTEMPTS,
         campaign.timezone,
         campaign.texting_hours_start,
         campaign.texting_hours_end,
@@ -432,7 +454,7 @@ export const saveDialerQuestionResponses = async (
       .onConflict(
         r.knex.raw(
           "(interaction_step_id, dialer_campaign_contact_id) WHERE is_deleted = false"
-        ) as any
+        )
       )
       .merge({ value: qr.value, updated_at: new Date() });
   }

@@ -286,7 +286,7 @@ const rootSchema = `
   type RootMutation {
     createInvite(invite:InviteInput!): Invite
     initiateCall(assignmentId: String!, dialerCampaignContactId: String!): InitiateCallResult!
-    updateDialerCall(dialerCallId: String!, status: String, telnyxCallControlId: String, answeredAt: String, endedAt: String): DialerCall!
+    updateDialerCall(dialerCallId: String!, input: UpdateDialerCallInput!): DialerCall!
     saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
     markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
     requestCallShift(organizationId: String!): RequestCallShiftResult!
