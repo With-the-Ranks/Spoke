@@ -54,7 +54,7 @@ exports.up = async function up(knex) {
       on dialer_campaign_contact (campaign_id, assignment_id, do_not_call)
       where archived = false;
 
-    -- Each contact (identified by cell) should only appear once per campaign (mirrors campaign_contact's cell+campaign_id unique constraint).
+    -- One phone number per campaign (mirrors campaign_contact's cell+campaign_id unique constraint).
     alter table dialer_campaign_contact
       add constraint dialer_campaign_contact_cell_campaign_id_unique unique (cell, campaign_id);
 

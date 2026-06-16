@@ -336,12 +336,14 @@ class AdminCampaignStats extends React.Component {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleNavigateToAutosending}
-                >
-                  Autosending
-                </Button>
+                {campaign.campaignType !== "CALL" && (
+                  <Button
+                    variant="outlined"
+                    onClick={this.handleNavigateToAutosending}
+                  >
+                    Autosending
+                  </Button>
+                )}
                 {isAdmin && (
                   <>
                     <Button
@@ -445,7 +447,10 @@ class AdminCampaignStats extends React.Component {
             </div>
           </div>
         </div>
-        <TopLineStats campaignId={campaign.id} />
+        <TopLineStats
+          campaignId={campaign.id}
+          campaignType={campaign.campaignType}
+        />
         <div
           style={{ marginTop: 32, marginBottom: 16 }}
           className={css(styles.header)}
@@ -454,16 +459,24 @@ class AdminCampaignStats extends React.Component {
         </div>
         <CampaignSurveyStats campaignId={campaign.id} />
 
-        <div className={css(styles.header)} style={{ marginTop: 16 }}>
-          Outbound Deliverability
-        </div>
-        <DeliverabilityStats campaignId={campaign.id} />
-        <div style={{ marginBottom: 32 }} />
+        {campaign.campaignType !== "CALL" && (
+          <>
+            <div className={css(styles.header)} style={{ marginTop: 16 }}>
+              Outbound Deliverability
+            </div>
+            <DeliverabilityStats campaignId={campaign.id} />
+            <div style={{ marginBottom: 32 }} />
+          </>
+        )}
 
-        <div className={css(styles.header)} style={{ marginBottom: 8 }}>
-          Texter stats
-        </div>
-        <TexterStats campaignId={campaign.id} />
+        {campaign.campaignType !== "CALL" && (
+          <>
+            <div className={css(styles.header)} style={{ marginBottom: 8 }}>
+              Texter stats
+            </div>
+            <TexterStats campaignId={campaign.id} />
+          </>
+        )}
 
         <Snackbar
           open={this.state.exportMessageOpen}

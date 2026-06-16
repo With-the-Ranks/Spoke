@@ -4,13 +4,6 @@ const { pipeline } = require("stream/promises");
 const { Readable } = require("stream");
 const { from: copyFrom } = require("pg-copy-streams");
 
-let logger;
-try {
-  logger = require("../src/logger");
-} catch {
-  logger = require(`${__dirname}/../build/src/logger`);
-}
-
 const STAGING_DIR = path.join(__dirname, "staging");
 
 /*
@@ -77,7 +70,7 @@ exports.seed = async function seed(knex) {
     );
   }
 
-  logger.info("Starting staging seed...");
+  console.log("Starting staging seed...");
 
   /*
    * Use a raw pg client for the entire operation so that COPY commands
@@ -96,13 +89,13 @@ exports.seed = async function seed(knex) {
       await client.query(
         `TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`
       );
-      logger.info(`Truncated ${table}`);
+      console.log(`Truncated ${table}`);
     }
 
     /* Insert via COPY */
     for (const entry of TABLES) {
       await copyInsert(client, entry);
-      logger.info(`Copied ${entry.file} into ${entry.table}`);
+      console.log(`Copied ${entry.file} into ${entry.table}`);
     }
 
     /*
@@ -121,7 +114,7 @@ exports.seed = async function seed(knex) {
         )
       `);
     }
-    logger.info("Advanced sequences past seeded IDs");
+    console.log("Advanced sequences past seeded IDs");
 
     await client.query("COMMIT");
   } catch (err) {
@@ -131,5 +124,5 @@ exports.seed = async function seed(knex) {
     await knex.client.releaseConnection(client);
   }
 
-  logger.info("Staging seed complete!");
+  console.log("Staging seed complete!");
 };

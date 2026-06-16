@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
+import { CampaignType } from "@spoke/spoke-codegen";
 import type { GraphQLError } from "graphql";
 import type { MouseEventHandler } from "react";
 
@@ -32,8 +33,16 @@ export interface CampaignOperationsProps {
 
 export const dialogOperations: Record<string, OperationDefinition> = {
   releaseUnsentMessages: {
-    title: (campaign) => `Release Unsent Messages for ${campaign.title}`,
-    body: () => `Releasing unsent messages for this campaign will cause unsent messages in this campaign\
+    title: (campaign) =>
+      campaign.campaignType === CampaignType.Call
+        ? `Release Uncalled Contacts for ${campaign.title}`
+        : `Release Unsent Messages for ${campaign.title}`,
+    body: (campaign) =>
+      campaign?.campaignType === CampaignType.Call
+        ? `Releasing uncalled contacts for this campaign will remove not-yet-called contacts from volunteers'\
+      shifts. This means those volunteers will no longer have these contacts to call, but the contacts will become\
+      available to assign again via the autoassignment functionality.`
+        : `Releasing unsent messages for this campaign will cause unsent messages in this campaign\
       to be removed from texter's assignments. This means that these texters will no longer be able to send\
       these messages, but these messages will become available to assign via the autoassignment\
       functionality.`,
@@ -55,8 +64,17 @@ export const dialogOperations: Record<string, OperationDefinition> = {
     mutationName: "releaseMessages"
   },
   deleteNeedsMessage: {
-    title: (campaign) => `Delete Un-Messaged Contacts for ${campaign.title}`,
-    body: () => `Deleting unmessaged contacts for this campaign will remove contacts that have not received a message yet.\
+    title: (campaign) =>
+      campaign.campaignType === CampaignType.Call
+        ? `Delete Uncalled Contacts for ${campaign.title}`
+        : `Delete Un-Messaged Contacts for ${campaign.title}`,
+    body: (campaign) =>
+      campaign?.campaignType === CampaignType.Call
+        ? `Deleting uncalled contacts for this campaign will remove contacts that have not been called yet.\
+      This operation is useful if, for one reason or another, you don't want to call any more contacts on this\
+      campaign. This might be because there's a mistake in the script or file, or because the event for which you\
+      were calling these contacts has already happened.`
+        : `Deleting unmessaged contacts for this campaign will remove contacts that have not received a message yet.\
       This operation is useful if, for one reason or another, you don't want to message any more contacts on this\
       campaign, but still want to use autoassignment to handle replies. This might be because there's a mistake in\
       the script or file, or because the event for which you were sending these messages has already happened.`,
