@@ -2,6 +2,7 @@ import { ForbiddenError, UserInputError } from "apollo-server-errors";
 import type { Knex } from "knex";
 
 import { config } from "../../../config";
+import { getFormattedPhoneNumber } from "../../../lib/phone-format";
 import { isNowBetween } from "../../../lib/timezones";
 import { r } from "../../models";
 import { OutsideTextingHoursError } from "../../send-message-errors";
@@ -482,4 +483,119 @@ export const markDialerContactComplete = async (
     .returning("*")) as DialerContactRecord[];
 
   return getContactWithData(updated);
+};
+
+export interface DialerContactConversation {
+  campaignId: number;
+  campaignTitle: string;
+  contactId: number;
+  firstName: string | null;
+  lastName: string | null;
+  messages: unknown[];
+}
+
+// Cap how many prior conversations we surface, newest first, to keep the
+// on-demand history fetch bounded.
+const MAX_HISTORY_CONVERSATIONS = 25;
+
+// A dialer contact's prior texting conversations (same phone, same org), grouped
+// by the past campaign_contact. On-demand context for the calling screen.
+export const getDialerContactTextingHistory = async (
+  dialerCampaignContactId: string,
+  user: Pick<UserRecord, "id" | "is_superadmin">
+): Promise<DialerContactConversation[]> => {
+  const contact = await assertContactAccess(dialerCampaignContactId, user);
+
+  const campaign = await r
+    .reader("all_campaign")
+    .where({ id: contact.campaign_id })
+    .first("organization_id");
+  if (!campaign) return [];
+
+  // Match the same person by normalized phone, scoped to this org only.
+  const cell = getFormattedPhoneNumber(contact.cell);
+
+  // Index-backed: campaign_contact (cell, campaign_id) then message
+  // (campaign_contact_id) — avoids an org-wide scan of the message table.
+  const priorContacts = await r
+    .reader("campaign_contact")
+    .join("campaign", "campaign.id", "campaign_contact.campaign_id")
+    .where({
+      "campaign_contact.cell": cell,
+      "campaign.organization_id": campaign.organization_id
+    })
+    .orderBy("campaign_contact.created_at", "desc")
+    .limit(MAX_HISTORY_CONVERSATIONS)
+    .select(
+      "campaign_contact.id as contact_id",
+      "campaign_contact.first_name as first_name",
+      "campaign_contact.last_name as last_name",
+      "campaign.id as campaign_id",
+      "campaign.title as campaign_title"
+    );
+
+  if (priorContacts.length === 0) return [];
+
+  const contactIds = priorContacts.map((c) => c.contact_id);
+  const messages = await r
+    .reader("message")
+    .whereIn("campaign_contact_id", contactIds)
+    .orderBy("created_at", "asc");
+
+  const messagesByContact = new Map<number, unknown[]>();
+  for (const message of messages) {
+    const list = messagesByContact.get(message.campaign_contact_id) ?? [];
+    list.push(message);
+    messagesByContact.set(message.campaign_contact_id, list);
+  }
+
+  // Only surface conversations that actually have messages.
+  return priorContacts
+    .map((c) => ({
+      campaignId: c.campaign_id,
+      campaignTitle: c.campaign_title,
+      contactId: c.contact_id,
+      firstName: c.first_name,
+      lastName: c.last_name,
+      messages: messagesByContact.get(c.contact_id) ?? []
+    }))
+    .filter((conversation) => conversation.messages.length > 0);
+};
+
+// Apply/remove tags on a dialer contact. Mirrors tagConversation for texting,
+// but writes to dialer_campaign_contact_tag (the dialer reuses the shared tag
+// vocabulary). The escalation/auto-message behavior of texting tagging does not
+// apply to calls, so this only adjusts the tag set.
+export const tagDialerContact = async (
+  dialerCampaignContactId: string,
+  addedTagIds: string[],
+  removedTagIds: string[],
+  user: Pick<UserRecord, "id" | "is_superadmin">
+): Promise<DialerContactWithData> => {
+  const contact = await assertContactAccess(dialerCampaignContactId, user);
+
+  if (removedTagIds.length > 0) {
+    await r
+      .knex("dialer_campaign_contact_tag")
+      .where({ dialer_campaign_contact_id: contact.id })
+      .whereIn("tag_id", removedTagIds)
+      .del();
+  }
+
+  if (addedTagIds.length > 0) {
+    await r
+      .knex("dialer_campaign_contact_tag")
+      .insert(
+        addedTagIds.map((tagId) => ({
+          dialer_campaign_contact_id: contact.id,
+          tag_id: parseInt(tagId, 10),
+          tagger_id: user.id
+        }))
+      )
+      // Composite PK (contact, tag): re-applying an existing tag is a no-op.
+      .onConflict(["dialer_campaign_contact_id", "tag_id"])
+      .ignore();
+  }
+
+  return getContactWithData(contact);
 };

@@ -249,6 +249,7 @@ const rootSchema = `
     organization(id:String!, utc:String): Organization
     getNextDialerContact(assignmentId: String!): DialerCampaignContact
     getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+    dialerContactTextingHistory(dialerCampaignContactId: String!): [DialerContactConversation!]!
     callShiftAvailable(organizationId: String!): Boolean!
     campaign(id:String!): Campaign
     inviteByHash(hash:String!): [Invite]
@@ -289,6 +290,7 @@ const rootSchema = `
     updateDialerCall(dialerCallId: String!, input: UpdateDialerCallInput!): DialerCall!
     saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
     markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
+    tagDialerContact(dialerCampaignContactId: String!, tag: ContactTagActionInput!): DialerCampaignContact!
     requestCallShift(organizationId: String!): RequestCallShiftResult!
     createCampaign(campaign:CampaignInput!): Campaign
     createTemplateCampaign(organizationId: String!): Campaign!

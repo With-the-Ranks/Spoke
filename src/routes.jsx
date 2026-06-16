@@ -41,6 +41,7 @@ import TexterDashboard from "./containers/TexterDashboard";
 import TexterTodo from "./containers/TexterTodo";
 import TexterTodoList from "./containers/TexterTodoList";
 import UserEdit from "./containers/UserEdit";
+import VolunteerDialer from "./containers/VolunteerDialer";
 import ApolloClientSingleton from "./network/apollo-client-singleton";
 
 class ProtectedInner extends React.Component {
@@ -382,6 +383,12 @@ const TexterOrganizationRoutes = (props) => {
         <Route
           path={`${organizationPath}/todos`}
           component={TexterTodoRoutes}
+        />
+
+        <TexterDashboardRoute
+          path={`${organizationPath}/dialer/:assignmentId`}
+          main={(routeProps) => <VolunteerDialer {...routeProps} />}
+          topNavTitle="Dialer"
         />
 
         <Redirect to={`${organizationPath}/todos`} />
