@@ -1,10 +1,3 @@
-let logger;
-try {
-  logger = require("../src/logger");
-} catch {
-  logger = require(`${__dirname}/../build/src/logger`);
-}
-
 // ── Campaign stats seed constants ─────────────────────────────────────────────
 const CAMPAIGN_ID = 1;
 const ORGANIZATION_ID = 1;
@@ -53,7 +46,7 @@ exports.seed = async function seed(knex) {
     );
   }
 
-  logger.info("Starting dev seed (campaign stats data)...");
+  console.log("Starting dev seed (campaign stats data)...");
 
   // Clear existing question responses and interaction steps for this campaign
   await knex("all_question_response")
@@ -277,7 +270,7 @@ exports.seed = async function seed(knex) {
   ).length;
   const replies = messageRows.filter((m) => m.is_from_contact).length;
 
-  logger.info(
+  console.log(
     `Dev seed complete — contacts: ${insertedContacts.length}, sent: ${sent}, replies: ${replies}, opt-outs: ${optOutRows.length}, survey responses: ${questionResponseRows.length}`
   );
 };

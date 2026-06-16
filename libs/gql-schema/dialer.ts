@@ -14,6 +14,7 @@ export const schema = `
     interactionSteps: [InteractionStep!]!
     questionResponseValues: [DialerQuestionResponseValue!]!
     tags: [Tag!]!
+    campaignVariables: [CampaignVariable!]!
   }
 
   type DialerQuestionResponseValue {
@@ -21,6 +22,17 @@ export const schema = `
     interactionStepId: ID!
     question: String!
     value: String!
+  }
+
+  # A past texting conversation with the same person (matched by phone), shown
+  # as context on the calling screen. One entry per prior campaign_contact.
+  type DialerContactConversation {
+    campaignId: ID!
+    campaignTitle: String!
+    contactId: ID!
+    firstName: String
+    lastName: String
+    messages: [Message!]!
   }
 
   type DialerCall {

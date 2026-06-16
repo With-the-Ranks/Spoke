@@ -385,9 +385,10 @@ const TexterOrganizationRoutes = (props) => {
           component={TexterTodoRoutes}
         />
 
-        <Route
+        <TexterDashboardRoute
           path={`${organizationPath}/dialer/:assignmentId`}
-          component={VolunteerDialer}
+          main={(routeProps) => <VolunteerDialer {...routeProps} />}
+          topNavTitle="Dialer"
         />
 
         <Redirect to={`${organizationPath}/todos`} />
