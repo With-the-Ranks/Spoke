@@ -1,3 +1,4 @@
+import { r } from "../models";
 import type { DialerContactWithData } from "./lib/dialer";
 import { sqlResolvers } from "./lib/utils";
 import type { DialerContactRecord } from "./types";
@@ -32,7 +33,13 @@ export const resolvers = {
     ) => loaders.interactionStepsByCampaign.load(c.campaign_id),
     questionResponseValues: (c: DialerContactWithData) =>
       c.questionResponseValues ?? [],
-    tags: (c: DialerContactWithData) => c.tags ?? []
+    tags: (c: DialerContactWithData) => c.tags ?? [],
+    campaignVariables: (c: DialerContactRecord) =>
+      r
+        .reader("campaign_variable")
+        .where({ campaign_id: c.campaign_id })
+        .whereNull("deleted_at")
+        .select("*")
   },
 
   DialerCall: {

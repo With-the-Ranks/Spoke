@@ -9,6 +9,11 @@ fragment DialerContactCore on DialerCampaignContact {
   attemptCount
   lastAttemptedAt
   customFields
+  campaignVariables {
+    id
+    name
+    value
+  }
   questionResponseValues {
     id
     interactionStepId
@@ -59,6 +64,24 @@ query GetDialerContact($dialerCampaignContactId: String!) {
   }
 }
 
+query DialerContactTextingHistory($dialerCampaignContactId: String!) {
+  dialerContactTextingHistory(
+    dialerCampaignContactId: $dialerCampaignContactId
+  ) {
+    contactId
+    campaignId
+    campaignTitle
+    firstName
+    lastName
+    messages {
+      id
+      text
+      isFromContact
+      createdAt
+    }
+  }
+}
+
 mutation InitiateCall($assignmentId: String!, $dialerCampaignContactId: String!) {
   initiateCall(assignmentId: $assignmentId, dialerCampaignContactId: $dialerCampaignContactId) {
     dialerCallId
@@ -104,6 +127,29 @@ mutation MarkDialerContactComplete(
     callStatus
     attemptCount
     lastAttemptedAt
+  }
+}
+
+mutation TagDialerContact(
+  $dialerCampaignContactId: String!
+  $tag: ContactTagActionInput!
+) {
+  tagDialerContact(
+    dialerCampaignContactId: $dialerCampaignContactId
+    tag: $tag
+  ) {
+    id
+    tags {
+      id
+      title
+      description
+      confirmationSteps
+      onApplyScript
+      textColor
+      backgroundColor
+      isAssignable
+      isSystem
+    }
   }
 }
 
