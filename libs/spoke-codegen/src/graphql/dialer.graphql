@@ -9,6 +9,11 @@ fragment DialerContactCore on DialerCampaignContact {
   attemptCount
   lastAttemptedAt
   customFields
+  campaignVariables {
+    id
+    name
+    value
+  }
   questionResponseValues {
     id
     interactionStepId
@@ -56,6 +61,24 @@ query GetNextDialerContact($assignmentId: String!) {
 query GetDialerContact($dialerCampaignContactId: String!) {
   getDialerContact(dialerCampaignContactId: $dialerCampaignContactId) {
     ...DialerContactCore
+  }
+}
+
+query DialerContactTextingHistory($dialerCampaignContactId: String!) {
+  dialerContactTextingHistory(
+    dialerCampaignContactId: $dialerCampaignContactId
+  ) {
+    contactId
+    campaignId
+    campaignTitle
+    firstName
+    lastName
+    messages {
+      id
+      text
+      isFromContact
+      createdAt
+    }
   }
 }
 

@@ -249,6 +249,7 @@ const rootSchema = `
     organization(id:String!, utc:String): Organization
     getNextDialerContact(assignmentId: String!): DialerCampaignContact
     getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+    dialerContactTextingHistory(dialerCampaignContactId: String!): [DialerContactConversation!]!
     callShiftAvailable(organizationId: String!): Boolean!
     campaign(id:String!): Campaign
     inviteByHash(hash:String!): [Invite]
