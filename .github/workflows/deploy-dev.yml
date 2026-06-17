@@ -37,7 +37,11 @@ jobs:
 
       - name: Get short SHA
         id: build-metadata
-        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+        # Derive the SHA from the checked-out branch (inputs.branch), NOT
+        # GITHUB_SHA. On workflow_dispatch, GITHUB_SHA is the SHA of the ref the
+        # workflow was dispatched from (the default branch), not the branch we
+        # just checked out, so it would mistag every build with main's SHA.
+        run: echo "sha_short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
 
       - uses: ./.github/actions/gcp-auth
         with:
