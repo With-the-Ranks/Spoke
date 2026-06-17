@@ -123,11 +123,6 @@ export const getOrgFeature = <T extends keyof IOrganizationSettings>(
     const returnValue =
       foundValue === undefined ? defaultValue ?? null : foundValue;
 
-    const transformer = SETTINGS_TRANSFORMERS[featureName];
-    if (transformer && returnValue) {
-      const result = transformer(returnValue);
-      return result as IOrganizationSettings[T];
-    }
     return returnValue;
   } catch (_err) {
     return SETTINGS_DEFAULTS[featureName] ?? null;
