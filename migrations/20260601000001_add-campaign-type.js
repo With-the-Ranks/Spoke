@@ -74,20 +74,14 @@ exports.down = async function down(knex) {
       drop constraint if exists call_campaigns_no_stale_release;
   `);
 
-  // Remove type from the campaign view before dropping the column.
-  // create or replace view cannot remove columns, so we must drop and recreate
-  // the view and all views that depend on it.
+  // Removing the type column requires dropping and recreating the campaign view,
+  // which cascades to EVERY dependent view: not just the autosend/assignable
+  // stack, but also assignable_campaign_contacts and the external-sync
+  // configuration views. Drop with cascade and rebuild the full stack to its
+  // pre-type definition (mirrors 20250912015240_drop_dynamic_assignment).
   await knex.raw(`
-    drop view if exists
-      autosend_campaigns_to_send,
-      assignable_needs_reply_with_escalation_tags,
-      assignable_campaigns_with_needs_reply,
-      assignable_campaigns_with_needs_message,
-      assignable_needs_reply,
-      assignable_needs_message,
-      assignable_campaigns,
-      sendable_campaigns,
-      campaign;
+    drop view campaign cascade;
+    alter table all_campaign drop column type;
 
     create view campaign as
       select
@@ -99,6 +93,121 @@ exports.down = async function down(knex) {
         autosend_user_id, messaging_service_sid, autosend_limit
       from all_campaign
       where is_template = false;
+
+    create view assignable_campaign_contacts as
+      select
+        campaign_contact.id, campaign_contact.campaign_id,
+        campaign_contact.message_status, campaign.texting_hours_end,
+        campaign_contact.timezone::text as contact_timezone
+      from campaign_contact
+      join campaign on campaign_contact.campaign_id = campaign.id
+      where assignment_id is null
+        and is_opted_out = false
+        and archived = false
+        and not exists (
+          select 1
+          from campaign_contact_tag
+          join tag on campaign_contact_tag.tag_id = tag.id
+          where tag.is_assignable = false
+            and campaign_contact_tag.campaign_contact_id = campaign_contact.id
+        );
+
+    create view public.missing_external_sync_question_response_configuration as
+      select
+        all_values.*,
+        external_system.id as system_id
+      from (
+        select
+          istep.campaign_id,
+          istep.parent_interaction_id as interaction_step_id,
+          istep.answer_option as value,
+          exists (
+            select 1
+            from public.question_response as istep_qr
+            where
+              istep_qr.interaction_step_id = istep.parent_interaction_id
+              and istep_qr.value = istep.answer_option
+          ) as is_required
+        from public.interaction_step istep
+        where istep.parent_interaction_id is not null
+        union
+        select
+          qr_istep.campaign_id,
+          qr.interaction_step_id,
+          qr.value,
+          true as is_required
+        from public.question_response as qr
+        join public.interaction_step qr_istep on qr_istep.id = qr.interaction_step_id
+      ) all_values
+      join campaign on campaign.id = all_values.campaign_id
+      join external_system
+        on external_system.organization_id = campaign.organization_id
+      where
+        not exists (
+          select 1
+          from public.all_external_sync_question_response_configuration aqrc
+          where
+            all_values.campaign_id = aqrc.campaign_id
+            and external_system.id = aqrc.system_id
+            and all_values.interaction_step_id = aqrc.interaction_step_id
+            and all_values.value = aqrc.question_response_value
+        );
+
+    create view public.external_sync_question_response_configuration as
+      select
+        aqrc.id::text as compound_id,
+        aqrc.campaign_id,
+        aqrc.system_id,
+        aqrc.interaction_step_id,
+        aqrc.question_response_value,
+        aqrc.created_at,
+        aqrc.updated_at,
+        not exists (
+          select 1 from public.external_sync_config_question_response_response_option qrro
+          where qrro.question_response_config_id = aqrc.id
+          union
+          select 1 from public.external_sync_config_question_response_activist_code qrac
+          where qrac.question_response_config_id = aqrc.id
+          union
+          select 1 from public.external_sync_config_question_response_result_code qrrc
+          where qrrc.question_response_config_id = aqrc.id
+        ) as is_empty,
+        exists (
+          select 1 from public.external_sync_config_question_response_response_option qrro
+          join external_survey_question_response_option
+            on external_survey_question_response_option.id = qrro.external_response_option_id
+          join external_survey_question
+            on external_survey_question.id = external_survey_question_response_option.external_survey_question_id
+          where
+            qrro.question_response_config_id = aqrc.id
+            and external_survey_question.status <> 'active'
+
+          union
+
+          select 1 from public.external_sync_config_question_response_activist_code qrac
+          join external_activist_code
+            on external_activist_code.id = qrac.external_activist_code_id
+          where
+            qrac.question_response_config_id = aqrc.id
+            and external_activist_code.status <> 'active'
+        ) as includes_not_active,
+        false as is_missing,
+        false as is_required
+      from public.all_external_sync_question_response_configuration aqrc
+      union
+      select
+        missing.value || '|' || missing.interaction_step_id || '|' || missing.campaign_id as compound_id,
+        missing.campaign_id,
+        missing.system_id as system_id,
+        missing.interaction_step_id,
+        missing.value as question_response_value,
+        null as created_at,
+        null as updated_at,
+        true as is_empty,
+        false as includes_not_active,
+        true as is_missing,
+        missing.is_required
+      from public.missing_external_sync_question_response_configuration missing;
 
     create view sendable_campaigns as
       select campaign.id, campaign.title, campaign.organization_id,
@@ -209,8 +318,4 @@ exports.down = async function down(knex) {
       )
       and sendable_campaigns.autosend_status = 'sending';
   `);
-
-  await knex.schema.alterTable("all_campaign", (table) => {
-    table.dropColumn("type");
-  });
 };
