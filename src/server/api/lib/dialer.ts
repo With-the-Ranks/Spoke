@@ -15,18 +15,16 @@ import type {
 import { getNumberForDial } from "./assemble-numbers";
 import { getMessagingServiceById } from "./message-sending";
 
-// A no-answer contact is served again so volunteers can retry, but only up to
-// this many dials — otherwise we'd call someone who never picks up endlessly.
-export const MAX_DIAL_ATTEMPTS = 3;
-
-// call_status values that still belong in the dial queue. Keep in sync with the
-// literal list in assignDialerShift's FOR UPDATE SKIP LOCKED query (raw SQL
-// can't share this array directly).
-export const CALLABLE_STATUSES = ["not_attempted", "no_answer"];
+// call_status values that still belong in the dial queue. Once a contact is
+// dialed, the volunteer's disposition becomes their call_status and they drop
+// out of the queue — including "no_answer", so we never repeatedly call someone
+// who doesn't pick up. Keep in sync with the literal list in assignDialerShift's
+// FOR UPDATE SKIP LOCKED query (raw SQL can't share this array directly).
+export const CALLABLE_STATUSES = ["not_attempted"];
 
 // The conditions that make a dialer contact callable right now: active, not on
-// the do-not-call list, under the dial-attempt cap, and within the campaign's
-// contact-hours window (same rule as texting). Shared by every query that
+// the do-not-call list, not yet dialed, and within the campaign's contact-hours
+// window (same rule as texting). Shared by every query that
 // serves or counts callable contacts so the definition can't drift. Callers
 // add their own assignment_id condition (claimed shift vs. unclaimed pool).
 // `contactAlias` is the dialer_campaign_contact table/alias; `campaignAlias`
@@ -41,7 +39,6 @@ export const applyCallableContactFilter = (
     .where(`${contactAlias}.do_not_call`, false)
     .where(`${contactAlias}.archived`, false)
     .whereIn(`${contactAlias}.call_status`, CALLABLE_STATUSES)
-    .where(`${contactAlias}.attempt_count`, "<", MAX_DIAL_ATTEMPTS)
     .whereRaw(
       `contact_is_textable_now(coalesce(${contactAlias}.timezone, ${campaignAlias}.timezone), ${campaignAlias}.texting_hours_start, ${campaignAlias}.texting_hours_end, true)`
     );
@@ -257,8 +254,7 @@ export const assignDialerShift = async (
             and assignment_id is null
             and do_not_call = false
             and archived = false
-            and call_status in ('not_attempted', 'no_answer')
-            and attempt_count < ?
+            and call_status = 'not_attempted'
             and contact_is_textable_now(coalesce(timezone, ?), ?, ?, true)
           order by id asc
           for update skip locked
@@ -272,7 +268,6 @@ export const assignDialerShift = async (
       `,
       [
         campaign.id,
-        MAX_DIAL_ATTEMPTS,
         campaign.timezone,
         campaign.texting_hours_start,
         campaign.texting_hours_end,
@@ -363,7 +358,7 @@ export const initiateCall = async (
   const claimed = await r
     .knex("dialer_campaign_contact")
     .where({ id: contact.id })
-    .whereIn("call_status", ["not_attempted", "no_answer"])
+    .where("call_status", "not_attempted")
     .update({ call_status: "in_progress" });
 
   if (claimed === 0) {
