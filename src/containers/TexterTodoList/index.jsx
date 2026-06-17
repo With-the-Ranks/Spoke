@@ -1,12 +1,10 @@
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
-import CheckIcon from "@material-ui/icons/Check";
 import PropTypes from "prop-types";
 import React from "react";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
-import Empty from "../../components/Empty";
 import { loadData } from "../hoc/with-operations";
 import AssignmentSummary from "./components/AssignmentSummary";
 import CallRequest from "./components/CallRequest";
@@ -25,13 +23,13 @@ class TexterTodoList extends React.Component {
     // this.props.data.startPolling(5000)
   }
 
-  releaseMyReplies = () => {
+  releaseMyTodos = () => {
     this.setState({
       releasingReplies: true
     });
 
     this.props.mutations
-      .releaseMyReplies(this.props.match.params.organizationId)
+      .releaseMyTodos(this.props.match.params.organizationId)
       .then(() => {
         this.setState({ releasingReplies: false, releasedReplies: true });
       })
@@ -86,12 +84,6 @@ class TexterTodoList extends React.Component {
     const { todos } = this.props.data.currentUser;
     const renderedTodos = this.renderTodoList(todos);
 
-    const empty = (
-      <div>
-        <Empty title="Waiting for replies!" icon={<CheckIcon />} />
-      </div>
-    );
-
     return (
       <div>
         <div
@@ -108,7 +100,7 @@ class TexterTodoList extends React.Component {
           />
         </div>
         <CallRequest organizationId={this.props.match.params.organizationId} />
-        {renderedTodos.length === 0 ? empty : renderedTodos}
+        {renderedTodos}
 
         <div
           style={{
@@ -139,8 +131,8 @@ class TexterTodoList extends React.Component {
               [
                 <h1 key={1}> Done for the day? </h1>,
                 <p key={2}>
-                  We can reassign conversations you haven't answered to other
-                  available texters
+                  We can reassign conversations you haven't completed to other
+                  available volunteers
                 </p>
               ]
             )}
@@ -151,9 +143,9 @@ class TexterTodoList extends React.Component {
               disabled={
                 this.state.releasingReplies || this.state.releasedReplies
               }
-              onClick={this.releaseMyReplies}
+              onClick={this.releaseMyTodos}
             >
-              Reassign My Replies
+              Reassign My Unfinished Converations
             </Button>
           </div>
         </div>
@@ -256,10 +248,10 @@ const queries = {
 };
 
 const mutations = {
-  releaseMyReplies: (_ownProps) => (organizationId) => ({
+  releaseMyTodos: (_ownProps) => (organizationId) => ({
     mutation: gql`
-      mutation releaseMyReplies($organizationId: String!) {
-        releaseMyReplies(organizationId: $organizationId)
+      mutation releaseMyTodos($organizationId: String!) {
+        releaseMyTodos(organizationId: $organizationId)
       }
     `,
     variables: { organizationId },

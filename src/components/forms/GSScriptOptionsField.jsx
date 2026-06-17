@@ -79,7 +79,9 @@ class GSScriptOptionsField extends GSFormField {
       getWarningContextForScript(scriptDraft);
 
     // 2022-09-24 - stop as a separate word is best for avoiding spam blocks
+    // Opt out language only applies to SMS campaigns, not calling campaigns
     const warnForOptOutLanguage =
+      !this.props.isCallCampaign &&
       this.props.isRootStep &&
       scriptDraft.length > 0 &&
       !scriptDraft.toLowerCase().includes("stop ");
@@ -275,6 +277,7 @@ GSScriptOptionsField.propTypes = {
     })
   ).isRequired,
   isRootStep: PropTypes.bool.isRequired,
+  isCallCampaign: PropTypes.bool,
   name: PropTypes.string,
   className: PropTypes.string,
   hintText: PropTypes.string,

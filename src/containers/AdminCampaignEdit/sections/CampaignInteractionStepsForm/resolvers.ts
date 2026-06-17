@@ -31,6 +31,7 @@ export const GET_CAMPAIGN_INTERACTIONS = gql`
       isStarted
       isApproved
       isTemplate
+      campaignType
       interactionSteps {
         ...EditInteractionStep
       }

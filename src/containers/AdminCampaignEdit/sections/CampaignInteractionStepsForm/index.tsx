@@ -7,6 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Grid from "@material-ui/core/Grid";
 import type { Action, Campaign, CampaignVariable } from "@spoke/spoke-codegen";
+import { CampaignType } from "@spoke/spoke-codegen";
 import produce from "immer";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useState } from "react";
@@ -67,7 +68,7 @@ interface HocProps {
   data: {
     campaign: Pick<
       Campaign,
-      "id" | "isStarted" | "customFields" | "externalSystem"
+      "id" | "isStarted" | "customFields" | "externalSystem" | "campaignType"
     > & {
       interactionSteps: InteractionStepWithLocalState[];
       campaignVariables: CampaignVariable[];
@@ -278,7 +279,8 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
         customFields,
         invalidScriptFields,
         campaignVariables,
-        externalSystem
+        externalSystem,
+        campaignType
       } = {
         customFields: [],
         campaignVariables: [],
@@ -408,6 +410,7 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
         customFields={customFields}
         campaignVariables={campaignVariables}
         integrationSourced={externalSystem !== null}
+        isCallCampaign={campaignType === CampaignType.Call}
         availableActions={availableActions}
         hasBlockCopied={hasBlockCopied}
         disabled={isWorking}

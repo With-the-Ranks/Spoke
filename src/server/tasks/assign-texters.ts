@@ -39,12 +39,14 @@ const getContactTableConfig = (
     ? {
         table: "dialer_campaign_contact",
         // Hand out only contacts that still need a call attempt — never
-        // already-finished (answered/voicemail) or do-not-call contacts.
+        // already-dialed (answered/no-answer/voicemail) or do-not-call contacts.
+        // A no-answer contact is terminal, so we don't repeatedly call someone
+        // who doesn't pick up.
         assignableFilter:
-          "and do_not_call = false and call_status in ('not_attempted', 'no_answer')",
-        // Prioritize never-attempted contacts over no-answer retries.
-        assignableOrder:
-          "(case when call_status = 'not_attempted' then 10 else 20 end) asc"
+          "and do_not_call = false and call_status = 'not_attempted'",
+        // The texting default orders by message_status, which doesn't exist on
+        // dialer_campaign_contact; order by id like the volunteer shift path.
+        assignableOrder: "id asc"
       }
     : {};
 

@@ -352,7 +352,7 @@ const TexterTodoRoutes = () => {
         path={todosPath}
         exact
         main={TexterTodoList}
-        topNavTitle="Texting"
+        topNavTitle="Volunteer"
       />
       <Route
         path={`${todosPath}/:assignmentId`}

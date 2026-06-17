@@ -57,6 +57,7 @@ interface Props {
   customFields: string[];
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
+  isCallCampaign: boolean;
   availableActions: any[];
   hasBlockCopied: boolean;
   title?: string;
@@ -78,6 +79,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
     customFields,
     campaignVariables,
     integrationSourced,
+    isCallCampaign,
     availableActions,
     hasBlockCopied,
     title = "Start",
@@ -246,6 +248,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
               customFields={customFields}
               campaignVariables={campaignVariables}
               isRootStep={isRootStep}
+              isCallCampaign={isCallCampaign}
               integrationSourced={integrationSourced}
               fullWidth
               multiLine
@@ -297,6 +300,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
                 customFields={customFields}
                 campaignVariables={campaignVariables}
                 integrationSourced={integrationSourced}
+                isCallCampaign={isCallCampaign}
                 availableActions={availableActions}
                 hasBlockCopied={hasBlockCopied}
                 disabled={disabled}

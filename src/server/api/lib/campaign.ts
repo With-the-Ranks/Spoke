@@ -297,7 +297,8 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
             is_autoassign_enabled,
             limit_assignment_to_teams,
             replies_stale_after_minutes,
-            external_system_id
+            external_system_id,
+            type
           )
           select
             coalesce(?, organization_id),
@@ -320,7 +321,8 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
             false as is_autoassign_enabled,
             limit_assignment_to_teams,
             replies_stale_after_minutes,
-            external_system_id
+            external_system_id,
+            type
           from all_campaign
           where id = ?
           returning *
