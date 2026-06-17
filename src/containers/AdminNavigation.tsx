@@ -53,7 +53,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = (props) => {
           button
           onClick={() => history.push(`/app/${organizationId}/todos`)}
         >
-          <ListItemText primary="Switch to texter" />
+          <ListItemText primary="Switch to volunteer view" />
         </ListItem>
       }
     />

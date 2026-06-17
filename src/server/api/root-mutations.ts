@@ -2825,6 +2825,21 @@ const rootMutations = {
         [user.id]
       );
 
+      // Also release call contacts the volunteer claimed into a shift but never
+      // dialed (still 'not_attempted'), so they return to the pool for others.
+      await r.knex.raw(
+        `
+        update dialer_campaign_contact
+        set assignment_id = null
+        from assignment
+        where assignment_id = assignment.id
+          and assignment.user_id = ?
+          and call_status = 'not_attempted'
+          and archived = false
+      `,
+        [user.id]
+      );
+
       return true;
     },
     dismissMatchingAlarms: async (
