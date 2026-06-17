@@ -6,7 +6,6 @@ export const schema = `
     showContactCell: Boolean
     confirmationClickForScriptLinks: Boolean
     defaulTexterApprovalStatus: RequestAutoApprove
-    numbersApiKey: String
     trollbotWebhookUrl: String
     scriptPreviewForSupervolunteers: Boolean
     defaultCampaignBuilderMode: CampaignBuilderMode
@@ -41,7 +40,6 @@ export const schema = `
 
     # Owner
     defaulTexterApprovalStatus: RequestAutoApprove
-    numbersApiKey: String
     trollbotWebhookUrl: String
   }
 `;

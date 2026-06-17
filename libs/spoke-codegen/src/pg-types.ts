@@ -144,14 +144,13 @@ export interface campaign {
   limit_assignment_to_teams: boolean
   updated_at?: Date | null
   replies_stale_after_minutes?: number | null
-  landlines_filtered?: boolean | null
   external_system_id?: string | null
   is_approved?: boolean | null
   autosend_status?: string | null
-  autosend_user_id?: number | null 
+  autosend_user_id?: number | null
 }
 
-export interface campaign_contact { 
+export interface campaign_contact {
   id: number
   campaign_id: number
   assignment_id?: number | null
@@ -222,7 +221,6 @@ export interface campaign_with_groups {
   limit_assignment_to_teams?: boolean | null
   updated_at?: Date | null
   replies_stale_after_minutes?: number | null
-  landlines_filtered?: boolean | null
   external_system_id?: string | null
   group_name?: string | null
   group_description?: string | null 

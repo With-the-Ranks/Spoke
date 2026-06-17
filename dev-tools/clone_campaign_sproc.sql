@@ -167,7 +167,6 @@ cross join lateral graphile_worker.add_job(
     'campaignId',  new_campaigns.campaign_id,
     'offset': new_campaigns.offset,
     'limit': new_campaigns.limit,
-    'initiateFilterLandlines', true,
     'signedDownloadUrl', 'https://s3.aws.amazon.com/my-secure-bucket/ak-export.csv',
     'columnMapping': json_build_object(
       'firstName', 'my_first_name_col_name',

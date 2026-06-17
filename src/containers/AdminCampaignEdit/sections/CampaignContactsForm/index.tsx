@@ -36,7 +36,6 @@ interface ContactSource {
 interface ContactsValues {
   contactSql: string | null;
   contactsFile: File | null;
-  filterOutLandlines: boolean;
   excludeCampaignIds: string[];
   contactsFilename: string | null;
 }
@@ -52,7 +51,6 @@ interface ContactsCampaign {
 
 interface ContactsOrganization {
   id: string;
-  numbersApiKey: string;
   externalSystems: Pick<RelayPaginatedResponse<never>, "pageInfo">;
   campaigns: {
     campaigns: {
@@ -83,7 +81,6 @@ interface ContactsState {
   contactsSql: string | null;
   contactsFile: File | null;
   externalListId: string | null;
-  filterOutLandlines: boolean;
   columnMapping: Array<ColumnMapping>;
 
   // UI
@@ -106,7 +103,6 @@ class CampaignContactsForm extends React.Component<
     contactsSql: null,
     contactsFile: null,
     externalListId: null,
-    filterOutLandlines: false,
     configureMappingOpen: false,
     columnMapping: []
   };
@@ -150,7 +146,6 @@ class CampaignContactsForm extends React.Component<
       contactsSql,
       contactsFile,
       externalListId,
-      filterOutLandlines,
       selectedCampaignIds,
       columnMapping
     } = this.state;
@@ -161,7 +156,6 @@ class CampaignContactsForm extends React.Component<
         contactSql: contactsSql,
         contactsFile,
         externalListId,
-        filterOutLandlines,
         excludeCampaignIds: selectedCampaignIds,
         columnMapping
       };
@@ -386,7 +380,6 @@ const queries = {
       query getOrganizationDataForEditContacts($organizationId: String!) {
         organization(id: $organizationId) {
           id
-          numbersApiKey
           externalSystems {
             pageInfo {
               totalCount

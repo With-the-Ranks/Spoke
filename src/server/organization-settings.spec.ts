@@ -36,7 +36,6 @@ describe("get organization settings", () => {
     scriptPreviewForSupervolunteers: false,
     defaultAutosendingControlsMode: AutosendingControlsMode.Basic,
     defaulTexterApprovalStatus: RequestAutoApproveType.APPROVAL_REQUIRED,
-    numbersApiKey: "SomethingSecret",
     trollbotWebhookUrl: "https://withtheranks.com/trolls",
     maxSmsSegmentLength: 3
   };
@@ -67,7 +66,6 @@ describe("get organization settings", () => {
                 scriptPreviewForSupervolunteers
                 defaultAutosendingControlsMode
                 defaulTexterApprovalStatus
-                numbersApiKey
                 trollbotWebhookUrl
                 maxSmsSegmentLength
               }
@@ -97,7 +95,6 @@ describe("get organization settings", () => {
       features.confirmationClickForScriptLinks
     );
     expect(settings.id).not.toBeNull();
-    expect(settings.numbersApiKey).toBeNull();
     expect(settings.trollbotWebhookUrl).toBeNull();
   });
 
@@ -135,7 +132,6 @@ describe("get organization settings", () => {
     expect(settings.defaulTexterApprovalStatus).toEqual(
       features.defaulTexterApprovalStatus
     );
-    expect(settings.numbersApiKey).not.toBeNull();
     expect(settings.trollbotWebhookUrl).toEqual(features.trollbotWebhookUrl);
     expect(settings.maxSmsSegmentLength).toEqual(features.maxSmsSegmentLength);
   });

@@ -30,10 +30,6 @@ import {
   exportOptOuts,
   TASK_IDENTIFIER as exportOptOutsIdentifier
 } from "./tasks/export-opt-outs";
-import {
-  filterLandlines,
-  TASK_IDENTIFIER as filterLandlinesIdentifier
-} from "./tasks/filter-landlines";
 import handleAutoassignmentRequest from "./tasks/handle-autoassignment-request";
 import handleDeliveryReport from "./tasks/handle-delivery-report";
 import {
@@ -145,9 +141,6 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     [PAUSE_AUTOSENDING_CAMPAIGNS_TASK_IDENTIFIER]: pauseAutosendingCampaigns,
     [exportForVanIdentifier]: wrapProgressTask(exportForVan, {
       removeOnComplete: true
-    }),
-    [filterLandlinesIdentifier]: wrapProgressTask(filterLandlines, {
-      removeOnComplete: false
     }),
     [assignTextersIdentifier]: wrapProgressTask(assignTexters, {
       removeOnComplete: true

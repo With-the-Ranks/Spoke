@@ -33,7 +33,6 @@ import { addExportMultipleCampaigns } from "../tasks/chunk-tasks/export-multiple
 import { addMarkSecondPass } from "../tasks/chunk-tasks/mark-second-pass";
 import { addExportForVan } from "../tasks/export-for-van";
 import { TASK_IDENTIFIER as exportOptOutsIdentifier } from "../tasks/export-opt-outs";
-import { addFilterLandlines } from "../tasks/filter-landlines";
 import { QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER } from "../tasks/queue-autosend-initials";
 import { getWorker } from "../worker";
 import { giveUserMoreTexts, myCurrentAssignmentTarget } from "./assignment";
@@ -1075,28 +1074,6 @@ const rootMutations = {
       );
     },
 
-    filterLandlines: async (_root, { id }, { user, loaders }) => {
-      const campaign = await r.knex("campaign").where({ id }).first();
-
-      await accessRequired(user, campaign.organization_id, "ADMIN");
-
-      if (campaign.is_started) {
-        throw new GraphQLError(
-          "Not allowed to filter landlines after the campaign starts"
-        );
-      }
-
-      if (campaign.landlines_filtered) {
-        throw new GraphQLError(
-          "Landlines already filtered. You may need to wait for current contact upload to finish."
-        );
-      }
-
-      await addFilterLandlines({ campaignId: campaign.id });
-
-      return loaders.campaign.load(id);
-    },
-
     bulkUpdateScript: async (
       _root,
       { organizationId, findAndReplace },
@@ -1224,12 +1201,6 @@ const rootMutations = {
           maxRequestCount: 100,
           defaulTexterApprovalStatus: RequestAutoApproveType.APPROVAL_REQUIRED
         };
-        if (payload.org_features) {
-          const { switchboard_lrn_api_key } = payload.org_features;
-          if (switchboard_lrn_api_key) {
-            orgFeatures.numbersApiKey = switchboard_lrn_api_key;
-          }
-        }
 
         const insertResult = await trx("organization")
           .insert({

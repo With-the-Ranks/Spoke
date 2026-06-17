@@ -486,7 +486,6 @@ export const resolvers = {
       "textingHoursEnd",
       "isAutoassignEnabled",
       "createdAt",
-      "landlinesFiltered",
       "messagingServiceSid",
       "autosendLimit",
       "columnMapping"
