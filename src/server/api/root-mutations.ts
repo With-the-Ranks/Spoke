@@ -2809,7 +2809,7 @@ const rootMutations = {
         .del();
       return true;
     },
-    releaseMyReplies: async (_root, { organizationId }, { user }) => {
+    releaseMyTodos: async (_root, { organizationId }, { user }) => {
       await accessRequired(user, organizationId, "TEXTER");
 
       await r.knex.raw(

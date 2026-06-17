@@ -23,13 +23,13 @@ class TexterTodoList extends React.Component {
     // this.props.data.startPolling(5000)
   }
 
-  releaseMyReplies = () => {
+  releaseMyTodos = () => {
     this.setState({
       releasingReplies: true
     });
 
     this.props.mutations
-      .releaseMyReplies(this.props.match.params.organizationId)
+      .releaseMyTodos(this.props.match.params.organizationId)
       .then(() => {
         this.setState({ releasingReplies: false, releasedReplies: true });
       })
@@ -143,7 +143,7 @@ class TexterTodoList extends React.Component {
               disabled={
                 this.state.releasingReplies || this.state.releasedReplies
               }
-              onClick={this.releaseMyReplies}
+              onClick={this.releaseMyTodos}
             >
               Reassign My Unfinished Converations
             </Button>
@@ -248,10 +248,10 @@ const queries = {
 };
 
 const mutations = {
-  releaseMyReplies: (_ownProps) => (organizationId) => ({
+  releaseMyTodos: (_ownProps) => (organizationId) => ({
     mutation: gql`
-      mutation releaseMyReplies($organizationId: String!) {
-        releaseMyReplies(organizationId: $organizationId)
+      mutation releaseMyTodos($organizationId: String!) {
+        releaseMyTodos(organizationId: $organizationId)
       }
     `,
     variables: { organizationId },
