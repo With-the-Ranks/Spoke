@@ -140,7 +140,6 @@ export type CreateCampaignOptions = Partial<
     | "timezone"
     | "isAutoassignEnabled"
     | "isAssignmentLimitedToTeams"
-    | "landlinesFiltered"
   > & {
     creatorId: number;
     repliesStaleAfterMinutes: number;
@@ -176,11 +175,10 @@ export const createCampaign = async (
         is_autoassign_enabled,
         limit_assignment_to_teams,
         replies_stale_after_minutes,
-        landlines_filtered,
         external_system_id,
         autosend_status,
         autosend_user_id
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       returning *
     `,
       [
@@ -200,7 +198,6 @@ export const createCampaign = async (
         options.isAutoassignEnabled ?? false,
         options.isAssignmentLimitedToTeams ?? false,
         options.repliesStaleAfterMinutes ?? null,
-        options.landlinesFiltered ?? false,
         options.externalSystemId ?? null,
         options.autosendStatus ?? null,
         options.autosendUserId ?? null
@@ -233,12 +230,11 @@ export const createTemplate = async (
         is_autoassign_enabled,
         limit_assignment_to_teams,
         replies_stale_after_minutes,
-        landlines_filtered,
         external_system_id,
         autosend_status,
         autosend_user_id,
         is_template
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       returning *
     `,
       [
@@ -258,7 +254,6 @@ export const createTemplate = async (
         options.isAutoassignEnabled ?? false,
         options.isAssignmentLimitedToTeams ?? false,
         options.repliesStaleAfterMinutes ?? null,
-        options.landlinesFiltered ?? false,
         options.externalSystemId ?? null,
         options.autosendStatus ?? null,
         options.autosendUserId ?? null,

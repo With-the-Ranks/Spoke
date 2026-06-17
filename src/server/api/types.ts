@@ -36,7 +36,6 @@ export enum ExternalSystemType {
 
 export enum FilteredContactReason {
   Invalid = "INVALID",
-  Landline = "LANDLINE",
   VOIP = "VOIP",
   OptedOut = "OPTEDOUT"
 }
@@ -119,7 +118,6 @@ export interface CampaignRecord {
   limit_assignment_to_teams: boolean;
   updated_at: string;
   replies_stale_after_minutes: number | null;
-  landlines_filtered: boolean;
   external_system_id: string | null;
   autosend_status: AutosendStatus;
   autosend_user_id: number;

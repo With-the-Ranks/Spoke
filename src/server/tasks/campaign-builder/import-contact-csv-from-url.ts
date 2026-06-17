@@ -16,7 +16,6 @@ import {
 } from "../../api/lib/contact-list";
 import type { CampaignContactRecord } from "../../api/types";
 import { withTransaction } from "../../utils";
-import { addFilterLandlines } from "../filter-landlines";
 
 export const TASK_IDENTIFIER = "import-contact-csv-from-url";
 
@@ -94,7 +93,6 @@ export interface ImportContactCsvFromUrlPayload {
   campaignId: number;
   signedDownloadUrl: string;
   columnMapping: ColumnMapping;
-  initiateFilterLandlines: boolean;
   limit?: number;
   offset?: number;
 }
@@ -107,7 +105,6 @@ export const importContactCsvFromUrl: Task = async (
     campaignId,
     signedDownloadUrl,
     columnMapping,
-    initiateFilterLandlines,
     offset,
     limit
   } = payload;
@@ -164,7 +161,7 @@ export const importContactCsvFromUrl: Task = async (
 
     await withTransaction(client, async (trx) => {
       await trx.query(
-        `update campaign set external_system_id = null, landlines_filtered = false where id = $1`,
+        `update campaign set external_system_id = null where id = $1`,
         [campaignId]
       );
       await trx.query(`delete from campaign_contact where campaign_id = $1`, [
@@ -202,10 +199,6 @@ export const importContactCsvFromUrl: Task = async (
       );
     });
   });
-
-  if (initiateFilterLandlines) {
-    await addFilterLandlines({ campaignId });
-  }
 
   await notifyLargeCampaignEvent(campaignId, "upload");
 };

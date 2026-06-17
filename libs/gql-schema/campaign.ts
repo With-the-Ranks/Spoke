@@ -117,7 +117,6 @@ export const schema = `
     timezone: String
     createdAt: String!
     previewUrl: String
-    landlinesFiltered: Boolean!
     externalSystem: ExternalSystem
     syncReadiness: ExternalSyncReadinessState!
     externalSyncConfigurations(after: Cursor, first: Int): ExternalSyncQuestionResponseConfigPage!
@@ -182,7 +181,6 @@ export const schema = `
     contacts: [CampaignContactInput!]
     contactsFile: Upload
     externalListId: String
-    filterOutLandlines: Boolean
     excludeCampaignIds: [String!]
     contactSql: String
     organizationId: String

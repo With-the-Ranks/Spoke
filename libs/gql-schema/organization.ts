@@ -47,7 +47,6 @@ export const schema = `
     escalatedConversationCount: Int!
     linkDomains: [LinkDomain]!
     unhealthyLinkDomains: [UnhealthyLinkDomain]!
-    numbersApiKey: String
     settings: OrganizationSettings!
     tagList: [Tag!]!
     escalationTagList: [Tag!]!

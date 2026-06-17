@@ -50,7 +50,6 @@ query getOrganizationData($organizationId: String!) {
       lastName
       displayName
     }
-    numbersApiKey
     campaigns(cursor: { offset: 0, limit: 5000 }) {
       campaigns {
         id

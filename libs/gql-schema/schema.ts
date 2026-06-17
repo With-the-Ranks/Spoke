@@ -288,7 +288,6 @@ const rootSchema = `
     editCampaign(id:String!, campaign:CampaignInput!): Campaign
     saveCampaignGroups(organizationId: String!, campaignGroups: [CampaignGroupInput!]!): [CampaignGroup!]!
     deleteCampaignGroup(organizationId: String!, campaignGroupId: String!): Boolean!
-    filterLandlines(id:String!): Campaign
     bulkUpdateScript(organizationId:String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
     deleteJob(campaignId:String!, id:String!): JobRequest
     copyCampaign(id: String!): Campaign

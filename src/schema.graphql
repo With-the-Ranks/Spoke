@@ -254,7 +254,6 @@ type RootMutation {
   editCampaign(id:String!, campaign:CampaignInput!): Campaign
   saveCampaignGroups(organizationId: String!, campaignGroups: [CampaignGroupInput!]!): [CampaignGroup!]!
   deleteCampaignGroup(organizationId: String!, campaignGroupId: String!): Boolean!
-  filterLandlines(id:String!): Campaign
   bulkUpdateScript(organizationId:String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
   deleteJob(campaignId:String!, id:String!): JobRequest
   copyCampaign(id: String!): Campaign
@@ -684,7 +683,6 @@ type Campaign {
   timezone: String
   createdAt: String!
   previewUrl: String
-  landlinesFiltered: Boolean!
   externalSystem: ExternalSystem
   syncReadiness: ExternalSyncReadinessState!
   externalSyncConfigurations(after: Cursor, first: Int): ExternalSyncQuestionResponseConfigPage!
@@ -749,7 +747,6 @@ input CampaignInput {
   contacts: [CampaignContactInput!]
   contactsFile: Upload
   externalListId: String
-  filterOutLandlines: Boolean
   excludeCampaignIds: [String!]
   contactSql: String
   organizationId: String

@@ -336,18 +336,6 @@ export const resolvers = {
       const escalatedCount = await r.parseCount(countQuery);
       return escalatedCount;
     },
-    numbersApiKey: async (organization) => {
-      let numbersApiKey = null;
-
-      try {
-        const features = JSON.parse(organization.features);
-        numbersApiKey = `${features.numbersApiKey.slice(0, 4)}****************`;
-      } catch (ex) {
-        // no-op
-      }
-
-      return numbersApiKey;
-    },
     pendingAssignmentRequestCount: async (organization) =>
       config.DISABLE_SIDEBAR_BADGES
         ? 0

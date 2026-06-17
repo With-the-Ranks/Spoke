@@ -59,7 +59,6 @@ export const GET_ORGANIZATION_SETTINGS = gql`
       settings {
         id
         optOutMessage
-        numbersApiKey
         trollbotWebhookUrl
         defaulTexterApprovalStatus
         showContactLastName
@@ -79,7 +78,6 @@ export const EDIT_ORGANIZATION_SETTINGS = gql`
     editOrganizationSettings(id: $id, input: $input) {
       id
       optOutMessage
-      numbersApiKey
       trollbotWebhookUrl
       defaulTexterApprovalStatus
       showContactLastName

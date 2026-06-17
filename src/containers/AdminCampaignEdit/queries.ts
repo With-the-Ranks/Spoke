@@ -16,7 +16,6 @@ export const GET_ORGANIZATION_DATA = gql`
         lastName
         displayName
       }
-      numbersApiKey
       messagingServices(active: true) {
         edges {
           node {

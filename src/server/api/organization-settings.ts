@@ -17,7 +17,6 @@ export enum CampaignBuilderMode {
 interface IOrganizationSettings {
   defaulTexterApprovalStatus: string;
   optOutMessage: string;
-  numbersApiKey?: string;
   trollbotWebhookUrl?: string;
   showContactLastName: boolean;
   showContactCell: boolean;
@@ -45,7 +44,6 @@ const SETTINGS_PERMISSIONS: {
   defaultCampaignBuilderMode: UserRoleType.SUPERVOLUNTEER,
   defaultAutosendingControlsMode: UserRoleType.ADMIN,
   defaulTexterApprovalStatus: UserRoleType.OWNER,
-  numbersApiKey: UserRoleType.OWNER,
   trollbotWebhookUrl: UserRoleType.OWNER,
   maxSmsSegmentLength: UserRoleType.TEXTER
 };
@@ -58,7 +56,6 @@ const SETTINGS_WRITE_PERMISSIONS: {
   showContactCell: UserRoleType.OWNER,
   confirmationClickForScriptLinks: UserRoleType.OWNER,
   defaulTexterApprovalStatus: UserRoleType.OWNER,
-  numbersApiKey: UserRoleType.OWNER,
   trollbotWebhookUrl: UserRoleType.OWNER,
   scriptPreviewForSupervolunteers: UserRoleType.OWNER,
   defaultCampaignBuilderMode: UserRoleType.OWNER,
@@ -93,25 +90,9 @@ const SETTINGS_DEFAULTS: IOrganizationSettings = {
   maxSmsSegmentLength: 3
 };
 
-const SETTINGS_TRANSFORMERS: Partial<
-  {
-    [key in keyof IOrganizationSettings]: (
-      value: string
-    ) => IOrganizationSettings[key];
-  }
-> = {
-  numbersApiKey: (value: string) => `${value.slice(0, 4)}****************`
-};
-
 const SETTINGS_VALIDATORS: {
   [key in keyof IOrganizationSettings]?: { (value: string): void };
 } = {
-  numbersApiKey: (value: string) => {
-    // User probably made a mistake - no API key will have a *
-    if (value.includes("*")) {
-      throw new Error("Numbers API Key cannot have character: *");
-    }
-  },
   trollbotWebhookUrl: (value: string) => {
     if (!stringIsAValidUrl(value)) {
       throw new Error("TrollBot webhook URL must be a valid URL");
@@ -181,7 +162,6 @@ export const resolvers = {
     ...settingResolvers([
       "defaulTexterApprovalStatus",
       "optOutMessage",
-      "numbersApiKey",
       "trollbotWebhookUrl",
       "showContactLastName",
       "showContactCell",
