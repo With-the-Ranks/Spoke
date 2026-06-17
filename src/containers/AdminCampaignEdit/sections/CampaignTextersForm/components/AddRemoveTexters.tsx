@@ -48,8 +48,8 @@ export const AddRemoveTexters: React.FC<Props> = (props) => {
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Add texter"
-            helperText="Search for texters to assign"
+            label="Add volunteer"
+            helperText="Search for volunteers to assign"
             variant="outlined"
           />
         )}

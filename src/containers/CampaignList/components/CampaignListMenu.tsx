@@ -6,6 +6,7 @@ import ArchiveIcon from "@material-ui/icons/Archive";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import UnarchiveIcon from "@material-ui/icons/Unarchive";
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
+import { CampaignType } from "@spoke/spoke-codegen";
 import React, { useCallback, useState } from "react";
 
 import type { CampaignOperationsProps } from "../utils";
@@ -34,6 +35,10 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
     setMenuAnchor
   ]);
 
+  // Call campaigns track contacts in dialer_campaign_contact and have no
+  // replies/second-pass concept, so they get a trimmed, call-worded menu.
+  const isCallCampaign = campaign.campaignType === CampaignType.Call;
+
   return (
     <div>
       <IconButton aria-label="people-row-menu" onClick={handleClickMenu}>
@@ -50,33 +55,39 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
             campaign
           })}
         >
-          Release Unsent Messages
+          {isCallCampaign
+            ? "Release Uncalled Contacts"
+            : "Release Unsent Messages"}
         </MenuItem>
-        <MenuItem
-          onClick={startOperation({
-            name: "markForSecondPass",
-            campaign,
-            payload: {
-              excludeNewer: true,
-              excludeRecentlyTexted: true,
-              days: 3,
-              hours: 0
-            }
-          })}
-        >
-          Mark for a Second Pass
-        </MenuItem>
-        <MenuItem
-          onClick={startOperation({
-            name: "releaseUnrepliedMessages",
-            campaign,
-            payload: {
-              ageInHours: 1
-            }
-          })}
-        >
-          Release Unreplied Conversations
-        </MenuItem>
+        {!isCallCampaign && (
+          <MenuItem
+            onClick={startOperation({
+              name: "markForSecondPass",
+              campaign,
+              payload: {
+                excludeNewer: true,
+                excludeRecentlyTexted: true,
+                days: 3,
+                hours: 0
+              }
+            })}
+          >
+            Mark for a Second Pass
+          </MenuItem>
+        )}
+        {!isCallCampaign && (
+          <MenuItem
+            onClick={startOperation({
+              name: "releaseUnrepliedMessages",
+              campaign,
+              payload: {
+                ageInHours: 1
+              }
+            })}
+          >
+            Release Unreplied Conversations
+          </MenuItem>
+        )}
         {!campaign.isArchived && (
           <MenuItem onClick={archiveCampaign(campaign.id)}>
             <ListItemIcon>
@@ -96,14 +107,18 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
         <MenuItem
           onClick={startOperation({ name: "deleteNeedsMessage", campaign })}
         >
-          Delete Unmessaged Contacts
+          {isCallCampaign
+            ? "Delete Uncalled Contacts"
+            : "Delete Unmessaged Contacts"}
         </MenuItem>
 
-        <MenuItem
-          onClick={startOperation({ name: "unMarkForSecondPass", campaign })}
-        >
-          Un-Mark for Second Pass
-        </MenuItem>
+        {!isCallCampaign && (
+          <MenuItem
+            onClick={startOperation({ name: "unMarkForSecondPass", campaign })}
+          >
+            Un-Mark for Second Pass
+          </MenuItem>
+        )}
         <MenuItem
           onClick={startOperation({
             name: campaign.isAutoassignEnabled

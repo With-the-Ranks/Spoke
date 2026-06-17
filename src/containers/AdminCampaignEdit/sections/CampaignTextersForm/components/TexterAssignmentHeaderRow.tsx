@@ -18,7 +18,7 @@ const TexterAssignmentHeaderRow: React.FC = () => (
     <div
       className={css(rowStyles.leftSlider, headerStyles.alreadyTextedHeader)}
     >
-      Already texted
+      Already contacted
     </div>
     <div className={css(rowStyles.assignedCount)} />
     <div className={css(rowStyles.nameColumn)} />

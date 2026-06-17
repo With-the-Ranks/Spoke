@@ -212,6 +212,10 @@ type OptOutByCampaign {
 type RootQuery {
   currentUser: User
   organization(id:String!, utc:String): Organization
+  getNextDialerContact(assignmentId: String!): DialerCampaignContact
+  getDialerContact(dialerCampaignContactId: String!): DialerCampaignContact
+  dialerContactTextingHistory(dialerCampaignContactId: String!): [DialerContactConversation!]!
+  callShiftAvailable(organizationId: String!): Boolean!
   campaign(id:String!): Campaign
   inviteByHash(hash:String!): [Invite]
   contact(id:String!): CampaignContact
@@ -247,6 +251,12 @@ input SecondPassInput {
 
 type RootMutation {
   createInvite(invite:InviteInput!): Invite
+  initiateCall(assignmentId: String!, dialerCampaignContactId: String!): InitiateCallResult!
+  updateDialerCall(dialerCallId: String!, input: UpdateDialerCallInput!): DialerCall!
+  saveDialerQuestionResponses(dialerCampaignContactId: String!, questionResponses: [DialerQuestionResponseInput!]!): DialerCampaignContact!
+  markDialerContactComplete(dialerCampaignContactId: String!, callStatus: String!): DialerCampaignContact!
+  tagDialerContact(dialerCampaignContactId: String!, tag: ContactTagActionInput!): DialerCampaignContact!
+  requestCallShift(organizationId: String!): RequestCallShiftResult!
   createCampaign(campaign:CampaignInput!): Campaign
   createTemplateCampaign(organizationId: String!): Campaign!
   deleteTemplateCampaign(organizationId: String!, campaignId: String!): Boolean!
@@ -566,6 +576,11 @@ type OrganizationMembershipPage {
 
 
 
+enum CampaignType {
+  SMS
+  CALL
+}
+
 input CampaignsFilter {
   isArchived: Boolean
   isStarted: Boolean
@@ -619,6 +634,7 @@ type JobRequest {
 type CampaignReadiness {
   id: ID!
   basics: Boolean!
+  campaignType: Boolean!
   messagingService: Boolean!
   textingHours: Boolean!
   integration: Boolean!
@@ -695,6 +711,7 @@ type Campaign {
   columnMapping: [CsvColumnMapping!]
   messagingService: MessagingService
   contactsFilename: String
+  campaignType: CampaignType!
 }
 
 type CampaignEdge {
@@ -768,6 +785,7 @@ input CampaignInput {
   messagingServiceSid: String
   autosendLimit: Int
   columnMapping: [CsvColumnMappingInput!]
+  campaignType: CampaignType
 }
 
 
@@ -1465,4 +1483,77 @@ type ExternalSyncTagConfigEdge {
 type ExternalSyncTagConfigPage {
   edges: [ExternalSyncTagConfigEdge!]!
   pageInfo: RelayPageInfo!
+}
+
+
+
+type DialerCampaignContact {
+  id: ID!
+  campaignId: ID!
+  firstName: String!
+  lastName: String!
+  zip: String
+  callStatus: String!
+  doNotCall: Boolean!
+  attemptCount: Int!
+  lastAttemptedAt: Date
+  customFields: JSON!
+  assignment: Assignment
+  interactionSteps: [InteractionStep!]!
+  questionResponseValues: [DialerQuestionResponseValue!]!
+  tags: [Tag!]!
+  campaignVariables: [CampaignVariable!]!
+}
+
+type DialerQuestionResponseValue {
+  id: ID!
+  interactionStepId: ID!
+  question: String!
+  value: String!
+}
+
+# A past texting conversation with the same person (matched by phone), shown
+# as context on the calling screen. One entry per prior campaign_contact.
+type DialerContactConversation {
+  campaignId: ID!
+  campaignTitle: String!
+  contactId: ID!
+  firstName: String
+  lastName: String
+  messages: [Message!]!
+}
+
+type DialerCall {
+  id: ID!
+  dialerCampaignContactId: ID!
+  status: String!
+  fromNumber: String
+  telnyxCallControlId: String
+  createdAt: Date!
+  answeredAt: Date
+  endedAt: Date
+}
+
+type InitiateCallResult {
+  dialerCallId: ID!
+  contactPhone: String!
+  fromNumber: String!
+}
+
+type RequestCallShiftResult {
+  assignmentId: ID
+  campaignId: ID
+  count: Int!
+}
+
+input DialerQuestionResponseInput {
+  interactionStepId: String!
+  value: String!
+}
+
+input UpdateDialerCallInput {
+  status: String
+  telnyxCallControlId: String
+  answeredAt: String
+  endedAt: String
 }

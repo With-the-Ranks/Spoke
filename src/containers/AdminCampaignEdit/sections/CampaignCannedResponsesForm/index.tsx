@@ -395,10 +395,10 @@ class CampaignCannedResponsesForm extends React.Component<InnerProps, State> {
     return (
       <div>
         <CampaignFormSectionHeading
-          title="Canned responses for texters"
+          title="Canned responses for volunteers"
           subtitle={
             <>
-              Share additional FAQ responses with your texters that are NOT
+              Share additional FAQ responses with your volunteers that are NOT
               associated with logging data. Please note that canned responses
               are not tracked or stored when used. Responses associated with
               data collection should be included in your{" "}
