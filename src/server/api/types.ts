@@ -98,6 +98,8 @@ export interface CampaignContactRecord {
   archived: boolean;
 }
 
+export type ContactTable = "campaign_contact" | "dialer_campaign_contact";
+
 export interface CampaignRecord {
   id: number;
   organization_id: number;
