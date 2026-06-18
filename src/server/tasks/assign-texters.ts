@@ -1,8 +1,8 @@
+import type { TexterAssignmentInput } from "@spoke/spoke-codegen";
 import type { Pool, PoolClient } from "pg";
 
-import type { TexterAssignmentInput } from "../../api/assignment";
 import { DateTime } from "../../lib/datetime";
-import type { CampaignRecord } from "../api/types";
+import type { CampaignRecord, ContactTable } from "../api/types";
 import { Notifications, sendUserNotification } from "../notifications";
 import { withTransaction } from "../utils";
 import type { ProgressTask } from "./utils";
@@ -21,7 +21,7 @@ export interface AssignmentTarget {
 // ordering baked into the per-stage option defaults). Only call campaigns
 // override the table and assignable rules.
 interface ContactTableConfig {
-  table?: string;
+  table?: ContactTable;
   // Extra SQL predicate (with a leading "and ") restricting which unassigned
   // contacts may be handed out.
   assignableFilter?: string;
@@ -87,7 +87,7 @@ export const ensureAssignments = async (options: EnsureAssignmentsOptions) => {
 
 interface ZeroOutDeletedOptions {
   client: PoolClient | Pool;
-  table?: string;
+  table?: ContactTable;
   campaignId: number;
   isArchived: boolean;
   assignmentIds: number[];
@@ -120,7 +120,7 @@ export const zeroOutDeleted = async (options: ZeroOutDeletedOptions) => {
 
 interface FreeUpTextersOptions {
   client: PoolClient;
-  table?: string;
+  table?: ContactTable;
   campaignId: number;
   isArchived: boolean;
   assignmentTargets: AssignmentTarget[];
@@ -173,7 +173,7 @@ export const freeUpTexters = async (options: FreeUpTextersOptions) => {
 
 interface AssignPayloadsOptions {
   client: PoolClient;
-  table?: string;
+  table?: ContactTable;
   assignableFilter?: string;
   assignableOrder?: string;
   campaignId: number;
