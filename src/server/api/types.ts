@@ -98,8 +98,6 @@ export interface CampaignContactRecord {
   archived: boolean;
 }
 
-export type ContactTable = "campaign_contact" | "dialer_campaign_contact";
-
 export interface CampaignRecord {
   id: number;
   organization_id: number;
@@ -151,6 +149,34 @@ export interface CannedResponseRecord {
   user_id?: number | null;
   created_at: Date;
   updated_at?: Date | null;
+}
+
+export interface DialerCallRecord {
+  id: number;
+  dialer_campaign_contact_id: number;
+  user_id: number;
+  telnyx_call_control_id: string | null;
+  from_number: string | null;
+  status: string;
+  created_at: Date;
+  ended_at: Date | null;
+}
+
+export interface DialerContactRecord {
+  id: number;
+  campaign_id: number;
+  assignment_id: number | null;
+  external_id: string | null;
+  first_name: string;
+  last_name: string;
+  cell: string;
+  zip: string | null;
+  timezone: string | null;
+  custom_fields: Record<string, unknown>;
+  do_not_call: boolean;
+  archived: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ExternalResultCodeRecord {
@@ -327,34 +353,6 @@ export interface TagRecord {
   deleted_at: string;
 }
 
-export interface DialerContactRecord {
-  id: number;
-  campaign_id: number;
-  assignment_id: number | null;
-  external_id: string | null;
-  first_name: string;
-  last_name: string;
-  cell: string;
-  zip: string | null;
-  timezone: string | null;
-  custom_fields: Record<string, unknown>;
-  do_not_call: boolean;
-  archived: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface DialerCallRecord {
-  id: number;
-  dialer_campaign_contact_id: number;
-  user_id: number;
-  telnyx_call_control_id: string | null;
-  from_number: string | null;
-  status: string;
-  created_at: Date;
-  ended_at: Date | null;
-}
-
 export interface UserRecord {
   id: number;
   auth0_id: string;
@@ -369,3 +367,4 @@ export interface UserRecord {
   updated_at: string;
   is_suspended: boolean;
 }
+export type ContactTable = "campaign_contact" | "dialer_campaign_contact";
