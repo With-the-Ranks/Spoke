@@ -17,6 +17,10 @@ interface QueueActionExternalSyncPayload {
   contactId?: number;
 }
 
+const isDialerAction = (actionType: ActionType) =>
+  actionType === ActionType.DialerQuestionResponse ||
+  actionType === ActionType.DialerOptOut;
+
 const queueActionExternalSync: Task = async (rawPayload, helpers) => {
   const {
     actionId,
@@ -31,12 +35,31 @@ const queueActionExternalSync: Task = async (rawPayload, helpers) => {
     })
     .returning("id");
 
-  const externalSystem = await r
-    .knex("external_system")
-    .join("campaign", "campaign.external_system_id", "external_system.id")
-    .join("campaign_contact", "campaign_contact.campaign_id", "campaign.id")
-    .where({ "campaign_contact.id": contactId })
-    .first(["external_system.id", "external_system.type"]);
+  let externalSystem: { id: string; type: string } | undefined;
+
+  if (isDialerAction(actionType)) {
+    externalSystem = await r
+      .knex("external_system")
+      .join(
+        "all_campaign",
+        "all_campaign.external_system_id",
+        "external_system.id"
+      )
+      .join(
+        "dialer_campaign_contact",
+        "dialer_campaign_contact.campaign_id",
+        "all_campaign.id"
+      )
+      .where({ "dialer_campaign_contact.id": contactId })
+      .first(["external_system.id", "external_system.type"]);
+  } else {
+    externalSystem = await r
+      .knex("external_system")
+      .join("campaign", "campaign.external_system_id", "external_system.id")
+      .join("campaign_contact", "campaign_contact.campaign_id", "campaign.id")
+      .where({ "campaign_contact.id": contactId })
+      .first(["external_system.id", "external_system.type"]);
+  }
 
   if (!externalSystem) {
     await markSyncFailed(syncId, "No external system found", helpers);
@@ -56,6 +79,12 @@ const queueActionExternalSync: Task = async (rawPayload, helpers) => {
         break;
       case ActionType.QuestionReponse:
         await VAN.queueQuestionResponse(syncPayload, helpers);
+        break;
+      case ActionType.DialerQuestionResponse:
+        await VAN.queueDialerQuestionResponse(syncPayload, helpers);
+        break;
+      case ActionType.DialerOptOut:
+        await VAN.queueDialerOptOut(syncPayload, helpers);
         break;
       default:
         await markSyncFailed(
