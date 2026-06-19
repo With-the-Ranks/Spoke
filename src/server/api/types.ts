@@ -3,7 +3,9 @@ import type { JobHelpers } from "graphile-worker";
 
 export enum ActionType {
   QuestionReponse = "question_response",
-  OptOut = "opt_out"
+  OptOut = "opt_out",
+  DialerQuestionResponse = "dialer_question_response",
+  DialerOptOut = "dialer_opt_out"
 }
 
 export enum AutosendingControlsMode {
@@ -201,6 +203,22 @@ export interface ExternalSystem {
     helpers: JobHelpers
   ): Promise<void>;
   syncOptOut(payload: Record<string, any>, helpers: JobHelpers): Promise<void>;
+  queueDialerQuestionResponse(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  queueDialerOptOut(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  syncDialerQuestionResponse(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  syncDialerOptOut(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
 }
 
 export interface ExternalSystemRecord {
@@ -367,4 +385,11 @@ export interface UserRecord {
   updated_at: string;
   is_suspended: boolean;
 }
+
+export type ContactIdColumn =
+  | "campaign_contact_id"
+  | "dialer_campaign_contact_id";
 export type ContactTable = "campaign_contact" | "dialer_campaign_contact";
+export type ResponseTable =
+  | "all_question_response"
+  | "dialer_question_response";

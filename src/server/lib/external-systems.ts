@@ -6,7 +6,7 @@ import { r } from "../models";
 
 interface CampaignData {
   external_system_id: string;
-  campaign_contact_id: number;
+  contact_id: number;
 }
 
 export const queueExternalSyncForAction = async (
@@ -28,7 +28,7 @@ export const queueExternalSyncForAction = async (
           "interaction_step.id"
         )
         .where({ "all_question_response.id": actionId })
-        .select(["external_system_id", "campaign_contact_id"])
+        .select(["external_system_id", "campaign_contact_id as contact_id"])
         .first();
       break;
     case ActionType.OptOut:
@@ -42,9 +42,38 @@ export const queueExternalSyncForAction = async (
           "opt_out.assignment_id"
         )
         .where({ "opt_out.id": actionId })
+        .select(["external_system_id", "campaign_contact.id as contact_id"])
+        .first();
+      break;
+    case ActionType.DialerQuestionResponse:
+      campaign = await r
+        .knex("campaign")
+        .join("interaction_step", "interaction_step.campaign_id", "campaign.id")
+        .join(
+          "dialer_question_response",
+          "dialer_question_response.interaction_step_id",
+          "interaction_step.id"
+        )
+        .where({ "dialer_question_response.id": actionId })
         .select([
-          "external_system_id",
-          "campaign_contact.id as campaign_contact_id"
+          "campaign.external_system_id",
+          "dialer_question_response.dialer_campaign_contact_id as contact_id"
+        ])
+        .first();
+      break;
+    case ActionType.DialerOptOut:
+      // action_id is dialer_campaign_contact.id for dialer opt-outs
+      campaign = await r
+        .knex("campaign")
+        .join(
+          "dialer_campaign_contact",
+          "dialer_campaign_contact.campaign_id",
+          "campaign.id"
+        )
+        .where({ "dialer_campaign_contact.id": actionId })
+        .select([
+          "campaign.external_system_id",
+          "dialer_campaign_contact.id as contact_id"
         ])
         .first();
       break;
@@ -57,7 +86,7 @@ export const queueExternalSyncForAction = async (
   const payload = {
     actionType,
     actionId,
-    campaignContactId: campaign?.campaign_contact_id
+    contactId: campaign.contact_id
   };
 
   await r.knex.raw(

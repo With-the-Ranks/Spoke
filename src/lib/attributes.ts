@@ -27,6 +27,12 @@ export const snakeToTitleCase = (value: string) =>
     .map((s) => titleCase(s))
     .join(" ");
 
+export const snakeToCamelCase = (value: string) =>
+  value
+    .split("_")
+    .map((s, i) => (i === 0 ? s : s.charAt(0).toUpperCase() + s.slice(1)))
+    .join("");
+
 export const nameComponents = (name: string) => {
   let firstName;
   let lastName;
