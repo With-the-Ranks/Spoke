@@ -1,8 +1,11 @@
+import type { CampaignType } from "@spoke/spoke-codegen";
 import type { JobHelpers } from "graphile-worker";
 
 export enum ActionType {
   QuestionReponse = "question_response",
-  OptOut = "opt_out"
+  OptOut = "opt_out",
+  DialerQuestionResponse = "dialer_question_response",
+  DialerOptOut = "dialer_opt_out"
 }
 
 export enum AutosendingControlsMode {
@@ -126,6 +129,7 @@ export interface CampaignRecord {
   messaging_service_sid: string | null;
   column_mapping: string | null;
   contacts_filename: string | null;
+  type: Lowercase<CampaignType>;
 }
 
 export interface CampaignVariableRecord {
@@ -147,6 +151,34 @@ export interface CannedResponseRecord {
   user_id?: number | null;
   created_at: Date;
   updated_at?: Date | null;
+}
+
+export interface DialerCallRecord {
+  id: number;
+  dialer_campaign_contact_id: number;
+  user_id: number;
+  telnyx_call_control_id: string | null;
+  from_number: string | null;
+  status: string;
+  created_at: Date;
+  ended_at: Date | null;
+}
+
+export interface DialerContactRecord {
+  id: number;
+  campaign_id: number;
+  assignment_id: number | null;
+  external_id: string | null;
+  first_name: string;
+  last_name: string;
+  cell: string;
+  zip: string | null;
+  timezone: string | null;
+  custom_fields: Record<string, unknown>;
+  do_not_call: boolean;
+  archived: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ExternalResultCodeRecord {
@@ -171,6 +203,22 @@ export interface ExternalSystem {
     helpers: JobHelpers
   ): Promise<void>;
   syncOptOut(payload: Record<string, any>, helpers: JobHelpers): Promise<void>;
+  queueDialerQuestionResponse(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  queueDialerOptOut(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  syncDialerQuestionResponse(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
+  syncDialerOptOut(
+    payload: Record<string, any>,
+    helpers: JobHelpers
+  ): Promise<void>;
 }
 
 export interface ExternalSystemRecord {
@@ -337,3 +385,11 @@ export interface UserRecord {
   updated_at: string;
   is_suspended: boolean;
 }
+
+export type ContactIdColumn =
+  | "campaign_contact_id"
+  | "dialer_campaign_contact_id";
+export type ContactTable = "campaign_contact" | "dialer_campaign_contact";
+export type ResponseTable =
+  | "all_question_response"
+  | "dialer_question_response";

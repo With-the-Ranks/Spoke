@@ -62,6 +62,14 @@ import {
   markAutosendingPaused,
   unqueueAutosending
 } from "./lib/campaign";
+import {
+  assignDialerShift,
+  initiateCall,
+  markDialerContactComplete,
+  saveDialerQuestionResponses,
+  tagDialerContact,
+  updateDialerCall
+} from "./lib/dialer";
 import { getSecondPassCampaign } from "./lib/mark-second-pass";
 import { saveNewIncomingMessage } from "./lib/message-sending";
 import { processNumbers } from "./lib/opt-out";
@@ -1857,11 +1865,45 @@ const rootMutations = {
       const campaign = await r
         .knex("campaign")
         .where({ id: parseInt(campaignId, 10) })
-        .first(["organization_id", "is_archived"]);
+        .first(["organization_id", "is_archived", "type"]);
 
       const organizationId = campaign.organization_id;
 
       await accessRequired(user, organizationId, "ADMIN", true);
+
+      // Call campaigns: delete not-yet-called contacts from dialer_campaign_contact.
+      // Dependent rows (tags applied before dialing, etc.) have no ON DELETE
+      // cascade, so clear them first within a transaction.
+      if (campaign.type === "call") {
+        const deletedCount = await r.knex.transaction(async (trx) => {
+          const targetIds = await trx("dialer_campaign_contact")
+            .where({
+              campaign_id: parseInt(campaignId, 10),
+              call_status: "not_attempted"
+            })
+            .whereRaw(`archived = ${campaign.is_archived}`)
+            .whereNotExists(function noCalls() {
+              this.select(trx.raw(1))
+                .from("dialer_call")
+                .whereRaw(
+                  "dialer_call.dialer_campaign_contact_id = dialer_campaign_contact.id"
+                );
+            })
+            .pluck("id");
+
+          if (targetIds.length === 0) return 0;
+
+          await trx("dialer_campaign_contact_tag")
+            .whereIn("dialer_campaign_contact_id", targetIds)
+            .del();
+          await trx("dialer_question_response")
+            .whereIn("dialer_campaign_contact_id", targetIds)
+            .del();
+          return trx("dialer_campaign_contact").whereIn("id", targetIds).del();
+        });
+
+        return `Deleted ${deletedCount} uncalled campaign contacts`;
+      }
 
       /**
        * deleteNeedsMessage will only delete contacts
@@ -2203,6 +2245,27 @@ const rootMutations = {
       { campaignId, target, ageInHours },
       { user: _user }
     ) => {
+      const campaign = await r
+        .knex("campaign")
+        .where({ id: campaignId })
+        .first(["organization_id", "is_archived", "type"]);
+
+      // Call campaigns have no replies to release — only not-yet-called contacts.
+      // Unassign them back to the autoassign pool (mirrors releasing "unsent").
+      if (campaign.type === "call") {
+        const releasedCount = await r
+          .knex("dialer_campaign_contact")
+          .where({
+            campaign_id: parseInt(campaignId, 10),
+            call_status: "not_attempted"
+          })
+          .whereNotNull("assignment_id")
+          .whereRaw(`archived = ${campaign.is_archived}`)
+          .update({ assignment_id: null });
+
+        return `Released ${releasedCount} uncalled contacts for reassignment`;
+      }
+
       let messageStatus;
       switch (target) {
         case "UNSENT":
@@ -2222,11 +2285,6 @@ const rootMutations = {
         ageInHoursAgo.setHours(new Date().getHours() - ageInHours);
         ageInHoursAgo = ageInHoursAgo.toISOString();
       }
-
-      const campaign = await r
-        .knex("campaign")
-        .where({ id: campaignId })
-        .first(["organization_id", "is_archived"]);
 
       const updatedCount = await r.knex.transaction(async (trx) => {
         const queryArgs = [parseInt(campaignId, 10), messageStatus];
@@ -2751,7 +2809,7 @@ const rootMutations = {
         .del();
       return true;
     },
-    releaseMyReplies: async (_root, { organizationId }, { user }) => {
+    releaseMyTodos: async (_root, { organizationId }, { user }) => {
       await accessRequired(user, organizationId, "TEXTER");
 
       await r.knex.raw(
@@ -2762,6 +2820,21 @@ const rootMutations = {
         where assignment_id = assignment.id
           and assignment.user_id = ?
           and message_status = 'needsResponse'
+          and archived = false
+      `,
+        [user.id]
+      );
+
+      // Also release call contacts the volunteer claimed into a shift but never
+      // dialed (still 'not_attempted'), so they return to the pool for others.
+      await r.knex.raw(
+        `
+        update dialer_campaign_contact
+        set assignment_id = null
+        from assignment
+        where assignment_id = assignment.id
+          and assignment.user_id = ?
+          and call_status = 'not_attempted'
           and archived = false
       `,
         [user.id]
@@ -3331,6 +3404,98 @@ const rootMutations = {
       });
 
       return true;
+    },
+
+    initiateCall: async (
+      _root,
+      {
+        assignmentId,
+        dialerCampaignContactId
+      }: { assignmentId: string; dialerCampaignContactId: string },
+      { user }: SpokeRequestContext
+    ) => {
+      await assignmentRequired(user, assignmentId);
+      return initiateCall(assignmentId, dialerCampaignContactId, user);
+    },
+
+    requestCallShift: async (
+      _root,
+      { organizationId }: { organizationId: string },
+      { user }: SpokeRequestContext
+    ) => {
+      await accessRequired(user, organizationId, "TEXTER");
+      return assignDialerShift(user, organizationId, config.DIALER_SHIFT_SIZE);
+    },
+
+    updateDialerCall: async (
+      _root,
+      {
+        dialerCallId,
+        input
+      }: {
+        dialerCallId: string;
+        input: {
+          status?: string;
+          telnyxCallControlId?: string;
+          answeredAt?: string;
+          endedAt?: string;
+        };
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return updateDialerCall(dialerCallId, user, input);
+    },
+
+    saveDialerQuestionResponses: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        questionResponses
+      }: {
+        dialerCampaignContactId: string;
+        questionResponses: Array<{ interactionStepId: string; value: string }>;
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return saveDialerQuestionResponses(
+        dialerCampaignContactId,
+        questionResponses,
+        user
+      );
+    },
+
+    markDialerContactComplete: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        callStatus
+      }: { dialerCampaignContactId: string; callStatus: string },
+      { user }: SpokeRequestContext
+    ) => {
+      return markDialerContactComplete(
+        dialerCampaignContactId,
+        callStatus,
+        user
+      );
+    },
+
+    tagDialerContact: async (
+      _root,
+      {
+        dialerCampaignContactId,
+        tag
+      }: {
+        dialerCampaignContactId: string;
+        tag: { addedTagIds: string[]; removedTagIds: string[] };
+      },
+      { user }: SpokeRequestContext
+    ) => {
+      return tagDialerContact(
+        dialerCampaignContactId,
+        tag.addedTagIds,
+        tag.removedTagIds,
+        user
+      );
     }
   }
 };

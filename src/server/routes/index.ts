@@ -4,6 +4,7 @@ import previewRouter from "./campaign-preview";
 import { createRouter as createGraphqlRouter } from "./graphql";
 import nexmoRouter from "./nexmo";
 import settingsRouter from "./settings";
+import telnyxRouter from "./telnyx";
 import twilioRouter from "./twilio";
 import utilsRouter from "./utils";
 
@@ -14,6 +15,7 @@ export {
   twilioRouter,
   assembleRouter,
   settingsRouter,
+  telnyxRouter,
   utilsRouter,
   previewRouter
 };

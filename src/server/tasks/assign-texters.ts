@@ -1,8 +1,8 @@
+import type { TexterAssignmentInput } from "@spoke/spoke-codegen";
 import type { Pool, PoolClient } from "pg";
 
-import type { TexterAssignmentInput } from "../../api/assignment";
 import { DateTime } from "../../lib/datetime";
-import type { CampaignRecord } from "../api/types";
+import type { CampaignRecord, ContactTable } from "../api/types";
 import { Notifications, sendUserNotification } from "../notifications";
 import { withTransaction } from "../utils";
 import type { ProgressTask } from "./utils";
@@ -16,6 +16,39 @@ export interface AssignmentTarget {
   contactsCount: number;
   operation: string;
 }
+
+// Texting is the default everywhere (campaign_contact + the message_status
+// ordering baked into the per-stage option defaults). Only call campaigns
+// override the table and assignable rules.
+interface ContactTableConfig {
+  table?: ContactTable;
+  // Extra SQL predicate (with a leading "and ") restricting which unassigned
+  // contacts may be handed out.
+  assignableFilter?: string;
+  // ORDER BY expression deciding which assignable contacts go out first.
+  assignableOrder?: string;
+}
+
+// Admin push-assignment writes the same assignment_id column the volunteer
+// shift/pull path uses, so the two coexist: claimed contacts (non-null
+// assignment_id) are invisible to assignDialerShift, which only claims nulls.
+const getContactTableConfig = (
+  campaignType: string | null | undefined
+): ContactTableConfig =>
+  campaignType === "call"
+    ? {
+        table: "dialer_campaign_contact",
+        // Hand out only contacts that still need a call attempt — never
+        // already-dialed (answered/no-answer/voicemail) or do-not-call contacts.
+        // A no-answer contact is terminal, so we don't repeatedly call someone
+        // who doesn't pick up.
+        assignableFilter:
+          "and do_not_call = false and call_status = 'not_attempted'",
+        // The texting default orders by message_status, which doesn't exist on
+        // dialer_campaign_contact; order by id like the volunteer shift path.
+        assignableOrder: "id asc"
+      }
+    : {};
 
 interface EnsureAssignmentsOptions {
   client: PoolClient | Pool;
@@ -54,6 +87,7 @@ export const ensureAssignments = async (options: EnsureAssignmentsOptions) => {
 
 interface ZeroOutDeletedOptions {
   client: PoolClient | Pool;
+  table?: ContactTable;
   campaignId: number;
   isArchived: boolean;
   assignmentIds: number[];
@@ -63,6 +97,7 @@ interface ZeroOutDeletedOptions {
 export const zeroOutDeleted = async (options: ZeroOutDeletedOptions) => {
   const {
     client,
+    table = "campaign_contact",
     campaignId,
     isArchived,
     assignmentIds,
@@ -70,7 +105,7 @@ export const zeroOutDeleted = async (options: ZeroOutDeletedOptions) => {
   } = options;
   await client.query(
     `
-      update campaign_contact
+      update ${table}
       set assignment_id = null
       where
         campaign_id = $1
@@ -85,6 +120,7 @@ export const zeroOutDeleted = async (options: ZeroOutDeletedOptions) => {
 
 interface FreeUpTextersOptions {
   client: PoolClient;
+  table?: ContactTable;
   campaignId: number;
   isArchived: boolean;
   assignmentTargets: AssignmentTarget[];
@@ -94,6 +130,7 @@ interface FreeUpTextersOptions {
 export const freeUpTexters = async (options: FreeUpTextersOptions) => {
   const {
     client,
+    table = "campaign_contact",
     campaignId,
     isArchived,
     assignmentTargets,
@@ -106,7 +143,7 @@ export const freeUpTexters = async (options: FreeUpTextersOptions) => {
       `
         with cc_ids_to_keep as (
           select id
-          from campaign_contact
+          from ${table}
           where
             campaign_id = $1
             and archived = ${isArchived}
@@ -114,7 +151,7 @@ export const freeUpTexters = async (options: FreeUpTextersOptions) => {
           order by id asc
           limit $3
         )
-        update campaign_contact
+        update ${table}
         set assignment_id = null
         where
           campaign_id = $4
@@ -136,13 +173,32 @@ export const freeUpTexters = async (options: FreeUpTextersOptions) => {
 
 interface AssignPayloadsOptions {
   client: PoolClient;
+  table?: ContactTable;
+  assignableFilter?: string;
+  assignableOrder?: string;
   campaignId: number;
   isArchived: boolean;
   assignmentTargets: AssignmentTarget[];
 }
 
 export const assignPayloads = async (options: AssignPayloadsOptions) => {
-  const { client, campaignId, isArchived, assignmentTargets } = options;
+  const {
+    client,
+    table = "campaign_contact",
+    assignableFilter = "",
+    // Texting default: prioritize conversations that need action.
+    assignableOrder = `(case
+            when message_status = 'needsMessage' then 10
+            when message_status = 'needsResponse' then 20
+            when message_status = 'convo' then 30
+            when message_status = 'messaged' then 40
+            when message_status = 'closed' then 50
+            else 60
+          end) asc`,
+    campaignId,
+    isArchived,
+    assignmentTargets
+  } = options;
 
   const assignmentIds = assignmentTargets.map(({ id }) => parseInt(id, 10));
   const contactsCounts = assignmentTargets.map(
@@ -158,11 +214,11 @@ export const assignPayloads = async (options: AssignPayloadsOptions) => {
         select
           assignment_id,
           generate_series(1, desired_count - (
-            select count(*) from campaign_contact
+            select count(*) from ${table}
             where
               campaign_id = $3
               and archived = ${isArchived}
-              and campaign_contact.assignment_id = raw_assignments.assignment_id
+              and ${table}.assignment_id = raw_assignments.assignment_id
           ))
         from raw_assignments
       ),
@@ -175,32 +231,26 @@ export const assignPayloads = async (options: AssignPayloadsOptions) => {
       assignable_contacts as (
         select
           row_number() over () as row,
-          id as campaign_contact_id
-          from campaign_contact
+          id as contact_id
+          from ${table}
         where
           campaign_id = $3
           and archived = ${isArchived}
           and assignment_id is null
+          ${assignableFilter}
         order by
-          -- prioritize conversations requiring action
-          (case
-            when message_status = 'needsMessage' then 10
-            when message_status = 'needsResponse' then 20
-            when message_status = 'convo' then 30
-            when message_status = 'messaged' then 40
-            when message_status = 'closed' then 50
-            else 60
-          end) asc
+          -- prioritize contacts requiring action
+          ${assignableOrder}
       ),
       final_payloads as (
-        select ap.assignment_id, ac.campaign_contact_id
+        select ap.assignment_id, ac.contact_id
         from assignments_payload ap
         join assignable_contacts ac on ac.row = ap.row
       )
-      update campaign_contact cc
+      update ${table} cc
       set assignment_id = fp.assignment_id
       from final_payloads fp
-      where cc.id = fp.campaign_contact_id
+      where cc.id = fp.contact_id
     `,
     [assignmentIds, contactsCounts, campaignId]
   );
@@ -259,6 +309,12 @@ export const assignTexters: ProgressTask<AssignTextersPayload> = async (
     ])
     .then(({ rows: [row] }) => row);
 
+  // Texting campaigns assign campaign_contact rows; call campaigns assign
+  // dialer_campaign_contact rows. Everything else is shared.
+  const { table, assignableFilter, assignableOrder } = getContactTableConfig(
+    campaign.type
+  );
+
   const targets = await helpers.withPgClient((poolClient) =>
     withTransaction(poolClient, async (trx) => {
       // Ensure assignments for all texters
@@ -273,6 +329,7 @@ export const assignTexters: ProgressTask<AssignTextersPayload> = async (
       const assignmentIds = assignmentTargets.map(({ id }) => parseInt(id, 10));
       await zeroOutDeleted({
         client: trx,
+        table,
         campaignId,
         isArchived: campaign.is_archived ?? false,
         assignmentIds,
@@ -283,6 +340,7 @@ export const assignTexters: ProgressTask<AssignTextersPayload> = async (
       // Free up contacts from assignment counts that have decreased
       await freeUpTexters({
         client: trx,
+        table,
         campaignId,
         isArchived: campaign.is_archived ?? false,
         assignmentTargets,
@@ -294,6 +352,9 @@ export const assignTexters: ProgressTask<AssignTextersPayload> = async (
       // Assign desired payloads to texters
       await assignPayloads({
         client: trx,
+        table,
+        assignableFilter,
+        assignableOrder,
         campaignId,
         isArchived: campaign.is_archived ?? false,
         assignmentTargets

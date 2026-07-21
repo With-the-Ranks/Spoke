@@ -77,3 +77,19 @@ mutation StartCampaign($campaignId: String!) {
     isApproved
   }
 }
+
+query GetCampaignType($campaignId: String!) {
+  campaign(id: $campaignId) {
+    id
+    isStarted
+    campaignType
+    contactsCount
+  }
+}
+
+mutation EditCampaignType($campaignId: String!, $payload: CampaignInput!) {
+  editCampaign(id: $campaignId, campaign: $payload) {
+    id
+    campaignType
+  }
+}

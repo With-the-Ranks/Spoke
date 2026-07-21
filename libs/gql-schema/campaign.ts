@@ -1,4 +1,9 @@
 export const schema = `
+  enum CampaignType {
+    SMS
+    CALL
+  }
+
   input CampaignsFilter {
     isArchived: Boolean
     isStarted: Boolean
@@ -52,6 +57,7 @@ export const schema = `
   type CampaignReadiness {
     id: ID!
     basics: Boolean!
+    campaignType: Boolean!
     messagingService: Boolean!
     textingHours: Boolean!
     integration: Boolean!
@@ -128,6 +134,7 @@ export const schema = `
     columnMapping: [CsvColumnMapping!]
     messagingService: MessagingService
     contactsFilename: String
+    campaignType: CampaignType!
   }
 
   type CampaignEdge {
@@ -201,6 +208,7 @@ export const schema = `
     messagingServiceSid: String
     autosendLimit: Int
     columnMapping: [CsvColumnMappingInput!]
+    campaignType: CampaignType
   }
 `;
 export default schema;

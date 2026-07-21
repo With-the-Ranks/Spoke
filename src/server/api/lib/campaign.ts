@@ -2,12 +2,14 @@
 import type {
   Campaign,
   CampaignInput,
-  CampaignsFilter
+  CampaignsFilter,
+  CampaignType
 } from "@spoke/spoke-codegen";
 import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import isNil from "lodash/isNil";
 import type { QueryResult } from "pg";
+import zipCodeToTimeZone from "zipcode-to-timezone";
 
 import type { RelayPaginatedResponse } from "../../../api/pagination";
 import { config } from "../../../config";
@@ -295,7 +297,8 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
             is_autoassign_enabled,
             limit_assignment_to_teams,
             replies_stale_after_minutes,
-            external_system_id
+            external_system_id,
+            type
           )
           select
             coalesce(?, organization_id),
@@ -318,7 +321,8 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
             false as is_autoassign_enabled,
             limit_assignment_to_teams,
             replies_stale_after_minutes,
-            external_system_id
+            external_system_id,
+            type
           from all_campaign
           where id = ?
           returning *
@@ -522,7 +526,8 @@ export const editCampaign = async (
     timezone,
     externalSystemId,
     messagingServiceSid,
-    columnMapping
+    columnMapping,
+    campaignType
   } = campaign;
 
   const organizationId = origCampaignRecord.organization_id;
@@ -541,7 +546,10 @@ export const editCampaign = async (
     replies_stale_after_minutes: repliesStaleAfter, // this is null to unset it - it must be null, not undefined
     timezone: timezone ? parseIanaZone(timezone) : undefined,
     external_system_id: externalSystemId,
-    messaging_service_sid: messagingServiceSid ?? undefined
+    messaging_service_sid: messagingServiceSid ?? undefined,
+    type: campaignType
+      ? (campaignType.toLowerCase() as Lowercase<CampaignType>)
+      : undefined
   };
 
   Object.keys(campaignUpdates).forEach((key) => {
@@ -603,8 +611,13 @@ export const editCampaign = async (
   ) {
     await accessRequired(user, organizationId, "ADMIN", /* superadmin */ true);
 
+    // A campaign's type is fixed at creation, so the persisted value on
+    // origCampaignRecord is authoritative for routing the upload.
+    const isCallCampaign = origCampaignRecord.type === "call";
+
     // Uploading contacts from a CSV invalidates external system configuration
-    // and invalidates filtered landlines
+    // and invalidates filtered landlines. Reset for both campaign types (at
+    // least until filter-landlines is dropped).
     await r
       .knex("campaign")
       .update({
@@ -613,44 +626,68 @@ export const editCampaign = async (
       })
       .where({ id });
 
-    const contactsToSave = campaign.contacts.map((datum) => {
-      const modelData = {
+    if (isCallCampaign) {
+      // Call campaigns store contacts in dialer_campaign_contact and are
+      // dialed by volunteers over WebRTC; they never enter the SMS
+      // campaign_contact / messaging pipeline (and so skip the
+      // upload_contacts job, opt-out scrubbing, and landline filtering).
+      const dialerContacts = campaign.contacts.map((datum) => ({
         campaign_id: id,
         first_name: datum.firstName,
         last_name: datum.lastName,
         cell: datum.cell,
-        external_id: datum.external_id,
-        custom_fields: datum.customFields,
-        message_status: "needsMessage",
-        is_opted_out: false,
-        zip: datum.zip || ""
+        external_id: datum.external_id || null,
+        zip: datum.zip || "",
+        timezone: datum.zip ? zipCodeToTimeZone.lookup(datum.zip) : null,
+        custom_fields: JSON.stringify(datum.customFields ?? {})
+      }));
+
+      await r.knex.transaction(async (trx) => {
+        await trx("dialer_campaign_contact")
+          .where({ campaign_id: id })
+          .delete();
+        await trx.batchInsert("dialer_campaign_contact", dialerContacts, 1000);
+      });
+    } else {
+      const contactsToSave = campaign.contacts.map((datum) => {
+        const modelData = {
+          campaign_id: id,
+          first_name: datum.firstName,
+          last_name: datum.lastName,
+          cell: datum.cell,
+          external_id: datum.external_id,
+          custom_fields: datum.customFields,
+          message_status: "needsMessage",
+          is_opted_out: false,
+          zip: datum.zip || ""
+        };
+        modelData.campaign_id = id;
+        return modelData;
+      });
+      const jobPayload = {
+        excludeCampaignIds: campaign.excludeCampaignIds || [],
+        contacts: contactsToSave,
+        filterOutLandlines: campaign.filterOutLandlines,
+        validationStats
       };
-      modelData.campaign_id = id;
-      return modelData;
-    });
-    const jobPayload = {
-      excludeCampaignIds: campaign.excludeCampaignIds || [],
-      contacts: contactsToSave,
-      filterOutLandlines: campaign.filterOutLandlines,
-      validationStats
-    };
-    const compressedString: Buffer = (await gzip(
-      JSON.stringify(jobPayload)
-    )) as Buffer;
-    const [job] = await r
-      .knex("job_request")
-      .insert({
-        queue_name: `${id}:edit_campaign`,
-        job_type: "upload_contacts",
-        locks_queue: true,
-        assigned: JOBS_SAME_PROCESS, // can get called immediately, below
-        campaign_id: id,
-        // NOTE: stringifying because compressedString is a binary buffer
-        payload: compressedString.toString("base64")
-      })
-      .returning("*");
-    if (JOBS_SAME_PROCESS) {
-      uploadContacts(job);
+      const compressedString: Buffer = (await gzip(
+        JSON.stringify(jobPayload)
+      )) as Buffer;
+      const [job] = await r
+        .knex("job_request")
+        .insert({
+          queue_name: `${id}:edit_campaign`,
+          job_type: "upload_contacts",
+          locks_queue: true,
+          assigned: JOBS_SAME_PROCESS, // can get called immediately, below
+          campaign_id: id,
+          // NOTE: stringifying because compressedString is a binary buffer
+          payload: compressedString.toString("base64")
+        })
+        .returning("*");
+      if (JOBS_SAME_PROCESS) {
+        uploadContacts(job);
+      }
     }
   }
   if (

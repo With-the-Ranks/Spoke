@@ -13,7 +13,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { withTheme } from "@material-ui/core/styles";
-import { CampaignBuilderMode } from "@spoke/spoke-codegen";
+import { CampaignBuilderMode, CampaignType } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
 import pick from "lodash/pick";
 import PropTypes from "prop-types";
@@ -54,6 +54,7 @@ import CampaignOverlapManager from "./sections/CampaignOverlapManager";
 import CampaignTeamsForm from "./sections/CampaignTeamsForm";
 import CampaignTextersForm from "./sections/CampaignTextersForm";
 import CampaignTextingHoursForm from "./sections/CampaignTextingHoursForm";
+import CampaignTypeForm from "./sections/CampaignTypeForm";
 import CampaignVariablesForm from "./sections/CampaignVariablesForm";
 
 class AdminCampaignEdit extends React.Component {
@@ -298,7 +299,21 @@ class AdminCampaignEdit extends React.Component {
   };
 
   sections = () => {
+    const isCallCampaign =
+      this.state.campaignFormValues.campaignType === CampaignType.Call;
+
     const sections = [
+      {
+        title: "Campaign Type",
+        content: CampaignTypeForm,
+        isStandalone: true,
+        showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced],
+        keys: ["campaignType"],
+        checkCompleted: () => true,
+        blocksStarting: false,
+        expandAfterCampaignStarts: false,
+        expandableBySuperVolunteers: false
+      },
       {
         title: "Basics",
         content: CampaignBasicsForm,
@@ -350,11 +365,12 @@ class AdminCampaignEdit extends React.Component {
         expandAfterCampaignStarts: false,
         expandableBySuperVolunteers: false,
         exclude:
+          isCallCampaign ||
           this.props.organizationData?.organization?.messagingServices?.edges
             ?.length <= 1
       },
       {
-        title: "Texting Hours",
+        title: "Contact Hours",
         content: CampaignTextingHoursForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
@@ -477,7 +493,7 @@ class AdminCampaignEdit extends React.Component {
         }
       },
       {
-        title: "Texters",
+        title: "Volunteers",
         content: CampaignTextersForm,
         isStandalone: true,
         showForModes: [CampaignBuilderMode.Advanced],
@@ -579,7 +595,7 @@ class AdminCampaignEdit extends React.Component {
           (job) =>
             job.jobType === "upload_contacts" || job.jobType === "contact_sql"
         );
-      } else if (section.title === "Texters") {
+      } else if (section.title === "Volunteers") {
         [relatedJob] = pendingJobs.filter(
           (job) => job.jobType === "assign_texters"
         );

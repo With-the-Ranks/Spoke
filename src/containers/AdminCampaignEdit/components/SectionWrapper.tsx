@@ -14,6 +14,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import DoneIcon from "@material-ui/icons/Done";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import WarningIcon from "@material-ui/icons/Warning";
+import type { CampaignType } from "@spoke/spoke-codegen";
 import clsx from "clsx";
 import isNil from "lodash/isNil";
 import React from "react";
@@ -56,6 +57,10 @@ interface WrapperProps {
   isExpandable: boolean;
   sectionIsDone: boolean;
   deleteJob: DeleteJobType;
+
+  // Optional: render a custom status avatar (e.g. a campaign-type icon) instead
+  // of the default done/warning indicator.
+  avatarOverride?: React.ReactNode;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -109,6 +114,10 @@ const useStyles = makeStyles((theme) => ({
   warningIcon: {
     color: theme.palette.warning.main
   },
+  typeIcon: {
+    display: "flex",
+    color: theme.palette.success.main
+  },
   expand: {
     transform: "rotate(0deg)",
     marginLeft: "auto",
@@ -161,7 +170,8 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
     isExpandable,
     pendingJob,
     sectionIsDone,
-    deleteJob
+    deleteJob,
+    avatarOverride
   } = props;
 
   const classes = useStyles();
@@ -188,6 +198,17 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
     );
     classNames.push(classes.saving);
     cardHeaderStyle.width = `${progressPercent}%`;
+  } else if (avatarOverride) {
+    avatar = (
+      <Avatar className={classes.cardAvatar}>
+        <span className={classes.typeIcon}>{avatarOverride}</span>
+      </Avatar>
+    );
+    if (active && expandable) {
+      classNames.push(classes.active);
+    } else if (!expandable) {
+      classNames.push(classes.unexpandable);
+    }
   } else if (active && expandable) {
     classNames.push(classes.active);
   } else if (!expandable) {
@@ -298,9 +319,11 @@ const makeQueries = (jobTypes: string[]) => ({
           id
           isStarted
           isApproved
+          campaignType
           readiness {
             id
             basics
+            campaignType
             messagingService
             textingHours
             integration
@@ -372,6 +395,9 @@ export interface SectionOptions {
   jobQueueNames: string[];
   expandAfterCampaignStarts: boolean;
   expandableBySuperVolunteers: boolean;
+  // Optional: render a custom status avatar based on the campaign instead of the
+  // default done/warning indicator (e.g. a text/call icon for Campaign Type).
+  avatarIcon?: (campaign: { campaignType: CampaignType }) => React.ReactNode;
 }
 
 interface WrapperGraphqlProps {
@@ -379,6 +405,7 @@ interface WrapperGraphqlProps {
     campaign: {
       id: string;
       isStarted: boolean;
+      campaignType: CampaignType;
       readiness: CampaignReadinessType;
     };
   };
@@ -401,6 +428,7 @@ interface WrappedComponentProps
   isExpandable: boolean;
   sectionIsDone: boolean;
   deleteJob: DeleteJobType;
+  avatarOverride?: React.ReactNode;
 }
 
 export const asSection = (options: SectionOptions) => (
@@ -433,7 +461,17 @@ export const asSection = (options: SectionOptions) => (
 
       const sectionIsDone = readiness[readinessName];
 
-      return { pendingJob, isExpandable, sectionIsDone, deleteJob };
+      const avatarOverride = options.avatarIcon
+        ? options.avatarIcon(status.campaign)
+        : undefined;
+
+      return {
+        pendingJob,
+        isExpandable,
+        sectionIsDone,
+        deleteJob,
+        avatarOverride
+      };
     })
   )((props) => {
     const {
@@ -454,6 +492,7 @@ export const asSection = (options: SectionOptions) => (
       isExpandable,
       sectionIsDone,
       deleteJob,
+      avatarOverride,
 
       ...otherProps
     } = props;
@@ -470,6 +509,7 @@ export const asSection = (options: SectionOptions) => (
         isExpandable={isExpandable}
         sectionIsDone={sectionIsDone}
         deleteJob={deleteJob}
+        avatarOverride={avatarOverride}
       >
         <Component
           organizationId={organizationId}

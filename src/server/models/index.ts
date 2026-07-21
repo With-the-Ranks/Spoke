@@ -45,6 +45,30 @@ const createLoader = <T = unknown>(
   });
 };
 
+/**
+ * Like createLoader, but batches by a non-unique foreign key and returns the
+ * full list of matching rows per key (empty array when none match). Useful for
+ * one-to-many relationships, e.g. all interaction steps for a campaign.
+ *
+ * @param {string} tableName The database table name to load from
+ * @param {string} foreignKey The column to batch and group by
+ * @param {function} applyScope Optional extra query scoping (e.g. soft-delete)
+ */
+const createListLoader = <T = unknown>(
+  context: SpokeContext,
+  tableName: string,
+  foreignKey: string,
+  applyScope?: (query: any) => any
+) => {
+  const { db } = context;
+  return new DataLoader<string, T[]>(async (keys) => {
+    const baseQuery = db.reader(tableName).whereIn(foreignKey, keys);
+    const docs = await (applyScope ? applyScope(baseQuery) : baseQuery);
+    const docsByKey = groupBy(docs, foreignKey);
+    return keys.map((key) => docsByKey[key] ?? []);
+  });
+};
+
 const createLoaders = (context: SpokeContext) => ({
   assignment: createLoader(context, "assignment"),
   assignmentRequest: createLoader(context, "assignment_request"),
@@ -56,6 +80,12 @@ const createLoaders = (context: SpokeContext) => ({
   campaignTeam: createLoader(context, "campaign_team"),
   cannedResponse: createLoader(context, "canned_response"),
   interactionStep: createLoader(context, "interaction_step"),
+  interactionStepsByCampaign: createListLoader(
+    context,
+    "interaction_step",
+    "campaign_id",
+    (query) => query.where({ is_deleted: false })
+  ),
   invite: createLoader(context, "invite"),
   jobRequest: createLoader(context, "job_request"),
   linkDomain: createLoader(context, "link_domain"),

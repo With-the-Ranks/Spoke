@@ -30,6 +30,7 @@ import {
   exportOptOuts,
   TASK_IDENTIFIER as exportOptOutsIdentifier
 } from "./tasks/export-opt-outs";
+import { taskList as externalSystemSyncTaskList } from "./tasks/external-system-sync";
 import {
   filterLandlines,
   TASK_IDENTIFIER as filterLandlinesIdentifier
@@ -44,7 +45,6 @@ import {
   PAUSE_AUTOSENDING_CAMPAIGNS_TASK_IDENTIFIER,
   pauseAutosendingCampaigns
 } from "./tasks/pause-autosending";
-import queueActionExternalSync from "./tasks/queue-action-external-sync";
 import {
   QUEUE_AUTOSEND_INITIALS_TASK_IDENTIFIER,
   QUEUE_AUTOSEND_ORGANIZATION_INITIALS_TASK_IDENTIFIER,
@@ -63,8 +63,6 @@ import {
   sendNotificationDigestForUser,
   sendNotificationEmail
 } from "./tasks/send-notification-email";
-import syncContactOptOut from "./tasks/sync-contact-opt-out";
-import syncContactQuestionResponse from "./tasks/sync-contact-question-response";
 import syncSlackTeamMembers from "./tasks/sync-slack-team-members";
 import { trollPatrol, trollPatrolForOrganization } from "./tasks/troll-patrol";
 import updateOrgMessageUsage from "./tasks/update-org-message-usage";
@@ -135,9 +133,7 @@ export const getWorker = async (attempt = 0): Promise<Runner> => {
     "queue-daily-notifications": queueDailyNotifications,
     "send-notification-email": sendNotificationEmail,
     "send-notification-digest": sendNotificationDigestForUser,
-    "queue-action-external-sync": queueActionExternalSync,
-    "sync-contact-question-response": syncContactQuestionResponse,
-    "sync-contact-opt-out": syncContactOptOut,
+    ...externalSystemSyncTaskList,
     [QUEUE_AUTOSEND_INITIALS_TASK_IDENTIFIER]: queueAutoSendInitials,
     // prettier and eslint are fighting here
     // eslint-disable-next-line max-len
