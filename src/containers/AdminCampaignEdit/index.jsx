@@ -46,7 +46,6 @@ import CampaignAutoassignModeForm from "./sections/CampaignAutoassignModeForm";
 import CampaignBasicsForm from "./sections/CampaignBasicsForm";
 import CampaignCannedResponsesForm from "./sections/CampaignCannedResponsesForm";
 import CampaignContactsForm from "./sections/CampaignContactsForm";
-import CampaignFilterLandlinesForm from "./sections/CampaignFilterLandlinesForm";
 import CampaignGroupsForm from "./sections/CampaignGroupsForm";
 import CampaignIntegrationForm from "./sections/CampaignIntegrationForm";
 import CampaignInteractionStepsForm from "./sections/CampaignInteractionStepsForm";
@@ -445,28 +444,10 @@ class AdminCampaignEdit extends React.Component {
           jobResult: this.props.pendingJobsData.campaign.pendingJobs.find(
             (job) => /contacts/.test(job.jobType)
           ),
-          canFilterLandlines:
-            this.props.organizationData.organization &&
-            !!this.props.organizationData.organization.numbersApiKey,
           otherCampaigns: this.props.organizationData.organization.campaigns.campaigns.filter(
             (campaign) => campaign.id !== this.props.match.params.campaignId
           )
         }
-      },
-      {
-        title: "Filtering Landlines",
-        content: CampaignFilterLandlinesForm,
-        isStandalone: true,
-        showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced],
-        keys: ["landlinesFiltered"],
-        checkCompleted: () => true,
-        blocksStarting: false,
-        expandAfterCampaignStarts: false,
-        extraProps: {},
-        exclude:
-          isCallCampaign ||
-          (this.props.organizationData.organization &&
-            !this.props.organizationData.organization.numbersApiKey)
       },
       {
         title: "Contact Overlap Management",
