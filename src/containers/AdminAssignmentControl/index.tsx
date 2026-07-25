@@ -123,6 +123,11 @@ const AdminAssignmentControl: React.FC<InnerProps> = (props) => {
   const hasChanges = Object.keys(changes).length > 0;
 
   const assignmentPools = assignmentPoolsWithChanges();
+  const hasInvalidPools = assignmentPools.some(
+    (pool) =>
+      pool.isAssignmentEnabled &&
+      (!pool.maxRequestCount || !pool.assignmentType)
+  );
   const escalationTagList = props.assignmentConfiguration.organization
     ? props.assignmentConfiguration.organization.escalationTagList
     : [];
@@ -151,7 +156,7 @@ const AdminAssignmentControl: React.FC<InnerProps> = (props) => {
         <Button
           variant="contained"
           color="primary"
-          disabled={working || !hasChanges}
+          disabled={working || !hasChanges || hasInvalidPools}
           onClick={handleSaveAssignmentControls}
         >
           Save

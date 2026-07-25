@@ -2,12 +2,12 @@ import Chip from "@material-ui/core/Chip";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import { TextRequestType } from "@spoke/spoke-codegen";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import Toggle from "material-ui/Toggle";
 import React from "react";
 
-import { TextRequestType } from "../../../api/types";
 import type {
   TagWithTitle,
   TeamForAssignment,
@@ -29,33 +29,6 @@ const AssignmentRow: React.FC<AssignmentRowProps> = (props) => {
     escalationTagList
   } = props;
 
-  const handleToggleIsEnabled = (
-    _event: React.MouseEvent<unknown, MouseEvent>,
-    isAssignmentEnabled: boolean
-  ) => onChange({ isAssignmentEnabled });
-
-  const handleChangeAssignmentType = (
-    _event: React.SyntheticEvent<unknown, Event>,
-    _index: number,
-    assignmentType: any
-  ) => onChange({ assignmentType });
-
-  const handleChangeMaxCount = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const maxRequestCount = event?.target?.value;
-    onChange({
-      maxRequestCount: maxRequestCount ? parseInt(maxRequestCount, 10) : null
-    });
-  };
-
-  const handleChangeEscalationTags = (
-    _event: React.ChangeEvent<any>,
-    value: TagWithTitle[]
-  ): void => {
-    onChange({ escalationTags: value });
-  };
-
   const {
     id,
     title,
@@ -66,6 +39,52 @@ const AssignmentRow: React.FC<AssignmentRowProps> = (props) => {
     maxRequestCount,
     escalationTags
   } = assignmentPool;
+
+  const handleToggleIsEnabled = (
+    _event: React.MouseEvent<unknown, MouseEvent>,
+    newIsAssignmentEnabled: boolean
+  ) => {
+    const payload: TeamInputWithTags = {
+      isAssignmentEnabled: newIsAssignmentEnabled
+    };
+    if (newIsAssignmentEnabled) {
+      const effectiveType = assignmentType ?? TextRequestType.Unreplied;
+      if (!assignmentType) payload.assignmentType = effectiveType;
+
+      if (!maxRequestCount) {
+        payload.maxRequestCount =
+          effectiveType === TextRequestType.Unreplied ? 10 : 100;
+      }
+    }
+    onChange(payload);
+  };
+
+  const handleChangeAssignmentType = (
+    _event: React.SyntheticEvent<unknown, Event>,
+    _index: number,
+    newAssignmentType: TextRequestType
+  ) =>
+    onChange({
+      assignmentType: newAssignmentType,
+      maxRequestCount:
+        newAssignmentType === TextRequestType.Unreplied ? 10 : 100
+    });
+
+  const handleChangeMaxCount = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const rawValue = event?.target?.value;
+    onChange({
+      maxRequestCount: rawValue ? parseInt(rawValue, 10) : null
+    });
+  };
+
+  const handleChangeEscalationTags = (
+    _event: React.ChangeEvent<any>,
+    value: TagWithTitle[]
+  ): void => {
+    onChange({ escalationTags: value });
+  };
 
   const isSaveDisabled =
     isRowDisabled || !isAssignmentEnabled || id === "general";
@@ -98,11 +117,11 @@ const AssignmentRow: React.FC<AssignmentRowProps> = (props) => {
           onChange={handleChangeAssignmentType}
         >
           <MenuItem
-            value={TextRequestType.UNSENT}
+            value={TextRequestType.Unsent}
             primaryText="Unsent Initial Messages"
           />
           <MenuItem
-            value={TextRequestType.UNREPLIED}
+            value={TextRequestType.Unreplied}
             primaryText="Unhandled Replies"
           />
         </SelectField>
@@ -111,8 +130,10 @@ const AssignmentRow: React.FC<AssignmentRowProps> = (props) => {
         <TextField
           label="Max to request at once"
           type="number"
-          value={maxRequestCount}
+          value={maxRequestCount ?? ""}
           disabled={isRowDisabled || !isAssignmentEnabled}
+          required={isAssignmentEnabled}
+          error={isAssignmentEnabled && !maxRequestCount}
           onChange={handleChangeMaxCount}
         />
       </Grid>
