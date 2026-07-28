@@ -34,3 +34,18 @@ jobs:
           prerelease: ${{ !!steps.semver_parser.outputs.prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Notify Slack
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          VERSION: ${{ steps.semver_parser.outputs.fullversion }}
+          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.semver_parser.outputs.fullversion }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL secret not set, skipping Slack notification"
+            exit 0
+          fi
+          jq -n \
+            --arg text "New Spoke release: <$RELEASE_URL|v$VERSION>" \
+            '{text: $text}' \
+          | curl -X POST -H "Content-Type: application/json" -d @- "$SLACK_WEBHOOK_URL"
