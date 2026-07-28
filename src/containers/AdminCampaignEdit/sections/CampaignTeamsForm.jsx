@@ -31,7 +31,11 @@ class CampaignTeamsForm extends React.Component {
   };
 
   handleChange = (_event, value) => {
-    this.props.onChange({ teams: value });
+    const update = { teams: value };
+    if (value.length === 0) {
+      update.isAssignmentLimitedToTeams = false;
+    }
+    this.props.onChange(update);
   };
 
   render() {
