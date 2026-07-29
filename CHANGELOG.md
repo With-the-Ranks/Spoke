@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.0.0](https://github.com/With-the-Ranks/spoke/compare/v10.4.0...v11.0.0) (2026-07-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **exports:** export multiple campaigns (#182)
+
+### Features
+
+* **assemble-numbers:** add send after support ([#222](https://github.com/With-the-Ranks/spoke/issues/222)) ([d09ae06](https://github.com/With-the-Ranks/spoke/commit/d09ae06fd75bfcbd60631b822c01f72d3a406dec))
+* hide filter landlines ([#219](https://github.com/With-the-Ranks/spoke/issues/219)) ([e014ad2](https://github.com/With-the-Ranks/spoke/commit/e014ad24b1c885c44b954fef4cb0d0e1bc026632))
+* **exports:** export multiple campaigns ([#182](https://github.com/With-the-Ranks/spoke/issues/182)) ([1ed7a9f](https://github.com/With-the-Ranks/spoke/commit/1ed7a9f65d96951c216778b76981581692d9e6c2))
+
+
+### Bug Fixes
+
+* **assignment-control:** enforce assignment type and max count for enabled teams ([#213](https://github.com/With-the-Ranks/spoke/issues/213)) ([ecc5b03](https://github.com/With-the-Ranks/spoke/commit/ecc5b03b563d0513e20fd7654f6a2f022c7b4e5a))
+* **teams:** remove team restriction when no teams for campaign ([#221](https://github.com/With-the-Ranks/spoke/issues/221)) ([ad2cda4](https://github.com/With-the-Ranks/spoke/commit/ad2cda4834d86fee8e13910a34b221e44b7be694))
+
+
+### Backend Changes
+
+* **ci:** fix incorrect SHA being added to tag for every dev deploy ([#214](https://github.com/With-the-Ranks/spoke/issues/214)) ([ea0d26f](https://github.com/With-the-Ranks/spoke/commit/ea0d26f80b4afc685eb53376080f22b9a3f289c0))
+* update seeds to not use logger.info ([#206](https://github.com/With-the-Ranks/spoke/issues/206)) ([9e1d099](https://github.com/With-the-Ranks/spoke/commit/9e1d0999970fe2321ff3dee280c121bbfac5f064))
+* **tool-versions:** update node version ([#195](https://github.com/With-the-Ranks/spoke/issues/195)) ([46b1efd](https://github.com/With-the-Ranks/spoke/commit/46b1efd4572c9a7695b24a7ece6cecb308024f17))
+
 ## [10.4.0](https://github.com/With-the-Ranks/spoke/compare/v10.2.0...v10.4.0) (2026-06-02)
 
 
