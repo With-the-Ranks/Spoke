@@ -43,6 +43,7 @@ interface NumbersOutboundMessagePayload {
   mediaUrls?: any; // client lib has incorrect type [string]
   contactZipCode?: string;
   sendBefore: string;
+  sendAfter?: string;
 }
 
 interface NumbersInboundMessagePayload {
@@ -178,10 +179,11 @@ export const sendMessage = async (
   const profileId = service.messaging_service_sid;
   const numbers = await numbersClient(service);
 
-  const { zip: contactZipCode } = await r
+  const { zip: contactZipCode, send_after: sendAfter } = await r
     .reader("campaign_contact")
-    .where({ id: campaignContactId })
-    .first("zip");
+    .join("campaign", "campaign_contact.campaign_id", "campaign.id")
+    .where({ "campaign_contact.id": campaignContactId })
+    .first("campaign_contact.zip as zip", "campaign.send_after as send_after");
 
   const { features } = await r
     .reader("organization")
@@ -205,7 +207,8 @@ export const sendMessage = async (
     body,
     mediaUrls,
     sendBefore,
-    contactZipCode: contactZipCode === "" ? null : contactZipCode
+    contactZipCode: contactZipCode === "" ? null : contactZipCode,
+    ...(sendAfter ? { sendAfter } : {})
   };
 
   try {
