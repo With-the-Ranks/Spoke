@@ -223,6 +223,7 @@ CREATE TABLE public.all_campaign (
     is_template boolean DEFAULT false NOT NULL,
     messaging_service_sid text,
     autosend_limit integer,
+    send_after timestamp with time zone,
     CONSTRAINT campaign_autosend_status_check CHECK ((autosend_status = ANY (ARRAY['unstarted'::text, 'sending'::text, 'paused'::text, 'complete'::text])))
 );
 
@@ -1524,7 +1525,8 @@ CREATE VIEW public.campaign AS
     all_campaign.autosend_status,
     all_campaign.autosend_user_id,
     all_campaign.messaging_service_sid,
-    all_campaign.autosend_limit
+    all_campaign.autosend_limit,
+    all_campaign.send_after
    FROM public.all_campaign
   WHERE (all_campaign.is_template = false);
 
