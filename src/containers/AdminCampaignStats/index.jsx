@@ -10,7 +10,8 @@ import Alert from "@material-ui/lab/Alert";
 import {
   GetCampaignDocument,
   GetOrganizationDataDocument,
-  GetOrganizationsDocument
+  GetOrganizationsDocument,
+  StartCampaignDocument
 } from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
@@ -94,7 +95,9 @@ class AdminCampaignStats extends React.Component {
     copyCampaignError: undefined,
     exportCampaignOpen: false,
     exportCampaignError: undefined,
-    moreMenuAnchor: null
+    moreMenuAnchor: null,
+    startCampaignErrorOpen: false,
+    startCampaignError: undefined
   };
 
   handleNavigateToEdit = () => {
@@ -106,6 +109,20 @@ class AdminCampaignStats extends React.Component {
   handleNavigateToAutosending = () => {
     const { organizationId } = this.props.match.params;
     this.props.history.push(`/admin/${organizationId}/autosending`);
+  };
+
+  handleStartCampaign = async () => {
+    try {
+      const result = await this.props.mutations.startCampaign();
+      if (result.errors) {
+        throw result.errors;
+      }
+    } catch (error) {
+      this.setState({
+        startCampaignError: error.message ?? String(error),
+        startCampaignErrorOpen: true
+      });
+    }
   };
 
   handleOpenMoreMenu = (event) => {
@@ -239,7 +256,11 @@ class AdminCampaignStats extends React.Component {
     if (!campaign) {
       return <h1> Uh oh! Campaign {campaignId} doesn't seem to exist </h1>;
     }
-    const { pendingJobs, messagingService } = campaign;
+    const { pendingJobs, messagingService, readiness } = campaign;
+
+    const isCampaignReady = Object.keys(readiness)
+      .filter((key) => key !== "__typename" && key !== "id")
+      .every((key) => readiness[key]);
 
     const currentExportJob = pendingJobs.find(
       (job) => job.jobType === "export"
@@ -336,12 +357,19 @@ class AdminCampaignStats extends React.Component {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleNavigateToAutosending}
-                >
-                  Autosending
-                </Button>
+                {!campaign.isStarted && isCampaignReady && (
+                  <Button variant="outlined" onClick={this.handleStartCampaign}>
+                    Start Campaign
+                  </Button>
+                )}
+                {campaign.isStarted && window.ENABLE_AUTOSENDING && (
+                  <Button
+                    variant="outlined"
+                    onClick={this.handleNavigateToAutosending}
+                  >
+                    Autosending
+                  </Button>
+                )}
                 {isAdmin && (
                   <>
                     <Button
@@ -474,6 +502,18 @@ class AdminCampaignStats extends React.Component {
           }}
         />
         <Snackbar
+          open={this.state.startCampaignErrorOpen}
+          autoHideDuration={5000}
+          onClose={() => {
+            this.setState({
+              startCampaignErrorOpen: false,
+              startCampaignError: undefined
+            });
+          }}
+        >
+          <Alert severity="error">{this.state.startCampaignError}</Alert>
+        </Snackbar>
+        <Snackbar
           open={this.state.campaignJustCopied}
           message={
             this.state.copyCampaignError
@@ -567,6 +607,10 @@ const queries = {
 };
 
 const mutations = {
+  startCampaign: (ownProps) => () => ({
+    mutation: StartCampaignDocument,
+    variables: { campaignId: ownProps.match.params.campaignId }
+  }),
   archiveCampaign: (ownProps) => () => ({
     mutation: gql`
       mutation archiveCampaign($campaignId: String!) {
