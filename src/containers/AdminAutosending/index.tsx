@@ -135,17 +135,22 @@ const AdminAutosending: React.FC = () => {
     campaigns.filter(
       (c) => c.autosendStatus && activeStatus.includes(c.autosendStatus)
     ),
-    (c) => c.id
+    (c) => Number(c.id)
   );
 
-  const inactiveCampaigns = sortBy(
-    campaigns.filter(
-      (c) => c.autosendStatus && !activeStatus.includes(c.autosendStatus)
-    ),
-    (c) => c.id
+  const unstartedCampaigns = sortBy(
+    campaigns.filter((c) => c.autosendStatus === "unstarted"),
+    (c) => Number(c.id)
   );
 
-  const sortedCampaigns = activeCampaigns.concat(inactiveCampaigns);
+  const completeCampaigns = sortBy(
+    campaigns.filter((c) => c.autosendStatus === "complete"),
+    (c) => Number(c.id)
+  );
+
+  const sortedCampaigns = activeCampaigns
+    .concat(unstartedCampaigns)
+    .concat(completeCampaigns);
   const actionsDisabled = isStartingAutosending || isPausingAutosending;
   const inlineStyles = useStyles();
 
