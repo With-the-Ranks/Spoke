@@ -110,7 +110,6 @@ export const sendMessage = async (
     .join("campaign", "campaign_contact.campaign_id", "campaign.id")
     .where({ "campaign_contact.id": parseInt(campaignContactId, 10) })
     .whereRaw("campaign_contact.archived = false")
-    .where({ "campaign.is_archived": false })
     .leftJoin("assignment", "campaign_contact.assignment_id", "assignment.id");
 
   if (config.ENABLE_MONTHLY_ORG_MESSAGE_LIMITS) {
@@ -133,7 +132,6 @@ export const sendMessage = async (
       "campaign_contact.assignment_id as assignment_id",
       "campaign_contact.message_status as cc_message_status",
       "campaign.id as campaign_id",
-      "campaign.is_archived as is_archived",
       "campaign.organization_id as organization_id",
       "campaign.timezone as c_timezone",
       "campaign.texting_hours_start as c_texting_hours_start",

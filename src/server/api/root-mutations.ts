@@ -1559,10 +1559,9 @@ const rootMutations = {
         const contactUpdates = r
           .knex("campaign_contact")
           .transacting(trx)
-          .leftJoin("campaign", "campaign_contact.campaign_id", "campaign.id")
           .where({
             "campaign_contact.cell": cell,
-            "campaign.is_archived": false
+            "campaign_contact.archived": false
           })
           .pluck("campaign_contact.id")
           .then((contactIdsRes) => {
@@ -2243,10 +2242,9 @@ const rootMutations = {
           set
             assignment_id = null
           from
-            assignment, campaign
+            assignment
           where
             campaign_contact.campaign_id = ?
-            and campaign.id = campaign_contact.campaign_id
             and assignment.id = campaign_contact.assignment_id
             and is_opted_out = false
             and message_status = ?
