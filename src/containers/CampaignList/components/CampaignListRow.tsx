@@ -77,7 +77,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     onToggleAutoassign: props.startOperation({
       name: isAutoassignEnabled ? "turnAutoAssignOff" : "turnAutoAssignOn",
       campaign
-    }) as () => void
+    })
   });
 
   const isCampaignSelected = !!campaignDetailsForExport.find(

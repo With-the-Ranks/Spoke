@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import type { GraphQLError } from "graphql";
-import type { MouseEventHandler } from "react";
 
 import type { Tag } from "./components/CampaignHeader";
 
@@ -19,15 +18,9 @@ export interface Operation {
 }
 
 export interface CampaignOperationsProps {
-  startOperation: (
-    op: Operation
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
-  archiveCampaign: (
-    campaignId: string
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
-  unarchiveCampaign: (
-    campaignId: string
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
+  startOperation: (op: Operation) => () => void;
+  archiveCampaign: (campaignId: string) => () => void;
+  unarchiveCampaign: (campaignId: string) => () => void;
 }
 
 export const dialogOperations: Record<string, OperationDefinition> = {
