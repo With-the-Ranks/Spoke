@@ -938,31 +938,13 @@ const rootMutations = {
       return newCampaigns;
     },
 
-    unarchiveCampaign: async (_root, { id }, { user, loaders }) => {
+    setCampaignArchived: async (_root, { id, archived }, { user, loaders }) => {
       const { organization_id } = await loaders.campaign.load(id);
       await accessRequired(user, organization_id, "ADMIN");
 
       const [campaign] = await r
         .knex("campaign")
-        .update({ is_archived: false })
-        .where({ id })
-        .returning("*");
-
-      const memoizer = await MemoizeHelper.getMemoizer();
-      await memoizer.invalidate(cacheOpts.CampaignsList.key, {
-        organizationId: organization_id
-      });
-
-      return campaign;
-    },
-
-    archiveCampaign: async (_root, { id }, { user, loaders }) => {
-      const { organization_id } = await loaders.campaign.load(id);
-      await accessRequired(user, organization_id, "ADMIN");
-
-      const [campaign] = await r
-        .knex("campaign")
-        .update({ is_archived: true })
+        .update({ is_archived: archived })
         .where({ id })
         .returning("*");
 

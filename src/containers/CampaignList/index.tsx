@@ -1,13 +1,12 @@
 import type { Campaign } from "@spoke/spoke-codegen";
 import {
   ReleaseActionTarget,
-  useArchiveCampaignMutation,
   useDeleteNeedsMessageMutation,
   useGetAdminAssignmentTargetsQuery,
   useMarkForSecondPassMutation,
   useReleaseMessagesMutation,
+  useSetCampaignArchivedMutation,
   useToggleAutoAssignMutation,
-  useUnarchiveCampaignMutation,
   useUnMarkForSecondPassMutation
 } from "@spoke/spoke-codegen";
 import type { GraphQLError } from "graphql";
@@ -46,17 +45,14 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
   const [finished, setFinished] = useState<string | undefined>(undefined);
   const [executing, setExecuting] = useState(false);
 
-  const [useArchiveCampaign] = useArchiveCampaignMutation();
-  const [useUnarchiveCampaign] = useUnarchiveCampaignMutation();
+  const [setCampaignArchived] = useSetCampaignArchivedMutation();
   const toggleArchive = (
     campaignId: string,
     shouldArchive: boolean
   ) => async () => {
-    if (shouldArchive) {
-      await useArchiveCampaign({ variables: { campaignId } });
-    } else {
-      await useUnarchiveCampaign({ variables: { campaignId } });
-    }
+    await setCampaignArchived({
+      variables: { campaignId, archived: shouldArchive }
+    });
   };
 
   const [releaseMessages] = useReleaseMessagesMutation();
