@@ -30,8 +30,7 @@ const CampaignListLoader: React.FC<Props> = (props) => {
     pageSize,
     isAdmin,
     startOperation,
-    archiveCampaign,
-    unarchiveCampaign,
+    toggleArchive,
     toggleAutoAssign,
     selectForExport,
     campaignDetailsForExport
@@ -107,8 +106,7 @@ const CampaignListLoader: React.FC<Props> = (props) => {
         campaigns={campaigns}
         isAdmin={isAdmin}
         startOperation={startOperation}
-        archiveCampaign={archiveCampaign}
-        unarchiveCampaign={unarchiveCampaign}
+        toggleArchive={toggleArchive}
         toggleAutoAssign={toggleAutoAssign}
         selectForExport={selectForExport}
         campaignDetailsForExport={campaignDetailsForExport}

@@ -133,8 +133,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
             <CampaignListMenu
               campaign={campaign}
               startOperation={props.startOperation}
-              archiveCampaign={props.archiveCampaign}
-              unarchiveCampaign={props.unarchiveCampaign}
+              toggleArchive={props.toggleArchive}
               toggleAutoAssign={props.toggleAutoAssign}
             />
           </ListItemSecondaryAction>

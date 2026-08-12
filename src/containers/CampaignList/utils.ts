@@ -19,8 +19,7 @@ export interface Operation {
 
 export interface CampaignOperationsProps {
   startOperation: (op: Operation) => () => void;
-  archiveCampaign: (campaignId: string) => () => void;
-  unarchiveCampaign: (campaignId: string) => () => void;
+  toggleArchive: (campaignId: string, shouldArchive: boolean) => () => void;
   toggleAutoAssign: (campaignId: string, enabled: boolean) => () => void;
 }
 
@@ -83,14 +82,6 @@ export interface MarkForSecondPass extends Operation {
     hours: number;
   };
 }
-
-export const isArchiveCampaign = (inProgress: Operation) => {
-  return inProgress.name === "archiveCampign";
-};
-
-export const isUnarchiveCampaign = (inProgress: Operation) => {
-  return inProgress.name === "unarchiveCampign";
-};
 
 export const isReleaseUnsentMessages = (inProgress: Operation) => {
   return inProgress.name === "releaseUnsentMessages";

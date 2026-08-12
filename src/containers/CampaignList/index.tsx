@@ -20,12 +20,10 @@ import CampaignListLoader from "./components/CampaignListLoader";
 import { OperationDialog } from "./components/OperationDialog";
 import type { Operation } from "./utils";
 import {
-  isArchiveCampaign,
   isDeleteNeedsMessage,
   isMarkForSecondPass,
   isReleaseUnrepliedMessages,
   isReleaseUnsentMessages,
-  isUnarchiveCampaign,
   isUnMarkForSecondPass
 } from "./utils";
 
@@ -49,16 +47,16 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
   const [executing, setExecuting] = useState(false);
 
   const [useArchiveCampaign] = useArchiveCampaignMutation();
-  const archiveCampaign = (campaignId: string) => async () => {
-    await useArchiveCampaign({
-      variables: { campaignId }
-    });
-  };
   const [useUnarchiveCampaign] = useUnarchiveCampaignMutation();
-  const unarchiveCampaign = (campaignId: string) => async () => {
-    await useUnarchiveCampaign({
-      variables: { campaignId }
-    });
+  const toggleArchive = (
+    campaignId: string,
+    shouldArchive: boolean
+  ) => async () => {
+    if (shouldArchive) {
+      await useArchiveCampaign({ variables: { campaignId } });
+    } else {
+      await useUnarchiveCampaign({ variables: { campaignId } });
+    }
   };
 
   const [releaseMessages] = useReleaseMessagesMutation();
@@ -107,20 +105,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
 
     // eslint-disable-next-line default-case
     switch (true) {
-      case isArchiveCampaign(inProgress): {
-        const { data, errors } = await useArchiveCampaign({
-          variables: { campaignId: campaign.id }
-        });
-        setStateAfterOperation(data?.archiveCampaign, errors);
-        break;
-      }
-      case isUnarchiveCampaign(inProgress): {
-        const { data, errors } = await useUnarchiveCampaign({
-          variables: { campaignId: campaign.id }
-        });
-        setStateAfterOperation(data?.unarchiveCampaign, errors);
-        break;
-      }
       case isReleaseUnsent || isReleaseUnreplied: {
         const target = isReleaseUnsent
           ? ReleaseActionTarget.Unsent
@@ -221,8 +205,7 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         pageSize={pageSize}
         isAdmin={isAdmin}
         startOperation={start}
-        archiveCampaign={archiveCampaign}
-        unarchiveCampaign={unarchiveCampaign}
+        toggleArchive={toggleArchive}
         toggleAutoAssign={toggleAutoAssign}
         selectForExport={selectForExport}
         campaignDetailsForExport={campaignDetailsForExport}
