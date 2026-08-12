@@ -74,10 +74,10 @@ export const CampaignListRow: React.FC<Props> = (props) => {
     hasUnsentInitialMessages,
     hasUnhandledMessages,
     onNavigate: (path) => history.push(path),
-    onToggleAutoassign: props.startOperation({
-      name: isAutoassignEnabled ? "turnAutoAssignOff" : "turnAutoAssignOn",
-      campaign
-    })
+    onToggleAutoassign: props.toggleAutoAssign(
+      campaign.id,
+      !isAutoassignEnabled
+    )
   });
 
   const isCampaignSelected = !!campaignDetailsForExport.find(
@@ -135,6 +135,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
               startOperation={props.startOperation}
               archiveCampaign={props.archiveCampaign}
               unarchiveCampaign={props.unarchiveCampaign}
+              toggleAutoAssign={props.toggleAutoAssign}
             />
           </ListItemSecondaryAction>
         )}

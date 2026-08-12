@@ -32,6 +32,7 @@ export const CampaignList: React.FC<Props> = (props) => {
           startOperation={props.startOperation}
           archiveCampaign={props.archiveCampaign}
           unarchiveCampaign={props.unarchiveCampaign}
+          toggleAutoAssign={props.toggleAutoAssign}
           selectForExport={props.selectForExport}
           campaignDetailsForExport={props.campaignDetailsForExport}
         />

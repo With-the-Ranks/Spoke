@@ -21,6 +21,7 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
     startOperation,
     archiveCampaign,
     unarchiveCampaign,
+    toggleAutoAssign,
     campaign
   } = props;
 
@@ -105,12 +106,7 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
           Un-Mark for Second Pass
         </MenuItem>
         <MenuItem
-          onClick={startOperation({
-            name: campaign.isAutoassignEnabled
-              ? "turnAutoAssignOff"
-              : "turnAutoAssignOn",
-            campaign
-          })}
+          onClick={toggleAutoAssign(campaign.id, !campaign.isAutoassignEnabled)}
         >
           {campaign.isAutoassignEnabled
             ? "Turn auto-assign OFF"
