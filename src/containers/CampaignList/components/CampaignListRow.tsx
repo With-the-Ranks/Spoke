@@ -67,10 +67,17 @@ export const CampaignListRow: React.FC<Props> = (props) => {
   );
 
   const headerTags = makeCampaignHeaderTags({
+    organizationId,
+    campaignId: campaign.id,
     isStarted,
     isAutoAssignEligible,
     hasUnsentInitialMessages,
-    hasUnhandledMessages
+    hasUnhandledMessages,
+    onNavigate: (path) => history.push(path),
+    onToggleAutoassign: props.startOperation({
+      name: isAutoassignEnabled ? "turnAutoAssignOff" : "turnAutoAssignOn",
+      campaign
+    }) as () => void
   });
 
   const isCampaignSelected = !!campaignDetailsForExport.find(
