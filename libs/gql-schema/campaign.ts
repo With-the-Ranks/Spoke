@@ -96,6 +96,7 @@ export const schema = `
     hasUnassignedContacts: Boolean
     hasUnsentInitialMessages: Boolean
     hasUnhandledMessages: Boolean
+    hasSentMessages: Boolean!
     customFields: [String]
     customFieldAverageLengths: JSON!
     cannedResponses(userId: String): [CannedResponse!]!

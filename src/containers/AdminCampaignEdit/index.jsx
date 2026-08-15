@@ -23,14 +23,15 @@ import { compose } from "recompose";
 
 import { withSpokeContext } from "../../client/spoke-context";
 import CampaignNavigation from "../../components/CampaignNavigation";
-import { dataTest } from "../../lib/attributes";
 import { DateTime } from "../../lib/datetime";
 import theme from "../../styles/theme";
 import { withAuthzContext } from "../AuthzProvider";
 import { loadData } from "../hoc/with-operations";
 import ApproveCampaignButton from "./components/ApproveCampaignButton";
+import ArchiveCampaignButton from "./components/ArchiveCampaignButton";
 import { SectionWrapper } from "./components/SectionWrapper";
 import StartCampaignButton from "./components/StartCampaignButton";
+import UnstartCampaignButton from "./components/UnstartCampaignButton";
 import {
   DELETE_JOB,
   EDIT_CAMPAIGN,
@@ -38,7 +39,6 @@ import {
   GET_EDIT_CAMPAIGN_DATA,
   GET_ORGANIZATION_ACTIONS,
   GET_ORGANIZATION_DATA,
-  SET_CAMPAIGN_ARCHIVED,
   START_CAMPAIGN
 } from "./queries";
 import CampaignAutoassignModeForm from "./sections/CampaignAutoassignModeForm";
@@ -652,21 +652,37 @@ class AdminCampaignEdit extends React.Component {
     } = this.props.campaignData;
 
     const isOverdue = DateTime.local() >= DateTime.fromISO(dueBy);
+    const isCampaignReady = !isStarted && this.isCampaignReadyToStart();
 
-    const notStarting = isStarted ? (
+    const statusText = isStarted
+      ? isOverdue
+        ? "This campaign is running but is overdue!"
+        : "This campaign is running!"
+      : isCampaignReady
+      ? "Your campaign is all good to go!"
+      : "You need to complete all the sections below before you can start this campaign";
+
+    const header = (
       <div
-        {...dataTest("campaignIsStarted")}
         style={{
-          color: isOverdue ? red[600] : theme.colors.green
+          ...theme.layouts.multiColumn.container
         }}
       >
-        {isOverdue
-          ? "This campaign is running but is overdue!"
-          : "This campaign is running!"}
-        {this.renderCurrentEditors()}
+        <div
+          style={{
+            ...theme.layouts.multiColumn.flexColumn,
+            ...(isStarted && {
+              color: isOverdue ? red[600] : theme.colors.green
+            })
+          }}
+        >
+          {statusText}
+          {this.renderCurrentEditors()}
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {this.renderHeaderButtons(isCampaignReady)}
+        </div>
       </div>
-    ) : (
-      this.renderStartButton()
     );
 
     return (
@@ -733,19 +749,13 @@ class AdminCampaignEdit extends React.Component {
             Starting your campaign...
           </div>
         )}
-        {!isTemplate && !this.state.startingCampaign && notStarting}
+        {!isTemplate && !this.state.startingCampaign && header}
       </div>
     );
   };
 
-  renderStartButton = () => {
-    const { isAdmin, campaignData, pendingJobsData, mutations } = this.props;
-
-    if (!isAdmin) {
-      // Supervolunteers don't have access to start the campaign or un/archive it
-      return null;
-    }
-    const { campaign } = campaignData;
+  isCampaignReadyToStart = () => {
+    const { pendingJobsData } = this.props;
 
     let isCompleted =
       pendingJobsData.campaign.pendingJobs.filter((job) =>
@@ -756,43 +766,41 @@ class AdminCampaignEdit extends React.Component {
       if (
         (section.blocksStarting && !this.checkSectionCompleted(section)) ||
         !this.checkSectionSaved(section)
-      ) {
+      )
         isCompleted = false;
-      }
     });
 
+    return isCompleted;
+  };
+
+  renderHeaderButtons = (isCampaignReady) => {
+    const { isAdmin, campaignData } = this.props;
+    if (!isAdmin) return null;
+    const { campaign } = campaignData;
+
     return (
-      <div
-        style={{
-          ...theme.layouts.multiColumn.container
-        }}
-      >
-        <div
-          style={{
-            ...theme.layouts.multiColumn.flexColumn
-          }}
-        >
-          {isCompleted
-            ? "Your campaign is all good to go!"
-            : "You need to complete all the sections below before you can start this campaign"}
-          {this.renderCurrentEditors()}
-        </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            onClick={() =>
-              mutations.setCampaignArchived(campaign.id, !campaign.isArchived)
-            }
-          >
-            {campaign.isArchived ? "Unarchive" : "Archive"}
-          </Button>
-          <ApproveCampaignButton campaignId={campaign.id} />
-          <StartCampaignButton
-            campaignId={campaign.id}
-            isCompleted={isCompleted}
-          />
-        </div>
-      </div>
+      <>
+        <ArchiveCampaignButton
+          campaignId={campaign.id}
+          isArchived={campaign.isArchived}
+        />
+        {campaign.isStarted ? (
+          !campaign.hasSentMessages && (
+            <UnstartCampaignButton
+              campaignId={campaign.id}
+              onError={this.handleSectionError}
+            />
+          )
+        ) : (
+          <>
+            <ApproveCampaignButton campaignId={campaign.id} />
+            <StartCampaignButton
+              campaignId={campaign.id}
+              isCompleted={isCampaignReady}
+            />
+          </>
+        )}
+      </>
     );
   };
 
@@ -943,10 +951,6 @@ const queries = {
 };
 
 const mutations = {
-  setCampaignArchived: (_ownProps) => (campaignId, archived) => ({
-    mutation: SET_CAMPAIGN_ARCHIVED,
-    variables: { campaignId, archived }
-  }),
   startCampaign: (_ownProps) => (campaignId) => ({
     mutation: START_CAMPAIGN,
     variables: { campaignId }

@@ -814,6 +814,20 @@ export const editCampaign = async (
   return newCampaign || loaders.campaign.load(id);
 };
 
+export const hasSentMessages = async (campaignId: string) => {
+  const { rows } = await r.reader.raw(
+    `
+      select exists (
+        select 1 from message m
+        join campaign_contact cc on cc.id = m.campaign_contact_id
+        where campaign_id = ?
+      ) as message_exists
+    `,
+    [campaignId]
+  );
+  return rows[0] && rows[0].message_exists;
+};
+
 export const invalidScriptFields = async (campaignId: string) => {
   const { rows: variables } = await r.knex.raw(
     // eslint-disable-next-line no-useless-escape

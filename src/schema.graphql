@@ -296,6 +296,7 @@ type RootMutation {
   ): CampaignContact,
   setCampaignApproved(id: String!, approved: Boolean!): Campaign!,
   startCampaign(id:String!): Campaign,
+  unstartCampaign(id:String!): Campaign,
   setCampaignArchived(id: String!, archived: Boolean!): Campaign!,
   sendReply(id: String!, message: String!): CampaignContact
   getAssignmentContacts(assignmentId: String!, contactIds: [String], findNew: Boolean): [CampaignContact],
@@ -663,6 +664,7 @@ type Campaign {
   hasUnassignedContacts: Boolean
   hasUnsentInitialMessages: Boolean
   hasUnhandledMessages: Boolean
+  hasSentMessages: Boolean!
   customFields: [String]
   customFieldAverageLengths: JSON
   cannedResponses(userId: String): [CannedResponse!]!
