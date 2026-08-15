@@ -739,14 +739,19 @@ class AdminCampaignEdit extends React.Component {
   };
 
   renderStartButton = () => {
-    if (!this.props.isAdmin) {
+    const { isAdmin, campaignData, pendingJobsData, mutations } = this.props;
+
+    if (!isAdmin) {
       // Supervolunteers don't have access to start the campaign or un/archive it
       return null;
     }
+    const { campaign } = campaignData;
+
     let isCompleted =
-      this.props.pendingJobsData.campaign.pendingJobs.filter((job) =>
+      pendingJobsData.campaign.pendingJobs.filter((job) =>
         /Error/.test(job.resultMessage || "")
       ).length === 0;
+
     this.sections().forEach((section) => {
       if (
         (section.blocksStarting && !this.checkSectionCompleted(section)) ||
@@ -776,21 +781,14 @@ class AdminCampaignEdit extends React.Component {
           <Button
             variant="outlined"
             onClick={() =>
-              this.props.mutations.setCampaignArchived(
-                this.props.campaignData.campaign.id,
-                !this.props.campaignData.campaign.isArchived
-              )
+              mutations.setCampaignArchived(campaign.id, !campaign.isArchived)
             }
           >
-            {this.props.campaignData.campaign.isArchived
-              ? "Unarchive"
-              : "Archive"}
+            {campaign.isArchived ? "Unarchive" : "Archive"}
           </Button>
-          <ApproveCampaignButton
-            campaignId={this.props.campaignData.campaign.id}
-          />
+          <ApproveCampaignButton campaignId={campaign.id} />
           <StartCampaignButton
-            campaignId={this.props.campaignData.campaign.id}
+            campaignId={campaign.id}
             isCompleted={isCompleted}
           />
         </div>
