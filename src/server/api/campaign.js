@@ -9,7 +9,11 @@ import MemoizeHelper, { Buckets, cacheOpts } from "../memoredis";
 import { cacheableData, r } from "../models";
 import { currentEditors } from "../models/cacheable_queries";
 import { accessRequired } from "./errors";
-import { getDeliverabilityStats, invalidScriptFields } from "./lib/campaign";
+import {
+  getDeliverabilityStats,
+  hasSentMessages,
+  invalidScriptFields
+} from "./lib/campaign";
 import { symmetricEncrypt } from "./lib/crypto";
 import { getMessagingServiceById } from "./lib/message-sending";
 import { formatPage } from "./lib/pagination";
@@ -764,6 +768,7 @@ export const resolvers = {
         organizationId: campaign.organization_id
       });
     },
+    hasSentMessages: async (campaign) => hasSentMessages(campaign.id),
     customFields: async (campaign) =>
       campaign.customFields ||
       cacheableData.campaign.dbCustomFields(campaign.id),
