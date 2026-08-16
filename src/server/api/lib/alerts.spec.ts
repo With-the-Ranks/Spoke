@@ -31,12 +31,13 @@ describe("notifyLargeCampaignEvent", () => {
   });
 
   const setUpCampaign = async (client: PoolClient) => {
-    const { organization } = await createOrgAndSession(client, {
+    const { organization, user } = await createOrgAndSession(client, {
       agent,
       role: UserRoleType.OWNER
     });
     const campaign = await createCampaign(client, {
-      organizationId: organization.id
+      organizationId: organization.id,
+      creatorId: user.id
     });
     await Promise.all(
       [...new Array(10)].map(() =>

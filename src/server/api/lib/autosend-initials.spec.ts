@@ -28,6 +28,7 @@ const createTestBed = async (
   });
   const campaign = await createCampaign(client, {
     organizationId: organization.id,
+    creatorId: user.id,
     isStarted: true
   });
   await Promise.all(
