@@ -32,7 +32,8 @@ describe("handle-delivery-report", () => {
       const texter = await createTexter(client, {});
       const organization = await createOrganization(client, {});
       const campaign = await createCampaign(client, {
-        organizationId: organization.id
+        organizationId: organization.id,
+        creatorId: texter.id
       });
       const campaignContact = await createCampaignContact(client, {
         campaignId: campaign.id

@@ -407,7 +407,10 @@ export const createCompleteCampaign = async (
     ? optOrg
     : await createOrganization(client, optOrg ?? {});
 
+  const creator = await createTexter(client, {});
+
   const campaign = await createCampaign(client, {
+    creatorId: creator.id,
     ...(options.campaign ?? {}),
     organizationId: organization.id
   });
