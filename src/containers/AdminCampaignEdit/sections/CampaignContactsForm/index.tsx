@@ -367,10 +367,6 @@ const queries = {
             id
           }
           datawarehouseAvailable
-          columnMapping {
-            column
-            remap
-          }
           contactsFilename
         }
       }

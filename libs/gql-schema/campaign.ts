@@ -70,11 +70,6 @@ export const schema = `
     INCLUDES_NOT_ACTIVE_TARGETS
   }
 
-  type CsvColumnMapping {
-    column: String!
-    remap: String!
-  }
-
   type Campaign {
     id: ID!
     organization: Organization!
@@ -83,39 +78,39 @@ export const schema = `
     dueBy: Date
     readiness: CampaignReadiness!
     isApproved: Boolean!
-    isStarted: Boolean
-    isArchived: Boolean
+    isStarted: Boolean!
+    isArchived: Boolean!
     isTemplate: Boolean!
-    creator: User
-    texters: [User]
-    assignments(assignmentsFilter: AssignmentsFilter): [Assignment]
-    interactionSteps: [InteractionStep]
+    creator: User!
+    texters: [User!]!
+    assignments(assignmentsFilter: AssignmentsFilter): [Assignment!]!
+    interactionSteps: [InteractionStep!]!
     invalidScriptFields: [String!]!
-    contacts: [CampaignContact]
-    contactsCount: Int
-    hasUnassignedContacts: Boolean
-    hasUnsentInitialMessages: Boolean
-    hasUnhandledMessages: Boolean
+    contacts: [CampaignContact!]!
+    contactsCount: Int!
+    hasUnassignedContacts: Boolean!
+    hasUnsentInitialMessages: Boolean!
+    hasUnhandledMessages: Boolean!
     hasSentMessages: Boolean!
-    customFields: [String]
+    customFields: [String!]!
     customFieldAverageLengths: JSON!
     cannedResponses(userId: String): [CannedResponse!]!
-    stats: CampaignStats,
-    pendingJobs(jobTypes: [String]): [JobRequest]!
-    datawarehouseAvailable: Boolean
+    stats: CampaignStats!
+    pendingJobs(jobTypes: [String]): [JobRequest!]!
+    datawarehouseAvailable: Boolean!
     introHtml: String
     primaryColor: String
     logoImageUrl: String
-    editors: String
+    editors: String!
     teams: [Team!]!
     campaignGroups: CampaignGroupPage
     campaignVariables: [CampaignVariable!]!
-    textingHoursStart: Int
-    textingHoursEnd: Int
+    textingHoursStart: Int!
+    textingHoursEnd: Int!
     isAutoassignEnabled: Boolean!
     repliesStaleAfter: Int
     isAssignmentLimitedToTeams: Boolean!
-    timezone: String
+    timezone: String!
     createdAt: String!
     previewUrl: String
     landlinesFiltered: Boolean!
@@ -126,7 +121,6 @@ export const schema = `
     autosendStatus: String!
     messagingServiceSid: String
     autosendLimit: Int
-    columnMapping: [CsvColumnMapping!]
     messagingService: MessagingService
     contactsFilename: String
   }

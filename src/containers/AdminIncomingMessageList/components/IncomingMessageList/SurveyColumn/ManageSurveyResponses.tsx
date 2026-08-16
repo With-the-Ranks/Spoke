@@ -61,15 +61,14 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
 
   useEffect(() => {
     const { interactionSteps } = props.campaign;
-    const newQuestionResponses = interactionSteps?.reduce<QuestionResponseMap>(
+    const newQuestionResponses = interactionSteps.reduce<QuestionResponseMap>(
       (collector, iStep) => {
-        if (!iStep) return collector;
         const value = iStep.questionResponse?.value;
         return value ? { ...collector, [iStep.id]: value } : collector;
       },
       {}
     );
-    setQuestionResponses(newQuestionResponses ?? {});
+    setQuestionResponses(newQuestionResponses);
   }, [props.campaign.interactionSteps]);
 
   const getResponsesFrom = (startingStepId: string) => {
@@ -77,26 +76,24 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
     const iSteps: (InteractionStep & { children: InteractionStep[] })[] = [];
 
     let currentStep: InteractionStep | null =
-      interactionSteps?.find(
-        (iStep) => iStep?.questionText && iStep.id === startingStepId
+      interactionSteps.find(
+        (iStep) => iStep.questionText && iStep.id === startingStepId
       ) ?? null;
 
     while (currentStep) {
       const currentStepId = currentStep.id;
 
-      const children = (
-        interactionSteps?.filter(
-          (iStep) => iStep?.parentInteractionId === currentStepId
-        ) ?? []
-      ).filter((iStep): iStep is InteractionStep => iStep !== null);
+      const children = interactionSteps.filter(
+        (iStep) => iStep.parentInteractionId === currentStepId
+      );
 
       iSteps.push({ ...currentStep, children });
       const value = questionResponses[currentStep.id];
 
       currentStep = value
         ? // Only show actionable questions
-          children?.find(
-            (iStep) => iStep?.questionText && iStep.answerOption === value
+          children.find(
+            (iStep) => iStep.questionText && iStep.answerOption === value
           ) ?? null
         : null;
     }
@@ -178,8 +175,8 @@ export const ManageSurveyResponses: React.FC<ManageSurveyResponsesProps> = (
 
   const { interactionSteps } = props.campaign;
 
-  const startingStep = interactionSteps?.find(
-    (iStep) => iStep?.parentInteractionId === null
+  const startingStep = interactionSteps.find(
+    (iStep) => iStep.parentInteractionId === null
   );
 
   // There may not be an interaction step, or it may not define a question

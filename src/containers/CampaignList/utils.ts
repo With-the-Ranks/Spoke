@@ -118,10 +118,10 @@ export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
 type MakeCampaignTagsFn = (props: {
   organizationId: string;
   campaignId: string;
-  isStarted: boolean | null | undefined;
+  isStarted: boolean;
   isAutoAssignEligible: boolean;
-  hasUnsentInitialMessages: boolean | null | undefined;
-  hasUnhandledMessages: boolean | null | undefined;
+  hasUnsentInitialMessages: boolean;
+  hasUnhandledMessages: boolean;
   onNavigate: (path: string) => void;
   onToggleAutoassign: () => void;
 }) => Tag[];
