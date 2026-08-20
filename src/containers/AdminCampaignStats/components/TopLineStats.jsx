@@ -2,12 +2,15 @@ import { gql } from "@apollo/client";
 import { Grid } from "@material-ui/core";
 import PropTypes from "prop-types";
 import React from "react";
+import { Link } from "react-router-dom";
 
 import { withQueries } from "../../hoc/with-operations";
 import CampaignStat from "./CampaignStat";
 
 export const TopLineStats = (props) => {
   const {
+    organizationId,
+    campaignId,
     contactsCount,
     assignments,
     needsMessageCount,
@@ -65,18 +68,24 @@ export const TopLineStats = (props) => {
         />
       </Grid>
       <Grid item xs={2}>
-        <CampaignStat
-          title="Replies"
-          loading={receivedMessagesCount.loading}
-          error={
-            receivedMessagesCount.errors && receivedMessagesCount.errors.message
-          }
-          count={
-            receivedMessagesCount.campaign &&
-            receivedMessagesCount.campaign.stats.receivedMessagesCount
-          }
-          highlight={replyHighlight}
-        />
+        <Link
+          to={`/admin/${organizationId}/incoming?campaignsFilter=isArchived-false_campaignId-${campaignId}&contactsFilter=isOptedOut-false_messageStatus-needsResponse`}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <CampaignStat
+            title="Replies"
+            loading={receivedMessagesCount.loading}
+            error={
+              receivedMessagesCount.errors &&
+              receivedMessagesCount.errors.message
+            }
+            count={
+              receivedMessagesCount.campaign &&
+              receivedMessagesCount.campaign.stats.receivedMessagesCount
+            }
+            highlight={replyHighlight}
+          />
+        </Link>
       </Grid>
       <Grid item xs={2}>
         <CampaignStat
@@ -93,6 +102,7 @@ export const TopLineStats = (props) => {
 };
 
 TopLineStats.propTypes = {
+  organizationId: PropTypes.string.isRequired,
   campaignId: PropTypes.string.isRequired
 };
 

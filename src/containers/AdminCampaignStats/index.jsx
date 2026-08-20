@@ -445,7 +445,10 @@ class AdminCampaignStats extends React.Component {
             </div>
           </div>
         </div>
-        <TopLineStats campaignId={campaign.id} />
+        <TopLineStats
+          organizationId={organizationId}
+          campaignId={campaign.id}
+        />
         <div
           style={{ marginTop: 32, marginBottom: 16 }}
           className={css(styles.header)}
