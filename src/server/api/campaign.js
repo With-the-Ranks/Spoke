@@ -168,6 +168,66 @@ export const resolvers = {
 
       return memoizedSentMessagesCount({ campaignId: campaign.id });
     },
+    sentSmsSegmentsCount: async (campaign) => {
+      const getSentSmsSegmentsCount = async ({ campaignId }) => {
+        const count = await r.parseCount(
+          r
+            .reader("campaign_contact")
+            .join(
+              "message",
+              "message.campaign_contact_id",
+              "campaign_contact.id"
+            )
+            .where({
+              "campaign_contact.campaign_id": campaignId,
+              "message.is_from_contact": false
+            })
+            .whereRaw("coalesce(message.num_media, 0) = 0")
+            .sum("message.num_segments as count")
+        );
+        return count || 0;
+      };
+
+      const memoizer = await MemoizeHelper.getMemoizer();
+      const memoizedSentSmsSegmentsCount = MemoizeHelper.hasBucketConfigured(
+        Buckets.Aggregates
+      )
+        ? memoizer.memoize(
+            getSentSmsSegmentsCount,
+            cacheOpts.CampaignSentSmsSegmentsCount
+          )
+        : getSentSmsSegmentsCount;
+
+      return memoizedSentSmsSegmentsCount({ campaignId: campaign.id });
+    },
+    sentMmsCount: async (campaign) => {
+      const getSentMmsCount = async ({ campaignId }) => {
+        return r.parseCount(
+          r
+            .reader("campaign_contact")
+            .join(
+              "message",
+              "message.campaign_contact_id",
+              "campaign_contact.id"
+            )
+            .where({
+              "campaign_contact.campaign_id": campaignId,
+              "message.is_from_contact": false
+            })
+            .where("message.num_media", ">", 0)
+            .count()
+        );
+      };
+
+      const memoizer = await MemoizeHelper.getMemoizer();
+      const memoizedSentMmsCount = MemoizeHelper.hasBucketConfigured(
+        Buckets.Aggregates
+      )
+        ? memoizer.memoize(getSentMmsCount, cacheOpts.CampaignSentMmsCount)
+        : getSentMmsCount;
+
+      return memoizedSentMmsCount({ campaignId: campaign.id });
+    },
     receivedMessagesCount: async (campaign) => {
       const getReceivedMessagesCount = async ({ campaignId }) => {
         return r.parseCount(
