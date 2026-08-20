@@ -9,7 +9,7 @@ import LoadingIndicator from "../../../components/LoadingIndicator";
 
 const useStyles = makeStyles((theme) => ({
   card: {
-    alignSelf: "flex-start"
+    height: "100%"
   },
   label: {
     fontSize: 13,
