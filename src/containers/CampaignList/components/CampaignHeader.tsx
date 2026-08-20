@@ -36,6 +36,9 @@ const useStyles = makeStyles({
   statusCellError: {
     backgroundColor: "#FFF2E9"
   },
+  statusCellClickable: {
+    cursor: "pointer"
+  },
   iconSuccess: {
     color: "#4caf50",
     flexShrink: 0
@@ -53,6 +56,7 @@ const useStyles = makeStyles({
 export type Tag = {
   title: string;
   status: string;
+  onClick?: () => void;
 };
 
 interface CampaignHeaderProps {
@@ -83,7 +87,15 @@ const CampaignHeader: React.FC<CampaignHeaderProps> = ({
               key={tag.title}
               className={`${classes.statusCell} ${
                 isSuccess ? classes.statusCellSuccess : classes.statusCellError
-              }`}
+              } ${tag.onClick ? classes.statusCellClickable : ""}`}
+              onClick={
+                tag.onClick
+                  ? (e) => {
+                      e.stopPropagation();
+                      tag.onClick?.();
+                    }
+                  : undefined
+              }
             >
               {isSuccess ? (
                 <CheckCircleIcon

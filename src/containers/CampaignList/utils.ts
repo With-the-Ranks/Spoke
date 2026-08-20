@@ -151,34 +151,56 @@ export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
 };
 
 type MakeCampaignTagsFn = (props: {
+  organizationId: string;
+  campaignId: string;
   isStarted: boolean | null | undefined;
   isAutoAssignEligible: boolean;
   hasUnsentInitialMessages: boolean | null | undefined;
   hasUnhandledMessages: boolean | null | undefined;
+  onNavigate: (path: string) => void;
+  onToggleAutoassign: () => void;
 }) => Tag[];
 
 export const makeCampaignHeaderTags: MakeCampaignTagsFn = ({
+  organizationId,
+  campaignId,
   isStarted,
   isAutoAssignEligible,
   hasUnsentInitialMessages,
-  hasUnhandledMessages
+  hasUnhandledMessages,
+  onNavigate,
+  onToggleAutoassign
 }) => {
   return [
     {
       title: isStarted ? "Started" : "Not Started",
-      status: isStarted ? "success" : "alert"
+      status: isStarted ? "success" : "alert",
+      ...(!isStarted && {
+        onClick: () =>
+          onNavigate(`/admin/${organizationId}/campaigns/${campaignId}/edit`)
+      })
     },
     {
       title: hasUnsentInitialMessages ? "Unsent Initials" : "All Initials Sent",
-      status: hasUnsentInitialMessages ? "alert" : "success"
+      status: hasUnsentInitialMessages ? "alert" : "success",
+      ...(hasUnsentInitialMessages && {
+        onClick: () => onNavigate(`/admin/${organizationId}/autosending`)
+      })
     },
     {
       title: hasUnhandledMessages ? "Unhandled Replies" : "All Replies Handled",
-      status: hasUnhandledMessages ? "alert" : "success"
+      status: hasUnhandledMessages ? "alert" : "success",
+      ...(hasUnhandledMessages && {
+        onClick: () =>
+          onNavigate(
+            `/admin/${organizationId}/incoming?campaignsFilter=isArchived-false_campaignId-${campaignId}&contactsFilter=isOptedOut-false_messageStatus-needsResponse`
+          )
+      })
     },
     {
       title: isAutoAssignEligible ? "Autoassign" : "No Autoassign",
-      status: isAutoAssignEligible ? "success" : "alert"
+      status: isAutoAssignEligible ? "success" : "alert",
+      onClick: onToggleAutoassign
     }
   ];
 };
