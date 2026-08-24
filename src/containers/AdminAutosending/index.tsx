@@ -60,6 +60,7 @@ const AdminAutosending: React.FC = () => {
     error: getCampaignsError
   } = useCampaignsEligibleForAutosendingQuery({
     variables: { organizationId, isStarted, isBasic },
+    fetchPolicy: "cache-and-network",
     pollInterval: 10 * 1000
   });
 
