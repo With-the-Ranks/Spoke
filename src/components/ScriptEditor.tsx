@@ -365,7 +365,11 @@ class ScriptEditor extends React.Component<Props, State> {
 
   render() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const info = getSpokeCharCount(text, this.props.customFieldAverageLengths);
+    const info = getSpokeCharCount(
+      text,
+      this.props.customFieldAverageLengths,
+      this.props.campaignVariables
+    );
     const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
 
     return (

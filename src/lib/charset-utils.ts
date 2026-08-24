@@ -17,14 +17,19 @@ export const replaceEasyGsmWins = (text: string) =>
 
 export const getSpokeCharCount = (
   text: string,
-  customFieldAverageLengths: Record<string, number> = {}
+  customFieldAverageLengths: Record<string, number> = {},
+  campaignVariables: { name: string; value?: string | null }[] = []
 ) =>
   getCharCount(
-    replaceEasyGsmWins(
-      text.replace(/\{([^{}]+)\}/g, (token, fieldName: string) => {
+    replaceEasyGsmWins(text).replace(
+      /\{([^{}]+)\}/g,
+      (token, fieldName: string) => {
         const averageLength = customFieldAverageLengths[fieldName];
-        return averageLength > 0 ? "x".repeat(averageLength) : token;
-      })
+        return averageLength > 0
+          ? "x".repeat(averageLength)
+          : campaignVariables.find(({ name }) => name === fieldName)?.value ||
+              token;
+      }
     )
   );
 
