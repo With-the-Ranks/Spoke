@@ -35,6 +35,7 @@ export const GET_CAMPAIGN_INTERACTIONS = gql`
         ...EditInteractionStep
       }
       customFields
+      customFieldAverageLengths
       invalidScriptFields
       campaignVariables {
         id

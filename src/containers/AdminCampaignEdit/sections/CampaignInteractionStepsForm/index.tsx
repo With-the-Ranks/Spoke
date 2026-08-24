@@ -69,6 +69,7 @@ interface HocProps {
       Campaign,
       "id" | "isStarted" | "customFields" | "externalSystem"
     > & {
+      customFieldAverageLengths?: Record<string, number>;
       interactionSteps: InteractionStepWithLocalState[];
       campaignVariables: CampaignVariable[];
     };
@@ -276,6 +277,7 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
     data: {
       campaign: {
         customFields,
+        customFieldAverageLengths,
         invalidScriptFields,
         campaignVariables,
         externalSystem
@@ -406,6 +408,7 @@ const CampaignInteractionStepsForm: React.FC<InnerProps> = (props) => {
       <InteractionStepCard
         interactionStep={finalFree}
         customFields={customFields}
+        customFieldAverageLengths={customFieldAverageLengths}
         campaignVariables={campaignVariables}
         integrationSourced={externalSystem !== null}
         availableActions={availableActions}

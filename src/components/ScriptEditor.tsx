@@ -120,6 +120,7 @@ const UnrecognizedField: React.FC = (props) => (
 interface Props {
   scriptText: string;
   scriptFields: string[];
+  customFieldAverageLengths?: Record<string, number>;
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
   maxSmsSegmentLength: number | null;
@@ -364,7 +365,7 @@ class ScriptEditor extends React.Component<Props, State> {
 
   render() {
     const text = this.state.editorState.getCurrentContent().getPlainText();
-    const info = getSpokeCharCount(text);
+    const info = getSpokeCharCount(text, this.props.customFieldAverageLengths);
     const messageType = getMessageType(text, this.props.maxSmsSegmentLength);
 
     return (

@@ -15,8 +15,18 @@ export const replaceEasyGsmWins = (text: string) =>
     text
   );
 
-export const getSpokeCharCount = (text: string) =>
-  getCharCount(replaceEasyGsmWins(text));
+export const getSpokeCharCount = (
+  text: string,
+  customFieldAverageLengths: Record<string, number> = {}
+) =>
+  getCharCount(
+    replaceEasyGsmWins(
+      text.replace(/\{([^{}]+)\}/g, (token, fieldName: string) => {
+        const averageLength = customFieldAverageLengths[fieldName];
+        return averageLength > 0 ? "x".repeat(averageLength) : token;
+      })
+    )
+  );
 
 export const replaceCurlyApostrophes = (rawText: string) =>
   rawText.replace(/[\u2018\u2019]/g, "'");
