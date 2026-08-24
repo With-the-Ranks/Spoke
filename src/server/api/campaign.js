@@ -767,6 +767,29 @@ export const resolvers = {
     customFields: async (campaign) =>
       campaign.customFields ||
       cacheableData.campaign.dbCustomFields(campaign.id),
+    customFieldAverageLengths: async (campaign) => {
+      const averages = await r
+        .reader("campaign_contact")
+        .select(
+          r.knex.raw(
+            "custom_field.key, AVG(LENGTH(custom_field.value)) AS average_length"
+          )
+        )
+        .crossJoin(
+          r.knex.raw(
+            "LATERAL json_each_text(campaign_contact.custom_fields::json) AS custom_field(key, value)"
+          )
+        )
+        .where("campaign_contact.campaign_id", campaign.id)
+        .groupBy("custom_field.key");
+
+      return Object.fromEntries(
+        averages.map(({ key, average_length }) => [
+          key,
+          Math.round(Number(average_length))
+        ])
+      );
+    },
     stats: async (campaign) => campaign,
     editors: async (campaign, _, { user }) => {
       if (r.redis) {
