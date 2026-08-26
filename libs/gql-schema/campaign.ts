@@ -97,7 +97,7 @@ export const schema = `
     hasUnsentInitialMessages: Boolean
     hasUnhandledMessages: Boolean
     customFields: [String]
-    customFieldAverageLengths: JSON
+    customFieldAverageLengths: JSON!
     cannedResponses(userId: String): [CannedResponse!]!
     stats: CampaignStats,
     pendingJobs(jobTypes: [String]): [JobRequest]!
