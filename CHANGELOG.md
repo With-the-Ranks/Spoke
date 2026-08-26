@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.0](https://github.com/With-the-Ranks/spoke/compare/v11.0.0...v11.1.0) (2026-08-26)
+
+
+### Features
+
+* **autoassign:** perform single click update ([#247](https://github.com/With-the-Ranks/spoke/issues/247)) ([cdc56d2](https://github.com/With-the-Ranks/spoke/commit/cdc56d27d73746c5ef31e427879db0553fec25f8))
+* **campaign:** use custom field averages in segment calculator ([#253](https://github.com/With-the-Ranks/spoke/issues/253)) ([9669db7](https://github.com/With-the-Ranks/spoke/commit/9669db7585c0deaf5cfabb4bf2c03ac16862ef6a))
+* **campaign-list:** make status chips actionable for admins ([#246](https://github.com/With-the-Ranks/spoke/issues/246)) ([9fee153](https://github.com/With-the-Ranks/spoke/commit/9fee153a949164018cf5af1ed5b37d47c8330616))
+* **campaign-stats:** add outbound SMS and MMS counts ([#252](https://github.com/With-the-Ranks/spoke/issues/252)) ([3c419c8](https://github.com/With-the-Ranks/spoke/commit/3c419c8b495bb125e17b02261e7875681698a320))
+* **campaign-stats:** link Replies card to message review ([#245](https://github.com/With-the-Ranks/spoke/issues/245)) ([bde452d](https://github.com/With-the-Ranks/spoke/commit/bde452d1a9aeac5d0dc05faa03d8fe4d772955cf))
+* **nav:** show group badges ([#184](https://github.com/With-the-Ranks/spoke/issues/184)) ([fa0a2c0](https://github.com/With-the-Ranks/spoke/commit/fa0a2c0215d09dc42129934f6a7a5f7d8b4b6310))
+* **scripts:** use campaign variables in segment count ([#254](https://github.com/With-the-Ranks/spoke/issues/254)) ([cdad859](https://github.com/With-the-Ranks/spoke/commit/cdad859a442330871b2245234d8dc080e0c0e4d6))
+
+
+### Bug Fixes
+
+* **bulk script editor:** restrict to user organization ([#175](https://github.com/With-the-Ranks/spoke/issues/175)) ([874206d](https://github.com/With-the-Ranks/spoke/commit/874206d8a61b4eab9032d4115a5765c784737e1b))
+
+
+### Backend Changes
+
+* **archiving:** use single mutation ([#249](https://github.com/With-the-Ranks/spoke/issues/249)) ([dd80987](https://github.com/With-the-Ranks/spoke/commit/dd80987914f157d00c177020933df2d0c4dade46))
+* **docker-compose:** update for easier onboarding ([#199](https://github.com/With-the-Ranks/spoke/issues/199)) ([e4a011c](https://github.com/With-the-Ranks/spoke/commit/e4a011cdb16a9cc5150ec66f1bc7c7d6adc0ccc1))
+* **superadmin:** use org selector ([#178](https://github.com/With-the-Ranks/spoke/issues/178)) ([49f484b](https://github.com/With-the-Ranks/spoke/commit/49f484b9a36ce4508f8b525ee76fe96e5b55af1c))
+* **template campaigns:** use number copies field component ([#177](https://github.com/With-the-Ranks/spoke/issues/177)) ([8f08a20](https://github.com/With-the-Ranks/spoke/commit/8f08a206622cae5ffa0b373056c266a100e7141f))
+
 ## [11.0.0](https://github.com/With-the-Ranks/spoke/compare/v10.4.0...v11.0.0) (2026-07-29)
 
 
