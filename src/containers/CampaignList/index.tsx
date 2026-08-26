@@ -25,8 +25,6 @@ import {
   isMarkForSecondPass,
   isReleaseUnrepliedMessages,
   isReleaseUnsentMessages,
-  isTurnAutoAssignOff,
-  isTurnAutoAssignOn,
   isUnarchiveCampaign,
   isUnMarkForSecondPass
 } from "./utils";
@@ -67,7 +65,16 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
   const [deleteNeedsMessage] = useDeleteNeedsMessageMutation();
   const [markCampaign] = useMarkForSecondPassMutation();
   const [unmarkCampaign] = useUnMarkForSecondPassMutation();
-  const [toggleAutoAssign] = useToggleAutoAssignMutation();
+  const [useToggleAutoAssign] = useToggleAutoAssignMutation();
+
+  const toggleAutoAssign = (
+    campaignId: string,
+    enabled: boolean
+  ) => async () => {
+    await useToggleAutoAssign({
+      variables: { campaignId, enabled }
+    });
+  };
 
   const start = (op: Operation) => () => setInProgress(op);
 
@@ -97,8 +104,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
 
     const isReleaseUnsent = isReleaseUnsentMessages(inProgress);
     const isReleaseUnreplied = isReleaseUnrepliedMessages(inProgress);
-    const isAutoAssignOn = isTurnAutoAssignOn(inProgress);
-    const isAutoAssignOff = isTurnAutoAssignOff(inProgress);
 
     // eslint-disable-next-line default-case
     switch (true) {
@@ -168,13 +173,6 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         setStateAfterOperation(data?.unMarkForSecondPass, errors);
         break;
       }
-      case isAutoAssignOn || isAutoAssignOff: {
-        const { data, errors } = await toggleAutoAssign({
-          variables: { campaignId: campaign.id, enabled: isAutoAssignOn }
-        });
-        setStateAfterOperation(data?.editCampaign, errors);
-        break;
-      }
     }
   };
 
@@ -225,6 +223,7 @@ export const CampaignList: React.FC<CampaignListProps> = (props) => {
         startOperation={start}
         archiveCampaign={archiveCampaign}
         unarchiveCampaign={unarchiveCampaign}
+        toggleAutoAssign={toggleAutoAssign}
         selectForExport={selectForExport}
         campaignDetailsForExport={campaignDetailsForExport}
       />

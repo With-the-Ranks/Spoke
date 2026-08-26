@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import type { CampaignListEntryFragment } from "@spoke/spoke-codegen";
 import type { GraphQLError } from "graphql";
-import type { MouseEventHandler } from "react";
 
 import type { Tag } from "./components/CampaignHeader";
 
@@ -19,15 +18,10 @@ export interface Operation {
 }
 
 export interface CampaignOperationsProps {
-  startOperation: (
-    op: Operation
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
-  archiveCampaign: (
-    campaignId: string
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
-  unarchiveCampaign: (
-    campaignId: string
-  ) => MouseEventHandler<HTMLLIElement> | undefined;
+  startOperation: (op: Operation) => () => void;
+  archiveCampaign: (campaignId: string) => () => void;
+  unarchiveCampaign: (campaignId: string) => () => void;
+  toggleAutoAssign: (campaignId: string, enabled: boolean) => () => void;
 }
 
 export const dialogOperations: Record<string, OperationDefinition> = {
@@ -72,18 +66,6 @@ export const dialogOperations: Record<string, OperationDefinition> = {
       or because the event for which you were sending these messages has already happened. This will not affect contacts\
       that have not yet received one message, or contacts that have replied.`,
     mutationName: "unMarkForSecondPass"
-  },
-  turnAutoAssignOn: {
-    title: (campaign) => `Turn auto-assign ON for ${campaign.title}`,
-    body: () =>
-      `Turning auto-assign ON means that this campaign's contacts will be eligible to be assigned by the text request form`,
-    mutationName: "turnAutoAssignOn"
-  },
-  turnAutoAssignOff: {
-    title: (campaign) => `Turn auto-assign OFF for ${campaign.title}`,
-    body: () =>
-      `Turning auto-assign OFF means that this campaign's contacts will not be assigned by the text request form`,
-    mutationName: "turnAutoAssignOff"
   }
 };
 
@@ -132,14 +114,6 @@ export const isMarkForSecondPass = (
 
 export const isUnMarkForSecondPass = (inProgress: Operation) => {
   return inProgress.name === "unMarkForSecondPass";
-};
-
-export const isTurnAutoAssignOn = (inProgress: Operation) => {
-  return inProgress.name === "turnAutoAssignOn";
-};
-
-export const isTurnAutoAssignOff = (inProgress: Operation) => {
-  return inProgress.name === "turnAutoAssignOff";
 };
 
 export const isCampaignGroupsPermissionError = (gqlError: GraphQLError) => {
