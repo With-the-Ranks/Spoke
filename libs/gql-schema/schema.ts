@@ -48,6 +48,7 @@ const rootSchema = `
     searchString: String!
     replaceString: String!
     campaignIds: [String!]!
+    organizationId: String!
   }
 
   input ContactActionInput {
@@ -268,7 +269,7 @@ const rootSchema = `
     notices(organizationId: String): NoticePage!
     campaignGroups(organizationId: String! after: Cursor, first: Int): CampaignGroupPage!
     campaignNavigation(campaignId: String!): CampaignNavigation!
-    bulkUpdateScriptChanges(organizationId: String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateChange!]!
+    bulkUpdateScriptChanges(findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateChange!]!
     superadmins: [User!]
     optOuts(organizationId: String!): [OptOutByCampaign!]!
     isValidAttachment(fileUrl: String!): Boolean!
@@ -289,7 +290,7 @@ const rootSchema = `
     saveCampaignGroups(organizationId: String!, campaignGroups: [CampaignGroupInput!]!): [CampaignGroup!]!
     deleteCampaignGroup(organizationId: String!, campaignGroupId: String!): Boolean!
     filterLandlines(id:String!): Campaign
-    bulkUpdateScript(organizationId:String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
+    bulkUpdateScript(findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
     deleteJob(campaignId:String!, id:String!): JobRequest
     copyCampaign(id: String!): Campaign
     copyCampaigns(sourceCampaignId: String!, quantity: Int!, targetOrgId: String): [Campaign!]!
