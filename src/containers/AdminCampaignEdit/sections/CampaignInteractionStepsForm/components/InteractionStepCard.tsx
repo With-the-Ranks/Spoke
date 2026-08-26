@@ -55,6 +55,7 @@ type BlockHandlerFactory = (stepId: string) => () => Promise<void> | void;
 interface Props {
   interactionStep: InteractionStepWithChildren;
   customFields: string[];
+  customFieldAverageLengths?: Record<string, number>;
   campaignVariables: CampaignVariable[];
   integrationSourced: boolean;
   availableActions: any[];
@@ -76,6 +77,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
   const {
     interactionStep,
     customFields,
+    customFieldAverageLengths,
     campaignVariables,
     integrationSourced,
     availableActions,
@@ -244,6 +246,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
               label="Script"
               hintText="This is what your texters will send to your contacts. E.g. Hi, {firstName}. It's {texterFirstName} here."
               customFields={customFields}
+              customFieldAverageLengths={customFieldAverageLengths}
               campaignVariables={campaignVariables}
               isRootStep={isRootStep}
               integrationSourced={integrationSourced}
@@ -295,6 +298,7 @@ export const InteractionStepCard: React.FC<Props> = (props) => {
                 title={`Question: ${questionText}`}
                 interactionStep={childStep}
                 customFields={customFields}
+                customFieldAverageLengths={customFieldAverageLengths}
                 campaignVariables={campaignVariables}
                 integrationSourced={integrationSourced}
                 availableActions={availableActions}

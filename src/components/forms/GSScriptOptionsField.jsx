@@ -124,6 +124,7 @@ class GSScriptOptionsField extends GSFormField {
     const {
       name,
       customFields,
+      customFieldAverageLengths,
       campaignVariables,
       value: scriptVersions,
       integrationSourced,
@@ -186,6 +187,7 @@ class GSScriptOptionsField extends GSFormField {
             name={name}
             scriptText={scriptDraft}
             scriptFields={scriptFields}
+            customFieldAverageLengths={customFieldAverageLengths}
             campaignVariables={campaignVariables}
             integrationSourced={integrationSourced}
             maxSmsSegmentLength={orgSettings.maxSmsSegmentLength}
@@ -267,6 +269,7 @@ class GSScriptOptionsField extends GSFormField {
 GSScriptOptionsField.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string),
   customFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  customFieldAverageLengths: PropTypes.object,
   campaignVariables: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
