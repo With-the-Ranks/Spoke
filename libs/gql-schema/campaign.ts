@@ -11,6 +11,8 @@ export const schema = `
 
   type CampaignStats {
     sentMessagesCount: Int!
+    sentSmsSegmentsCount: Int!
+    sentMmsCount: Int!
     receivedMessagesCount: Int!
     optOutsCount: Int!
     needsMessageOptOutsCount: Int!

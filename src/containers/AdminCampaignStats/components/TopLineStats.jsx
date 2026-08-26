@@ -26,8 +26,8 @@ export const TopLineStats = (props) => {
   const replyHighlight = campaignPercent > highUnhandledReplyPercent;
 
   return (
-    <Grid container spacing={2} justifyContent="center">
-      <Grid item xs={2}>
+    <Grid container spacing={2}>
+      <Grid item xs={6} sm={3}>
         <CampaignStat
           title="Contacts"
           loading={contactsCount.loading}
@@ -35,7 +35,7 @@ export const TopLineStats = (props) => {
           count={contactsCount.campaign && contactsCount.campaign.contactsCount}
         />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={3}>
         <CampaignStat
           title="Texters"
           loading={assignments.loading}
@@ -45,7 +45,7 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={3}>
         <CampaignStat
           title="Initials To Send"
           loading={needsMessageCount.loading}
@@ -56,7 +56,7 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={3}>
         <CampaignStat
           title="Sent"
           loading={sentMessagesCount.loading}
@@ -67,7 +67,7 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={3}>
         <Link
           to={`/admin/${organizationId}/incoming?campaignsFilter=isArchived-false_campaignId-${campaignId}&contactsFilter=isOptedOut-false_messageStatus-needsResponse`}
           style={{ textDecoration: "none", color: "inherit" }}
@@ -87,13 +87,35 @@ export const TopLineStats = (props) => {
           />
         </Link>
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={3}>
         <CampaignStat
           title="Opt-outs"
           loading={optOutsCount.loading}
           error={optOutsCount.errors && optOutsCount.errors.message}
           count={
             optOutsCount.campaign && optOutsCount.campaign.stats.optOutsCount
+          }
+        />
+      </Grid>
+      <Grid item xs={6} sm={3}>
+        <CampaignStat
+          title="SMS Segments"
+          loading={sentMessagesCount.loading}
+          error={sentMessagesCount.errors && sentMessagesCount.errors.message}
+          count={
+            sentMessagesCount.campaign &&
+            sentMessagesCount.campaign.stats.sentSmsSegmentsCount
+          }
+        />
+      </Grid>
+      <Grid item xs={6} sm={3}>
+        <CampaignStat
+          title="MMS Sent"
+          loading={sentMessagesCount.loading}
+          error={sentMessagesCount.errors && sentMessagesCount.errors.message}
+          count={
+            sentMessagesCount.campaign &&
+            sentMessagesCount.campaign.stats.sentMmsCount
           }
         />
       </Grid>
@@ -163,6 +185,8 @@ const queries = {
           id
           stats {
             sentMessagesCount
+            sentSmsSegmentsCount
+            sentMmsCount
           }
         }
       }

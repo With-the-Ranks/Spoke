@@ -70,6 +70,14 @@ export const cacheOpts: Record<string, CacheOpt> = {
     key: "campaign-sent-messages-count",
     ttl: ONE_MINUTE
   },
+  CampaignSentSmsSegmentsCount: {
+    key: "campaign-sent-sms-segments-count",
+    ttl: ONE_MINUTE
+  },
+  CampaignSentMmsCount: {
+    key: "campaign-sent-mms-count",
+    ttl: ONE_MINUTE
+  },
   CampaignReceivedMessagesCount: {
     key: "campaign-received-messages-count",
     ttl: ONE_MINUTE
