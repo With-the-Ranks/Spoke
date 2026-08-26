@@ -17,13 +17,7 @@ interface Props extends CampaignOperationsProps {
 export const CampaignListMenu: React.FC<Props> = (props) => {
   const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
 
-  const {
-    startOperation,
-    archiveCampaign,
-    unarchiveCampaign,
-    toggleAutoAssign,
-    campaign
-  } = props;
+  const { startOperation, toggleArchive, toggleAutoAssign, campaign } = props;
 
   const handleClickMenu = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
@@ -78,22 +72,12 @@ export const CampaignListMenu: React.FC<Props> = (props) => {
         >
           Release Unreplied Conversations
         </MenuItem>
-        {!campaign.isArchived && (
-          <MenuItem onClick={archiveCampaign(campaign.id)}>
-            <ListItemIcon>
-              <ArchiveIcon />
-            </ListItemIcon>
-            Archive Campaign
-          </MenuItem>
-        )}
-        {campaign.isArchived && (
-          <MenuItem onClick={unarchiveCampaign(campaign.id)}>
-            <ListItemIcon>
-              <UnarchiveIcon />
-            </ListItemIcon>
-            Unarchive Campaign
-          </MenuItem>
-        )}
+        <MenuItem onClick={toggleArchive(campaign.id, !campaign.isArchived)}>
+          <ListItemIcon>
+            {campaign.isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
+          </ListItemIcon>
+          {campaign.isArchived ? "Unarchive Campaign" : "Archive Campaign"}
+        </MenuItem>
         <MenuItem
           onClick={startOperation({ name: "deleteNeedsMessage", campaign })}
         >

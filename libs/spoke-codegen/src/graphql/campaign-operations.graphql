@@ -31,14 +31,8 @@ query GetAdminAssignmentTargets($organizationId: String!) {
   }
 }
 
-mutation archiveCampaign($campaignId: String!) {
-  archiveCampaign(id: $campaignId) {
-    ...CampaignInfo
-  }
-}
-
-mutation unarchiveCampaign($campaignId: String!) {
-  unarchiveCampaign(id: $campaignId) {
+mutation setCampaignArchived($campaignId: String!, $archived: Boolean!) {
+  setCampaignArchived(id: $campaignId, archived: $archived) {
     ...CampaignInfo
   }
 }

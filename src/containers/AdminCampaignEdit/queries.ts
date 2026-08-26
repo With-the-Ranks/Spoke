@@ -123,18 +123,9 @@ export const GET_EDIT_CAMPAIGN_DATA = gql`
   ${EditCampaignFragment}
 `;
 
-export const ARCHIVE_CAMPAIGN = gql`
-  mutation archiveCampaign($campaignId: String!) {
-    archiveCampaign(id: $campaignId) {
-      ...EditCampaignFragment
-    }
-  }
-  ${EditCampaignFragment}
-`;
-
-export const UNARCHIVE_CAMPAIGN = gql`
-  mutation unarchiveCampaign($campaignId: String!) {
-    unarchiveCampaign(id: $campaignId) {
+export const SET_CAMPAIGN_ARCHIVED = gql`
+  mutation setCampaignArchived($campaignId: String!, $archived: Boolean!) {
+    setCampaignArchived(id: $campaignId, archived: $archived) {
       ...EditCampaignFragment
     }
   }

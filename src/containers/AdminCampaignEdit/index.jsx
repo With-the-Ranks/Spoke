@@ -32,15 +32,14 @@ import ApproveCampaignButton from "./components/ApproveCampaignButton";
 import { SectionWrapper } from "./components/SectionWrapper";
 import StartCampaignButton from "./components/StartCampaignButton";
 import {
-  ARCHIVE_CAMPAIGN,
   DELETE_JOB,
   EDIT_CAMPAIGN,
   GET_CAMPAIGN_JOBS,
   GET_EDIT_CAMPAIGN_DATA,
   GET_ORGANIZATION_ACTIONS,
   GET_ORGANIZATION_DATA,
-  START_CAMPAIGN,
-  UNARCHIVE_CAMPAIGN
+  SET_CAMPAIGN_ARCHIVED,
+  START_CAMPAIGN
 } from "./queries";
 import CampaignAutoassignModeForm from "./sections/CampaignAutoassignModeForm";
 import CampaignBasicsForm from "./sections/CampaignBasicsForm";
@@ -740,14 +739,19 @@ class AdminCampaignEdit extends React.Component {
   };
 
   renderStartButton = () => {
-    if (!this.props.isAdmin) {
+    const { isAdmin, campaignData, pendingJobsData, mutations } = this.props;
+
+    if (!isAdmin) {
       // Supervolunteers don't have access to start the campaign or un/archive it
       return null;
     }
+    const { campaign } = campaignData;
+
     let isCompleted =
-      this.props.pendingJobsData.campaign.pendingJobs.filter((job) =>
+      pendingJobsData.campaign.pendingJobs.filter((job) =>
         /Error/.test(job.resultMessage || "")
       ).length === 0;
+
     this.sections().forEach((section) => {
       if (
         (section.blocksStarting && !this.checkSectionCompleted(section)) ||
@@ -774,34 +778,17 @@ class AdminCampaignEdit extends React.Component {
           {this.renderCurrentEditors()}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {this.props.campaignData.campaign.isArchived ? (
-            <Button
-              variant="outlined"
-              onClick={() =>
-                this.props.mutations.unarchiveCampaign(
-                  this.props.campaignData.campaign.id
-                )
-              }
-            >
-              Unarchive
-            </Button>
-          ) : (
-            <Button
-              variant="outlined"
-              onClick={() =>
-                this.props.mutations.archiveCampaign(
-                  this.props.campaignData.campaign.id
-                )
-              }
-            >
-              Archive
-            </Button>
-          )}
-          <ApproveCampaignButton
-            campaignId={this.props.campaignData.campaign.id}
-          />
+          <Button
+            variant="outlined"
+            onClick={() =>
+              mutations.setCampaignArchived(campaign.id, !campaign.isArchived)
+            }
+          >
+            {campaign.isArchived ? "Unarchive" : "Archive"}
+          </Button>
+          <ApproveCampaignButton campaignId={campaign.id} />
           <StartCampaignButton
-            campaignId={this.props.campaignData.campaign.id}
+            campaignId={campaign.id}
             isCompleted={isCompleted}
           />
         </div>
@@ -956,13 +943,9 @@ const queries = {
 };
 
 const mutations = {
-  archiveCampaign: (_ownProps) => (campaignId) => ({
-    mutation: ARCHIVE_CAMPAIGN,
-    variables: { campaignId }
-  }),
-  unarchiveCampaign: (_ownProps) => (campaignId) => ({
-    mutation: UNARCHIVE_CAMPAIGN,
-    variables: { campaignId }
+  setCampaignArchived: (_ownProps) => (campaignId, archived) => ({
+    mutation: SET_CAMPAIGN_ARCHIVED,
+    variables: { campaignId, archived }
   }),
   startCampaign: (_ownProps) => (campaignId) => ({
     mutation: START_CAMPAIGN,

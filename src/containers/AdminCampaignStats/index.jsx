@@ -405,25 +405,16 @@ class AdminCampaignStats extends React.Component {
                       >
                         {vanSyncLabel}
                       </MenuItem>
-                      {campaign.isArchived ? (
-                        <MenuItem
-                          onClick={() => {
-                            this.handleCloseMoreMenu();
-                            this.props.mutations.unarchiveCampaign();
-                          }}
-                        >
-                          Unarchive
-                        </MenuItem>
-                      ) : (
-                        <MenuItem
-                          onClick={() => {
-                            this.handleCloseMoreMenu();
-                            this.props.mutations.archiveCampaign();
-                          }}
-                        >
-                          Archive
-                        </MenuItem>
-                      )}
+                      <MenuItem
+                        onClick={() => {
+                          this.handleCloseMoreMenu();
+                          this.props.mutations.setCampaignArchived(
+                            !campaign.isArchived
+                          );
+                        }}
+                      >
+                        {campaign.isArchived ? "Unarchive" : "Archive"}
+                      </MenuItem>
                       <MenuItem
                         {...dataTest("copyCampaign")}
                         disabled={this.state.copyingCampaign}
@@ -570,27 +561,16 @@ const queries = {
 };
 
 const mutations = {
-  archiveCampaign: (ownProps) => () => ({
+  setCampaignArchived: (ownProps) => (archived) => ({
     mutation: gql`
-      mutation archiveCampaign($campaignId: String!) {
-        archiveCampaign(id: $campaignId) {
+      mutation setCampaignArchived($campaignId: String!, $archived: Boolean!) {
+        setCampaignArchived(id: $campaignId, archived: $archived) {
           id
           isArchived
         }
       }
     `,
-    variables: { campaignId: ownProps.match.params.campaignId }
-  }),
-  unarchiveCampaign: (ownProps) => () => ({
-    mutation: gql`
-      mutation unarchiveCampaign($campaignId: String!) {
-        unarchiveCampaign(id: $campaignId) {
-          id
-          isArchived
-        }
-      }
-    `,
-    variables: { campaignId: ownProps.match.params.campaignId }
+    variables: { campaignId: ownProps.match.params.campaignId, archived }
   }),
   copyCampaign: (ownProps) => () => ({
     mutation: gql`
