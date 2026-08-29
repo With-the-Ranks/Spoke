@@ -50,6 +50,7 @@ const setUpAutosending = async (
 
   const campaign = await createCampaign(client, {
     organizationId,
+    creatorId: autosendUserId,
     isStarted: true,
     autosendUserId,
     autosendStatus

@@ -133,7 +133,7 @@ export const TemplateCampaignRow: React.FC<TemplateCampaignRowProps> = ({
             </span>
             <br />
             <span>
-              Created {createdAt} by {templateCampaign.creator?.displayName}
+              Created {createdAt} by {templateCampaign.creator.displayName}
             </span>
           </>
         }

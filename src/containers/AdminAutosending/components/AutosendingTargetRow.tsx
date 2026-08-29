@@ -27,7 +27,13 @@ export const AutosendingTargetRow: React.FC<AutosendingTargetRowProps> = (
   const { target, organizationId, disabled = false, onStart, onPause } = props;
 
   const chipClasses = useChipStyles();
-  const totalSent = target.stats?.countMessagedContacts;
+  const {
+    countMessagedContacts: totalSent,
+    percentUnhandledReplies,
+    needsMessageOptOutsCount,
+    receivedMessagesCount,
+    optOutsCount
+  } = target.stats;
   const statusChipDisplay = target.autosendStatus;
 
   const chipRootClass =
@@ -39,9 +45,7 @@ export const AutosendingTargetRow: React.FC<AutosendingTargetRowProps> = (
       ? chipClasses.complete
       : chipClasses.unstarted;
 
-  const hasHighUnhandledReplies =
-    target.stats?.percentUnhandledReplies !== undefined &&
-    target.stats.percentUnhandledReplies > 25;
+  const hasHighUnhandledReplies = percentUnhandledReplies > 25;
   const repliesColor = hasHighUnhandledReplies ? red[600] : "black";
 
   const waitingToDeliver =
@@ -85,18 +89,14 @@ export const AutosendingTargetRow: React.FC<AutosendingTargetRowProps> = (
       <TableCell>{target.contactsCount}</TableCell>
       <TableCell>{target.deliverabilityStats.deliveredCount}</TableCell>
       <TableCell>
-        {target.contactsCount! -
-          totalSent! -
-          (target.stats?.needsMessageOptOutsCount || 0)}
+        {target.contactsCount - totalSent - needsMessageOptOutsCount}
       </TableCell>
       <TableCell>{waitingToDeliver}</TableCell>
       <TableCell>{target.deliverabilityStats.errorCount}</TableCell>
       <TableCell>
-        <span style={{ color: repliesColor }}>
-          {target.stats?.receivedMessagesCount}
-        </span>
+        <span style={{ color: repliesColor }}>{receivedMessagesCount}</span>
       </TableCell>
-      <TableCell>{target.stats?.optOutsCount}</TableCell>
+      <TableCell>{optOutsCount}</TableCell>
       <TableCell>
         <Link to={`/admin/${organizationId}/campaigns/${target.id}`}>
           <MoreIcon />
