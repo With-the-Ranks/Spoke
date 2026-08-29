@@ -77,3 +77,11 @@ mutation StartCampaign($campaignId: String!) {
     isApproved
   }
 }
+
+mutation UnstartCampaign($campaignId: String!) {
+  unstartCampaign(id: $campaignId) {
+    id
+    isStarted
+    isApproved
+  }
+}

@@ -78,6 +78,7 @@ export const EditCampaignFragment = gql`
     isApproved
     isArchived
     isTemplate
+    hasSentMessages
     contactsCount
     datawarehouseAvailable
     customFields
@@ -117,15 +118,6 @@ export const EditCampaignFragment = gql`
 export const GET_EDIT_CAMPAIGN_DATA = gql`
   query getCampaign($campaignId: String!) {
     campaign(id: $campaignId) {
-      ...EditCampaignFragment
-    }
-  }
-  ${EditCampaignFragment}
-`;
-
-export const SET_CAMPAIGN_ARCHIVED = gql`
-  mutation setCampaignArchived($campaignId: String!, $archived: Boolean!) {
-    setCampaignArchived(id: $campaignId, archived: $archived) {
       ...EditCampaignFragment
     }
   }
