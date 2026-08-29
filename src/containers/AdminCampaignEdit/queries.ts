@@ -35,16 +35,6 @@ export const GET_ORGANIZATION_DATA = gql`
   }
 `;
 
-export const GET_ORGANIZATION_ACTIONS = gql`
-  query getActions($organizationId: String!) {
-    availableActions(organizationId: $organizationId) {
-      name
-      display_name
-      instructions
-    }
-  }
-`;
-
 export const GET_CAMPAIGN_JOBS = gql`
   query getCampaignJobs($campaignId: String!) {
     campaign(id: $campaignId) {
@@ -113,15 +103,6 @@ export const EditCampaignFragment = gql`
 export const GET_EDIT_CAMPAIGN_DATA = gql`
   query getCampaign($campaignId: String!) {
     campaign(id: $campaignId) {
-      ...EditCampaignFragment
-    }
-  }
-  ${EditCampaignFragment}
-`;
-
-export const START_CAMPAIGN = gql`
-  mutation startCampaign($campaignId: String!) {
-    startCampaign(id: $campaignId) {
       ...EditCampaignFragment
     }
   }

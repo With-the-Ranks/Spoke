@@ -1,5 +1,4 @@
 import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -11,7 +10,6 @@ import Grid from "@material-ui/core/Grid";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { withTheme } from "@material-ui/core/styles";
 import { CampaignBuilderMode } from "@spoke/spoke-codegen";
 import isEqual from "lodash/isEqual";
 import pick from "lodash/pick";
@@ -35,9 +33,7 @@ import {
   EDIT_CAMPAIGN,
   GET_CAMPAIGN_JOBS,
   GET_EDIT_CAMPAIGN_DATA,
-  GET_ORGANIZATION_ACTIONS,
-  GET_ORGANIZATION_DATA,
-  START_CAMPAIGN
+  GET_ORGANIZATION_DATA
 } from "./queries";
 import CampaignAutoassignModeForm from "./sections/CampaignAutoassignModeForm";
 import CampaignBasicsForm from "./sections/CampaignBasicsForm";
@@ -58,7 +54,6 @@ class AdminCampaignEdit extends React.Component {
     super(props);
     this.state = {
       campaignFormValues: { ...props.campaignData.campaign },
-      startingCampaign: false,
       isWorking: false,
       requestError: undefined,
       builderMode: props.campaignData.campaign.isTemplate
@@ -332,8 +327,7 @@ class AdminCampaignEdit extends React.Component {
         checkCompleted: () => true,
         blocksStarting: false,
         expandAfterCampaignStarts: true,
-        expandableBySuperVolunteers: false,
-        extraProps: {}
+        expandableBySuperVolunteers: false
       },
       {
         title: "Messaging Service",
@@ -416,18 +410,7 @@ class AdminCampaignEdit extends React.Component {
         },
         blocksStarting: true,
         expandAfterCampaignStarts: false,
-        expandableBySuperVolunteers: false,
-        extraProps: {
-          optOuts: [], // this.props.organizationData.organization.optOuts, // <= doesn't scale
-          datawarehouseAvailable: this.props.campaignData.campaign
-            .datawarehouseAvailable,
-          jobResult: this.props.pendingJobsData.campaign.pendingJobs.find(
-            (job) => /contacts/.test(job.jobType)
-          ),
-          otherCampaigns: this.props.organizationData.organization.campaigns.campaigns.filter(
-            (campaign) => campaign.id !== this.props.match.params.campaignId
-          )
-        }
+        expandableBySuperVolunteers: false
       },
       {
         title: "Contact Overlap Management",
@@ -502,8 +485,7 @@ class AdminCampaignEdit extends React.Component {
         checkCompleted: () => true,
         blocksStarting: false,
         expandAfterCampaignStarts: true,
-        expandableBySuperVolunteers: false,
-        extraProps: {}
+        expandableBySuperVolunteers: false
       },
       {
         title: "Interactions",
@@ -519,11 +501,7 @@ class AdminCampaignEdit extends React.Component {
           this.props.campaignData.campaign.readiness.interactions,
         blocksStarting: true,
         expandAfterCampaignStarts: true,
-        expandableBySuperVolunteers: true,
-        extraProps: {
-          customFields: this.props.campaignData.campaign.customFields,
-          availableActions: this.props.availableActionsData.availableActions
-        }
+        expandableBySuperVolunteers: true
       },
       {
         title: "Canned Responses",
@@ -537,10 +515,7 @@ class AdminCampaignEdit extends React.Component {
         checkCompleted: () => true,
         blocksStarting: true,
         expandAfterCampaignStarts: true,
-        expandableBySuperVolunteers: true,
-        extraProps: {
-          customFields: this.props.campaignData.campaign.customFields
-        }
+        expandableBySuperVolunteers: true
       },
       {
         title: "Autoassign Mode",
@@ -731,19 +706,7 @@ class AdminCampaignEdit extends React.Component {
           </>
         )}
         {title && <h1> {title} </h1>}
-        {!isTemplate && this.state.startingCampaign && (
-          <div style={{ color: theme.colors.gray }}>
-            <CircularProgress
-              size={0.5}
-              style={{
-                verticalAlign: "middle",
-                display: "inline-block"
-              }}
-            />
-            Starting your campaign...
-          </div>
-        )}
-        {!isTemplate && !this.state.startingCampaign && header}
+        {!isTemplate && header}
       </div>
     );
   };
@@ -902,7 +865,6 @@ AdminCampaignEdit.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   location: PropTypes.object,
   pendingJobsData: PropTypes.object,
-  availableActionsData: PropTypes.object,
   orgSettings: PropTypes.object
 };
 
@@ -932,23 +894,10 @@ const queries = {
         organizationId: ownProps.match.params.organizationId
       }
     })
-  },
-  availableActionsData: {
-    query: GET_ORGANIZATION_ACTIONS,
-    options: (ownProps) => ({
-      variables: {
-        organizationId: ownProps.match.params.organizationId
-      },
-      fetchPolicy: "network-only"
-    })
   }
 };
 
 const mutations = {
-  startCampaign: (_ownProps) => (campaignId) => ({
-    mutation: START_CAMPAIGN,
-    variables: { campaignId }
-  }),
   editCampaign: (_ownProps) => (campaignId, campaign) => ({
     mutation: EDIT_CAMPAIGN,
     variables: {
@@ -966,7 +915,6 @@ const mutations = {
 };
 
 export default compose(
-  withTheme,
   withSpokeContext,
   withAuthzContext,
   loadData({
