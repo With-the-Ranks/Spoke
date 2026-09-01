@@ -177,7 +177,7 @@ describe("get organization settings", () => {
       });
 
   it("allows owner to update appropriately permissioned settings", async () => {
-    const { organization, cookies } = await withClient(pool, async (client) => {
+    const { organization, cookies } = await t(pool, async (client) => {
       const result = await createOrgAndSession(client, {
         agent,
         role: UserRoleType.OWNER,

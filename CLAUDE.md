@@ -16,6 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `yarn test` - Run all tests with Jest
 - `yarn test:e2e` - Run end-to-end tests
 - `yarn test:coverage` - Run tests with coverage report
+- There are useful methods for test setup in `__test__/testbed-preparation/core.ts`
 
 ### Linting and Formatting
 

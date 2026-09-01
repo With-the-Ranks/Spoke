@@ -65,7 +65,10 @@ import {
 } from "./tasks/send-notification-email";
 import syncContactOptOut from "./tasks/sync-contact-opt-out";
 import syncContactQuestionResponse from "./tasks/sync-contact-question-response";
-import syncSlackTeamMembers from "./tasks/sync-slack-team-members";
+import {
+  syncSlackTeamMembers,
+  TASK_IDENTIFIER as syncSlackTeamMembersIdentifier
+} from "./tasks/sync-slack-team-members";
 import { trollPatrol, trollPatrolForOrganization } from "./tasks/troll-patrol";
 import updateOrgMessageUsage from "./tasks/update-org-message-usage";
 import { wrapProgressTask, wrapProgressTaskList } from "./tasks/utils";
@@ -251,8 +254,8 @@ export const getScheduler = async (attempt = 0): Promise<Scheduler> => {
   if (config.SLACK_SYNC_CHANNELS) {
     if (config.SLACK_TOKEN) {
       schedules.push({
-        name: "sync-slack-team-members",
-        taskIdentifier: "sync-slack-team-members",
+        name: syncSlackTeamMembersIdentifier,
+        taskIdentifier: syncSlackTeamMembersIdentifier,
         pattern: config.SLACK_SYNC_CHANNELS_CRONTAB,
         timeZone: config.TZ
       });
