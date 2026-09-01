@@ -112,7 +112,7 @@ const validators = {
   }),
   ENABLE_AUTOSENDING: bool({
     desc: "Whether autosending is enabled",
-    default: false,
+    default: true,
     isClient: true
   }),
   DISABLE_ASSIGNMENT_CASCADE: bool({
