@@ -13,17 +13,20 @@ import IconButton from "@material-ui/core/IconButton";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import Snackbar from "@material-ui/core/Snackbar";
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/AddOutlined";
 import DeleteIcon from "@material-ui/icons/DeleteOutlined";
 import EditIcon from "@material-ui/icons/Edit";
 import FileCopyIcon from "@material-ui/icons/FileCopyOutlined";
 import MoreVertIcon from "@material-ui/icons/MoreVertOutlined";
+import Alert from "@material-ui/lab/Alert";
 import type { TemplateCampaignFragment } from "@spoke/spoke-codegen";
 import isEmpty from "lodash/isEmpty";
 import type { ReactNode } from "react";
 import React, { useCallback, useState } from "react";
 
+import type { CreateCampaignFromTemplateDialogProps } from "../../../components/CreateCampaignFromTemplateDialog";
 import CreateCampaignFromTemplateDialog from "../../../components/CreateCampaignFromTemplateDialog";
 import { DateTime } from "../../../lib/datetime";
 
@@ -57,6 +60,7 @@ export const TemplateCampaignRow: React.FC<TemplateCampaignRowProps> = ({
     false
   );
   const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const classes = useStyles();
 
@@ -119,6 +123,19 @@ export const TemplateCampaignRow: React.FC<TemplateCampaignRowProps> = ({
   const handleCreateTemplateClicked = () => {
     setCreateFromTemplateOpen(true);
   };
+
+  const handleCreateTemplateCompleted: CreateCampaignFromTemplateDialogProps["onCreateTemplateCompleted"] = (
+    copiedCampaigns,
+    selectedTemplateTitle
+  ) => {
+    const campaignLabel =
+      copiedCampaigns.length === 1 ? "campaign" : "campaigns";
+    setSuccessMessage(
+      `Created ${copiedCampaigns.length} ${campaignLabel} from "${selectedTemplateTitle}"`
+    );
+  };
+
+  const handleCloseSuccessMessage = () => setSuccessMessage("");
 
   return (
     <Card>
@@ -209,7 +226,17 @@ export const TemplateCampaignRow: React.FC<TemplateCampaignRowProps> = ({
         open={createFromTemplateOpen}
         defaultTemplate={templateCampaign}
         onClose={() => setCreateFromTemplateOpen(false)}
+        onCreateTemplateCompleted={handleCreateTemplateCompleted}
       />
+      <Snackbar
+        open={successMessage !== ""}
+        autoHideDuration={4000}
+        onClose={handleCloseSuccessMessage}
+      >
+        <Alert onClose={handleCloseSuccessMessage} severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Card>
   );
 };
