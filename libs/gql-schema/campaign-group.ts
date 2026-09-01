@@ -11,8 +11,8 @@ export const schema = `
     name: String!
     description: String!
     campaigns: CampaignPage!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: Date!
+    updatedAt: Date!
   }
 
   type CampaignGroupEdge {
