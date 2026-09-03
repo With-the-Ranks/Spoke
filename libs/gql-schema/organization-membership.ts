@@ -27,6 +27,7 @@ export const schema = `
     organization: Organization!
     role: UserRole!
     requestAutoApprove: RequestAutoApprove!
+    assignmentRequestNotifications: Boolean!
   }
 
   type OrganizationMembershipEdge {

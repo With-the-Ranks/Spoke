@@ -5,6 +5,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import isEqual from "lodash/isEqual";
 import PropTypes from "prop-types";
 import React, { Component } from "react";
@@ -84,6 +86,13 @@ class AdminAssignmentRequest extends Component {
   handleResolveRequest = (approved) => (requestId) =>
     this.resolveRequest(requestId, approved);
 
+  handleNotificationSubscription = ({ target: { checked } }) => {
+    const {
+      node
+    } = this.props.pendingAssignmentRequests.currentUser.memberships.edges[0];
+    this.props.mutations.editOrganizationMembership(node.id, checked);
+  };
+
   resolveRequest = async (requestId, approved, autoApprove = false) => {
     const { resolveAssignmentRequest } = this.props.mutations;
     this.setRequestStatus(requestId, RowWorkStatus.Working);
@@ -110,6 +119,8 @@ class AdminAssignmentRequest extends Component {
   render() {
     const { currentUser } = this.props.pendingAssignmentRequests;
     const { assignmentRequests, autoApproveReqId } = this.state;
+    const isAdmin = hasRole("ADMIN", currentUser.roles);
+    const membership = currentUser.memberships.edges[0].node;
     const autoApproveRequest =
       autoApproveReqId &&
       assignmentRequests.find(({ id }) => id === autoApproveReqId);
@@ -129,8 +140,20 @@ class AdminAssignmentRequest extends Component {
 
     return (
       <div>
+        {isAdmin && (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={membership.assignmentRequestNotifications}
+                color="primary"
+                onChange={this.handleNotificationSubscription}
+              />
+            }
+            label="Email me when assignment requests need approval"
+          />
+        )}
         <AssignmentRequestTable
-          isAdmin={hasRole("ADMIN", currentUser.roles)}
+          isAdmin={isAdmin}
           assignmentRequests={assignmentRequests}
           onAutoApproveRequest={this.handleAutoApproveRequest}
           onApproveRequest={this.handleResolveRequest(true)}
@@ -174,7 +197,15 @@ const queries = {
       ) {
         currentUser {
           id
-          roles(organizationId: "1")
+          roles(organizationId: $organizationId)
+          memberships(organizationId: $organizationId, first: 1) {
+            edges {
+              node {
+                id
+                assignmentRequestNotifications
+              }
+            }
+          }
         }
         assignmentRequests(organizationId: $organizationId, status: $status) {
           id
@@ -201,6 +232,20 @@ const queries = {
 };
 
 const mutations = {
+  editOrganizationMembership: () => (id, enabled) => ({
+    mutation: gql`
+      mutation editOrganizationMembership($id: String!, $enabled: Boolean!) {
+        editOrganizationMembership(
+          id: $id
+          assignmentRequestNotifications: $enabled
+        ) {
+          id
+          assignmentRequestNotifications
+        }
+      }
+    `,
+    variables: { id, enabled }
+  }),
   resolveAssignmentRequest: () => (
     assignmentRequestId,
     approved,

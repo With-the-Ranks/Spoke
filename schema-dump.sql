@@ -3370,6 +3370,7 @@ CREATE TABLE public.user_organization (
     role text NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     request_status public.texter_status DEFAULT 'approval_required'::public.texter_status NOT NULL,
+    assignment_request_notifications boolean DEFAULT false NOT NULL,
     CONSTRAINT user_organization_role_check CHECK ((role = ANY (ARRAY['OWNER'::text, 'ADMIN'::text, 'SUPERVOLUNTEER'::text, 'TEXTER'::text, 'SUSPENDED'::text])))
 );
 
