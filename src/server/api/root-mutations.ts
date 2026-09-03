@@ -353,7 +353,7 @@ const rootMutations = {
 
     editOrganizationMembership: async (
       _root,
-      { id, level, role },
+      { id, level, role, assignmentRequestNotifications },
       { user: authUser }
     ) => {
       const membership = await r
@@ -361,6 +361,14 @@ const rootMutations = {
         .where({ id: parseInt(id, 10) })
         .first();
       if (!membership) throw new Error("No such org membership");
+      if (
+        _.isBoolean(assignmentRequestNotifications) &&
+        membership.user_id !== authUser.id
+      ) {
+        throw new ForbiddenError(
+          "You can only edit your own notification settings."
+        );
+      }
 
       let roleRequired = UserRoleType.ADMIN;
       if (
@@ -396,6 +404,11 @@ const rootMutations = {
         .returning("*");
 
       if (level) updateQuery.update({ request_status: level.toLowerCase() });
+      if (_.isBoolean(assignmentRequestNotifications)) {
+        updateQuery.update({
+          assignment_request_notifications: assignmentRequestNotifications
+        });
+      }
       if (role) {
         // update both tables if role change
         userUpdateQuery.update(
@@ -2164,6 +2177,26 @@ const rootMutations = {
               throw new Error(`Could not submit external requst: ${message}`);
             }
           });
+
+          const subscribers = await trx("user_organization")
+            .join("user", "user_organization.user_id", "user.id")
+            .where({
+              organization_id: organizationId,
+              assignment_request_notifications: true
+            })
+            .whereIn("role", ["ADMIN", "OWNER"])
+            .pluck("email");
+          await Promise.all(
+            subscribers.map((to) =>
+              sendEmail({
+                to,
+                subject: "Assignment request needs approval",
+                html: `A request for ${count} texts needs approval. <a href="${config.BASE_URL}/admin/${organizationId}/assignment-requests">Review request</a>.`
+              })
+            )
+          ).catch((err) =>
+            logger.error("Error sending assignment request email: ", err)
+          );
         }
 
         if (config.AUTO_HANDLE_REQUESTS) {
