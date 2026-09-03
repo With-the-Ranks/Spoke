@@ -300,7 +300,7 @@ const rootSchema = `
     createOrganization(name: String!, userId: String!, inviteId: String!): Organization
     editOrganization(id: String! input: EditOrganizationInput!): Organization!
     joinOrganization(organizationUuid: String!): Organization!
-    editOrganizationMembership(id: String!, level: RequestAutoApprove, role: String): OrganizationMembership!
+    editOrganizationMembership(id: String!, level: RequestAutoApprove, role: String, assignmentRequestNotifications: Boolean): OrganizationMembership!
     editOrganizationSettings(id: String!, input: OrganizationSettingsInput!): OrganizationSettings!
     purgeOrganizationUsers(organizationId: String!): Int!
     editUser(organizationId: String!, userId: String!, userData:UserInput): User
