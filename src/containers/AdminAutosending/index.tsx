@@ -1,3 +1,4 @@
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -35,6 +36,7 @@ import AutosendingTargetRow from "./components/AutosendingTargetRow";
 import AutosendingUnstartedTargetRow from "./components/AutosendingUnstartedTargetRow";
 
 const useStyles = makeStyles({
+  throughputNotice: { marginBottom: 16 },
   select: { width: 150, marginRight: 10 }
 });
 
@@ -116,6 +118,11 @@ const AdminAutosending: React.FC = () => {
     [setAlertErrorMessage]
   );
 
+  const handleContactSupport = useCallback(
+    () => window.$chatwoot?.toggle("open"),
+    []
+  );
+
   const handlePlayFactory = useCallback(
     (campaignId: string) => () =>
       startAutosending({ variables: { campaignId } }),
@@ -160,7 +167,7 @@ const AdminAutosending: React.FC = () => {
           {alertErrorMessage?.replace("GraphQL error:", "")}
         </Alert>
       </Snackbar>
-      {data?.organization && data.organization.autosendingMps === null ? (
+      {data?.organization && (data.organization.autosendingMps ?? 0) <= 0 ? (
         <CardHeader
           title="No autosending throughput has been allocated to this organization."
           subheader="Please contact the administrator of your Spoke instance."
@@ -214,6 +221,22 @@ const AdminAutosending: React.FC = () => {
             }
           />
           <CardContent>
+            {data?.organization && (
+              <Alert
+                className={inlineStyles.throughputNotice}
+                severity="info"
+                action={
+                  window.CHATWOOT_WEBSITE_TOKEN && window.CHATWOOT_BASE_URL ? (
+                    <Button color="inherit" onClick={handleContactSupport}>
+                      Contact support
+                    </Button>
+                  ) : undefined
+                }
+              >
+                Autosending rate: {data.organization.autosendingMps} messages
+                per second. Higher rates are available on request.
+              </Alert>
+            )}
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
