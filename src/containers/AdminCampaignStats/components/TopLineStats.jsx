@@ -5,6 +5,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import { withQueries } from "../../hoc/with-operations";
+import CampaignCostStat from "./CampaignCostStat";
 import CampaignStat from "./CampaignStat";
 
 export const TopLineStats = (props) => {
@@ -97,23 +98,15 @@ export const TopLineStats = (props) => {
           }
         />
       </Grid>
-      <Grid item xs={6} sm={3}>
-        <CampaignStat
-          title="SMS Segments"
+      <Grid item xs={12} sm={6}>
+        <CampaignCostStat
           loading={sentMessagesCount.loading}
           error={sentMessagesCount.errors && sentMessagesCount.errors.message}
-          count={
+          smsSegments={
             sentMessagesCount.campaign &&
             sentMessagesCount.campaign.stats.sentSmsSegmentsCount
           }
-        />
-      </Grid>
-      <Grid item xs={6} sm={3}>
-        <CampaignStat
-          title="MMS Sent"
-          loading={sentMessagesCount.loading}
-          error={sentMessagesCount.errors && sentMessagesCount.errors.message}
-          count={
+          mmsMessages={
             sentMessagesCount.campaign &&
             sentMessagesCount.campaign.stats.sentMmsCount
           }

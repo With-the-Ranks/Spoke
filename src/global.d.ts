@@ -7,6 +7,7 @@ interface Window {
   GRAPHQL_URL: string;
   SPOKE_VERSION: string;
   MAX_MESSAGE_LENGTH: number;
+  MMS_MESSAGE_COST: number;
   PASSPORT_STRATEGY: string;
   TZ: string;
   RENDERED_CLASS_NAMES: string[];
@@ -15,6 +16,7 @@ interface Window {
   BASE_URL: string;
   ENABLE_TROLLBOT: boolean;
   ENABLE_AUTOSENDING: boolean;
+  SMS_SEGMENT_COST: number;
 
   CHATWOOT_WEBSITE_TOKEN?: string;
   CHATWOOT_BASE_URL?: string;

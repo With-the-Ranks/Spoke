@@ -476,6 +476,12 @@ const validators = {
     default: 99999,
     isClient: true
   }),
+  MMS_MESSAGE_COST: num({
+    desc:
+      "Estimated USD cost for each outbound MMS message, shown in campaign stats.",
+    default: 0.0325,
+    isClient: true
+  }),
   METRICS_ENABLED: bool({
     desc: "Whether to expose the /metrics endpoint for Prometheus scraping.",
     default: true
@@ -611,6 +617,12 @@ const validators = {
   SEND_DELAY: num({
     desc: "Delay between successive sends in Spoke client",
     default: 100,
+    isClient: true
+  }),
+  SMS_SEGMENT_COST: num({
+    desc:
+      "Estimated USD cost for each outbound SMS segment, shown in campaign stats.",
+    default: 0.013,
     isClient: true
   }),
   SESSION_SECRET: str({
