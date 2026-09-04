@@ -13,7 +13,6 @@ import React, { Component } from "react";
 
 import { RequestAutoApproveType } from "../../api/organization-membership";
 import { hasRole } from "../../lib/permissions";
-import { sleep } from "../../lib/utils";
 import { loadData } from "../hoc/with-operations";
 import AssignmentRequestTable, {
   RowWorkStatus
@@ -63,14 +62,6 @@ class AdminAssignmentRequest extends Component {
     this.setState({ assignmentRequests });
   };
 
-  deleteRequest = (requestId) => {
-    let { assignmentRequests } = this.state;
-    assignmentRequests = assignmentRequests.filter(
-      (request) => request.id !== requestId
-    );
-    this.setState({ assignmentRequests });
-  };
-
   handleDismissAutoApproveRequest = () =>
     this.setState({ autoApproveReqId: undefined });
 
@@ -109,8 +100,6 @@ class AdminAssignmentRequest extends Component {
         ? RowWorkStatus.Approved
         : RowWorkStatus.Denied;
       this.setRequestStatus(requestId, newStatus);
-      await sleep(2000);
-      this.deleteRequest(requestId);
     } catch (exc) {
       this.setRequestStatus(requestId, RowWorkStatus.Error);
     }
