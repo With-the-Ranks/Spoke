@@ -191,10 +191,7 @@ AdminAssignmentRequest.propTypes = {
 const queries = {
   pendingAssignmentRequests: {
     query: gql`
-      query assignmentRequestsWithUser(
-        $organizationId: String!
-        $status: String
-      ) {
+      query assignmentRequestsWithUser($organizationId: String!) {
         currentUser {
           id
           roles(organizationId: $organizationId)
@@ -207,7 +204,7 @@ const queries = {
             }
           }
         }
-        assignmentRequests(organizationId: $organizationId, status: $status) {
+        assignmentRequests(organizationId: $organizationId) {
           id
           createdAt
           amount
@@ -222,8 +219,7 @@ const queries = {
     `,
     options: (ownProps) => ({
       variables: {
-        organizationId: ownProps.match.params.organizationId,
-        status: "pending"
+        organizationId: ownProps.match.params.organizationId
       },
       fetchPolicy: "network-only",
       pollInterval: 10000
