@@ -445,7 +445,7 @@ type Organization {
   messagingServices(after: Cursor, first: Int, active: Boolean): MessagingServicePage
   campaignGroups(after: Cursor, first: Int): CampaignGroupPage!
   templateCampaigns(after: Cursor, first: Int): CampaignPage!
-  deletedAt: String
+  deletedAt: Date
   deletedBy: User
   autosendingMps: Int
 }
@@ -682,7 +682,7 @@ type Campaign {
   repliesStaleAfter: Int
   isAssignmentLimitedToTeams: Boolean!
   timezone: String
-  createdAt: String!
+  createdAt: Date!
   previewUrl: String
   landlinesFiltered: Boolean!
   externalSystem: ExternalSystem
@@ -851,7 +851,7 @@ type MessagingService {
   id: ID!
   messagingServiceSid: String!
   serviceType: MessagingServiceType!
-  updatedAt: String!
+  updatedAt: Date!
   name: String
   active: Boolean!
   isDefault: Boolean
@@ -962,8 +962,8 @@ type CampaignGroup {
   name: String!
   description: String!
   campaigns: CampaignPage!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type CampaignGroupEdge {

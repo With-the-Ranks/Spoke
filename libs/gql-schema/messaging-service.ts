@@ -8,7 +8,7 @@ export const schema = `
     id: ID!
     messagingServiceSid: String!
     serviceType: MessagingServiceType!
-    updatedAt: String!
+    updatedAt: Date!
     name: String
     active: Boolean!
     isDefault: Boolean

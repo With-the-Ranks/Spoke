@@ -56,7 +56,7 @@ export const schema = `
     messagingServices(after: Cursor, first: Int, active: Boolean): MessagingServicePage
     campaignGroups(after: Cursor, first: Int): CampaignGroupPage!
     templateCampaigns(after: Cursor, first: Int): CampaignPage!
-    deletedAt: String
+    deletedAt: Date
     deletedBy: User
     autosendingMps: Int
   }

@@ -115,7 +115,7 @@ export const schema = `
     repliesStaleAfter: Int
     isAssignmentLimitedToTeams: Boolean!
     timezone: String
-    createdAt: String!
+    createdAt: Date!
     previewUrl: String
     landlinesFiltered: Boolean!
     externalSystem: ExternalSystem
