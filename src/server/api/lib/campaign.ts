@@ -815,7 +815,7 @@ export const editCampaign = async (
 };
 
 export const hasSentMessages = async (campaignId: string) => {
-  const { rows } = await r.reader.raw(
+  const { rows } = await r.knex.raw(
     `
       select exists (
         select 1 from message m
