@@ -73,7 +73,7 @@ import {
   updateOrganizationSettings,
   writePermissionRequired
 } from "./organization-settings";
-import { ActionType, DeactivateMode } from "./types";
+import { ActionType, AutosendStatus, DeactivateMode } from "./types";
 
 const uuidv4 = require("uuid").v4;
 
@@ -1018,8 +1018,16 @@ const rootMutations = {
     },
 
     unstartCampaign: async (_root, { id }, { user, loaders }) => {
-      const { organization_id } = await loaders.campaign.load(id);
+      const { organization_id, autosend_status } = await loaders.campaign.load(
+        id
+      );
       await accessRequired(user, organization_id, "ADMIN", true);
+
+      if (autosend_status !== AutosendStatus.Unstarted) {
+        throw new ForbiddenError(
+          "Campaign cannot be unstarted after autosending stared."
+        );
+      }
 
       if (await hasSentMessages(id)) {
         throw new ForbiddenError(
