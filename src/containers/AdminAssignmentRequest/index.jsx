@@ -94,15 +94,12 @@ class AdminAssignmentRequest extends Component {
       query: queries.pendingAssignmentRequests.query,
       variables: {
         organizationId: this.props.match.params.organizationId,
-        status: null
+        excludeStatus: RowWorkStatus.Inactive,
+        limit: 100
       },
       fetchPolicy: "network-only"
     });
-    this.setState({
-      pastAssignmentRequests: data.assignmentRequests.filter(
-        ({ status }) => status !== RowWorkStatus.Inactive
-      )
-    });
+    this.setState({ pastAssignmentRequests: data.assignmentRequests });
   };
 
   handleNotificationSubscription = ({ target: { checked } }) => {
@@ -226,6 +223,8 @@ const queries = {
       query assignmentRequestsWithUser(
         $organizationId: String!
         $status: String
+        $excludeStatus: String
+        $limit: Int
       ) {
         currentUser {
           id
@@ -239,7 +238,12 @@ const queries = {
             }
           }
         }
-        assignmentRequests(organizationId: $organizationId, status: $status) {
+        assignmentRequests(
+          organizationId: $organizationId
+          status: $status
+          excludeStatus: $excludeStatus
+          limit: $limit
+        ) {
           id
           createdAt
           amount
