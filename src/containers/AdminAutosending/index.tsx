@@ -36,7 +36,12 @@ import AutosendingTargetRow from "./components/AutosendingTargetRow";
 import AutosendingUnstartedTargetRow from "./components/AutosendingUnstartedTargetRow";
 
 const useStyles = makeStyles({
-  throughputNotice: { marginBottom: 16 },
+  throughputNotice: {
+    backgroundColor: "#f5f5f5",
+    color: "#616161",
+    marginTop: 16,
+    "& .MuiAlert-icon": { color: "inherit" }
+  },
   select: { width: 150, marginRight: 10 }
 });
 
@@ -221,22 +226,6 @@ const AdminAutosending: React.FC = () => {
             }
           />
           <CardContent>
-            {data?.organization && (
-              <Alert
-                className={inlineStyles.throughputNotice}
-                severity="info"
-                action={
-                  window.CHATWOOT_WEBSITE_TOKEN && window.CHATWOOT_BASE_URL ? (
-                    <Button color="inherit" onClick={handleContactSupport}>
-                      Contact support
-                    </Button>
-                  ) : undefined
-                }
-              >
-                Autosending rate: {data.organization.autosendingMps} messages
-                per second. Higher rates are available on request.
-              </Alert>
-            )}
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -316,6 +305,22 @@ const AdminAutosending: React.FC = () => {
               </Table>
             </TableContainer>
             {loading && <LoadingIndicator />}
+            {data?.organization && (
+              <Alert
+                className={inlineStyles.throughputNotice}
+                severity="info"
+                action={
+                  window.CHATWOOT_WEBSITE_TOKEN && window.CHATWOOT_BASE_URL ? (
+                    <Button color="inherit" onClick={handleContactSupport}>
+                      Contact support
+                    </Button>
+                  ) : undefined
+                }
+              >
+                Autosending rate: {data.organization.autosendingMps} messages
+                per second. Higher rates are available on request.
+              </Alert>
+            )}
           </CardContent>
         </>
       )}
