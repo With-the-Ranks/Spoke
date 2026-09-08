@@ -30,8 +30,8 @@ const useStyles = makeStyles({
 interface CampaignDetailsProps {
   id: string;
   description: string;
-  creatorName: string | null;
-  hasUnassignedContacts: boolean | null | undefined;
+  creatorName: string;
+  hasUnassignedContacts: boolean;
   teams: CampaignListEntryFragment["teams"];
   campaignGroups: CampaignListEntryFragment["campaignGroups"];
   externalSystem: Pick<ExternalSystem, "name" | "type"> | null | undefined;

@@ -31,7 +31,7 @@ export const AutosendingLimitField: React.FC<AutosendingLimitFieldProps> = ({
   ] = useUpdateCampaignAutosendingLimitMutation();
 
   const countMessagedContacts = useMemo(
-    () => data?.campaign?.stats?.countMessagedContacts,
+    () => data?.campaign?.stats.countMessagedContacts,
     [data]
   );
 

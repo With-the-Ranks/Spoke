@@ -56,10 +56,9 @@ export const TexterStats: React.FC<TexterStatsProps> = ({ campaignId }) => {
           </tr>
         </thead>
         <tbody>
-          {assignments.map(
-            (assignment) =>
-              assignment && <TexterStatRow assignment={assignment} />
-          )}
+          {assignments.map((assignment) => (
+            <TexterStatRow key={assignment.id} assignment={assignment} />
+          ))}
         </tbody>
       </table>
     </Paper>

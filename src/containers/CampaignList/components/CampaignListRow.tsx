@@ -58,7 +58,7 @@ export const CampaignListRow: React.FC<Props> = (props) => {
 
   const classes = useStyles();
 
-  const creatorName = campaign.creator ? campaign.creator.displayName : null;
+  const creatorName = campaign.creator.displayName;
 
   const isAutoAssignEligible = !!(
     isStarted &&

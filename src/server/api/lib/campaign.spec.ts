@@ -230,6 +230,7 @@ describe("create / edit campaign", () => {
 
       const campaign = await createCampaign(client, {
         organizationId: result.organization.id,
+        creatorId: result.user.id,
         isStarted,
         isApproved
       });
@@ -502,7 +503,8 @@ describe("create / edit campaign", () => {
       });
 
       const template = await createTemplate(client, {
-        organizationId: result.organization.id
+        organizationId: result.organization.id,
+        creatorId: result.user.id
       });
       return { ...result, template };
     });

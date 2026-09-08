@@ -552,8 +552,7 @@ export const resolvers = {
       "createdAt",
       "landlinesFiltered",
       "messagingServiceSid",
-      "autosendLimit",
-      "columnMapping"
+      "autosendLimit"
     ]),
     isApproved: (campaign) =>
       isNil(campaign.is_approved) ? false : campaign.is_approved,
@@ -803,7 +802,7 @@ export const resolvers = {
       return "";
     },
     creator: async (campaign, _, { loaders }) =>
-      campaign.creator_id ? loaders.user.load(campaign.creator_id) : null,
+      loaders.user.load(campaign.creator_id),
     previewUrl: async (campaign, _, { user, loaders }) => {
       const campaignId = campaign.id;
       const organizationId = await getCampaignOrganization({ campaignId });
