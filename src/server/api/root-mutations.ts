@@ -59,6 +59,7 @@ import { getStepsToUpdate } from "./lib/bulk-script-editor";
 import {
   copyCampaign,
   editCampaign,
+  hasSentMessages,
   markAutosendingPaused,
   unqueueAutosending
 } from "./lib/campaign";
@@ -72,7 +73,7 @@ import {
   updateOrganizationSettings,
   writePermissionRequired
 } from "./organization-settings";
-import { ActionType, DeactivateMode } from "./types";
+import { ActionType, AutosendStatus, DeactivateMode } from "./types";
 
 const uuidv4 = require("uuid").v4;
 
@@ -1007,6 +1008,38 @@ const rootMutations = {
         }),
         notifyLargeCampaignEvent(id, "start")
       ]);
+
+      const memoizer = await MemoizeHelper.getMemoizer();
+      await memoizer.invalidate(cacheOpts.CampaignsList.key, {
+        organizationId: organization_id
+      });
+
+      return campaign;
+    },
+
+    unstartCampaign: async (_root, { id }, { user, loaders }) => {
+      const { organization_id, autosend_status } = await loaders.campaign.load(
+        id
+      );
+      await accessRequired(user, organization_id, "ADMIN", true);
+
+      if (autosend_status !== AutosendStatus.Unstarted) {
+        throw new ForbiddenError(
+          "Campaign cannot be unstarted after autosending stared."
+        );
+      }
+
+      if (await hasSentMessages(id)) {
+        throw new ForbiddenError(
+          "Campaign cannot be unstarted after messages have been sent."
+        );
+      }
+
+      const [campaign] = await r
+        .knex("campaign")
+        .update({ is_started: false })
+        .where({ id })
+        .returning("*");
 
       const memoizer = await MemoizeHelper.getMemoizer();
       await memoizer.invalidate(cacheOpts.CampaignsList.key, {

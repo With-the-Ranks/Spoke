@@ -330,6 +330,7 @@ const rootSchema = `
     ): CampaignContact,
     setCampaignApproved(id: String!, approved: Boolean!): Campaign!,
     startCampaign(id:String!): Campaign,
+    unstartCampaign(id:String!): Campaign,
     setCampaignArchived(id: String!, archived: Boolean!): Campaign!,
     sendReply(id: String!, message: String!): CampaignContact
     getAssignmentContacts(assignmentId: String!, contactIds: [String], findNew: Boolean): [CampaignContact],
