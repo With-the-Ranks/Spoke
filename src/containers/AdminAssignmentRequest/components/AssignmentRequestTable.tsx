@@ -40,10 +40,6 @@ const rowStyleForStatus = (rowStatus: string) => {
   let overrideStyle = {};
   if (rowStatus === RowWorkStatus.Error) {
     overrideStyle = { backgroundColor: theme.colors.lightGray };
-  } else if (rowStatus === RowWorkStatus.Approved) {
-    overrideStyle = { backgroundColor: theme.colors.lightGreen };
-  } else if (rowStatus === RowWorkStatus.Denied) {
-    overrideStyle = { backgroundColor: red[50] };
   }
   return { ...baseStyle, ...overrideStyle };
 };
@@ -148,6 +144,13 @@ const AssignmentRequestTable: React.FC<AssignmentRequestTableProps> = (
               </TableRow>
             );
           })}
+          {assignmentRequests.length === 0 && (
+            <TableRow>
+              <TableCell align="center" colSpan={4}>
+                No requests
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
