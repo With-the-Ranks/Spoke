@@ -354,7 +354,17 @@ const rootMutations = {
 
     editOrganizationMembership: async (
       _root,
-      { id, level, role, assignmentRequestNotifications },
+      {
+        id,
+        level,
+        role,
+        assignmentRequestNotifications
+      }: {
+        id: string;
+        level?: RequestAutoApproveType;
+        role?: UserRoleType;
+        assignmentRequestNotifications?: boolean;
+      },
       { user: authUser }
     ) => {
       const membership = await r
@@ -363,7 +373,7 @@ const rootMutations = {
         .first();
       if (!membership) throw new Error("No such org membership");
       if (
-        _.isBoolean(assignmentRequestNotifications) &&
+        assignmentRequestNotifications !== undefined &&
         membership.user_id !== authUser.id
       ) {
         throw new ForbiddenError(
@@ -405,7 +415,7 @@ const rootMutations = {
         .returning("*");
 
       if (level) updateQuery.update({ request_status: level.toLowerCase() });
-      if (_.isBoolean(assignmentRequestNotifications)) {
+      if (assignmentRequestNotifications !== undefined) {
         updateQuery.update({
           assignment_request_notifications: assignmentRequestNotifications
         });
