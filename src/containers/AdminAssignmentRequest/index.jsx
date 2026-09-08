@@ -6,6 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { withStyles } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import isEqual from "lodash/isEqual";
 import PropTypes from "prop-types";
@@ -18,9 +19,18 @@ import AssignmentRequestTable, {
   RowWorkStatus
 } from "./components/AssignmentRequestTable";
 
+const styles = {
+  pastRequestsSummary: {
+    cursor: "pointer",
+    padding: "16px 0",
+    width: "fit-content"
+  }
+};
+
 class AdminAssignmentRequest extends Component {
   state = {
     assignmentRequests: [],
+    pastAssignmentRequests: null,
     autoApproveReqId: undefined
   };
 
@@ -77,6 +87,24 @@ class AdminAssignmentRequest extends Component {
   handleResolveRequest = (approved) => (requestId) =>
     this.resolveRequest(requestId, approved);
 
+  handleLoadPastRequests = async ({ target: { open } }) => {
+    if (!open) return;
+    const { data } = await this.props.client.query({
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      query: queries.pendingAssignmentRequests.query,
+      variables: {
+        organizationId: this.props.match.params.organizationId,
+        status: null
+      },
+      fetchPolicy: "network-only"
+    });
+    this.setState({
+      pastAssignmentRequests: data.assignmentRequests.filter(
+        ({ status }) => status !== RowWorkStatus.Inactive
+      )
+    });
+  };
+
   handleNotificationSubscription = ({ target: { checked } }) => {
     const {
       node
@@ -107,7 +135,11 @@ class AdminAssignmentRequest extends Component {
 
   render() {
     const { currentUser } = this.props.pendingAssignmentRequests;
-    const { assignmentRequests, autoApproveReqId } = this.state;
+    const {
+      assignmentRequests,
+      pastAssignmentRequests,
+      autoApproveReqId
+    } = this.state;
     const isAdmin = hasRole("ADMIN", currentUser.roles);
     const membership = currentUser.memberships.edges[0].node;
     const autoApproveRequest =
@@ -148,6 +180,17 @@ class AdminAssignmentRequest extends Component {
           onApproveRequest={this.handleResolveRequest(true)}
           onDenyRequest={this.handleResolveRequest(false)}
         />
+        <details onToggle={this.handleLoadPastRequests}>
+          <summary className={this.props.classes.pastRequestsSummary}>
+            Past requests
+          </summary>
+          {pastAssignmentRequests && (
+            <AssignmentRequestTable
+              isAdmin={false}
+              assignmentRequests={pastAssignmentRequests}
+            />
+          )}
+        </details>
         <Dialog
           open={!!autoApproveRequest}
           onClose={this.handleDismissAutoApproveRequest}
@@ -180,7 +223,10 @@ AdminAssignmentRequest.propTypes = {
 const queries = {
   pendingAssignmentRequests: {
     query: gql`
-      query assignmentRequestsWithUser($organizationId: String!) {
+      query assignmentRequestsWithUser(
+        $organizationId: String!
+        $status: String
+      ) {
         currentUser {
           id
           roles(organizationId: $organizationId)
@@ -193,7 +239,7 @@ const queries = {
             }
           }
         }
-        assignmentRequests(organizationId: $organizationId) {
+        assignmentRequests(organizationId: $organizationId, status: $status) {
           id
           createdAt
           amount
@@ -208,7 +254,8 @@ const queries = {
     `,
     options: (ownProps) => ({
       variables: {
-        organizationId: ownProps.match.params.organizationId
+        organizationId: ownProps.match.params.organizationId,
+        status: "pending"
       },
       fetchPolicy: "network-only",
       pollInterval: 10000
@@ -256,4 +303,4 @@ const mutations = {
 export default loadData({
   queries,
   mutations
-})(AdminAssignmentRequest);
+})(withStyles(styles)(AdminAssignmentRequest));
