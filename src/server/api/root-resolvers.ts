@@ -203,7 +203,11 @@ const rootResolvers = {
 
       return toReturn;
     },
-    assignmentRequests: async (_root, { organizationId, status }, { user }) => {
+    assignmentRequests: async (
+      _root,
+      { organizationId, status, excludeStatus, limit },
+      { user }
+    ) => {
       await accessRequired(user, organizationId, "SUPERVOLUNTEER");
 
       const query = r
@@ -221,6 +225,12 @@ const rootResolvers = {
 
       if (status) {
         query.where({ status });
+      }
+      if (excludeStatus) {
+        query.whereNot({ status: excludeStatus });
+      }
+      if (limit) {
+        query.orderBy("created_at", "desc").limit(limit);
       }
 
       const assignmentRequests = await query;

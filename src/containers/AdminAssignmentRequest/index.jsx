@@ -6,6 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { withStyles } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import isEqual from "lodash/isEqual";
 import PropTypes from "prop-types";
@@ -13,15 +14,23 @@ import React, { Component } from "react";
 
 import { RequestAutoApproveType } from "../../api/organization-membership";
 import { hasRole } from "../../lib/permissions";
-import { sleep } from "../../lib/utils";
 import { loadData } from "../hoc/with-operations";
 import AssignmentRequestTable, {
   RowWorkStatus
 } from "./components/AssignmentRequestTable";
 
+const styles = {
+  pastRequestsSummary: {
+    cursor: "pointer",
+    padding: "16px 0",
+    width: "fit-content"
+  }
+};
+
 class AdminAssignmentRequest extends Component {
   state = {
     assignmentRequests: [],
+    pastAssignmentRequests: null,
     autoApproveReqId: undefined
   };
 
@@ -63,14 +72,6 @@ class AdminAssignmentRequest extends Component {
     this.setState({ assignmentRequests });
   };
 
-  deleteRequest = (requestId) => {
-    let { assignmentRequests } = this.state;
-    assignmentRequests = assignmentRequests.filter(
-      (request) => request.id !== requestId
-    );
-    this.setState({ assignmentRequests });
-  };
-
   handleDismissAutoApproveRequest = () =>
     this.setState({ autoApproveReqId: undefined });
 
@@ -85,6 +86,21 @@ class AdminAssignmentRequest extends Component {
 
   handleResolveRequest = (approved) => (requestId) =>
     this.resolveRequest(requestId, approved);
+
+  handleLoadPastRequests = async ({ target: { open } }) => {
+    if (!open) return;
+    const { data } = await this.props.client.query({
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      query: queries.pendingAssignmentRequests.query,
+      variables: {
+        organizationId: this.props.match.params.organizationId,
+        excludeStatus: RowWorkStatus.Inactive,
+        limit: 100
+      },
+      fetchPolicy: "network-only"
+    });
+    this.setState({ pastAssignmentRequests: data.assignmentRequests });
+  };
 
   handleNotificationSubscription = ({ target: { checked } }) => {
     const {
@@ -109,8 +125,6 @@ class AdminAssignmentRequest extends Component {
         ? RowWorkStatus.Approved
         : RowWorkStatus.Denied;
       this.setRequestStatus(requestId, newStatus);
-      await sleep(2000);
-      this.deleteRequest(requestId);
     } catch (exc) {
       this.setRequestStatus(requestId, RowWorkStatus.Error);
     }
@@ -118,7 +132,11 @@ class AdminAssignmentRequest extends Component {
 
   render() {
     const { currentUser } = this.props.pendingAssignmentRequests;
-    const { assignmentRequests, autoApproveReqId } = this.state;
+    const {
+      assignmentRequests,
+      pastAssignmentRequests,
+      autoApproveReqId
+    } = this.state;
     const isAdmin = hasRole("ADMIN", currentUser.roles);
     const membership = currentUser.memberships.edges[0].node;
     const autoApproveRequest =
@@ -159,6 +177,17 @@ class AdminAssignmentRequest extends Component {
           onApproveRequest={this.handleResolveRequest(true)}
           onDenyRequest={this.handleResolveRequest(false)}
         />
+        <details onToggle={this.handleLoadPastRequests}>
+          <summary className={this.props.classes.pastRequestsSummary}>
+            Past requests
+          </summary>
+          {pastAssignmentRequests && (
+            <AssignmentRequestTable
+              isAdmin={false}
+              assignmentRequests={pastAssignmentRequests}
+            />
+          )}
+        </details>
         <Dialog
           open={!!autoApproveRequest}
           onClose={this.handleDismissAutoApproveRequest}
@@ -194,6 +223,8 @@ const queries = {
       query assignmentRequestsWithUser(
         $organizationId: String!
         $status: String
+        $excludeStatus: String
+        $limit: Int
       ) {
         currentUser {
           id
@@ -207,7 +238,12 @@ const queries = {
             }
           }
         }
-        assignmentRequests(organizationId: $organizationId, status: $status) {
+        assignmentRequests(
+          organizationId: $organizationId
+          status: $status
+          excludeStatus: $excludeStatus
+          limit: $limit
+        ) {
           id
           createdAt
           amount
@@ -271,4 +307,4 @@ const mutations = {
 export default loadData({
   queries,
   mutations
-})(AdminAssignmentRequest);
+})(withStyles(styles)(AdminAssignmentRequest));

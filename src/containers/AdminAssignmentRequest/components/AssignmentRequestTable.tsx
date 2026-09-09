@@ -40,10 +40,6 @@ const rowStyleForStatus = (rowStatus: string) => {
   let overrideStyle = {};
   if (rowStatus === RowWorkStatus.Error) {
     overrideStyle = { backgroundColor: theme.colors.lightGray };
-  } else if (rowStatus === RowWorkStatus.Approved) {
-    overrideStyle = { opacity: 0, backgroundColor: theme.colors.green };
-  } else if (rowStatus === RowWorkStatus.Denied) {
-    overrideStyle = { opacity: 0, backgroundColor: theme.colors.lightRed };
   }
   return { ...baseStyle, ...overrideStyle };
 };
@@ -141,11 +137,20 @@ const AssignmentRequestTable: React.FC<AssignmentRequestTableProps> = (
                     {status === RowWorkStatus.Working && (
                       <CircularProgress size={25} />
                     )}
+                    {status === RowWorkStatus.Approved && "Approved"}
+                    {status === RowWorkStatus.Denied && "Rejected"}
                   </div>
                 </TableCell>
               </TableRow>
             );
           })}
+          {assignmentRequests.length === 0 && (
+            <TableRow>
+              <TableCell align="center" colSpan={4}>
+                No requests
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
