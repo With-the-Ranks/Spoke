@@ -13,7 +13,7 @@ interface IOrganizationMembership {
 
 export const resolvers = {
   OrganizationMembership: {
-    ...sqlResolvers(["id"]),
+    ...sqlResolvers(["id", "assignmentRequestNotifications"]),
     user: async (membership: IOrganizationMembership) =>
       membership.user
         ? membership.user
