@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.2.0](https://github.com/With-the-Ranks/spoke/compare/v11.1.1...v11.2.0) (2026-09-10)
+
+
+### Features
+
+* **assignment requests:** notify subscribed admins ([#259](https://github.com/With-the-Ranks/spoke/issues/259)) ([536771e](https://github.com/With-the-Ranks/spoke/commit/536771eeddd13005cd3f6f863a361dca441da828))
+* **assignment requests:** show completed assignment requests ([#260](https://github.com/With-the-Ranks/spoke/issues/260)) ([b787157](https://github.com/With-the-Ranks/spoke/commit/b78715779b3a14b471a0e24a83158ac995a80daa))
+* **autosending:** enable by default ([#258](https://github.com/With-the-Ranks/spoke/issues/258)) ([8a9dcc9](https://github.com/With-the-Ranks/spoke/commit/8a9dcc9c115a3a02152f1fa19abf84b0964add7e))
+* **campaign-builder:** allow unstarting campaign ([#250](https://github.com/With-the-Ranks/spoke/issues/250)) ([7ec6642](https://github.com/With-the-Ranks/spoke/commit/7ec6642d6f7e09acce357e6dded04d395931e506))
+* **campaign-stats:** add estimated campaign cost ([#257](https://github.com/With-the-Ranks/spoke/issues/257)) ([e3b082b](https://github.com/With-the-Ranks/spoke/commit/e3b082b7c0f3b0c263d881358561ff7e7533295a))
+
+
+### Backend Changes
+
+* **campaign:** clean up non null types ([#251](https://github.com/With-the-Ranks/spoke/issues/251)) ([cc92acf](https://github.com/With-the-Ranks/spoke/commit/cc92acff74b969037e4cce686dc06e283d601a6c))
+
 ### [11.1.1](https://github.com/With-the-Ranks/spoke/compare/v11.1.0...v11.1.1) (2026-08-26)
 
 ## [11.1.0](https://github.com/With-the-Ranks/spoke/compare/v11.0.0...v11.1.0) (2026-08-26)
