@@ -191,7 +191,6 @@ const queries = {
               introHtml
               primaryColor
               logoImageUrl
-              dueBy
             }
             maxContacts
             unmessagedCount: contactsCount(contactsFilter: $needsMessageFilter)

@@ -75,7 +75,6 @@ export const schema = `
     organization: Organization!
     title: String!
     description: String!
-    dueBy: Date
     readiness: CampaignReadiness!
     isApproved: Boolean!
     isStarted: Boolean!
@@ -169,7 +168,6 @@ export const schema = `
   input CampaignInput {
     title: String
     description: String
-    dueBy: Date
     logoImageUrl: String
     primaryColor: String
     introHtml: String

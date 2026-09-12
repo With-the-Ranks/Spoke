@@ -201,7 +201,6 @@ CREATE TABLE public.all_campaign (
     title text DEFAULT ''::text NOT NULL,
     description text DEFAULT ''::text NOT NULL,
     is_started boolean DEFAULT false NOT NULL,
-    due_by timestamp with time zone,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_archived boolean DEFAULT false NOT NULL,
     logo_image_url text,
@@ -1505,7 +1504,6 @@ CREATE VIEW public.campaign AS
     all_campaign.title,
     all_campaign.description,
     all_campaign.is_started,
-    all_campaign.due_by,
     all_campaign.created_at,
     all_campaign.is_archived,
     all_campaign.logo_image_url,
@@ -1704,9 +1702,7 @@ CREATE VIEW public.assignable_campaigns_with_needs_message AS
    FROM public.assignable_campaigns
   WHERE ((EXISTS ( SELECT 1
            FROM public.assignable_needs_message
-          WHERE (assignable_needs_message.campaign_id = assignable_campaigns.id))) AND (NOT (EXISTS ( SELECT 1
-           FROM public.campaign
-          WHERE ((campaign.id = assignable_campaigns.id) AND (now() > date_trunc('day'::text, ((campaign.due_by + '24:00:00'::interval) AT TIME ZONE campaign.timezone))))))) AND (assignable_campaigns.autosend_status <> 'sending'::text));
+          WHERE (assignable_needs_message.campaign_id = assignable_campaigns.id))) AND (assignable_campaigns.autosend_status <> 'sending'::text));
 
 
 ALTER TABLE public.assignable_campaigns_with_needs_message OWNER TO postgres;
@@ -1855,9 +1851,7 @@ CREATE VIEW public.autosend_campaigns_to_send AS
    FROM public.sendable_campaigns
   WHERE ((EXISTS ( SELECT 1
            FROM public.assignable_needs_message
-          WHERE (assignable_needs_message.campaign_id = sendable_campaigns.id))) AND (NOT (EXISTS ( SELECT 1
-           FROM public.campaign
-          WHERE ((campaign.id = sendable_campaigns.id) AND (now() > date_trunc('day'::text, ((campaign.due_by + '24:00:00'::interval) AT TIME ZONE campaign.timezone))))))) AND (sendable_campaigns.autosend_status = 'sending'::text));
+          WHERE (assignable_needs_message.campaign_id = sendable_campaigns.id))) AND (sendable_campaigns.autosend_status = 'sending'::text));
 
 
 ALTER TABLE public.autosend_campaigns_to_send OWNER TO postgres;
