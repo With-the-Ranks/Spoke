@@ -5,30 +5,11 @@ export const GET_ORGANIZATION_DATA = gql`
     organization(id: $organizationId) {
       id
       name
-      uuid
-      teams {
-        id
-        title
-      }
-      texters: people {
-        id
-        firstName
-        lastName
-        displayName
-      }
-      numbersApiKey
       messagingServices(active: true) {
         edges {
           node {
             name
           }
-        }
-      }
-      campaigns(cursor: { offset: 0, limit: 5000 }) {
-        campaigns {
-          id
-          title
-          createdAt
         }
       }
     }
@@ -50,68 +31,27 @@ export const GET_CAMPAIGN_JOBS = gql`
   }
 `;
 
-export const DELETE_JOB = gql`
-  mutation deleteJob($campaignId: String!, $id: String!) {
-    deleteJob(campaignId: $campaignId, id: $id) {
-      id
-    }
-  }
-`;
-
 export const EditCampaignFragment = gql`
   fragment EditCampaignFragment on Campaign {
     id
     title
     description
     isStarted
-    isApproved
     isArchived
     isTemplate
     hasSentMessages
     contactsCount
-    datawarehouseAvailable
-    customFields
-    logoImageUrl
-    introHtml
-    primaryColor
-    textingHoursStart
-    textingHoursEnd
-    isAssignmentLimitedToTeams
-    isAutoassignEnabled
-    timezone
-    teams {
-      id
-      title
-    }
-    messagingServiceSid
     editors
     readiness {
-      basics
-      textingHours
-      integration
-      contacts
-      autoassign
-      cannedResponses
-      campaignGroups
+      id
       interactions
-      texters
     }
-    contactsFilename
   }
 `;
 
 export const GET_EDIT_CAMPAIGN_DATA = gql`
   query getCampaign($campaignId: String!) {
     campaign(id: $campaignId) {
-      ...EditCampaignFragment
-    }
-  }
-  ${EditCampaignFragment}
-`;
-
-export const EDIT_CAMPAIGN = gql`
-  mutation editCampaign($campaignId: String!, $campaign: CampaignInput!) {
-    editCampaign(id: $campaignId, campaign: $campaign) {
       ...EditCampaignFragment
     }
   }
