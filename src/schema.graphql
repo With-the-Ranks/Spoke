@@ -890,7 +890,6 @@ input ContactsFilter {
   messageStatus: String
   isOptedOut: Boolean
   validTimezone: Boolean
-  includePastDue: Boolean
 }
 
 type Location {
