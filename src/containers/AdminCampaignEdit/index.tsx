@@ -196,17 +196,12 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Canned Responses",
       content: CampaignCannedResponsesForm,
-      showForModes: [
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
-      blocksStarting: true
+      showForModes: [CampaignBuilderMode.Advanced, CampaignBuilderMode.Template]
     },
     {
       title: "Autoassign Mode",
       content: CampaignAutoassignModeForm,
-      showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced],
-      blocksStarting: true
+      showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced]
     }
   ];
 
