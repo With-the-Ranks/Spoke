@@ -17,6 +17,7 @@ interface Window {
   ENABLE_TROLLBOT: boolean;
   ENABLE_AUTOSENDING: boolean;
   SMS_SEGMENT_COST: number;
+  ENABLE_CAMPAIGN_GROUPS: boolean;
 
   CHATWOOT_WEBSITE_TOKEN?: string;
   CHATWOOT_BASE_URL?: string;
