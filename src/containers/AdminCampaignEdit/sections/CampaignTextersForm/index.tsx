@@ -118,7 +118,6 @@ const CampaignTextersForm: React.FC<InnerProps> = (props) => {
     ({ assignment }) => assignment.contactsCount > 0
   );
 
-  if (!contactsCount) return null;
   const {
     lastReset,
     autoSplit,
