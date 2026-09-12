@@ -66,7 +66,7 @@ interface CampaignEditSection {
   content: any;
   showForModes?: CampaignBuilderMode[];
   exclude?: boolean;
-  blocksStarting: boolean;
+  blocksStarting?: boolean;
   checkCompleted?: () => boolean;
 }
 
@@ -143,8 +143,7 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
         CampaignBuilderMode.Advanced,
         CampaignBuilderMode.Template
       ],
-      exclude: !window.ENABLE_CAMPAIGN_GROUPS,
-      blocksStarting: false
+      exclude: !window.ENABLE_CAMPAIGN_GROUPS
     },
     {
       title: "Messaging Service",
@@ -156,13 +155,11 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Texting Hours",
       content: CampaignTextingHoursForm,
-      showForModes: [CampaignBuilderMode.Advanced],
-      blocksStarting: false
+      showForModes: [CampaignBuilderMode.Advanced]
     },
     {
       title: "Integration",
-      content: CampaignIntegrationForm,
-      blocksStarting: false
+      content: CampaignIntegrationForm
     },
     {
       title: "Contacts",
@@ -174,28 +171,21 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Contact Overlap Management",
       content: CampaignOverlapManager,
-      showForModes: [CampaignBuilderMode.Advanced],
-      blocksStarting: false
+      showForModes: [CampaignBuilderMode.Advanced]
     },
     {
       title: "Teams",
       content: CampaignTeamsForm,
-      showForModes: [
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
-      blocksStarting: false
+      showForModes: [CampaignBuilderMode.Advanced, CampaignBuilderMode.Template]
     },
     {
       title: "Texters",
       content: CampaignTextersForm,
-      showForModes: [CampaignBuilderMode.Advanced],
-      blocksStarting: false
+      showForModes: [CampaignBuilderMode.Advanced]
     },
     {
       title: "Campaign Variables",
-      content: CampaignVariablesForm,
-      blocksStarting: false
+      content: CampaignVariablesForm
     },
     {
       title: "Interactions",
