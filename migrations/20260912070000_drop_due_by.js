@@ -34,7 +34,8 @@ exports.up = function up(knex) {
         autosend_status,
         autosend_user_id,
         messaging_service_sid,
-        autosend_limit
+        autosend_limit,
+        send_after
       from all_campaign
       where is_template = false;
 
@@ -291,7 +292,8 @@ exports.down = function down(knex) {
         autosend_status,
         autosend_user_id,
         messaging_service_sid,
-        autosend_limit
+        autosend_limit,
+        send_after
       from all_campaign
       where is_template = false;
 
