@@ -67,7 +67,7 @@ interface CampaignEditSection {
   showForModes?: CampaignBuilderMode[];
   exclude?: boolean;
   blocksStarting: boolean;
-  checkCompleted: () => boolean;
+  checkCompleted?: () => boolean;
 }
 
 interface AdminCampaignEditViewProps {
@@ -144,14 +144,12 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
         CampaignBuilderMode.Template
       ],
       exclude: !window.ENABLE_CAMPAIGN_GROUPS,
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
       title: "Messaging Service",
       content: CampaignMessagingServiceForm,
       showForModes: [CampaignBuilderMode.Advanced],
-      checkCompleted: () => true,
       blocksStarting: true,
       exclude: (organization.messagingServices?.edges?.length || 0) <= 1
     },
@@ -159,13 +157,11 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
       title: "Texting Hours",
       content: CampaignTextingHoursForm,
       showForModes: [CampaignBuilderMode.Advanced],
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
       title: "Integration",
       content: CampaignIntegrationForm,
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
@@ -179,7 +175,6 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
       title: "Contact Overlap Management",
       content: CampaignOverlapManager,
       showForModes: [CampaignBuilderMode.Advanced],
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
@@ -189,20 +184,17 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
         CampaignBuilderMode.Advanced,
         CampaignBuilderMode.Template
       ],
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
       title: "Texters",
       content: CampaignTextersForm,
       showForModes: [CampaignBuilderMode.Advanced],
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
       title: "Campaign Variables",
       content: CampaignVariablesForm,
-      checkCompleted: () => true,
       blocksStarting: false
     },
     {
@@ -218,14 +210,12 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
         CampaignBuilderMode.Advanced,
         CampaignBuilderMode.Template
       ],
-      checkCompleted: () => true,
       blocksStarting: true
     },
     {
       title: "Autoassign Mode",
       content: CampaignAutoassignModeForm,
       showForModes: [CampaignBuilderMode.Basic, CampaignBuilderMode.Advanced],
-      checkCompleted: () => true,
       blocksStarting: true
     }
   ];
@@ -243,7 +233,8 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     if (hasErroredJob) return false;
 
     return sections.every(
-      (section) => !section.blocksStarting || section.checkCompleted()
+      (section) =>
+        !section.blocksStarting || (section.checkCompleted?.() ?? true)
     );
   };
 
