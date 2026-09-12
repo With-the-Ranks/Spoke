@@ -64,7 +64,7 @@ interface CampaignEditSection {
   // prop-types/generics variance quirk, unrelated to the props themselves.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: any;
-  showForModes: CampaignBuilderMode[];
+  showForModes?: CampaignBuilderMode[];
   exclude?: boolean;
   blocksStarting: boolean;
   checkCompleted: () => boolean;
@@ -133,11 +133,6 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Basics",
       content: CampaignBasicsForm,
-      showForModes: [
-        CampaignBuilderMode.Basic,
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
       blocksStarting: true,
       checkCompleted: () => campaign.title !== "" && campaign.description !== ""
     },
@@ -170,11 +165,6 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Integration",
       content: CampaignIntegrationForm,
-      showForModes: [
-        CampaignBuilderMode.Basic,
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
       checkCompleted: () => true,
       blocksStarting: false
     },
@@ -212,22 +202,12 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
     {
       title: "Campaign Variables",
       content: CampaignVariablesForm,
-      showForModes: [
-        CampaignBuilderMode.Basic,
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
       checkCompleted: () => true,
       blocksStarting: false
     },
     {
       title: "Interactions",
       content: CampaignInteractionStepsForm,
-      showForModes: [
-        CampaignBuilderMode.Basic,
-        CampaignBuilderMode.Advanced,
-        CampaignBuilderMode.Template
-      ],
       checkCompleted: () => campaign.readiness.interactions,
       blocksStarting: true
     },
@@ -251,7 +231,9 @@ const AdminCampaignEditView: React.FC<AdminCampaignEditViewProps> = ({
   ];
 
   const sections = allSections.filter(
-    (section) => !section.exclude && section.showForModes.includes(builderMode)
+    (section) =>
+      !section.exclude &&
+      (!section.showForModes || section.showForModes.includes(builderMode))
   );
 
   const isCampaignReadyToStart = () => {
