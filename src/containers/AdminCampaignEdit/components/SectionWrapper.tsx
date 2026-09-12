@@ -368,7 +368,7 @@ export interface FullComponentProps extends RequiredComponentProps {
 
 export interface SectionOptions {
   title: string;
-  readinessName: keyof CampaignReadinessType;
+  readinessName?: keyof CampaignReadinessType;
   jobQueueNames: string[];
   expandAfterCampaignStarts: boolean;
   expandableBySuperVolunteers: boolean;
@@ -431,7 +431,7 @@ export const asSection = (options: SectionOptions) => (
         (expandAfterCampaignStarts || !isStarted) &&
         (expandableBySuperVolunteers || isAdmin);
 
-      const sectionIsDone = readiness[readinessName];
+      const sectionIsDone = readinessName ? readiness[readinessName] : true;
 
       return { pendingJob, isExpandable, sectionIsDone, deleteJob };
     })

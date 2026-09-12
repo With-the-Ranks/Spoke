@@ -7,12 +7,6 @@ interface Props {
   prevCampaignClicked(campaignId: string | null): void;
   nextCampaignClicked(campaignId: string | null): void;
   campaignId: string;
-  campaignNavigation: {
-    campaignNavigation: {
-      prevCampaignId: string | null;
-      nextCampaignId: string | null;
-    };
-  };
 }
 
 const CampaignNavigation: React.FC<Props> = (props) => {

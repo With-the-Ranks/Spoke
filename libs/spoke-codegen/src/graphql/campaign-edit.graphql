@@ -1,0 +1,111 @@
+fragment EditCampaignData on Campaign {
+  id
+  title
+  description
+  isStarted
+  isArchived
+  isTemplate
+  hasSentMessages
+  contactsCount
+  editors
+  readiness {
+    id
+    interactions
+  }
+}
+
+query GetEditCampaignData($campaignId: String!) {
+  campaign(id: $campaignId) {
+    ...EditCampaignData
+  }
+}
+
+fragment OrganizationDataForCampaignEdit on Organization {
+  id
+  name
+  messagingServices(active: true) {
+    edges {
+      node {
+        name
+      }
+    }
+  }
+}
+
+query GetOrganizationDataForCampaignEdit($organizationId: String!) {
+  organization(id: $organizationId) {
+    ...OrganizationDataForCampaignEdit
+  }
+}
+
+fragment CampaignEditPendingJob on JobRequest {
+  id
+  jobType
+  assigned
+  status
+  resultMessage
+}
+
+query GetCampaignEditJobs($campaignId: String!) {
+  campaign(id: $campaignId) {
+    id
+    pendingJobs {
+      ...CampaignEditPendingJob
+    }
+  }
+}
+
+query GetCampaignTeams($campaignId: String!) {
+  campaign(id: $campaignId) {
+    id
+    teams {
+      id
+      title
+    }
+    isAssignmentLimitedToTeams
+  }
+}
+
+query GetOrganizationTeamsForCampaignEdit($organizationId: String!) {
+  organization(id: $organizationId) {
+    id
+    teams {
+      id
+      title
+    }
+  }
+}
+
+mutation EditCampaignTeams($campaignId: String!, $payload: CampaignInput!) {
+  editCampaign(id: $campaignId, campaign: $payload) {
+    id
+    teams {
+      id
+      title
+    }
+    isAssignmentLimitedToTeams
+  }
+}
+
+query FetchCampaignOverlaps($input: FetchCampaignOverlapInput!) {
+  fetchCampaignOverlaps(input: $input) {
+    campaign {
+      id
+      title
+    }
+    overlapCount
+    lastActivity
+  }
+}
+
+mutation DeleteManyCampaignOverlap(
+  $organizationId: String!
+  $campaignId: String!
+  $overlappingCampaignIds: [String]!
+) {
+  deleteManyCampaignOverlap(
+    organizationId: $organizationId
+    campaignId: $campaignId
+    overlappingCampaignIds: $overlappingCampaignIds
+  )
+}
