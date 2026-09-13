@@ -16,7 +16,7 @@ import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
 import { Helmet } from "react-helmet";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
 import CampaignNavigation from "../../components/CampaignNavigation";
@@ -470,9 +470,19 @@ class AdminCampaignStats extends React.Component {
         <Snackbar
           open={this.state.campaignJustCopied}
           message={
-            this.state.copyCampaignError
-              ? `Error: ${this.state.copyCampaignError}`
-              : `Campaign successfully copied to campaign ${this.state.copiedCampaignId}`
+            this.state.copyCampaignError ? (
+              `Error: ${this.state.copyCampaignError}`
+            ) : (
+              <span>
+                Campaign successfully copied to{" "}
+                <Link
+                  to={`/admin/${organizationId}/campaigns/${this.state.copiedCampaignId}/edit`}
+                  style={{ color: theme.colors.white }}
+                >
+                  campaign {this.state.copiedCampaignId}
+                </Link>
+              </span>
+            )
           }
           autoHideDuration={5000}
           onClose={() => {
