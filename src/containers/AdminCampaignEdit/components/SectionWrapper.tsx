@@ -167,7 +167,7 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
   const classes = useStyles();
 
   const { jobId, savePercent, jobMessage, isSaving } = unpackJob(pendingJob);
-  const { progressMessage, progressPercent } = unpackStatus(savePercent);
+  const { progressMessage } = unpackStatus(savePercent);
 
   const expandable = !isSaving && isExpandable;
   const expanded = active && expandable;
@@ -178,16 +178,14 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
     </Avatar>
   );
   const classNames: string[] = [classes.cardHeader];
-  const cardHeaderStyle: React.CSSProperties = {};
 
   if (isSaving) {
     avatar = (
-      <CircularProgress
-        className={clsx(classes.cardAvatar, classes.cardAvatarEmpty)}
-      />
+      <Avatar className={clsx(classes.cardAvatar, classes.cardAvatarEmpty)}>
+        <CircularProgress size={24} />
+      </Avatar>
     );
     classNames.push(classes.saving);
-    cardHeaderStyle.width = `${progressPercent}%`;
   } else if (active && expandable) {
     classNames.push(classes.active);
   } else if (!expandable) {
@@ -236,7 +234,6 @@ export const SectionWrapper: React.FC<WrapperProps> = (props) => {
           title={title}
           titleTypographyProps={{ variant: "body1" }}
           className={clsx(...classNames)}
-          style={cardHeaderStyle}
           avatar={avatar}
           action={
             expandable && (

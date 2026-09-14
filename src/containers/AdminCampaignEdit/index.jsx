@@ -919,7 +919,8 @@ const queries = {
       variables: {
         campaignId: ownProps.match.params.campaignId
       },
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
+      nextFetchPolicy: "cache-first"
     })
   },
   campaignData: {
@@ -928,7 +929,8 @@ const queries = {
       variables: {
         campaignId: ownProps.match.params.campaignId
       },
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
+      nextFetchPolicy: "cache-first"
     })
   },
   organizationData: {
