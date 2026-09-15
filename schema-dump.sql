@@ -2946,7 +2946,7 @@ CREATE TABLE public.organization (
     default_texting_tz character varying(255) DEFAULT 'America/New_York'::character varying NOT NULL,
     deleted_at timestamp with time zone,
     deleted_by integer,
-    autosending_mps integer
+    autosending_mps integer DEFAULT 3
 );
 
 
