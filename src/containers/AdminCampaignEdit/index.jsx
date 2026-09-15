@@ -624,7 +624,7 @@ class AdminCampaignEdit extends React.Component {
     return "";
   };
 
-  renderCampaignFormSection = (section, forceDisable) => {
+  renderCampaignFormSection = (section, forceDisable, active) => {
     const { isWorking } = this.state;
     const shouldDisable =
       isWorking || forceDisable || this.checkSectionSaved(section);
@@ -633,6 +633,7 @@ class AdminCampaignEdit extends React.Component {
     const formValues = this.getSectionState(section);
     return (
       <ContentComponent
+        active={active}
         onChange={this.handleChange}
         formValues={formValues}
         saveLabel={saveLabel}
@@ -880,7 +881,11 @@ class AdminCampaignEdit extends React.Component {
               sectionIsDone={sectionIsDone}
               deleteJob={() => this.handleDeleteJob(jobId)}
             >
-              {this.renderCampaignFormSection(section, sectionIsSaving)}
+              {this.renderCampaignFormSection(
+                section,
+                sectionIsSaving,
+                sectionIsExpanded
+              )}
             </SectionWrapper>
           );
         })}

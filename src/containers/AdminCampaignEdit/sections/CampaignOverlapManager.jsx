@@ -278,6 +278,7 @@ const queries = {
       }
     `,
     options: (ownProps) => ({
+      fetchPolicy: "network-only",
       variables: {
         input: {
           targetCampaignId: ownProps.campaignId,
@@ -327,6 +328,8 @@ class StateWrapper extends React.Component {
 
   render() {
     const { includeArchived } = this.state;
+    if (!this.props.active) return null;
+
     return (
       <div>
         <Toggle
