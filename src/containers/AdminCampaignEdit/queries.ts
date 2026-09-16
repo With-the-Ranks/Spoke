@@ -73,7 +73,6 @@ export const EditCampaignFragment = gql`
     id
     title
     description
-    dueBy
     isStarted
     isApproved
     isArchived

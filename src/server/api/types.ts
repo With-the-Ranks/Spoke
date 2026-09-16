@@ -105,7 +105,6 @@ export interface CampaignRecord {
   is_approved: boolean;
   is_started: boolean | null;
   is_template: boolean;
-  due_by: string | null;
   created_at: string;
   is_archived: boolean | null;
   logo_image_url: string | null;

@@ -3,7 +3,6 @@ import _ from "lodash";
 import request from "superagent";
 
 import { config } from "../../config";
-import { DateTime } from "../../lib/datetime";
 import { isNowBetween } from "../../lib/timezones";
 import { sleep } from "../../lib/utils";
 import logger from "../../logger";
@@ -19,7 +18,7 @@ class AutoassignError extends Error {
   }
 }
 
-export const addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue = (
+export const addWhereClauseForContactsFilterMessageStatus = (
   queryParameter,
   messageStatusFilter
 ) => {
@@ -53,23 +52,6 @@ export const getContacts = (
   campaign,
   forCount = false
 ) => {
-  // 24-hours past due - why is this 24 hours offset?
-  const includePastDue = contactsFilter && contactsFilter.includePastDue;
-
-  const dueBy = DateTime.fromJSDate(new Date(campaign.due_by));
-  const pastDue = campaign.due_by
-    ? dueBy.plus({ days: 1 }) < DateTime.local()
-    : false;
-
-  if (
-    !includePastDue &&
-    pastDue &&
-    contactsFilter &&
-    contactsFilter.messageStatus === "needsMessage"
-  ) {
-    return [];
-  }
-
   let query = r
     .reader("campaign_contact")
     .where({
@@ -108,14 +90,10 @@ export const getContacts = (
       }
     }
 
-    query = addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue(
+    query = addWhereClauseForContactsFilterMessageStatus(
       query,
       (contactsFilter && contactsFilter.messageStatus) ||
-        (pastDue
-          ? // by default if asking for 'send later' contacts we include only those that need replies
-            "needsResponse"
-          : // we do not want to return closed/messaged
-            "needsMessageOrResponse")
+        "needsMessageOrResponse"
     );
 
     if (Object.prototype.hasOwnProperty.call(contactsFilter, "isOptedOut")) {

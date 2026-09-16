@@ -9,7 +9,6 @@ fragment CampaignListEntry on Campaign {
   hasUnsentInitialMessages
   hasUnhandledMessages
   description
-  dueBy
   creator {
     displayName
   }
