@@ -1,6 +1,7 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import React from "react";
@@ -69,6 +70,10 @@ interface ContactsHocProps {
   };
   campaignData: {
     campaign: ContactsCampaign;
+    refetch(): Promise<unknown>;
+  };
+  jobs: {
+    refetch(): Promise<unknown>;
   };
   organizationData: {
     organization: ContactsOrganization;
@@ -116,6 +121,17 @@ class CampaignContactsForm extends React.Component<
 
     const options = this.getSourceOptions();
     this.state.source = options.find((op) => !op.disabledReason)!.source;
+  }
+
+  componentDidUpdate(prevProps: ContactsInnerProps) {
+    const { pendingJob, campaignData, onError } = this.props;
+    if (
+      prevProps.pendingJob &&
+      (prevProps.pendingJob.id !== pendingJob?.id ||
+        prevProps.pendingJob.resultMessage !== pendingJob?.resultMessage)
+    ) {
+      campaignData.refetch().catch((err) => onError(err.message));
+    }
   }
 
   handleOnChangeValidSql = (contactsSql: string | null) =>
@@ -167,7 +183,8 @@ class CampaignContactsForm extends React.Component<
       };
       const response = await this.props.mutations.editCampaign(campaignInput);
       if (response.errors) throw response.errors[0];
-      // TODO: this.props.onComplete();
+      await this.props.jobs.refetch();
+      await this.props.campaignData.refetch();
     } catch (err) {
       this.props.onError(err.message);
     } finally {
@@ -265,7 +282,8 @@ class CampaignContactsForm extends React.Component<
       (!isNew && !contactsFile && !contactsSql && !externalListId) ||
       (columnMapping === undefined && contactsFile);
 
-    const finalSaveLabel = isWorking ? "Working..." : saveLabel;
+    const workingLabel = contactsFile ? "Uploading CSV" : "Working...";
+    const finalSaveLabel = isWorking ? workingLabel : saveLabel;
 
     const sourceOptions = this.getSourceOptions();
 
@@ -341,6 +359,7 @@ class CampaignContactsForm extends React.Component<
           variant="contained"
           disabled={isSaveDisabled}
           onClick={this.handleOnSubmit}
+          startIcon={isWorking ? <CircularProgress size={20} /> : undefined}
         >
           {finalSaveLabel}
         </Button>
