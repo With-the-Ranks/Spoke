@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.3.0-rc.0](https://github.com/With-the-Ranks/spoke/compare/v11.2.0...v11.3.0-rc.0) (2026-09-18)
+
+
+### Features
+
+* **campaign builder:** add due date back ([#267](https://github.com/With-the-Ranks/spoke/issues/267)) ([708b5c1](https://github.com/With-the-Ranks/spoke/commit/708b5c1f8fb849728e81c2e325f6109c4627929a))
+
+
+### Bug Fixes
+
+* **campaign:** show CSV upload progress without resetting the form ([#265](https://github.com/With-the-Ranks/spoke/issues/265)) ([20b79d9](https://github.com/With-the-Ranks/spoke/commit/20b79d96c1a2b44da67ad2fb073a969a1452efe2))
+* **campaign-overlap:** refresh results when opened ([#266](https://github.com/With-the-Ranks/spoke/issues/266)) ([54d654b](https://github.com/With-the-Ranks/spoke/commit/54d654b910060827daa7c717364812591cbb887d))
+
+
+### Backend Changes
+
+* update dump ([#262](https://github.com/With-the-Ranks/spoke/issues/262)) ([092198e](https://github.com/With-the-Ranks/spoke/commit/092198e7024730700cfa07f5a0c85827bf1be278))
+
 ## [11.2.0](https://github.com/With-the-Ranks/spoke/compare/v11.1.1...v11.2.0) (2026-09-10)
 
 
