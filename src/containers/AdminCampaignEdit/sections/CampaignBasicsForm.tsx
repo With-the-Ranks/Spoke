@@ -1,6 +1,9 @@
 import type { ApolloQueryResult } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
+import DeleteIcon from "@material-ui/icons/Delete";
 import isEmpty from "lodash/isEmpty";
 import React from "react";
 import { compose } from "recompose";
@@ -83,6 +86,11 @@ class CampaignBasicsForm extends React.Component<
     this.setState({ pendingChanges });
   };
 
+  deleteDueDate = () => {
+    const pendingChanges = { ...this.state.pendingChanges, dueBy: null };
+    this.setState({ pendingChanges });
+  };
+
   handleSubmit = async () => {
     const { pendingChanges } = this.state;
     const { editCampaign } = this.props.mutations;
@@ -152,6 +160,29 @@ class CampaignBasicsForm extends React.Component<
             hintText="Get out the vote"
             fullWidth
           />
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              marginTop: 8
+            }}
+          >
+            <div style={{ width: 256 }}>
+              <SpokeFormField
+                name="dueBy"
+                label="Due date"
+                type="date"
+                fullWidth
+              />
+            </div>
+            <Tooltip title="Delete the Due Date" placement="top">
+              <IconButton onClick={this.deleteDueDate}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
         </GSForm>
 
         <Button
