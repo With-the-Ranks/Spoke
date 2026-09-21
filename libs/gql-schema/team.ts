@@ -1,6 +1,7 @@
 export const schema = `
   type Team {
     id: ID!
+    organizationId: String!
     title: String!
     description: String!
     textColor: String!
@@ -19,6 +20,7 @@ export const schema = `
 
   input TeamInput {
     id: ID
+    organizationId: 
     title: String
     description: String
     textColor: String

@@ -1134,6 +1134,7 @@ input TagsFilter {
 
 type Team {
   id: ID!
+  organizationId: String!
   title: String!
   description: String!
   textColor: String!
@@ -1152,6 +1153,7 @@ type Team {
 
 input TeamInput {
   id: ID
+  organizationId: 
   title: String
   description: String
   textColor: String
