@@ -29,13 +29,7 @@ const main = async (lastId) => {
   );
   const campaignIds = await r
     .knex("campaign")
-    .where((builder) =>
-      builder
-        .where({ is_archived: false })
-        .orWhereRaw(
-          `due_by > now() - interval '${ARCHIVED_CAMPAIGN_AGE_DAYS} day'`
-        )
-    )
+    .where((builder) => builder.where({ is_archived: false }))
     .where("id", ">", lastId)
     .limit(CAMPAIGN_FETCH_CHUNK_SIZE)
     .orderBy("id")

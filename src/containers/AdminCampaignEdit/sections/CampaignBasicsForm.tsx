@@ -26,7 +26,6 @@ import { asSection } from "../components/SectionWrapper";
 interface BasicsValues {
   title?: string;
   description?: string;
-  dueBy?: string | null;
   logoImageUrl?: string;
   primaryColor?: string;
   introHtml?: string;
@@ -55,7 +54,6 @@ const schemaForIsStarted = (mustBeComplete: boolean) =>
   yup.object({
     title: mustBeComplete ? yup.string().required() : yup.string(),
     description: mustBeComplete ? yup.string().required() : yup.string(),
-    dueBy: yup.mixed().nullable(),
     logoImageUrl: yup
       .string()
       .url()
@@ -205,7 +203,6 @@ const queries = {
           id
           title
           description
-          dueBy
           introHtml
           logoImageUrl
           primaryColor
@@ -233,7 +230,6 @@ const mutations = {
           id
           title
           description
-          dueBy
           introHtml
           logoImageUrl
           primaryColor

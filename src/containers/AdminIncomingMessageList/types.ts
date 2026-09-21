@@ -32,7 +32,6 @@ export const ContactsFilterParam = {
       switch (key) {
         case "isOptedOut":
         case "validTimezone":
-        case "includePastDue":
           contactsFilter[key] = value === "true";
           break;
         case "messageStatus":

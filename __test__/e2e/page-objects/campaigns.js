@@ -11,8 +11,7 @@ export const campaigns = {
     basics: {
       section: By.css('[data-test=basics]'),
       title: By.css('[data-test=title]'),
-      description: By.css('[data-test=description]'),
-      dueBy: By.css('[data-test=dueBy]')
+      description: By.css('[data-test=description]')
     },
     datePickerDialog: {
       // This selector is fragile and alternate means of finding an enabled date should be investigated.

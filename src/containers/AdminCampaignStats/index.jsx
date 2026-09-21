@@ -264,7 +264,6 @@ class AdminCampaignStats extends React.Component {
     const vanSyncLabel = vanSyncJob
       ? `Syncing to VAN (${vanSyncJob.status}%)`
       : "Sync to VAN";
-
     const newTitle = `${organization.name} - Campaigns - ${campaignId}: ${campaign.title}`;
 
     // only a superadmin with multiple active orgs can copy a campaign to another org

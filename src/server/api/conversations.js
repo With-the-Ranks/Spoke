@@ -4,7 +4,7 @@ import { config } from "../../config";
 import { UNASSIGNED_TEXTER } from "../../lib/constants";
 import { eventBus, EventType } from "../event-bus";
 import { r } from "../models";
-import { addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue } from "./assignment";
+import { addWhereClauseForContactsFilterMessageStatus } from "./assignment";
 import { buildCampaignQuery } from "./campaign";
 
 const getConversationsJoinsAndWhereClause = async (
@@ -92,7 +92,7 @@ const getConversationsJoinsAndWhereClause = async (
     }
   }
 
-  query = addWhereClauseForContactsFilterMessageStatusIrrespectiveOfPastDue(
+  query = addWhereClauseForContactsFilterMessageStatus(
     query,
     contactsFilter && contactsFilter.messageStatus
   );
@@ -237,7 +237,6 @@ export const getConversations = async (
     "user.last_name as u_last_name",
     "campaign.id as cmp_id",
     "campaign.title",
-    "campaign.due_by",
     "assignment.id as ass_id",
     "message.id as mess_id",
     "message.text",

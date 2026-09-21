@@ -19,7 +19,6 @@ fragment CampaignInfo on Campaign {
   hasUnsentInitialMessages
   hasUnhandledMessages
   description
-  dueBy
 }
 
 query GetAdminAssignmentTargets($organizationId: String!) {
