@@ -121,7 +121,8 @@ export const getMessagingServiceById = async (messagingServiceId) =>
  * Fetches an existing assigned messaging service for a campaign contact. If no messaging service
  * has been assigned then assign one and return that.
  * @param {number} campaignContactId The ID of the target campaign contact
- * @returns {object} Assigned messaging service Postgres row
+ * @returns {object} Assigned messaging service Postgres row, merged with the contact's
+ * `zip` and the campaign's `send_after`
  */
 export const getContactMessagingService = async (
   campaignContactId,
@@ -139,10 +140,22 @@ export const getContactMessagingService = async (
       "campaign_contact.campaign_id"
     )
     .where({ "campaign_contact.id": campaignContactId })
-    .first();
+    .first("messaging_service_sid", "send_after", "zip", "cell");
+
+  const contactFields = {
+    zip: campaignData.zip,
+    send_after: campaignData.send_after
+  };
 
   if (campaignData.messaging_service_sid) {
-    return getMessagingServiceById(campaignData.messaging_service_sid);
+    const messagingService = await getMessagingServiceById(
+      campaignData.messaging_service_sid
+    );
+
+    return {
+      ...messagingService,
+      ...contactFields
+    };
   }
 
   const {
@@ -160,21 +173,16 @@ export const getContactMessagingService = async (
     existingMessagingService &&
     existingMessagingService.messaging_service_sid
   ) {
-    return existingMessagingService;
+    return { ...existingMessagingService, ...contactFields };
   }
-
-  const campaignContact = await r
-    .reader("campaign_contact")
-    .where({ id: campaignContactId })
-    .first("cell");
 
   // Otherwise select an appropriate messaging service and assign
   const assignedService = await assignMessagingServiceSID(
-    campaignContact.cell,
+    campaignData.cell,
     parseInt(organizationId, 10)
   );
 
-  return assignedService;
+  return { ...assignedService, ...contactFields };
 };
 
 /**

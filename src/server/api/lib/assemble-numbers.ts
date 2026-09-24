@@ -178,12 +178,7 @@ export const sendMessage = async (
   );
   const profileId = service.messaging_service_sid;
   const numbers = await numbersClient(service);
-
-  const { zip: contactZipCode, send_after: sendAfter } = await r
-    .reader("campaign_contact")
-    .join("campaign", "campaign_contact.campaign_id", "campaign.id")
-    .where({ "campaign_contact.id": campaignContactId })
-    .first("campaign_contact.zip as zip", "campaign.send_after as send_after");
+  const { zip: contactZipCode, send_after: sendAfter } = service;
 
   const { features } = await r
     .reader("organization")
