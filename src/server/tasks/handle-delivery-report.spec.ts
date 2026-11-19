@@ -13,6 +13,10 @@ import {
   createTexter
 } from "../../../__test__/testbed-preparation/core";
 import { config } from "../../config";
+import {
+  INVALID_TO_NUMBER_ERROR_CODE,
+  NumbersSendStatus
+} from "../api/lib/assemble-numbers";
 import type { MessageRecord } from "../api/types";
 import { MessagingServiceType } from "../api/types";
 import { withClient } from "../utils";
@@ -100,6 +104,93 @@ describe("handle-delivery-report", () => {
       expect(JSON.parse(postJobMessage.service_response)).toContainEqual(
         deliveryReport
       );
+    });
+  });
+
+  const processReport = async (
+    client: Parameters<typeof createMessage>[0],
+    messageId: string,
+    report: ReturnType<typeof mockSwitchboardDeliveryReportBody>
+  ) => {
+    await client.query(
+      `insert into log (message_sid, body, service_type) values ($1, $2, $3)`,
+      [messageId, JSON.stringify(report), MessagingServiceType.AssembleNumbers]
+    );
+    await runTaskListOnce(
+      workerOptions,
+      { "handle-delivery-report": handleDeliveryReport },
+      client
+    );
+  };
+
+  const getMessageById = (
+    client: Parameters<typeof createMessage>[0],
+    id: number
+  ) =>
+    client
+      .query<MessageRecord>(`select * from message where id = $1`, [id])
+      .then(({ rows: [messageRecord] }) => messageRecord);
+
+  it("overwrites send-time estimates with the delivery report values", async () => {
+    await withClient(pool, async (client) => {
+      const message = await createMessage(client, {
+        assignmentId,
+        campaignContactId,
+        sendStatus: "SENT"
+      });
+      await client.query(
+        `update message set num_segments = 1, num_media = 0 where id = $1`,
+        [message.id]
+      );
+      const report = mockSwitchboardDeliveryReportBody(message.service_id);
+      report.extra = { num_segments: 3, num_media: 0 };
+      await processReport(client, message.service_id, report);
+
+      const updated = await getMessageById(client, message.id);
+      expect(updated.num_segments).toBe(3);
+      expect(updated.num_media).toBe(0);
+    });
+  });
+
+  it("clears send-time estimates when a message to a landline is rejected by telecom", async () => {
+    await withClient(pool, async (client) => {
+      const message = await createMessage(client, {
+        assignmentId,
+        campaignContactId,
+        sendStatus: "SENT"
+      });
+      await client.query(
+        `update message set num_segments = 2, num_media = 0 where id = $1`,
+        [message.id]
+      );
+      const report = mockSwitchboardDeliveryReportBody(message.service_id);
+      report.eventType = NumbersSendStatus.DeliveryFailed;
+      report.errorCodes = [INVALID_TO_NUMBER_ERROR_CODE];
+      delete report.extra;
+      await processReport(client, message.service_id, report);
+
+      const updated = await getMessageById(client, message.id);
+      expect(updated.send_status).toBe("ERROR");
+      expect(updated.num_segments).toBeNull();
+      expect(updated.num_media).toBeNull();
+    });
+  });
+
+  it("keeps segments reported on a carrier reported failure", async () => {
+    await withClient(pool, async (client) => {
+      const message = await createMessage(client, {
+        assignmentId,
+        campaignContactId,
+        sendStatus: "SENT"
+      });
+      const report = mockSwitchboardDeliveryReportBody(message.service_id);
+      report.eventType = NumbersSendStatus.DeliveryFailed;
+      report.extra = { num_segments: 2, num_media: 0 };
+      await processReport(client, message.service_id, report);
+
+      const updated = await getMessageById(client, message.id);
+      expect(updated.send_status).toBe("ERROR");
+      expect(updated.num_segments).toBe(2);
     });
   });
 
