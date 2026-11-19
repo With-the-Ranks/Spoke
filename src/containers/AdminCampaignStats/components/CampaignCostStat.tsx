@@ -53,6 +53,7 @@ export const CampaignCostStat: React.FC<CampaignCostStatProps> = ({
   const mmsCost = (mmsMessages ?? 0) * window.MMS_MESSAGE_COST;
   const estimatedCost = smsCost + mmsCost;
   const hasStats = smsSegments !== undefined && mmsMessages !== undefined;
+  const hasCost = hasStats && estimatedCost > 0;
   const openDialog = () => setOpen(true);
 
   return (
@@ -74,10 +75,12 @@ export const CampaignCostStat: React.FC<CampaignCostStatProps> = ({
         tabIndex={hasStats ? 0 : undefined}
       >
         <CampaignStat
-          title="Estimated Campaign Cost"
+          title="Estimated spend so far"
           loading={loading}
           error={error}
-          count={hasStats ? formatUsd(estimatedCost) : undefined}
+          count={
+            hasStats ? (hasCost ? formatUsd(estimatedCost) : "—") : undefined
+          }
         />
       </div>
       <Dialog open={open} onClose={() => setOpen(false)}>
