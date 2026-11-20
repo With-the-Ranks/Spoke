@@ -138,12 +138,12 @@ describe("handle-delivery-report", () => {
         campaignContactId,
         sendStatus: "SENT"
       });
-      
+
       await client.query(
         `update message set num_segments = 1, num_media = 0 where id = $1`,
         [message.id]
       );
-      
+
       const report = mockSwitchboardDeliveryReportBody(message.service_id);
       report.extra = { num_segments: 3, num_media: 0 };
       await processReport(client, message.service_id, report);
@@ -161,12 +161,12 @@ describe("handle-delivery-report", () => {
         campaignContactId,
         sendStatus: "SENT"
       });
-      
+
       await client.query(
         `update message set num_segments = 2, num_media = 0 where id = $1`,
         [message.id]
       );
-      
+
       const report = mockSwitchboardDeliveryReportBody(message.service_id);
       report.eventType = NumbersSendStatus.DeliveryFailed;
       report.errorCodes = [INVALID_TO_NUMBER_ERROR_CODE];
@@ -187,7 +187,7 @@ describe("handle-delivery-report", () => {
         campaignContactId,
         sendStatus: "SENT"
       });
-      
+
       const report = mockSwitchboardDeliveryReportBody(message.service_id);
       report.eventType = NumbersSendStatus.DeliveryFailed;
       report.extra = { num_segments: 2, num_media: 0 };
@@ -206,7 +206,7 @@ describe("handle-delivery-report", () => {
         campaignContactId,
         sendStatus: "SENT"
       });
-      
+
       const deliveryReport = mockTwilioDeliveryReportBody(message.service_id);
       await client.query(
         `insert into log (message_sid, body, service_type) values ($1, $2, $3)`,
@@ -216,7 +216,7 @@ describe("handle-delivery-report", () => {
           MessagingServiceType.Twilio
         ]
       );
-      
+
       await runTaskListOnce(
         workerOptions,
         {
