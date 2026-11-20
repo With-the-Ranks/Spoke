@@ -134,18 +134,24 @@ export const getAttachmentLink = (text: string) => {
   return null;
 };
 
-export const getMessageType = (
+export const getMessageInfo = (
   text: string,
   maxSmsSegmentLength: number | null
 ) => {
-  const { msgCount } = getSpokeCharCount(text);
-  if (
+  // The attachment link isn't sent as message text, so don't count it
+  const { msgCount } = getSpokeCharCount(text.replace(mediaExtractor, ""));
+  const type =
     mediaExtractor.test(text) ||
     (maxSmsSegmentLength && msgCount > maxSmsSegmentLength)
-  )
-    return "MMS";
-  return "SMS";
+      ? "MMS"
+      : "SMS";
+  return { type, segmentCount: msgCount };
 };
+
+export const getMessageType = (
+  text: string,
+  maxSmsSegmentLength: number | null
+) => getMessageInfo(text, maxSmsSegmentLength).type;
 
 export enum ScriptTokenType {
   Text = "Text",
