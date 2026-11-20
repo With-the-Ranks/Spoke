@@ -193,16 +193,18 @@ export const sendMessage = async (
 
   const maxSmsSegmentLength = getOrgFeature("maxSmsSegmentLength", features);
   const { body, mediaUrl } = messageComponents(messageText);
-
-  const { type, segmentCount } = getMessageInfo(body, maxSmsSegmentLength);
+  const { type, segmentCount } = getMessageInfo(
+    messageText,
+    maxSmsSegmentLength
+  );
+  const isMms = type === "MMS";
 
   const mediaUrls = mediaUrl
     ? [mediaUrl]
     : // check if we should convert to switchboard format for empty mms
-    type === "MMS"
+    isMms
     ? []
     : undefined;
-  const isMms = mediaUrls !== undefined;
 
   const messageInput: NumbersOutboundMessagePayload = {
     profileId,

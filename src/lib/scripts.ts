@@ -138,7 +138,8 @@ export const getMessageInfo = (
   text: string,
   maxSmsSegmentLength: number | null
 ) => {
-  const { msgCount } = getSpokeCharCount(text);
+  // The attachment link isn't sent as message text, so don't count it
+  const { msgCount } = getSpokeCharCount(text.replace(mediaExtractor, ""));
   const type =
     mediaExtractor.test(text) ||
     (maxSmsSegmentLength && msgCount > maxSmsSegmentLength)
