@@ -69,7 +69,7 @@ class CampaignAutoassignModeForm extends React.Component<
     });
 
   handleReleaseStaleRepliesAfterChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const eventValue = parseInt(event.target.value, 10);
     this.setState({
