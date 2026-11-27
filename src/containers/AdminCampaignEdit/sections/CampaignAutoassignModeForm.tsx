@@ -69,12 +69,14 @@ class CampaignAutoassignModeForm extends React.Component<
     });
 
   handleReleaseStaleRepliesAfterChange = (
-    _event: React.FormEvent<unknown>,
-    newVal: string
-  ) =>
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const eventValue = parseInt(event.target.value, 10);
     this.setState({
-      repliesStaleAfter: parseInt(newVal, 10)
+      repliesStaleAfter:
+        eventValue < 1 ? DEFAULT_RELEASE_STALE_REPLIES_AFTER : eventValue
     });
+  };
 
   handleDidSubmit = async () => {
     const { isAutoassignEnabled, repliesStaleAfter } = this.state;
@@ -92,7 +94,8 @@ class CampaignAutoassignModeForm extends React.Component<
         repliesStaleAfter: undefined
       });
     } catch (err) {
-      this.props.onError(err.message);
+      const message = err instanceof Error ? err.message : String(err);
+      this.props.onError(message);
     } finally {
       this.setState({ isWorking: false });
     }
