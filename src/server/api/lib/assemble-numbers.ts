@@ -4,7 +4,7 @@ import type { PoolClient } from "pg";
 
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
-import { getMessageType } from "../../../lib/scripts";
+import { getMessageInfo } from "../../../lib/scripts";
 import { stringIsAValidUrl } from "../../../lib/utils";
 import logger from "../../../logger";
 import { makeNumbersClient } from "../../lib/assemble-numbers";
@@ -193,11 +193,16 @@ export const sendMessage = async (
 
   const maxSmsSegmentLength = getOrgFeature("maxSmsSegmentLength", features);
   const { body, mediaUrl } = messageComponents(messageText);
+  const { type, segmentCount } = getMessageInfo(
+    messageText,
+    maxSmsSegmentLength
+  );
+  const isMms = type === "MMS";
 
   const mediaUrls = mediaUrl
     ? [mediaUrl]
     : // check if we should convert to switchboard format for empty mms
-    getMessageType(body, maxSmsSegmentLength) === "MMS"
+    isMms
     ? []
     : undefined;
 
@@ -224,7 +229,10 @@ export const sendMessage = async (
         service_id: serviceId,
         send_status: SpokeSendStatus.Sent,
         sent_at: r.knex.fn.now(),
-        service_response: JSON.stringify([result])
+        service_response: JSON.stringify([result]),
+        // Estimates until the delivery report supplies the billed values
+        num_segments: segmentCount,
+        num_media: isMms ? 1 : 0
       })
       .where({ id: spokeMessageId });
     smsSendTotal.inc({ status: "success", provider: "switchboard" });
@@ -269,6 +277,8 @@ const getMessageStatus = (assembleNumbersStatus: NumbersSendStatus) => {
   }
 };
 
+export const INVALID_TO_NUMBER_ERROR_CODE = "21211";
+
 /**
  * Process an Assemble Numbers delivery report
  * @param {object} reportBody Assemble Numbers delivery report
@@ -312,31 +322,35 @@ export const processDeliveryReportBody = async (
   );
 
   // Update segment counts
-  if (extra) {
-    const { num_segments, num_media } = extra;
-    const hasNumSegments = typeof num_segments === "number";
-    const hasNumMedia = typeof num_media === "number";
+  const { num_segments, num_media } = extra ?? {};
+  const hasNumSegments = typeof num_segments === "number";
+  const hasNumMedia = typeof num_media === "number";
 
-    if (hasNumSegments || hasNumMedia) {
-      const numSegments = hasNumSegments ? num_segments : null;
-      const numMedia = hasNumMedia ? num_media : null;
-
-      await client.query(
-        `
-          update message
-          set
-            num_segments = coalesce($1, num_segments),
-            num_media = coalesce($2, num_media)
-          where
-            service_id = $3
-            and (
-              num_segments is null
-              or num_media is null
-            )
-        `,
-        [numSegments, numMedia, messageId]
-      );
-    }
+  if (hasNumSegments || hasNumMedia) {
+    await client.query(
+      `
+        update message
+        set
+          num_segments = coalesce($1, num_segments),
+          num_media = coalesce($2, num_media)
+        where service_id = $3
+      `,
+      [
+        hasNumSegments ? num_segments : null,
+        hasNumMedia ? num_media : null,
+        messageId
+      ]
+    );
+  } else if (errorCodes?.includes(INVALID_TO_NUMBER_ERROR_CODE)) {
+    // Messages to invalid numbers (21211) are not billed, so drop the estimate.
+    await client.query(
+      `
+        update message
+        set num_segments = null, num_media = null
+        where service_id = $1
+      `,
+      [messageId]
+    );
   }
 };
 
